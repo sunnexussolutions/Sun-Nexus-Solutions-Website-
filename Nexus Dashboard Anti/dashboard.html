@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Sun Nexus Solutions</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="../css/nexus-theme.css" />
+  <link rel="stylesheet" href="assets/css/theme-toggle.css" />
+  <script src="assets/js/theme-engine.js"></script>
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    /* ── Main content ── */
+    .dashboard-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 20px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-main::before {
+      content: '';
+      position: absolute;
+      top: -100px; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(0,242,254,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .dashboard-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,242,254,0.08);
+      border: 1px solid rgba(0,242,254,0.25);
+      border-radius: var(--radius-full);
+      padding: 6px 18px;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin-bottom: 28px;
+      letter-spacing: 0.04em;
+    }
+
+    .dashboard-title {
+      font-size: 6rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 20px;
+      background: var(--gradient-indigo);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .dashboard-subtitle {
+      font-size: 1.8rem;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.6;
+      margin-bottom: 48px;
+    }
+
+    .launch-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--gradient-primary);
+      color: #fff;
+      text-decoration: none;
+      padding: 16px 40px;
+      border-radius: var(--radius-md);
+      font-size: 1.8rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-glow);
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .launch-btn::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: 0.5s;
+    }
+    .launch-btn:hover::after { left: 100%; }
+    .launch-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 0 40px rgba(0,242,254,0.5);
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .launch-arrow { font-size: 2rem; transition: transform 0.3s; }
+    .launch-btn:hover .launch-arrow { transform: translateX(4px); }
+
+    /* Info card */
+    .info-card {
+      margin-top: 48px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 32px 40px;
+      max-width: 560px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .info-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--gradient-primary);
+    }
+    .info-card h3 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+    .info-steps {
+      list-style: none;
+      padding: 0; margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+    .info-steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 1.4rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+    .info-steps code {
+      background: rgba(0,242,254,0.1);
+      border: 1px solid rgba(0,242,254,0.2);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 1.3rem;
+      color: var(--color-primary);
+      font-family: 'Courier New', monospace;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-title { font-size: 3.8rem; }
+      .dashboard-subtitle { font-size: 1.6rem; }
+      .info-card { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">
+      <a href="../home.html">
+        <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" alt="Sun Nexus Logo" class="nav-logo" />
+      </a>
+      <span class="brand-name">Sun Nexus Solutions</span>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="../home.html">Home</a></li>
+      <li><a href="../about-us.html">About Us</a></li>
+      <li><a href="../project.html">Projects</a></li>
+      <li class="active"><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="../events.html">Events</a></li>
+      <li><a href="../mentor-ship.html">Mentorship</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Theme">
+        <div class="toggle-glow"></div>
+        <div class="toggle-knob">
+          <span class="sun-icon">☀️</span>
+          <span class="moon-icon">🌙</span>
+        </div>
+      </button>
+    </div>
+
+    <div class="menu-toggle" id="menuToggle">☰</div>
+  </nav>
+
+  <main class="dashboard-main">
+    <div class="dashboard-badge">⚡ Sun Nexus Dashboard</div>
+    <h1 class="dashboard-title">Member Dashboard</h1>
+    <p class="dashboard-subtitle">Access your learning tracks, aptitude tests, projects, community, and profile — all in one place.</p>
+
+    <a href="http://localhost:5173" target="_blank" class="launch-btn">
+      🚀 Launch Dashboard <span class="launch-arrow">→</span>
+    </a>
+
+    <div class="info-card">
+      <h3>⚙️ How to start the dashboard</h3>
+      <ol class="info-steps">
+        <li>
+          <span class="step-num">1</span>
+          <span>Open a terminal and navigate to the <code>Present Dashboard</code> folder</span>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <span>Run <code>npm install</code> (first time only)</span>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <span>Run <code>npm run dev</code> to start the server</span>
+        </li>
+        <li>
+          <span class="step-num">4</span>
+          <span>Click <strong>Launch Dashboard</strong> above — it opens on <code>localhost:5173</code></span>
+        </li>
+      </ol>
+    </div>
+  </main>
+
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (menuToggle && navLinks) {
+      menuToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        menuToggle.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
+      });
+    }
+  </script>
+
+</body>
+</html>

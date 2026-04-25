@@ -1,0 +1,87 @@
+/* ── Theme Toggle Button ── */
+.nav-theme-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.theme-toggle-btn {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(0, 242, 254, 0.35);
+  background: rgba(0, 242, 254, 0.08);
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+  flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover {
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+  border-color: rgba(0, 242, 254, 0.6);
+}
+
+/* Glow ring */
+.toggle-glow {
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  background: transparent;
+  transition: background 0.3s;
+  pointer-events: none;
+}
+
+/* Sliding knob */
+.toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* Icon visibility */
+.sun-icon,
+.moon-icon {
+  position: absolute;
+  font-size: 1.1rem;
+  transition: opacity 0.25s, transform 0.25s;
+  line-height: 1;
+}
+
+/* Dark mode (default): show moon, hide sun */
+.sun-icon  { opacity: 0; transform: scale(0.6) rotate(-30deg); }
+.moon-icon { opacity: 1; transform: scale(1) rotate(0deg); }
+
+/* Light mode: show sun, hide moon */
+[data-theme="light"] .sun-icon  { opacity: 1; transform: scale(1) rotate(0deg); }
+[data-theme="light"] .moon-icon { opacity: 0; transform: scale(0.6) rotate(30deg); }
+
+/* Slide knob to the right in light mode */
+[data-theme="light"] .toggle-knob {
+  transform: translateX(28px);
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+}
+
+/* Light mode button styling */
+[data-theme="light"] .theme-toggle-btn {
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.45);
+}
+
+[data-theme="light"] .theme-toggle-btn:hover {
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+  border-color: rgba(251, 191, 36, 0.7);
+}

@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home — Sun Nexus Solutions</title>
+
+  <!-- External Resources -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
+  <script src="https://kit.fontawesome.com/ac42c3b1f7.js" crossorigin="anonymous"></script>
+
+  <!-- Core Theme & Page Specific Styles -->
+  <link rel="stylesheet" href="css/nexus-theme.css" />
+  <link rel="stylesheet" href="css/home.css" />
+  
+  <!-- Theme Engine -->
+  <link rel="stylesheet" href="Nexus Dashboard Anti/assets/css/theme-toggle.css" />
+  <script src="Nexus Dashboard Anti/assets/js/theme-engine.js"></script>
+
+  <script>
+    function logout() {
+      sessionStorage.removeItem('loggedIn');
+      alert('Logged out successfully!');
+      location.reload();
+    }
+  </script>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <a href="home.html">
+          <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png"
+               alt="Sun Nexus Logo" class="nav-logo" />
+        </a>
+        <span class="brand-name">Sun Nexus Solutions</span>
+      </div>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="home.html">Home</a></li>
+        <li><a href="about-us.html">About Us</a></li>
+        <li><a href="project.html">Projects</a></li>
+        <li><a href="Nexus Dashboard Anti/dashboard.html">Dashboard</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="mentor-ship.html">Mentorship</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Theme">
+          <div class="toggle-glow"></div>
+          <div class="toggle-knob">
+            <span class="sun-icon">☀️</span>
+            <span class="moon-icon">🌙</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="menu-toggle" id="menuToggle">☰</div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="gradient-text">
+          <span class="yellow">Sun Nexus</span>
+          <span class="white">Solutions</span>
+        </h1>
+        <p class="subtitle">Sun Nexus Solutions Club — Where innovation meets heart</p>
+      </div>
+    </section>
+
+    <!-- Logbook Section -->
+    <section class="log-book-section">
+      <div class="log-book-card">
+        <div class="log-book-content">
+          <h2>Log Book</h2>
+          <p>
+            Track your startup journey with our comprehensive Log Book system. 
+            Manage projects, monitor progress, and collaborate with your team in real-time.
+          </p>
+          <a href="https://startup-management-system-backend-u.vercel.app/" class="log-book-btn">Access Log Book</a>
+        </div>
+        <div class="log-book-branding">
+          <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" 
+               alt="Sun Nexus Logo" class="log-book-branding-logo">
+          <div class="log-book-branding-text">
+            <h3>SUN NEXUS</h3>
+            <p>LOGBOOK</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Nexus Section -->
+    <section class="why-nexus">
+      <h2>Why <span>Nexus Solutions?</span></h2>
+      <p class="why-intro">
+        At Nexus Solutions, we are more than just a tech club — we are a driven community of innovators,
+        problem-solvers, and creators.
+      </p>
+
+      <div class="why-container">
+        <div class="why-card">
+          <div class="why-icon">💡</div>
+          <div class="why-text">
+            <h3>Cutting-Edge Research</h3>
+            <p>We push the boundaries of AI, IoT, and Software Development.</p>
+            <small>AI, IoT & Software Development</small>
+          </div>
+        </div>
+        <div class="why-card reverse">
+          <div class="why-icon">🤝</div>
+          <div class="why-text">
+            <h3>Open for Collaborations</h3>
+            <p>We partner with startups, industry experts, and academia.</p>
+            <small>Industry & Academic Partnerships</small>
+          </div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🎓</div>
+          <div class="why-text">
+            <h3>Student-Driven Innovation</h3>
+            <p>We empower students through real-world projects and hackathons.</p>
+            <small>Hackathons & Real-World Projects</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="home.html" class="footer-logo">
+          <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png"
+               alt="Sun Nexus Logo" class="footer-logo-img" />
+          <span class="footer-logo-name">Sun Nexus Solutions</span>
+        </a>
+        <p class="footer-tagline">Empowering students at Sandip University, Nashik.</p>
+        <div class="footer-socials">
+          <a href="https://www.linkedin.com/company/sunnexussolutions/" class="footer-social-btn" target="_blank">LinkedIn</a>
+          <a href="https://www.instagram.com/sun_nexus_solutions/" class="footer-social-btn" target="_blank">Instagram</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <p class="footer-bottom-copy">© 2025 Sun Nexus Solutions. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("animate__animated", "animate__fadeInUp");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll(".why-card, .log-book-card").forEach(el => observer.observe(el));
+    });
+  </script>
+  <script src="js/nav-active.js"></script>
+</body>
+</html>

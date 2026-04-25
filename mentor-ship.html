@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sun Nexus Solutions</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/ac42c3b1f7.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
+  <link rel="stylesheet" href="css/nexus-theme.css" />
+  <link rel="stylesheet" href="css/mentor-ship.css" />
+  <link rel="stylesheet" href="Nexus Dashboard Anti/assets/css/theme-toggle.css" />
+  <script src="Nexus Dashboard Anti/assets/js/theme-engine.js"></script>
+  <script>
+    // Login check removed - browse freely
+    function logout() {
+      sessionStorage.removeItem('loggedIn');
+      window.location.href = 'login.html';
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <a href="home.html">
+          <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png"
+               alt="Sun Nexus Logo" class="nav-logo" />
+        </a>
+        <span class="brand-name">Sun Nexus Solutions</span>
+      </div>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="home.html">Home</a></li>
+        <li><a href="about-us.html">About Us</a></li>
+        <li><a href="project.html">Projects</a></li>
+        <li><a href="Nexus Dashboard Anti/dashboard.html">Dashboard</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="mentor-ship.html">Mentorship</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Theme">
+          <div class="toggle-glow"></div>
+          <div class="toggle-knob">
+            <span class="sun-icon">☀️</span>
+            <span class="moon-icon">🌙</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="menu-toggle" id="menuToggle">☰</div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Batch Info Section -->
+    <!-- <section class="mentees" style="padding: 40px 20px; text-align: center;">
+      <h2 style="font-size: 3.5rem; margin-bottom: 10px;">Batch 2024-2025</h2>
+      <p style="font-size: 1.8rem; color: #ddd; margin-bottom: 0;">Academic Year: September 2024 - May 2025</p>
+    </section> -->
+
+    <!-- Statistics Section -->
+    <section class="mentees" style="padding: 60px 20px;">
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 60px; background: rgba(99,102,241,0.06); padding: 48px; border-radius: 24px; border: 1.5px dashed var(--color-primary);">
+        <h2 style="margin: 0 0 16px 0; font-size: 3rem; color: var(--text-primary);">Ready to Start Your Journey?</h2>
+        <p style="font-size: 1.6rem; color: var(--text-secondary); max-width: 600px; margin-bottom: 32px;">Not sure which domain to choose? Take our 30-second interest assessment and get matched with a mentor today.</p>
+        <button class="btn btn-primary btn-lg" onclick="startInterestQuiz()" style="font-size:1.8rem; padding: 16px 48px; border-radius: 12px; transform: scale(1); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🎯 Find My Perfect Domain</button>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
+        <div style="text-align: left;">
+          <h2 style="margin: 0; color: var(--text-primary);">Membership Statistics</h2>
+        </div>
+        <div style="text-align: right;">
+          <p style="font-size: 1.8rem; color: var(--color-primary); margin: 0; font-weight: 600;">Batch: 1</p>
+          <p style="font-size: 1.5rem; color: var(--text-secondary); margin: 5px 0 0 0;">November 2025 - January 2026</p>
+        </div>
+      </div>
+      <div class="domain-grid-stack" style="max-width: 1100px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(255, 165, 0, 0.2); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+          <h3 style="font-size: 4rem; color: #fff; margin-bottom: 10px;">150+</h3>
+          <p style="font-size: 1.6rem; color: #fff;">Members Registered for Events</p>
+        </div>
+        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(255, 165, 0, 0.2); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+          <h3 style="font-size: 4rem; color: #fff; margin-bottom: 10px;">80+</h3>
+          <p style="font-size: 1.6rem; color: #fff;">Spot Registrations</p>
+        </div>
+        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(255, 165, 0, 0.2); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+          <h3 style="font-size: 4rem; color: #fff; margin-bottom: 10px;">200+</h3>
+          <p style="font-size: 1.6rem; color: #fff;">Members Attended Events</p>
+        </div>
+        <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(255, 165, 0, 0.2); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+          <h3 style="font-size: 4rem; color: #fff; margin-bottom: 10px;">80+</h3>
+          <p style="font-size: 1.6rem; color: #fff;">Members Registered for Mentorship</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Domains Section -->
+    <section class="mentorship-domains">
+      <div class="section-header">
+        <h2>Mentorship Domains</h2>
+        <p class="program-tag">📅 9 Weeks Program</p>
+      </div>
+      <div class="domains-container">
+        <div class="domain-grid-stack">
+          <div class="domain-card" data-domain="web-dev">
+            <h3>💻 Web Development</h3>
+            <p>Master frontend and backend technologies to build modern web applications.</p>
+          </div>
+          <div class="domain-card" data-domain="ai-ml">
+            <h3>🤖 AI & ML</h3>
+            <p>Learn artificial intelligence and machine learning to build intelligent systems.</p>
+          </div>
+          <div class="domain-card" data-domain="data-analytics">
+            <h3>📊 Data Analytics</h3>
+            <p>Extract insights from data and make data-driven decisions for business growth.</p>
+          </div>
+          <div class="domain-card" data-domain="cyber-security">
+            <h3>🛡️ Cyber Security</h3>
+            <p>Protect systems and networks from digital threats and vulnerabilities.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mentees">
+      <h2>Members Selected from Mentorship Program</h2>
+      <div class="mentees-grid" id="mentees-grid">
+        <!-- Content will be populated by JavaScript -->
+      </div>
+    </section>
+  </main>
+
+    <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="home.html" class="footer-logo">
+          <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" alt="Sun Nexus Logo" class="footer-logo-img" />
+          <span class="footer-logo-name">Sun Nexus Solutions</span>
+        </a>
+        <p class="footer-tagline">Empowering students with real-world tech skills, projects, and mentorship at Sandip University, Nashik.</p>
+        <div class="footer-socials">
+          <a href="https://www.linkedin.com/company/sunnexussolutions/" class="footer-social-btn" target="_blank"><span class="icon">💼</span> LinkedIn</a>
+          <a href="https://www.instagram.com/sun_nexus_solutions/" class="footer-social-btn" target="_blank"><span class="icon">📸</span> Instagram</a>
+          <a href="https://github.com/sunnexussolutions" class="footer-social-btn" target="_blank"><span class="icon">🐙</span> GitHub</a>
+        </div>
+        <div class="footer-newsletter">
+          <p>📬 Stay in the loop with our latest updates</p>
+          <div class="footer-newsletter-row">
+            <input type="email" placeholder="Enter your email..." aria-label="Newsletter email">
+            <button type="button">Subscribe</button>
+          </div>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Platform</div>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="about-us.html">About Us</a></li>
+          <li><a href="project.html">Projects</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="mentor-ship.html">Mentorship</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Resources</div>
+        <ul>
+          <li><a href="Nexus Dashboard Anti/dashboard.html">Dashboard</a></li>
+          <li><a href="Nexus Dashboard Anti/courses.html">Courses</a></li>
+          <li><a href="Nexus Dashboard Anti/leaderboard.html">Leaderboard</a></li>
+          <li><a href="Nexus Dashboard Anti/quiz.html">Quizzes</a></li>
+          <li><a href="Nexus Dashboard Anti/certificate.html">Certificates</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Contact</div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">📧</span>
+          <div class="footer-contact-text"><a href="mailto:sunnexussolutions@gmail.com">sunnexussolutions@gmail.com</a></div>
+        </div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">📍</span>
+          <div class="footer-contact-text">School of Computer Science &amp; Engineering,<br>Sandip University, Nashik</div>
+        </div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">🕐</span>
+          <div class="footer-contact-text">Mon – Sat, 9 AM – 6 PM IST</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <p class="footer-bottom-copy">© 2025 <span>Sun Nexus Solutions</span>. All Rights Reserved.</p>
+        <div class="footer-badge"><span>●</span> Active Platform</div>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Use</a>
+          <a href="#">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+
+  <!-- Domain Resources Modal -->
+  <div id="domainModal" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(8px);">
+    <div style="background: var(--bg-card, #16181f); margin: 3% auto; padding: 30px; border: 1px solid var(--border-color, rgba(99,102,241,0.22)); border-radius: 20px; width: 90%; max-width: 900px; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.6);">
+      <span class="close-domain" style="color: var(--text-secondary, #94a3b8); float: right; font-size: 35px; font-weight: bold; cursor: pointer;">&times;</span>
+      <h2 id="domainTitle" style="color: var(--text-primary, #f1f5f9); text-align: center; font-size: 2.5em; margin-bottom: 20px;"></h2>
+      <div id="domainResources" style="color: #ddd; font-size: 1.5rem;"></div>
+    </div>
+  </div>
+
+  <!-- Interest Quiz Modal -->
+  <div id="quizModal" style="display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);">
+    <div style="background: var(--bg-card, #16181f); border: 1px solid var(--border-color, rgba(99,102,241,0.22)); border-radius: 24px; width: 90%; max-width: 600px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 48px; box-shadow: 0 0 50px rgba(99,102,241,0.2);">
+      <button onclick="document.getElementById('quizModal').style.display='none'" style="position:absolute; top:20px; right:30px; background:none; border:none; color:var(--text-secondary,#94a3b8); font-size:2rem; cursor:pointer;">✕</button>
+      <div id="quiz-step-1">
+        <h3 style="font-size:2.5rem; color:var(--text-primary,#f1f5f9); margin-bottom:16px;">What excites you more?</h3>
+        <p style="color:#ddd; margin-bottom:32px;">Pick one to help us narrow down your path.</p>
+        <div style="display:grid; gap:16px;">
+          <button class="btn btn-secondary w-full" onclick="nextQuizStep(2, 'web-dev')" style="text-align:left; font-size:1.6rem; padding:20px;">Creating beautiful visual interfaces</button>
+          <button class="btn btn-secondary w-full" onclick="nextQuizStep(2, 'data-analytics')" style="text-align:left; font-size:1.6rem; padding:20px;">Solving complex data problems</button>
+          <button class="btn btn-secondary w-full" onclick="nextQuizStep(2, 'cyber-security')" style="text-align:left; font-size:1.6rem; padding:20px;">Protecting information from hackers</button>
+          <button class="btn btn-secondary w-full" onclick="nextQuizStep(2, 'ai-ml')" style="text-align:left; font-size:1.6rem; padding:20px;">Building intelligent, thinking machines</button>
+        </div>
+      </div>
+      <div id="quiz-step-2" style="display:none;">
+        <h3 style="font-size:2.5rem; color:var(--text-primary,#f1f5f9); margin-bottom:16px;">Which "Superpower" sounds better?</h3>
+        <p style="color:#ddd; margin-bottom:32px;">Almost there...</p>
+        <div style="display:grid; gap:16px;">
+          <button class="btn btn-secondary w-full" onclick="nextQuizStep(3, 'web-dev')" style="text-align:left; font-size:1.6rem; padding:20px;">Building apps used by millions</button>
+          <button class="btn btn-secondary w-full" onclick="nextQuizStep(3, 'ai-ml')" style="text-align:left; font-size:1.6rem; padding:20px;">Predicting the future with data</button>
+          <button class="btn btn-secondary w-full" onclick="nextQuizStep(3, 'cyber-security')" style="text-align:left; font-size:1.6rem; padding:20px;">Outsmarting digital criminals</button>
+          <button class="btn btn-secondary w-full" onclick="nextQuizStep(3, 'data-analytics')" style="text-align:left; font-size:1.6rem; padding:20px;">Finding hidden truths in numbers</button>
+        </div>
+      </div>
+      <div id="quiz-step-3" style="display:none;">
+        <h3 style="font-size:2.5rem; color:var(--text-primary,#f1f5f9); margin-bottom:16px;">Your ideal work result is:</h3>
+        <p style="color:#ddd; margin-bottom:32px;">Just two more...</p>
+        <div style="display:grid; gap:16px;">
+          <button class="btn btn-secondary w-full" onclick="nextQuizStep(4, 'web-dev')" style="text-align:left; font-size:1.6rem; padding:20px;">A pixel-perfect, interactive website</button>
+          <button class="btn btn-secondary w-full" onclick="nextQuizStep(4, 'ai-ml')" style="text-align:left; font-size:1.6rem; padding:20px;">An AI that can recognize objects or speech</button>
+          <button class="btn btn-secondary w-full" onclick="nextQuizStep(4, 'data-analytics')" style="text-align:left; font-size:1.6rem; padding:20px;">A dashboard showing business insights</button>
+          <button class="btn btn-secondary w-full" onclick="nextQuizStep(4, 'cyber-security')" style="text-align:left; font-size:1.6rem; padding:20px;">A secure, unhackable infrastructure</button>
+        </div>
+      </div>
+      <div id="quiz-step-4" style="display:none;">
+        <h3 style="font-size:2.5rem; color:var(--text-primary,#f1f5f9); margin-bottom:16px;">Pick your favorite "Toolbox":</h3>
+        <p style="color:#ddd; margin-bottom:32px;">Last one!</p>
+        <div style="display:grid; gap:16px;">
+          <button class="btn btn-secondary w-full" onclick="finishQuiz('web-dev')" style="text-align:left; font-size:1.6rem; padding:20px;">React, Tailwind & JavaScript</button>
+          <button class="btn btn-secondary w-full" onclick="finishQuiz('ai-ml')" style="text-align:left; font-size:1.6rem; padding:20px;">Python, PyTorch & GPU Clusters</button>
+          <button class="btn btn-secondary w-full" onclick="finishQuiz('data-analytics')" style="text-align:left; font-size:1.6rem; padding:20px;">SQL, Power BI & Statistics</button>
+          <button class="btn btn-secondary w-full" onclick="finishQuiz('cyber-security')" style="text-align:left; font-size:1.6rem; padding:20px;">Kali Linux, Wireshark & Encryption</button>
+        </div>
+      </div>
+      <div id="quiz-result" style="display:none; text-align:center;">
+        <div style="font-size:5rem; margin-bottom:20px;">🎉</div>
+        <h3 style="font-size:2.8rem; color:var(--color-primary-light,#818cf8); margin-bottom:16px;">It's a Match!</h3>
+        <p id="matchText" style="font-size:1.8rem; color:#ddd; margin-bottom:32px;"></p>
+        <button class="btn btn-primary" id="quizActionBtn" style="width:100%; font-size:1.8rem; padding:16px;">View This Module</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    let quizScores = { 'web-dev': 0, 'ai-ml': 0, 'data-analytics': 0, 'cyber-security': 0 };
+
+    function startInterestQuiz() {
+      quizScores = { 'web-dev': 0, 'ai-ml': 0, 'data-analytics': 0, 'cyber-security': 0 };
+      document.getElementById('quizModal').style.display='block';
+      document.getElementById('quiz-step-1').style.display='block';
+      document.getElementById('quiz-step-2').style.display='none';
+      document.getElementById('quiz-step-3').style.display='none';
+      document.getElementById('quiz-step-4').style.display='none';
+      document.getElementById('quiz-result').style.display='none';
+    }
+
+    function nextQuizStep(nextStep, domainWeight) {
+      if (domainWeight) quizScores[domainWeight]++;
+      
+      // Hide all steps
+      for(let i=1; i<=4; i++) {
+        const step = document.getElementById(`quiz-step-${i}`);
+        if(step) step.style.display = 'none';
+      }
+      
+      // Show next step
+      const next = document.getElementById(`quiz-step-${nextStep}`);
+      if(next) next.style.display = 'block';
+    }
+
+    function finishQuiz(domainWeight) {
+      if (domainWeight) quizScores[domainWeight]++;
+      
+      document.getElementById('quiz-step-4').style.display='none';
+      document.getElementById('quiz-result').style.display='block';
+      
+      // Find domain with highest score
+      let winner = Object.keys(quizScores).reduce((a, b) => quizScores[a] > quizScores[b] ? a : b);
+      
+      const names = {
+        'web-dev': 'Professional Web Development',
+        'ai-ml': 'AI & Machine Learning',
+        'data-analytics': 'Data Analytics Masterclass',
+        'cyber-security': 'Defensive Cyber Security'
+      };
+
+      document.getElementById('matchText').innerHTML = `Based on your preferences, you're perfect for <br><strong style="color:#ffa500; font-size:2.2rem">${names[winner]}</strong>.`;
+      
+      const actionBtn = document.getElementById('quizActionBtn');
+      actionBtn.onclick = () => {
+        document.getElementById('quizModal').style.display='none';
+        // Find the card and click it to show module
+        const cards = document.querySelectorAll('.domain-card');
+        cards.forEach(c => {
+          if(c.getAttribute('data-domain') === winner) c.click();
+        });
+      };
+    }
+  </script>
+
+</body>
+<script>
+const domainData = {
+  "web-dev": {
+    title: "Web Development Resources",
+    members: 4,
+    weeks: [
+      { week: 1, topic: "HTML Basics", description: "Introduction to HTML, tags, elements, and structure", resource: { name: "HTML Full Course", youtube: "https://www.youtube.com/watch?v=HcOc7P5BMi4" } },
+      { week: 2, topic: "CSS Fundamentals", description: "Styling, layouts, flexbox, and grid", resource: { name: "CSS Full Course", youtube: "https://www.youtube.com/watch?v=1Rs2ND1ryYc" } },
+      { week: 3, topic: "JavaScript Basics", description: "Variables, functions, DOM manipulation", resource: { name: "JavaScript Full Course", youtube: "https://www.youtube.com/watch?v=PkZNo7MFNFg" } },
+      { week: 4, topic: "JavaScript Advanced", description: "ES6+, async/await, promises", resource: { name: "JavaScript Full Course", youtube: "https://www.youtube.com/watch?v=PkZNo7MFNFg" } },
+      { week: 5, topic: "React Basics", description: "Components, props, state management", resource: { name: "React Full Course", youtube: "https://www.youtube.com/watch?v=b9eMGE7QtTk" } },
+      { week: 6, topic: "React Advanced", description: "Hooks, context API, routing", resource: { name: "React Full Course", youtube: "https://www.youtube.com/watch?v=b9eMGE7QtTk" } },
+      { week: 7, topic: "Node.js & Express", description: "Backend development, REST APIs", resource: { name: "Node.js Full Course", youtube: "https://www.youtube.com/watch?v=Oe421EPjeBE" } },
+      { week: 8, topic: "Database & MongoDB", description: "Database design, CRUD operations", resource: { name: "MongoDB Tutorial", youtube: "https://www.youtube.com/watch?v=Oe421EPjeBE" } },
+      { week: 9, topic: "Full Stack Project", description: "Build and deploy a complete web application", resource: { name: "Full Stack Guide", youtube: "https://www.youtube.com/watch?v=Oe421EPjeBE" } }
+    ]
+  },
+  "ai-ml": {
+    title: "AI & ML Resources",
+    members: 1,
+    weeks: [
+      { week: 1, topic: "Python Basics", description: "Syntax, data types, control structures", resource: { name: "Python Full Course", youtube: "https://www.youtube.com/watch?v=_uQrJ0TkZlc" } },
+      { week: 2, topic: "Python Advanced", description: "OOP, file handling, libraries", resource: { name: "Python Full Course", youtube: "https://www.youtube.com/watch?v=_uQrJ0TkZlc" } },
+      { week: 3, topic: "NumPy & Pandas", description: "Data manipulation and analysis", resource: { name: "Pandas Tutorial", youtube: "https://www.youtube.com/watch?v=vmEHCJofslg" } },
+      { week: 4, topic: "Data Visualization", description: "Matplotlib, Seaborn, plotting", resource: { name: "Data Visualization", youtube: "https://www.youtube.com/watch?v=_uQrJ0TkZlc" } },
+      { week: 5, topic: "Machine Learning Basics", description: "Supervised learning, regression, classification", resource: { name: "ML Algorithms", youtube: "https://www.youtube.com/watch?v=gmvvaobm7eQ" } },
+      { week: 6, topic: "ML Algorithms", description: "Decision trees, SVM, ensemble methods", resource: { name: "ML Algorithms", youtube: "https://www.youtube.com/watch?v=gmvvaobm7eQ" } },
+      { week: 7, topic: "Deep Learning", description: "Neural networks, TensorFlow, PyTorch", resource: { name: "TensorFlow Course", youtube: "https://www.youtube.com/watch?v=tPYj3fFJGjk" } },
+      { week: 8, topic: "CNN & NLP", description: "Image processing and text analysis", resource: { name: "PyTorch Course", youtube: "https://www.youtube.com/watch?v=c36lUUr864M" } },
+      { week: 9, topic: "ML Project", description: "End-to-end ML project deployment", resource: { name: "ML Project Guide", youtube: "https://www.youtube.com/watch?v=gmvvaobm7eQ" } }
+    ]
+  },
+  "data-analytics": {
+    title: "Data Analytics Resources",
+    members: 1,
+    weeks: [
+      { week: 1, topic: "Excel Fundamentals", description: "Formulas, functions, pivot tables", resource: { name: "Excel Full Course", youtube: "https://www.youtube.com/watch?v=Vl0H-qTclOg" } },
+      { week: 2, topic: "SQL Basics", description: "Queries, joins, aggregations", resource: { name: "SQL Full Course", youtube: "https://www.youtube.com/watch?v=HXV3zeQKqGY" } },
+      { week: 3, topic: "SQL Advanced", description: "Subqueries, window functions, optimization", resource: { name: "SQL Full Course", youtube: "https://www.youtube.com/watch?v=HXV3zeQKqGY" } },
+      { week: 4, topic: "Python for Data", description: "Pandas, data cleaning, preprocessing", resource: { name: "Python for Data", youtube: "https://www.youtube.com/watch?v=_uQrJ0TkZlc" } },
+      { week: 5, topic: "Data Visualization", description: "Charts, dashboards, storytelling", resource: { name: "Pandas Tutorial", youtube: "https://www.youtube.com/watch?v=vmEHCJofslg" } },
+      { week: 6, topic: "Power BI Basics", description: "Reports, visualizations, DAX", resource: { name: "Power BI Course", youtube: "https://www.youtube.com/watch?v=TmhQCQr_DCA" } },
+      { week: 7, topic: "Power BI Advanced", description: "Advanced analytics, custom visuals", resource: { name: "Power BI Course", youtube: "https://www.youtube.com/watch?v=TmhQCQr_DCA" } },
+      { week: 8, topic: "Statistical Analysis", description: "Hypothesis testing, regression analysis", resource: { name: "Statistics Guide", youtube: "https://www.youtube.com/watch?v=TmhQCQr_DCA" } },
+      { week: 9, topic: "Analytics Project", description: "Complete data analysis and reporting", resource: { name: "Analytics Guide", youtube: "https://www.youtube.com/watch?v=TmhQCQr_DCA" } }
+    ]
+  },
+  "cyber-security": {
+    title: "Cyber Security Resources",
+    members: 0,
+    weeks: [
+      { week: 1, topic: "Networking Basics", description: "OSI model, TCP/IP, protocols", resource: { name: "Networking Course", youtube: "https://www.youtube.com/watch?v=qiQR5rTSshw" } },
+      { week: 2, topic: "Network Security", description: "Firewalls, VPN, network monitoring", resource: { name: "Networking Course", youtube: "https://www.youtube.com/watch?v=qiQR5rTSshw" } },
+      { week: 3, topic: "Linux Fundamentals", description: "Commands, file system, permissions", resource: { name: "Linux Full Course", youtube: "https://www.youtube.com/watch?v=wBp0Rb-ZJak" } },
+      { week: 4, topic: "Linux Security", description: "Hardening, security tools, logs", resource: { name: "Linux Full Course", youtube: "https://www.youtube.com/watch?v=wBp0Rb-ZJak" } },
+      { week: 5, topic: "Ethical Hacking", description: "Reconnaissance, scanning, enumeration", resource: { name: "Ethical Hacking", youtube: "https://www.youtube.com/watch?v=3Kq1MIfTWCE" } },
+      { week: 6, topic: "Vulnerability Assessment", description: "Finding and exploiting vulnerabilities", resource: { name: "Ethical Hacking", youtube: "https://www.youtube.com/watch?v=3Kq1MIfTWCE" } },
+      { week: 7, topic: "Cryptography", description: "Encryption, hashing, digital signatures", resource: { name: "Cryptography Course", youtube: "https://www.youtube.com/watch?v=jhXCTbFnK8o" } },
+      { week: 8, topic: "Web & Penetration Testing", description: "OWASP Top 10, testing methodologies", resource: { name: "Penetration Testing", youtube: "https://www.youtube.com/watch?v=3Kq1MIfTWCE" } },
+      { week: 9, topic: "Security Project", description: "Complete security audit and report", resource: { name: "Security Project", youtube: "https://www.youtube.com/watch?v=3Kq1MIfTWCE" } }
+    ]
+  }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+
+
+  // Domain modal
+  const domainModal = document.getElementById("domainModal");
+  const domainTitle = document.getElementById("domainTitle");
+  const domainResources = document.getElementById("domainResources");
+  const closeDomainBtn = document.querySelector(".close-domain");
+  const domainCards = document.querySelectorAll(".domain-card");
+
+  domainCards.forEach(card => {
+    card.addEventListener("click", () => {
+      const domain = card.getAttribute("data-domain");
+      const data = domainData[domain];
+      
+      if (data) {
+        domainTitle.innerHTML = `
+          <span class="modal-domain-title">${data.title}</span>
+          <span class="modal-domain-stats">👥 ${data.members} Participated — 9 Weeks Intensive</span>
+        `;
+        domainResources.innerHTML = data.weeks.map(week => `
+          <div class="resource-card">
+            <div class="resource-header">
+              <span class="week-label">Week ${week.week}</span>
+              <h3>${week.topic}</h3>
+            </div>
+            <p class="resource-desc">${week.description}</p>
+            <div class="resource-actions">
+              ${week.pdf ? `
+                <a href="${week.pdf}" target="_blank" class="resource-btn notes-btn">
+                  <span class="icon">📝</span> Notes PDF
+                </a>
+              ` : `
+                <span class="resource-btn disabled-btn">
+                  <span class="icon">📝</span> PDF Coming Soon
+                </span>
+              `}
+              <a href="${week.resource.youtube}" target="_blank" class="resource-btn video-btn">
+                <span class="icon">▶️</span> ${week.resource.name}
+              </a>
+            </div>
+          </div>
+        `).join('');
+        
+        domainModal.style.display = "block";
+        document.body.style.overflow = "hidden";
+      }
+    });
+  });
+
+  closeDomainBtn.addEventListener("click", () => {
+    domainModal.style.display = "none";
+    document.body.style.overflow = "auto";
+  });
+
+  window.addEventListener("click", (e) => {
+    if (e.target === domainModal) {
+      domainModal.style.display = "none";
+      document.body.style.overflow = "auto";
+    }
+  });
+});
+</script>
+<script src="js/mentor-ship.js"></script>
+<script src="js/nav-active.js"></script>
+</html>
+
+

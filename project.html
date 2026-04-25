@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+    integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+    crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/ac42c3b1f7.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
+  <link rel="stylesheet" href="css/nexus-theme.css" />
+  <link rel="stylesheet" href="css/project.css">
+  <link rel="stylesheet" href="Nexus Dashboard Anti/assets/css/theme-toggle.css" />
+  <script src="Nexus Dashboard Anti/assets/js/theme-engine.js"></script>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <a href="home.html">
+          <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png"
+               alt="Sun Nexus Logo" class="nav-logo" />
+        </a>
+        <span class="brand-name">Sun Nexus Solutions</span>
+      </div>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="home.html">Home</a></li>
+        <li><a href="about-us.html">About Us</a></li>
+        <li><a href="project.html">Projects</a></li>
+        <li><a href="Nexus Dashboard Anti/dashboard.html">Dashboard</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="mentor-ship.html">Mentorship</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Theme">
+          <div class="toggle-glow"></div>
+          <div class="toggle-knob">
+            <span class="sun-icon">☀️</span>
+            <span class="moon-icon">🌙</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="menu-toggle" id="menuToggle">☰</div>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="row">
+      <div class="banner-section animate_animated animate_fadeInDown col-12" id="bannerSection">
+        <h1 class="banner-heading animate_animated animate_bounceIn gradient-text">COMPLETED PROJECTS</h1>
+      </div>
+
+      <div class="col-12" style="margin: 20px 0;">
+        <h2 class="level-heading">Beginner Level</h2>
+      </div>
+      <div class="projects animate_animated animate_zoomIn" id="beginnerProjectsContainer">
+        <!-- Beginner project cards will be dynamically inserted here -->
+      </div>
+
+      <div class="col-12" style="margin: 40px 0 20px 0;">
+        <h2 class="level-heading">Advanced Level</h2>
+      </div>
+      <div class="projects animate_animated animate_zoomIn" id="advancedProjectsContainer">
+        <!-- Advanced project cards will be dynamically inserted here -->
+      </div>
+
+      <div class="banner-section animate_animated animate_fadeInDown col-12" id="bannerSection">
+        <h1 class="banner-heading animate_animated animate_bounceIn gradient-text">ON GOING PROJECTS</h1>
+      </div>
+      <div class="projects animate_animated animate_zoomIn" id="ongoingProjectsContainer">
+        <!-- Project cards will be dynamically inserted here -->
+      </div>
+      <div class="domains animate_animated animate_slideInLeft">
+        <div class="header-section animate_animated animate_fadeInUp col-12">
+          <h1>Need a Project? Let's Build Something Amazing!</h1>
+          <p>Turn your ideas into reality with Sun Nexus Solutions. Whether it's AI, IoT, automation, or web apps, we've
+            got you covered!</p>
+        </div>
+        <div class="card">
+          <h3>AI & Machine Learning</h3>
+          <p>Predictive models, deep learning, NLP & more.</p>
+        </div>
+        <div class="card">
+          <h3>Web & App Development</h3>
+          <p>Full-stack websites & mobile apps.</p>
+        </div>
+        <div class="card">
+          <h3>Data Science & Analytics</h3>
+          <p>Data processing, analytics & insights.</p>
+        </div>
+      </div>
+      <div class="how-it-works animate_animated animate_slideInRight">
+        <h2>How It Works:</h2>
+        <div class="card">Step 1
+          <p>Share your idea or problem statement</p>
+        </div>
+        <div class="card">Step 2
+          <p>We analyze feasibility & provide a project plan</p>
+        </div>
+        <div class="card">Step 3
+          <p>Development with regular updates & feedback</p>
+        </div>
+        <div class="card">Step 4
+          <p>Project completion with deployment & documentation</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Project Modal -->
+  <div id="projectModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <div id="modalDetails"></div>
+      <div id="modalTeam">
+        <h4 style="font-size: 1.4rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; color: var(--color-primary-light); margin-bottom: 24px;">Council Members</h4>
+        <div id="teamList" class="team-grid"></div>
+      </div>
+      <button id="closeModal">Close Protocol</button>
+    </div>
+  </div>
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="home.html" class="footer-logo">
+          <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" alt="Sun Nexus Logo" class="footer-logo-img" />
+          <span class="footer-logo-name">Sun Nexus Solutions</span>
+        </a>
+        <p class="footer-tagline">Empowering students with real-world tech skills, projects, and mentorship at Sandip University, Nashik.</p>
+        <div class="footer-socials">
+          <a href="https://www.linkedin.com/company/sunnexussolutions/" class="footer-social-btn" target="_blank"><span class="icon">💼</span> LinkedIn</a>
+          <a href="https://www.instagram.com/sun_nexus_solutions/" class="footer-social-btn" target="_blank"><span class="icon">📸</span> Instagram</a>
+          <a href="https://github.com/sunnexussolutions" class="footer-social-btn" target="_blank"><span class="icon">🐙</span> GitHub</a>
+        </div>
+        <div class="footer-newsletter">
+          <p>📬 Stay in the loop with our latest updates</p>
+          <div class="footer-newsletter-row">
+            <input type="email" placeholder="Enter your email..." aria-label="Newsletter email">
+            <button type="button">Subscribe</button>
+          </div>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Platform</div>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="about-us.html">About Us</a></li>
+          <li><a href="project.html">Projects</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="mentor-ship.html">Mentorship</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Resources</div>
+        <ul>
+          <li><a href="Nexus Dashboard Anti/dashboard.html">Dashboard</a></li>
+          <li><a href="Nexus Dashboard Anti/courses.html">Courses</a></li>
+          <li><a href="Nexus Dashboard Anti/leaderboard.html">Leaderboard</a></li>
+          <li><a href="Nexus Dashboard Anti/quiz.html">Quizzes</a></li>
+          <li><a href="Nexus Dashboard Anti/certificate.html">Certificates</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Contact</div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">📧</span>
+          <div class="footer-contact-text"><a href="mailto:sunnexussolutions@gmail.com">sunnexussolutions@gmail.com</a></div>
+        </div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">📍</span>
+          <div class="footer-contact-text">School of Computer Science &amp; Engineering,<br>Sandip University, Nashik</div>
+        </div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">🕐</span>
+          <div class="footer-contact-text">Mon – Sat, 9 AM – 6 PM IST</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <p class="footer-bottom-copy">© 2025 <span>Sun Nexus Solutions</span>. All Rights Reserved.</p>
+        <div class="footer-badge"><span>●</span> Active Platform</div>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Use</a>
+          <a href="#">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/project.js"></script>
+  <script src="js/nav-active.js"></script>
+</body>
+
+</html>

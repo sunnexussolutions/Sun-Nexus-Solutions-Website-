@@ -1,0 +1,4 @@
+/* Auth page — minimal overrides only */
+@media (max-width: 768px) {
+  .auth-branding-panel { display: none !important; }
+}

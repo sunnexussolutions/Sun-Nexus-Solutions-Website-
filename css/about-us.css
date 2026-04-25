@@ -1,0 +1,299 @@
+/* ── About Us page — High-Fidelity UI Overhaul ── */
+
+body { 
+  background: var(--bg-primary); 
+  color: var(--text-primary); 
+  overflow-x: hidden; 
+}
+
+.container { margin-top: 100px; }
+
+.section-heading {
+  font-size: clamp(3.2rem, 8vw, 4.8rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  text-align: center;
+  margin-bottom: 40px;
+  background: var(--gradient-indigo);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.section-text {
+  font-size: 2.1rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 60px;
+  line-height: 1.85;
+  max-width: 950px;
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: 500;
+}
+
+/* ── Domains Bento Grid ── */
+.feature-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
+  padding: 40px 0;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--bg-card);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-radius: 32px;
+  padding: 48px 36px;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+  opacity: 0.15;
+  transition: opacity 0.4s;
+}
+
+.card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px var(--color-primary-glow);
+  border-color: var(--color-primary);
+  background: var(--bg-card-hover);
+}
+
+.card:hover::before { opacity: 1; }
+
+.domain-icon-glow {
+  font-size: 4rem;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 15px var(--color-primary-glow));
+  transition: transform 0.4s ease;
+}
+
+.card:hover .domain-icon-glow {
+  transform: scale(1.2) rotate(10deg);
+}
+
+.card h3 {
+  color: var(--text-primary);
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.card p {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.view-protocol-btn {
+  background: var(--gradient-primary);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 800;
+  padding: 12px 28px;
+  border-radius: 14px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-glow);
+  margin-top: auto;
+}
+
+.view-protocol-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 242, 254, 0.5);
+  color: #fff;
+  filter: brightness(1.1);
+}
+
+/* ── Join Protocol Section ── */
+.join-section {
+  text-align: center;
+  padding: 80px 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.join-section p {
+  font-size: 2.2rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  font-weight: 500;
+}
+
+.join-section span {
+  color: var(--color-primary-light);
+  font-weight: 800;
+  background: var(--gradient-indigo);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Master Team Sections ── */
+.team-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  padding: 40px 0;
+}
+
+.team-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border-radius: 28px;
+  width: 260px;
+  padding: 32px 24px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.team-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--color-primary);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.team-image {
+  width: 110px;
+  height: 110px;
+  border-radius: 24px;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 2px solid var(--border-subtle);
+  transition: all 0.4s ease;
+}
+
+.team-card:hover .team-image {
+  border-color: var(--color-primary);
+  transform: scale(1.05) rotate(2deg);
+}
+
+.team-card h4 {
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-primary-light);
+  margin-bottom: 8px;
+}
+
+.team-card h5 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+/* ── Modal Protocol ── */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--bg-card) !important;
+  backdrop-filter: blur(40px) saturate(180%) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 40px !important;
+  padding: 60px !important;
+  width: 95%;
+  max-width: 1100px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7), 0 0 50px var(--color-primary-glow) !important;
+  position: relative;
+}
+
+.modal-content::-webkit-scrollbar { width: 8px; }
+.modal-content::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 10px; }
+
+.modal-content h2 {
+  font-size: 3.2rem !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.04em !important;
+  margin-bottom: 40px !important;
+  text-align: center !important;
+  background: var(--gradient-indigo);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.close {
+  position: absolute;
+  top: 30px; right: 40px;
+  font-size: 40px;
+  font-weight: 300;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.close:hover { color: var(--color-primary); }
+
+.close-protocol-btn {
+  display: block;
+  margin: 50px auto 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 16px 40px;
+  border-radius: 18px;
+  font-weight: 900;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.close-protocol-btn:hover {
+  background: var(--gradient-primary);
+  color: #fff;
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 242, 254, 0.4);
+}
+
+@media (max-width: 768px) {
+  .modal-content { padding: 40px 20px !important; border-radius: 30px !important; }
+  .modal-content h2 { font-size: 2.2rem !important; }
+  .team-card { width: 100%; }
+  .feature-cards { 
+    padding: 20px; 
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+}

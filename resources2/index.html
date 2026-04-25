@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resources - Sun Nexus Solutions</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="../Nexus Dashboard Anti/assets/css/design-system.css">
+  <link rel="stylesheet" href="../Nexus Dashboard Anti/assets/css/theme-toggle.css">
+  <script src="../Nexus Dashboard Anti/assets/js/theme-engine.js"></script>
+  <script>
+    // Removed automatic redirect - users can browse without login
+    // Login only required when clicking Start/Quiz buttons
+    function logout() {
+      sessionStorage.removeItem('loggedIn');
+      alert('Logged out successfully!');
+      location.reload();
+    }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      box-shadow: var(--glass-shadow);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-logo {
+      width: 50px;
+    }
+
+    .brand-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      text-shadow: 0 0 10px var(--color-primary-glow);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      transition: color 0.3s;
+      font-size: 1.1rem;
+    }
+
+    .nav-links a:hover {
+      color: var(--color-primary);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
+    .header {
+      margin-bottom: 30px;
+      text-align: center;
+      animation: slideDown 0.6s;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      color: var(--color-primary);
+      margin-bottom: 8px;
+      text-shadow: var(--glow-primary);
+    }
+
+    .header p {
+      color: #aaa;
+      font-size: 1.1rem;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      padding: 25px;
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      text-align: center;
+      transition: all 0.4s;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--glass-shadow);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(0, 242, 254, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 0 30px rgba(0, 242, 254, 0.25);
+      border-color: var(--color-primary);
+    }
+
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      color: #aaa;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      border-bottom: 2px solid var(--border-color);
+      overflow-x: auto;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #aaa;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      color: var(--color-primary);
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--color-primary);
+    }
+
+    .course-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+      animation: fadeIn 0.5s;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .course-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+      box-shadow: var(--glass-shadow);
+    }
+
+    .course-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+      opacity: 0;
+      transform: scaleX(0);
+      transition: all 0.4s;
+      z-index: 10;
+    }
+
+    .course-card:hover::before {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+
+    .course-card:hover {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: var(--shadow-xl), var(--glow-primary);
+      border-color: var(--color-primary);
+    }
+
+    .course-thumbnail {
+      width: 100%;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .course-thumbnail::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .course-card:hover .course-thumbnail::after {
+      left: 100%;
+    }
+
+    .course-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--color-primary);
+      color: #050a18;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      box-shadow: 0 0 15px var(--color-primary-glow);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .course-content {
+      padding: 20px;
+    }
+
+    .course-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: 10px;
+      text-shadow: 0 0 5px var(--color-primary-glow);
+    }
+
+    .course-desc {
+      font-size: 0.95rem;
+      color: #aaa;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .course-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #1a1a2e;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--gradient-primary);
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 10px var(--color-primary-glow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    .progress-text {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 15px;
+    }
+
+    .course-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .course-btn {
+      flex: 1;
+      padding: 12px;
+      background: var(--gradient-primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow-glow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .course-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.5s, height 0.5s;
+    }
+
+    .course-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .course-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.4);
+    }
+
+    .course-btn-secondary {
+      background: transparent;
+      border: 2px solid var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    .course-btn-secondary:hover {
+      background: var(--color-primary);
+      color: #050a18;
+    }
+
+    .gradient-1 {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .gradient-2 {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .gradient-3 {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .gradient-4 {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .gradient-5 {
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .gradient-6 {
+      background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      overflow-y: auto;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      margin: 50px auto;
+      padding: 30px;
+      border: 1px solid var(--color-primary);
+      border-radius: 15px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 242, 254, 0.1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .modal-title {
+      font-size: 2rem;
+      color: var(--color-primary);
+      font-weight: 800;
+      text-shadow: 0 0 10px var(--color-primary-glow);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--color-primary);
+      font-size: 2rem;
+      cursor: pointer;
+    }
+
+    .quiz-question {
+      font-size: 1.3rem;
+      color: #fff;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .quiz-option {
+      padding: 15px;
+      background: var(--bg-secondary);
+      margin: 12px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1rem;
+    }
+
+    .quiz-option:hover {
+      background: #2a2a3e;
+      transform: translateX(8px);
+    }
+
+    .quiz-option.correct {
+      background: #43e97b;
+      border-color: #43e97b;
+      color: #000;
+    }
+
+    .quiz-option.wrong {
+      background: #f5576c;
+      border-color: #f5576c;
+    }
+
+    .quiz-result {
+      text-align: center;
+      padding: 30px;
+    }
+
+    .quiz-score {
+      font-size: 4rem;
+      color: #ffa500;
+      font-weight: 800;
+      margin-bottom: 15px;
+    }
+
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      background: #1a1a2e;
+      margin: 10px 0;
+      border-radius: 8px;
+      border-left: 4px solid #ffa500;
+    }
+
+    .rank {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #ffa500;
+      min-width: 40px;
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .user-points {
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    .user-score {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #ffa500;
+    }
+
+    .video-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .video-item {
+      display: flex;
+      gap: 15px;
+      padding: 15px;
+      background: #1a1a2e;
+      border-radius: 8px;
+      border: 2px solid #ffa500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .video-item:hover {
+      transform: translateX(8px);
+      background: #2a2a3e;
+    }
+
+    .video-thumb {
+      width: 120px;
+      height: 80px;
+      background: linear-gradient(135deg, #ffa500, #ff6b35);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    .video-info {
+      flex: 1;
+    }
+
+    .video-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin-bottom: 5px;
+    }
+
+    .video-duration {
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    .video-player-container {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .video-player {
+      width: 100%;
+      height: 400px;
+      background: #000;
+      border-radius: 8px;
+      border: 1px solid var(--color-primary);
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.1);
+    }
+
+    .back-to-list {
+      padding: 10px 20px;
+      background: #ffa500;
+      color: #16213e;
+      border: none;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+
+    .back-to-list:hover {
+      background: #ff8c42;
+    }
+
+    .cert-container {
+      text-align: center;
+      padding: 40px;
+      background: var(--bg-secondary);
+      border-radius: 15px;
+      border: 1px solid var(--color-primary);
+      box-shadow: 0 0 30px rgba(0, 242, 254, 0.1);
+    }
+
+    .cert-icon {
+      font-size: 5rem;
+      margin-bottom: 20px;
+    }
+
+    .cert-title {
+      font-size: 2rem;
+      color: var(--color-primary);
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .cert-desc {
+      font-size: 1.1rem;
+      color: #aaa;
+      margin-bottom: 25px;
+    }
+
+    .download-btn {
+      padding: 15px 40px;
+      background: #ffa500;
+      color: #16213e;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .download-btn:hover {
+      background: #ff8c42;
+      transform: scale(1.05);
+    }
+
+    .notes-section {
+      margin-top: 20px;
+      padding: 20px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      border: 1px solid var(--color-primary);
+    }
+
+    .notes-title {
+      color: var(--color-primary);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pdf-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .pdf-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .view-pdf-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+    }
+
+    .view-pdf-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .download-pdf-btn {
+      background: var(--gradient-primary);
+      color: #fff;
+    }
+
+    .download-pdf-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 165, 0, 0.5);
+    }
+
+    .pdf-info {
+      color: #aaa;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 2.5rem;
+      color: var(--color-primary);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .menu-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 70px;
+        right: 0;
+        background: #16213e;
+        width: 100%;
+        height: 100vh;
+        text-align: center;
+        padding: 20px 0;
+        border-top: 2px solid #ffa500;
+        z-index: 1001;
+      }
+
+      .nav-links.active {
+        display: flex;
+        animation: slideDown 0.3s ease-out;
+      }
+
+      .nav-links li {
+        margin: 15px 0;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="logo">
+      <a href="../home.html"><img
+          src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png"
+          alt="Logo" class="nav-logo"></a>
+      <span class="brand-name">Sun Nexus Solutions</span>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="../home.html">Home</a></li>
+      <li><a href="../about-us.html">About Us</a></li>
+      <li><a href="../project.html">Projects</a></li>
+      <li><a href="index.html">Resources</a></li>
+      <li><a href="../events.html">Events</a></li>
+      <li><a href="../mentor-ship.html">Mentorship</a></li>
+      <li><a href="#" onclick="logout(); return false;">Logout</a></li>
+      <li class="nav-theme-toggle">
+        <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Theme">
+          <div class="toggle-glow"></div>
+          <div class="toggle-knob">
+            <span class="sun-icon">☀️</span>
+            <span class="moon-icon">🌙</span>
+          </div>
+        </button>
+      </li>
+    </ul>
+    <div class="menu-toggle" id="menuToggle">☰</div>
+  </nav>
+
+  <div class="container">
+    <div class="header">
+      <h1>🎓 My Learning Dashboard</h1>
+      <p>Master new skills and advance your career</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="coursesCompleted">0</div>
+        <div class="stat-label">📚 Courses Completed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="learningStreak">0🔥</div>
+        <div class="stat-label">⚡ Day Streak</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="totalHours">0h</div>
+        <div class="stat-label">⏱️ Learning Hours</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="certificates">0</div>
+        <div class="stat-label">🏆 Certificates</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="quizScore">0</div>
+        <div class="stat-label">⭐ Quiz Points</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('all')">All Courses</button>
+      <button class="tab" onclick="switchTab('inprogress')">In Progress</button>
+      <button class="tab" onclick="switchTab('completed')">Completed</button>
+      <button class="tab" onclick="switchTab('leaderboard')">🏆 Leaderboard</button>
+      <button class="tab" onclick="switchTab('certificates')">📜 Certificates</button>
+    </div>
+
+    <div id="contentArea">
+      <div class="course-grid" id="courseGrid"></div>
+    </div>
+  </div>
+
+  <div id="quizModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="quizTitle">Quiz</h2>
+        <button class="close-btn" onclick="closeModal('quizModal')">&times;</button>
+      </div>
+      <div id="quizContent"></div>
+    </div>
+  </div>
+
+  <div id="videoModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="videoTitle">Course Videos</h2>
+        <button class="close-btn" onclick="closeModal('videoModal')">&times;</button>
+      </div>
+      <div id="videoContent" class="video-list"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const menuToggle = document.getElementById("menuToggle");
+      const navLinks = document.getElementById("navLinks");
+      if (menuToggle && navLinks) {
+        menuToggle.addEventListener("click", () => {
+          navLinks.classList.toggle("active");
+          menuToggle.textContent = navLinks.classList.contains("active") ? "✕" : "☰";
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>

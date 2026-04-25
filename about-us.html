@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+    integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+    crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/ac42c3b1f7.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
+  <script>
+    // Login check removed - browse freely
+    function logout() {
+      sessionStorage.removeItem('loggedIn');
+      window.location.href = 'login.html';
+    }
+  </script>
+  <title>About Us</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="Nexus Dashboard Anti/assets/js/theme-engine.js"></script>
+  <link rel="stylesheet" href="css/nexus-theme.css" />
+  <link rel="stylesheet" href="css/about-us.css" />
+  <link rel="stylesheet" href="Nexus Dashboard Anti/assets/css/theme-toggle.css" />
+</head>
+
+
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <a href="home.html">
+          <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png"
+               alt="Sun Nexus Logo" class="nav-logo" />
+        </a>
+        <span class="brand-name">Sun Nexus Solutions</span>
+      </div>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="home.html">Home</a></li>
+        <li><a href="about-us.html">About Us</a></li>
+        <li><a href="project.html">Projects</a></li>
+        <li><a href="Nexus Dashboard Anti/dashboard.html">Dashboard</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="mentor-ship.html">Mentorship</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Theme">
+          <div class="toggle-glow"></div>
+          <div class="toggle-knob">
+            <span class="sun-icon">☀️</span>
+            <span class="moon-icon">🌙</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="menu-toggle" id="menuToggle">☰</div>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="row">
+      <!-- <div class="banner-section animate__animated animate__fadeInDown col-12" id="bannerSection">
+                <h1 class="banner-heading animate__animated animate__bounceIn">OUR MISSION</h1>
+            </div> -->
+      <div class="who-we-are-section animate__animated animate__slideInLeft">
+        <h2 class="section-heading">Who We Are?</h2>
+        <p class="section-text">"At<span> Sun Nexus Solutions</span>, we are a student-driven tech club dedicated to
+          bridging the gap between academia and industry through cutting-edge projects and collaborations. Our team
+          thrives on innovation, research, and real-world applications, empowering students to develop practical skills
+          while delivering solutions that make an impact."</p>
+      </div>
+
+
+      <!-- <div class="team-section animate__animated animate__slideInRight">
+                <h2 class="section-heading">Meet Our Team</h2>
+                <div class="team-grid">
+                     <div class="team-card animate__animated animate__zoomIn ">
+                        <img src="https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.37.00%20AM.jpeg?updatedAt=1760072973049" alt="Founder" class="team-image">
+                        <h4>Founder</h4>
+                        <h5>Murali Krishna</h5>
+                        <p>Founder of Nexus Solutions.</p>
+                    </div>
+                      <div class="team-card animate__animated animate__zoomIn  ">
+                        <img src="https://ik.imagekit.io/kofq4cdghu/IMG-20250917-WA0086(1).jpg?updatedAt=1760094980018" alt="Co-Founder" class="team-image">
+                        <h4>Co-Founder</h4>
+                        <h5>Varshith Naidu</h5>
+                        <p>Co-founder of Nexus Solutions.</p>
+                    </div>
+                    <div class="team-card animate__animated animate__zoomIn  ">
+                        <img src="https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.29.51%20AM.jpeg?updatedAt=1760072973494" alt="Club President" class="team-image">
+                        <h4>Club President :</h4>
+                        <h5>Bharath Kumar.K</h5>
+                        <p>Leading the vision and direction of Nexus Solutions.</p>
+                    </div>
+                    <div class="team-card animate__animated animate__zoomIn ">
+                        <img src="https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.27.49%20AM.jpeg?updatedAt=1760072972669" alt="Vice President" class="team-image">
+                        <h4>Vice President :</h4>
+                        <h5>Jaya Manideep.B</h5>
+                        <p>Overseeing operations and project execution.</p>
+                    </div>
+                    <div class="team-card animate__animated animate__zoomIn  ">
+                        <img src="https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.37.49%20AM.jpeg?updatedAt=1760072973031" alt="Vice President" class="team-image">
+                        <h4>Vice President :</h4>
+                        <h5>Deekshitha.M</h5>
+                        <p>Overseeing operations and project execution.</p>
+                    </div>
+                    
+                </div>
+            </div> -->
+
+
+
+      <div class="join-section animate__animated animate__fadeInUp">
+        <h2 class="section-heading">Why Sun Join Nexus Solution?</h2>
+        <p>At<span> Nexus Solutions</span>, we provide a dynamic platform for students to gain <span>real-world
+            experience</span> by working on live projects
+          that align with industry standards. Our collaborative community fosters innovation, allowing you to connect
+          with like-
+          minded peers, mentors, and industry professionals who help you refine your skills. Beyond learning, we focus
+          on
+          <span>professional growth</span>, helping you build a strong portfolio, enhance your technical expertise, and
+          boost your career
+          prospects in cutting-edge fields like Al, software development, and loT.
+        </p>
+        <!-- <a href="/getintouch"> <button class="join-btn">Join Now</button> </a> -->
+      </div>
+
+      <div class="domains-section">
+        <h2 class="section-heading">Our Expertise Domains</h2>
+        <div class="feature-cards">
+          <div class="card domain-card" data-domain="ai">
+            <div class="domain-icon-glow">🤖</div>
+            <h3>AI & Machine Learning</h3>
+            <p>Building intelligent systems with deep learning, NLP, and neural architecture.</p>
+            <a href="#" class="view-protocol-btn">View Protocol</a>
+          </div>
+          <div class="card domain-card" data-domain="web">
+            <div class="domain-icon-glow">🌐</div>
+            <h3>Web Development</h3>
+            <p>Creating modern, high-performance web applications with reactive frameworks.</p>
+            <a href="#" class="view-protocol-btn">View Protocol</a>
+          </div>
+          <div class="card domain-card" data-domain="dataanalytics">
+            <div class="domain-icon-glow">📊</div>
+            <h3>Data Analytics</h3>
+            <p>Extracting strategic insights from complex datasets to drive platform scaling.</p>
+            <a href="#" class="view-protocol-btn">View Protocol</a>
+          </div>
+          <div class="card domain-card" data-domain="cyber">
+            <div class="domain-icon-glow">🛡️</div>
+            <h3>Cyber Security</h3>
+            <p>Hardening systems and network infrastructure against advanced digital threats.</p>
+            <a href="#" class="view-protocol-btn">View Protocol</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- Domain Members Modal -->
+  <div id="domainModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="domainTitle"></h2>
+      <div id="domainMembers" class="team-grid"></div>
+      <button class="close-protocol-btn" id="modalCloseBtn">Close Protocol</button>
+    </div>
+  </div>
+
+</body>
+
+<script>
+  const domainData = {
+    ai: {
+      title: "AI & Machine Learning Team",
+      members: [
+        { name: "Bharath Kumar.K", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.29.51%20AM.jpeg?updatedAt=1760072973494", role: "AI & ML Head", linkedin: "https://www.linkedin.com/in/bharath-karanam-00731428b", github: "https://github.com/BharathkumarK19" },
+        { name: "Madhu Sudhan.M", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2011.09.30%20AM.jpeg?updatedAt=1760074790613", role: "", linkedin: "https://www.linkedin.com/in/m-madhu-sudhan-reddy-51757a28b/", github: "https://github.com/madhusudhanreddy9966" },
+        { name: "Charitha.B", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772469092/charitha_akka_grzcgc.jpg", role: "", linkedin: "https://www.linkedin.com/in/bareddy-charitha", github: "https://github.com/Bareddycharitha" },
+        { name: "Vishnu Vardhan.A", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772771807/WhatsApp_Image_2026-03-06_at_9.53.49_AM_e4nkcd.jpg", role: "", linkedin: "https://www.linkedin.com/in/vishnu-vardhan-raju-alluri-85049b320/", github: "https://github.com/AlluriVishnuvardhan" },
+        { name: "Girivardhan.K", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.37.34%20AM.jpeg?updatedAt=1760072974650", role: "", linkedin: "https://www.linkedin.com/in/girivardhan", github: "https://github.com/girivardhan86" },
+        { name: "Vaishnavi", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772639378/vaishnavi_iwaurb.jpg", role: "" },
+        { name: "A.Yaswanth ", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772601567/yaswanth_gj9y5q.jpg", role: "", linkedin: "https://www.linkedin.com/in/yashwanth-varma-alluri-380862384", github: "https://github.com/yashalluri3467" },
+        { name: "K.Abhishek Reddy", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772771821/WhatsApp_Image_2026-03-06_at_9.58.02_AM_y68bio.jpg", role: "" }
+      ]
+    },
+    web: {
+      title: "Web Development Team",
+      members: [
+        { name: "Varun.C", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772303316/varun.C_lgibw2.jpg", role: "Web Development Head", linkedin: "https://www.linkedin.com/in/varun-chitrala", github: "https://github.com/varunchitrala" },
+        { name: "Deekshitha.M", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.37.49%20AM.jpeg?updatedAt=1760072973031", role: "", linkedin: "https://www.linkedin.com/in/deekshitha-majeti-8439b5277/", github: "https://github.com/Deekshitha741" },
+        { name: "R.Manoj", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772612644/manoj_buozjy.jpg", role: "", linkedin: "https://www.linkedin.com/in/manoj-rajammagari-773373391", github: "https://github.com/manojrajammagari-dot" },
+        { name: "Mallikarjuna Rao.C", image: "https://ik.imagekit.io/kofq4cdghu/IMG_20241008_135227_1_.jpg?updatedAt=1759896755572", role: "", linkedin: "https://www.linkedin.com/in/chintre-mallikarjuna-rao", github: "https://github.com/MKRAOCHINTRE" },
+        { name: "Raghu.K", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-08%20at%2010.27.23%20AM.jpeg?updatedAt=1760072973601", role: "", linkedin: "https://www.linkedin.com/in/raghu-su?utm_source=share_via&utm_content=profile&utm_medium=member_android", github: "https://github.com/luckyraghu9032" },
+        { name: "Bhargava.K", image: "https://res.cloudinary.com/djw0g8duw/image/upload/v1763865310/link_img_rusktx.png", role: "", linkedin: "https://www.linkedin.com/in/bhargava-sri-ram-kadali", github: "https://github.com/kbhargavasriram88" },
+        { name: "Sirisha.A", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-08%20at%2011.25.48%20AM.jpeg?updatedAt=1760072973509", role: "", linkedin: "https://www.linkedin.com/in/shirisha-ambati-a4034334a", github: "https://share.google/tWuFzKYopWTpvM0Ou" },
+        { name: "Amrutha Varshini", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772639381/amrutha_varshini_mgyn9n.jpg", role: "", linkedin: "https://www.linkedin.com/in/amrutha-varahini-291315381" },
+        { name: "Poojitha.S", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.24.52%20AM.jpeg?updatedAt=1760072972748", role: "", linkedin: "https://www.linkedin.com/in/sareddy-poojitha", github: "https://github.com/sareddypoojitha-662" },
+        { name: "Rishitha", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772518152/rishitha_zgdfij.jpg", role: "" },
+        { name: "Vanaja", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772518151/vanaja_izfe76.jpg", role: "" },
+        { name: "Sai Geethanjali", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772518151/geetanjali_ffvarc.jpg", role: "" },
+        { name: "A.Lokesh Reddy", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.39.51%20AM.jpeg?updatedAt=1760073049927", role: "backend developer" },
+        { name: "V.Gopinadh", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.55.20%20AM.jpeg?updatedAt=1760074230579", role: "backend developer" },
+        { name: "K.Hari", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.29.49%20AM.jpeg?updatedAt=1760072973038", role: "backend developer", linkedin: "https://www.linkedin.com/in/hariveerasritarunkota", github: "https://github.com/Hari5540" }
+      ]
+    },
+    dataanalytics: {
+      title: "Data Analytics Team",
+      members: [
+        { name: "Jaya manideep.B", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.27.49%20AM.jpeg?updatedAt=1760072972669", role: "Data Analytics Head", linkedin: "", github: "https://github.com/Jayamanideep-Tech" },
+        { name: "M.Swapna", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772688084/InShot_20250917_175835152.jpg_drrto9.jpg", role: "Data Analytics", linkedin: "www.linkedin.com/in/swapna-reddy-a2184a375", github: "https://github.com/swapna-techie" },
+        { name: "G.Purna Reddy", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772599133/purna_reddy_mszkgg.jpg", role: "Data Analytics", linkedin: "https://www.linkedin.com/in/gade-purna-reddy-aa687337b", github: "https://github.com/purnareddy45-tech" }
+      ]
+    },
+    cyber: {
+      title: "Cyber Security Team",
+      members: [
+        { name: "Ashish.C", image: "https://ik.imagekit.io/kofq4cdghu/1758679225122.jpg?updatedAt=1760073049933", role: "Cyber Security Head", linkedin: "https://www.linkedin.com/in/ashish-blue-team", github: "https://github.com/Ashish3546" }
+      ]
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+
+    const menuToggle = document.getElementById("menuToggle");
+    const navLinks = document.getElementById("navLinks");
+
+    if (menuToggle && navLinks) {
+      menuToggle.addEventListener("click", () => {
+        navLinks.classList.toggle("active");
+        const isExpanded = navLinks.classList.contains("active");
+        menuToggle.setAttribute("aria-expanded", isExpanded);
+        menuToggle.textContent = isExpanded ? "✕" : "☰";
+      });
+
+
+      $('.dropdown-toggle').dropdown();
+    } else {
+      console.error("Menu toggle or nav links not found in the DOM.");
+    }
+
+
+    const heroSection = document.querySelector(".hero");
+    const animatableSections = document.querySelectorAll(".who-we-are-section, .team-section, .join-section");
+
+
+    function isHeroInViewport() {
+      if (!heroSection) return false;
+      const rect = heroSection.getBoundingClientRect();
+      return rect.top >= 0 && rect.bottom <= window.innerHeight;
+    }
+
+
+    function applyAnimations() {
+      if (!isHeroInViewport()) {
+        animatableSections.forEach(section => {
+          if (section && !section.classList.contains("animate__animated")) {
+            if (section.classList.contains("who-we-are-section")) {
+              section.classList.add("animate__animated", "animate__slideInLeft");
+            } else if (section.classList.contains("team-section")) {
+              section.classList.add("animate__animated", "animate__slideInRight");
+            } else if (section.classList.contains("join-section")) {
+              section.classList.add("animate__animated", "animate__fadeInUp");
+            }
+          }
+        });
+      }
+    }
+
+    window.addEventListener("scroll", () => {
+      applyAnimations();
+    });
+
+
+    applyAnimations();
+
+
+    if (heroSection && isHeroInViewport()) {
+      heroSection.classList.add("animate__animated", "animate__fadeIn");
+    }
+
+    // Domain modal functionality
+    const modal = document.getElementById("domainModal");
+    const domainCards = document.querySelectorAll(".domain-card");
+    const closeBtn = document.querySelector(".close");
+    const domainTitle = document.getElementById("domainTitle");
+    const domainMembers = document.getElementById("domainMembers");
+
+    domainCards.forEach(card => {
+      card.addEventListener("click", () => {
+        const domain = card.getAttribute("data-domain");
+        const data = domainData[domain];
+
+        domainTitle.textContent = data.title;
+        domainMembers.innerHTML = "";
+
+        data.members.forEach(member => {
+          const memberCard = document.createElement("div");
+          memberCard.className = "team-card";
+          memberCard.innerHTML = `
+          <img src="${member.image || 'https://via.placeholder.com/100'}" alt="${member.name}" class="team-image">
+          <h4>${member.role}</h4>
+          <h5>${member.name}</h5>
+          <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px; flex-wrap: wrap;">
+            ${member.linkedin ? `<a href="${member.linkedin}" target="_blank" style="display: flex; align-items: center; justify-content: center; padding: 10px; background: #0077b5; color: #fff; text-decoration: none; border-radius: 5px; transition: background 0.3s ease; width: 40px; height: 40px;" onmouseover="this.style.background='#005582'" onmouseout="this.style.background='#0077b5'"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>` : ''}
+            ${member.github ? `<a href="${member.github}" target="_blank" style="display: flex; align-items: center; justify-content: center; padding: 10px; background: #333; color: #fff; text-decoration: none; border-radius: 5px; transition: background 0.3s ease; width: 40px; height: 40px;" onmouseover="this.style.background='#000'" onmouseout="this.style.background='#333'"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>` : ''}
+          </div>
+        `;
+          domainMembers.appendChild(memberCard);
+        });
+
+        modal.style.display = "block";
+        document.body.style.overflow = "hidden";
+      });
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto";
+      });
+    }
+
+    if (modalCloseBtn) {
+      modalCloseBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto";
+      });
+    }
+
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto";
+      }
+    });
+  });
+  </script>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="home.html" class="footer-logo">
+          <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" alt="Sun Nexus Logo" class="footer-logo-img" />
+          <span class="footer-logo-name">Sun Nexus Solutions</span>
+        </a>
+        <p class="footer-tagline">Empowering students with real-world tech skills, projects, and mentorship at Sandip University, Nashik.</p>
+        <div class="footer-socials">
+          <a href="https://www.linkedin.com/company/sunnexussolutions/" class="footer-social-btn" target="_blank"><span class="icon">💼</span> LinkedIn</a>
+          <a href="https://www.instagram.com/sun_nexus_solutions/" class="footer-social-btn" target="_blank"><span class="icon">📸</span> Instagram</a>
+          <a href="https://github.com/sunnexussolutions" class="footer-social-btn" target="_blank"><span class="icon">🐙</span> GitHub</a>
+        </div>
+        <div class="footer-newsletter">
+          <p>📬 Stay in the loop with our latest updates</p>
+          <div class="footer-newsletter-row">
+            <input type="email" placeholder="Enter your email..." aria-label="Newsletter email">
+            <button type="button">Subscribe</button>
+          </div>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Platform</div>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="about-us.html">About Us</a></li>
+          <li><a href="project.html">Projects</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="mentor-ship.html">Mentorship</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Resources</div>
+        <ul>
+          <li><a href="Nexus Dashboard Anti/dashboard.html">Dashboard</a></li>
+          <li><a href="Nexus Dashboard Anti/courses.html">Courses</a></li>
+          <li><a href="Nexus Dashboard Anti/leaderboard.html">Leaderboard</a></li>
+          <li><a href="Nexus Dashboard Anti/quiz.html">Quizzes</a></li>
+          <li><a href="Nexus Dashboard Anti/certificate.html">Certificates</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Contact</div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">📧</span>
+          <div class="footer-contact-text"><a href="mailto:sunnexussolutions@gmail.com">sunnexussolutions@gmail.com</a></div>
+        </div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">📍</span>
+          <div class="footer-contact-text">School of Computer Science &amp; Engineering,<br>Sandip University, Nashik</div>
+        </div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">🕐</span>
+          <div class="footer-contact-text">Mon – Sat, 9 AM – 6 PM IST</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <p class="footer-bottom-copy">© 2025 <span>Sun Nexus Solutions</span>. All Rights Reserved.</p>
+        <div class="footer-badge"><span>●</span> Active Platform</div>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Use</a>
+          <a href="#">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+<script src="js/nav-active.js"></script>
+</body>
+</html>
