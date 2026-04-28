@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const navItems = document.querySelectorAll('.nav-links li');
     if (navItems.length > 0) {
         const path = window.location.pathname;
-        const currentPage = path.split('/').pop() || 'home.html';
+        const currentPage = path.split('/').pop() || 'index.html';
         
         navItems.forEach(li => {
             if (li.classList.contains('nav-theme-toggle')) return;
@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
             li.classList.remove('active');
             
             if (href === currentPage || 
-                (currentPage === '' && href === 'home.html') ||
-                (currentPage === 'home.html' && href === 'home.html') ||
+                (currentPage === '' && href === 'index.html') ||
+                (currentPage === 'index.html' && href === 'index.html') ||
                 (href.includes(currentPage) && currentPage !== '')) {
                 li.classList.add('active');
             }
