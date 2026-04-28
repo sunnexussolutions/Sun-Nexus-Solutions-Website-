@@ -496,6 +496,10 @@ const Admin = () => {
       {/* ASSESSMENTS */}
       {tab === 'assessments' && (
         <div className="flex flex-col gap-5">
+          <div style={{ marginBottom: '4px' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>Assessment Library</h3>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Create, manage, and track all learning assessments</p>
+          </div>
           <input 
             type="file" 
             ref={pdfInputRef} 
@@ -558,6 +562,19 @@ const Admin = () => {
             )}
           </AnimatePresence>
 
+          {assessments.length === 0 && !showAssessmentForm && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', background: 'var(--bg-secondary)', borderRadius: '1.5rem', border: '1px dashed var(--border-strong)', textAlign: 'center' }}>
+              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                <BrainCircuit size={40} />
+              </div>
+              <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '8px' }}>No Assessments Found</h4>
+              <p style={{ fontSize: '14px', color: 'var(--text-muted)', maxWidth: '400px', marginBottom: '1.5rem' }}>Get started by creating a new assessment or bulk fetching questions to populate your learning library.</p>
+              <button onClick={() => setShowAssessmentForm(true)} style={{ padding: '10px 24px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', fontWeight: 800, fontSize: '14px', border: 'none', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.2)' }}>
+                Create Assessment
+              </button>
+            </div>
+          )}
+
           {assessments.map(a => (
             <Card key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
               <div>
@@ -597,7 +614,19 @@ const Admin = () => {
       {/* ── USERS ── */}
       {tab === 'users' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {users.length === 0 && <Card><p style={{ color: 'var(--text-muted)', textAlign: 'center' }}>No users registered yet.</p></Card>}
+          <div style={{ marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>User Management</h3>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Monitor and manage student accounts, progress, and roles</p>
+          </div>
+          {users.length === 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', background: 'var(--bg-secondary)', borderRadius: '1.5rem', border: '1px dashed var(--border-strong)', textAlign: 'center' }}>
+              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(168,85,247,0.1)', color: '#a855f7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                <Users size={40} />
+              </div>
+              <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '8px' }}>No Users Registered</h4>
+              <p style={{ fontSize: '14px', color: 'var(--text-muted)', maxWidth: '400px' }}>Your platform currently has no active users. Invite students to join and their accounts will appear here for management.</p>
+            </div>
+          )}
           {users.map((u, i) => {
             const isExpanded = expandedUser === i;
             const userResults = results.filter(r => r.userEmail === u.email);

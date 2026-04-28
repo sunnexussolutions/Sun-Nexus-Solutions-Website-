@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, Eye, EyeOff, User, Calendar, ArrowRight, BrainCircuit, Zap, Users, ShieldCheck, Orbit } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, User, Calendar, ArrowRight, BrainCircuit, Zap, Users, ShieldCheck, Orbit, X, Send, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import './Auth.css';
@@ -20,7 +20,7 @@ const brandingStyles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 0 40px rgba(99,102,241,0.4)',
+    boxShadow: '0 0 40px rgba(0, 242, 254, 0.4)',
     color: 'white',
     fontSize: '22px',
     fontWeight: 900
@@ -30,29 +30,22 @@ const brandingStyles = {
     fontWeight: 900,
     letterSpacing: '0.1em',
     color: '#fff',
-    textTransform: 'uppercase'
+    textTransform: 'uppercase',
+    textShadow: '0 0 20px rgba(0, 242, 254, 0.5)'
   }
-};
-
-const glassCard = {
-  background: 'rgba(15, 15, 20, 0.7)',
-  backdropFilter: 'blur(30px)',
-  border: '1px solid var(--border-strong)',
-  borderRadius: '2rem',
-  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-  padding: '2.5rem'
 };
 
 const inputStyle = (err) => ({
   width: '100%',
-  background: 'rgba(255,255,255,0.03)',
-  border: `1px solid ${err ? '#ef4444' : 'var(--border-subtle)'}`,
+  background: '#0e1116',
+  border: err ? '1px solid #ef4444' : '1px solid rgba(0, 242, 254, 0.3)',
   borderRadius: '14px',
   padding: '14px 14px 14px 44px',
   color: '#fff',
   fontSize: '0.95rem',
   outline: 'none',
-  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+  boxShadow: 'none',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   boxSizing: 'border-box',
 });
 
@@ -70,11 +63,23 @@ export default function Auth() {
     first: '', last: '', dob: '', user: '', email: '', pass: '', conf: ''
   });
 
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotStatus, setForgotStatus] = useState('idle'); // idle | loading | success | error
+
   useEffect(() => {
     // Ensuring scroll is enabled for all devices
     document.body.style.overflow = 'auto';
     return () => { document.body.style.overflow = ''; };
   }, []);
+
+  const handleForgotSubmit = (e) => {
+    e.preventDefault();
+    if (!forgotEmail) return setForgotStatus('error');
+    setForgotStatus('loading');
+    setTimeout(() => {
+      setForgotStatus('success');
+    }, 1500);
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -149,7 +154,7 @@ export default function Auth() {
               style={{ 
                 width: '64px', height: '64px', 
                 objectFit: 'contain', 
-                filter: 'drop-shadow(0 0 15px rgba(99,102,241,0.5))' 
+                filter: 'drop-shadow(0 0 25px rgba(0, 242, 254, 0.7))' 
               }} 
             />
             <h1 style={brandingStyles.title}>Sun Nexus Solutions</h1>
@@ -195,14 +200,16 @@ export default function Auth() {
             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
             style={{ width: '100%', maxWidth: '480px' }}
           >
-            <div style={glassCard}>
-              <div style={{ display: 'flex', background: 'rgba(255,255,255,0.03)', borderRadius: '16px', padding: '6px', marginBottom: '2.5rem' }}>
+            <div className="glass-card">
+              <div style={{ display: 'flex', background: '#0a0a0f', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '6px', marginBottom: '2.5rem' }}>
                 {['login', 'signup'].map(m => (
                   <button key={m} onClick={() => { setMode(m); setError(''); }}
-                    style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 800, transition: 'all 0.3s', 
-                      background: mode === m ? 'var(--accent-gradient)' : 'transparent',
-                      color: mode === m ? '#fff' : 'rgba(255,255,255,0.4)',
-                      boxShadow: mode === m ? '0 10px 20px rgba(99,102,241,0.2)' : 'none'
+                    className={mode === m ? "hover-glow-btn" : ""}
+                    style={{ flex: 1, padding: '12px', borderRadius: '12px', cursor: 'pointer', fontSize: '1rem', fontWeight: 800, transition: 'all 0.3s', 
+                      background: mode === m ? 'linear-gradient(to right, #4f46e5, #0ea5e9)' : 'transparent',
+                      color: mode === m ? '#fff' : '#6b7280',
+                      border: mode === m ? '1px solid rgba(0, 242, 254, 0.4)' : '1px solid transparent',
+                      boxShadow: 'none'
                     }}
                   >
                     {m === 'login' ? 'Login' : 'Sign Up'}
@@ -215,33 +222,37 @@ export default function Auth() {
                   {mode === 'login' ? (
                     <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                       <div>
-                        <h3 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '8px' }}>Executive Portal</h3>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Authorize your session to continue.</p>
+                        <h3 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '8px', color: '#fff', letterSpacing: '-0.02em' }}>Executive Portal</h3>
+                        <p style={{ color: '#9ca3af', fontSize: '0.95rem' }}>Authorize your session to continue.</p>
                       </div>
 
                       <div style={{ position: 'relative' }}>
-                        <User size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.2)' }} />
+                        <User size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#0ea5e9' }} />
                         <input value={lUser} onChange={e => setLUser(e.target.value)} placeholder="Username" style={inputStyle(error && !lUser)} />
                       </div>
 
                       <div style={{ position: 'relative' }}>
-                        <Lock size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.2)' }} />
+                        <Lock size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#0ea5e9' }} />
                         <input type="password" value={lPass} onChange={e => setLPass(e.target.value)} placeholder="Password" style={inputStyle(error && !lPass)} />
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-8px' }}>
+                        <span onClick={() => { setMode('forgot'); setForgotStatus('idle'); setForgotEmail(''); }} style={{ fontSize: '0.85rem', fontWeight: 800, color: '#6366f1', cursor: 'pointer' }}>Forgot Password?</span>
                       </div>
 
                       {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 700, padding: '12px', background: 'rgba(239,68,68,0.1)', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.2)' }}>{error}</div>}
                       {success && <div style={{ color: '#22c55e', fontSize: '0.85rem', fontWeight: 700, padding: '12px', background: 'rgba(34,197,94,0.1)', borderRadius: '12px', border: '1px solid rgba(34,197,94,0.2)' }}>{success}</div>}
 
-                      <button type="submit" disabled={loading} style={{ 
-                        width: '100%', padding: '16px', borderRadius: '16px', border: 'none', background: 'var(--accent-gradient)', 
-                        color: 'white', fontWeight: 900, fontSize: '1rem', cursor: 'pointer', display: 'flex', 
-                        alignItems: 'center', justifyContent: 'center', gap: '10px', boxShadow: '0 10px 30px rgba(99,102,241,0.3)',
-                        opacity: loading ? 0.7 : 1
+                      <button type="submit" disabled={loading} className="hover-glow-btn" style={{ 
+                        width: '100%', padding: '16px', borderRadius: '14px', border: '1px solid rgba(0, 242, 254, 0.4)', background: 'linear-gradient(to right, #4f46e5, #0ea5e9)', 
+                        color: 'white', fontWeight: 900, fontSize: '1.1rem', cursor: 'pointer', display: 'flex', 
+                        alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: 'none',
+                        opacity: loading ? 0.7 : 1, marginTop: '8px'
                       }}>
                         {loading ? <Orbit className="animate-spin" /> : <>Login<ArrowRight size={18} /></>}
                       </button>
                     </form>
-                  ) : (
+                  ) : mode === 'signup' ? (
                     <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                       <div>
                         <h3 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '8px' }}>Join the Nexus</h3>
@@ -261,14 +272,65 @@ export default function Auth() {
                       {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 700, padding: '12px', background: 'rgba(239,68,68,0.1)', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.2)' }}>{error}</div>}
                       {success && <div style={{ color: '#22c55e', fontSize: '0.85rem', fontWeight: 700, padding: '12px', background: 'rgba(34,197,94,0.1)', borderRadius: '12px', border: '1px solid rgba(34,197,94,0.2)' }}>{success}</div>}
 
-                      <button type="submit" disabled={loading} style={{ 
-                        width: '100%', padding: '16px', borderRadius: '16px', border: 'none', background: 'var(--accent-gradient)', 
-                        color: 'white', fontWeight: 900, fontSize: '1rem', cursor: 'pointer', display: 'flex', 
-                        alignItems: 'center', justifyContent: 'center', gap: '10px', boxShadow: '0 10px 30px rgba(99,102,241,0.3)',
-                        opacity: loading ? 0.7 : 1
+                      <button type="submit" disabled={loading} className="hover-glow-btn" style={{ 
+                        width: '100%', padding: '16px', borderRadius: '14px', border: '1px solid rgba(0, 242, 254, 0.4)', background: 'linear-gradient(to right, #4f46e5, #0ea5e9)', 
+                        color: 'white', fontWeight: 900, fontSize: '1.1rem', cursor: 'pointer', display: 'flex', 
+                        alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: 'none',
+                        opacity: loading ? 0.7 : 1, marginTop: '8px'
                       }}>
-                        {loading ? <Orbit className="animate-spin" /> : <>Create Account<ArrowRight size={18} /></>}
+                        {loading ? <Orbit className="animate-spin" /> : <>Sign Up<ArrowRight size={18} /></>}
                       </button>
+                    </form>
+                  ) : (
+                    <form onSubmit={handleForgotSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                      {forgotStatus === 'success' ? (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', padding: '1rem 0' }}>
+                          <CheckCircle2 size={48} style={{ color: '#00f2fe', margin: '0 auto 1.5rem', filter: 'drop-shadow(0 0 15px rgba(0,242,254,0.5))' }} />
+                          <h3 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: 900, marginBottom: '0.5rem' }}>Bypass Dispatched</h3>
+                          <p style={{ color: '#9ca3af', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                            A secure resync sequence has been activated for <strong style={{color:'#fff'}}>{forgotEmail}</strong>.
+                          </p>
+                          <button type="button" onClick={() => { setMode('login'); setForgotStatus('idle'); }} style={{ background: 'transparent', border: 'none', color: '#9ca3af', fontSize: '0.9rem', fontWeight: 800, marginTop: '2rem', cursor: 'pointer' }}
+                            onMouseEnter={e => e.currentTarget.style.color = '#fff'} onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}
+                          >
+                            Return to Portal Login
+                          </button>
+                        </motion.div>
+                      ) : (
+                        <>
+                          <div>
+                            <h3 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '8px', color: '#fff', letterSpacing: '-0.02em' }}>Reset Strategy</h3>
+                            <p style={{ color: '#9ca3af', fontSize: '0.95rem' }}>Initiate a bypass for your encrypted credentials.</p>
+                          </div>
+
+                          <div style={{ position: 'relative' }}>
+                            <Mail size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#0ea5e9' }} />
+                            <input 
+                              type="email" 
+                              value={forgotEmail} 
+                              onChange={e => { setForgotEmail(e.target.value); setForgotStatus('idle'); }} 
+                              placeholder="Verification Email" 
+                              style={inputStyle(forgotStatus === 'error' && !forgotEmail)} 
+                            />
+                          </div>
+                          
+                          <button type="submit" disabled={forgotStatus === 'loading'} className="hover-glow-btn" style={{ 
+                            width: '100%', padding: '16px', borderRadius: '14px', border: '1px solid rgba(0, 242, 254, 0.4)', background: 'linear-gradient(to right, #4f46e5, #0ea5e9)', 
+                            color: 'white', fontWeight: 900, fontSize: '1.1rem', cursor: 'pointer', display: 'flex', 
+                            alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: 'none',
+                            opacity: forgotStatus === 'loading' ? 0.7 : 1, marginTop: '8px'
+                          }}>
+                            {forgotStatus === 'loading' ? <Orbit className="animate-spin" /> : <>Request Resync <Mail size={18} /></>}
+                          </button>
+
+                          <div style={{ textAlign: 'center', marginTop: '4px' }}>
+                            <span onClick={() => { setMode('login'); setForgotStatus('idle'); }} style={{ fontSize: '0.85rem', fontWeight: 800, color: '#9ca3af', cursor: 'pointer' }}
+                              onMouseEnter={e => e.currentTarget.style.color = '#fff'} onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}>
+                              Return to Portal Login
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </form>
                   )}
                 </motion.div>
@@ -278,9 +340,42 @@ export default function Auth() {
         </div>
       </div>
 
+
+
       <style>{`
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .glass-card {
+          background: #11131a;
+          border: 1px solid rgba(0, 242, 254, 0.4);
+          border-radius: 1.5rem;
+          box-shadow: none;
+          padding: 3rem 2.5rem;
+          transition: box-shadow 0.3s ease-in-out;
+        }
+
+        .glass-card:hover {
+          box-shadow: 0 0 60px rgba(0, 242, 254, 0.2), inset 0 0 20px rgba(0, 242, 254, 0.05);
+        }
+
+        .auth-container form input:hover {
+          box-shadow: 0 0 15px rgba(0, 242, 254, 0.2) !important;
+        }
+
+        .auth-container form input:focus {
+          border: 1px solid #00f2fe !important;
+          box-shadow: 0 0 20px rgba(0, 242, 254, 0.3), inset 0 0 10px rgba(0, 242, 254, 0.05) !important;
+          background: #0d1520 !important;
+        }
+
+        .hover-glow-btn {
+          transition: box-shadow 0.3s ease !important;
+        }
+        
+        .hover-glow-btn:hover {
+          box-shadow: 0 0 25px rgba(14, 165, 233, 0.6) !important;
+        }
         
         html, body {
           background-color: #050507 !important;

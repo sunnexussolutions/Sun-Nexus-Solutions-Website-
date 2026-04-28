@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Edit3, Camera, Save, CheckCircle2, X, Briefcase, User,
-  Code2, Zap, Star, Award, GitBranch, BookOpen, TrendingUp, MapPin, Calendar
+  Code2, Zap, Star, Award, GitBranch, BookOpen, TrendingUp, MapPin, Calendar, ExternalLink
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -247,6 +247,49 @@ const Profile = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* ── Completed Projects ── */}
+      <motion.div variants={itemVariants} className="nx-card p-6 flex flex-col gap-6" style={{ marginTop: '1.5rem' }}>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
+          <Briefcase size={20} style={{ color: 'var(--accent-primary)' }} /> Completed Projects
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[
+            { title: 'Nexus Authentication Protocol', desc: 'High-fidelity access management system with role-based JWT handshake.', tech: ['React', 'Node.js', 'Framer Motion'], repo: '#' },
+            { title: 'Cognitive Assessment Engine', desc: 'Dynamic MCQ delivery and real-time performance analytics module.', tech: ['Vite', 'PostgreSQL', 'FastAPI'], repo: '#' },
+          ].map((proj, i) => (
+            <div key={i} style={{ 
+              background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)', borderRadius: '1.25rem', padding: '1.5rem', 
+              transition: 'all 0.3s', cursor: 'pointer', position: 'relative' 
+            }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(99,102,241,0.1)'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-subtle)'; e.currentTarget.style.boxShadow = 'none'; }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>{proj.title}</h4>
+                <a href={proj.repo} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', transition: 'color 0.2s' }}
+                   onMouseEnter={e => e.currentTarget.style.color = '#00f2fe'}
+                   onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>
+                  <ExternalLink size={16} />
+                </a>
+              </div>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '16px' }}>{proj.desc}</p>
+              
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {proj.tech.map((t, idx) => (
+                  <span key={idx} style={{ 
+                    padding: '4px 10px', borderRadius: '6px', fontSize: '10px', fontWeight: 800, 
+                    textTransform: 'uppercase', letterSpacing: '0.05em', background: 'rgba(99,102,241,0.1)', 
+                    color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)' 
+                  }}>
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
 
       {/* ── Edit Modal ── */}
       {createPortal(

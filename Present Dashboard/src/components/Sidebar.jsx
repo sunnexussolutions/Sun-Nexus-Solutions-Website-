@@ -52,8 +52,7 @@ const Sidebar = ({ isOpen, toggleSidebar, activePage, setActivePage }) => {
           {/* Logo */}
           <div className="p-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <motion.div
-                whileHover={{ rotate: 15, scale: 1.1 }}
+              <div
                 className="flex items-center justify-center"
                 style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}
               >
@@ -63,7 +62,7 @@ const Sidebar = ({ isOpen, toggleSidebar, activePage, setActivePage }) => {
                   className="w-full h-full object-contain"
                   style={{ filter: 'drop-shadow(0 0 8px var(--accent-primary))' }}
                 />
-              </motion.div>
+              </div>
               <span className="text-xl font-bold" style={{ background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Sun Nexus
               </span>

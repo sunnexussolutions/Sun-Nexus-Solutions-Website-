@@ -57,7 +57,7 @@ const Dashboard = () => {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-ultra bg-accent-primary/10 text-accent-primary">
-              Operational Status: Optimal
+              {/* Operational Status: Optimal */}
             </span>
           </div>
           <h1 className="text-3xl md:text-5xl font-black tracking-tighter">
