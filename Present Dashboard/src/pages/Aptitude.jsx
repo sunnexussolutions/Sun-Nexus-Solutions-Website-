@@ -73,7 +73,7 @@ const Aptitude = () => {
 
       {/* Category list */}
       {!selectedCategory && (
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-12">
           <div className="flex flex-col md-flex-row items-end justify-between gap-6">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3 mb-2">
@@ -89,15 +89,23 @@ const Aptitude = () => {
             </div>
           </div>
 
-          <div className="grid cols-1 sm-cols-3 gap-12">
+          <div className="grid cols-1 md-cols-2 lg-cols-3 gap-12 mt-10">
             {CATEGORY_META.map((cat, i) => (
               <motion.div
                 key={i}
                 whileHover={{ scale: 1.05, y: -10 }}
                 onClick={() => setSelectedCategory(cat.title)}
                 className="nx-card p-10 flex flex-col gap-8 cursor-pointer relative group overflow-hidden"
-                style={{ borderRadius: '2.5rem' }}
+                style={{ borderRadius: '2rem' }}
               >
+                {/* Individually Spread Shade */}
+                <div 
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${cat.color}10 0%, ${cat.color}05 100%)`,
+                    borderRadius: 'inherit'
+                  }}
+                />
                 <div className="absolute top-0 right-0 w-32 h-32 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-500" style={{ background: `${cat.color}08` }} />
                 <div className="flex items-center justify-between relative z-10">
                   <div className="flex items-center justify-center p-5 rounded-3xl shadow-xl" style={{ backgroundColor: `${cat.color}15`, color: cat.color }}>
@@ -113,8 +121,40 @@ const Aptitude = () => {
                     {topicsForCategory(cat.title).length} Topics
                   </p>
                 </div>
-                <button className="flex items-center gap-3 font-black text-xs uppercase tracking-ultra transition-all group relative z-10" style={{ color: 'var(--accent-primary)' }}>
-                  Explore Topics <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+                <button 
+                  className="relative overflow-hidden px-6 py-4 font-black text-[9px] uppercase tracking-ultra outline-none duration-300 group active:opacity-75 mt-auto self-start"
+                  style={{ 
+                    background: `${cat.color}10`, 
+                    color: cat.color, 
+                    border: `1px solid ${cat.color}40`,
+                    borderBottom: `4px solid ${cat.color}`,
+                    borderRadius: '9999px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    zIndex: 20
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.filter = 'brightness(1.5)';
+                    e.currentTarget.style.borderTopWidth = '4px';
+                    e.currentTarget.style.borderBottomWidth = '1px';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.filter = 'none';
+                    e.currentTarget.style.borderTopWidth = '1px';
+                    e.currentTarget.style.borderBottomWidth = '4px';
+                  }}
+                >
+                  <span 
+                    className="absolute -top-[150%] left-0 inline-flex w-[400px] h-[5px] opacity-50 duration-500 group-hover:top-[150%]"
+                    style={{ 
+                      background: cat.color, 
+                      boxShadow: `0 0 10px 10px ${cat.color}40`,
+                      borderRadius: '999px'
+                    }}
+                  />
+                  Explore Topics <ArrowRight size={14} className="transition-transform" />
                 </button>
               </motion.div>
             ))}
@@ -138,7 +178,7 @@ const Aptitude = () => {
             <p className="font-medium" style={{ color: 'var(--text-muted)' }}>Select a module to sharpen your skills.</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid cols-1 md-cols-2 lg-cols-3 gap-12 pt-10 pb-16">
             {topicsForCategory(selectedCategory).length === 0 && (
               <div className="nx-card p-10 text-center" style={{ borderRadius: '2rem' }}>
                 <p style={{ color: 'var(--text-muted)' }}>No assessments posted yet for this category. Check back soon!</p>
@@ -153,12 +193,14 @@ const Aptitude = () => {
               return (
                 <motion.div
                   key={topic.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.08 }}
-                  className="nx-card p-8 flex flex-col md:flex-row md:items-center justify-between gap-8 relative overflow-hidden group"
+                  whileHover={{ y: -10, scale: 1.02 }}
+                  className="nx-card p-8 md:p-10 flex flex-col gap-8 relative overflow-hidden group h-full"
                   style={{ 
-                    borderRadius: '2.5rem', 
+                    borderRadius: '2rem',
+                    transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                     background: isLocked 
                       ? 'rgba(10, 14, 28, 0.6)' 
                       : `linear-gradient(135deg, var(--bg-secondary) 0%, ${catColor}05 100%)`,
@@ -168,6 +210,14 @@ const Aptitude = () => {
                     border: isLocked ? '1px solid rgba(245, 158, 11, 0.2)' : '1px solid var(--border-subtle)'
                   }}
                 >
+                  {/* Individually Spread Shade */}
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{ 
+                      background: `linear-gradient(135deg, ${catColor}10 0%, ${catColor}05 100%)`,
+                      borderRadius: 'inherit'
+                    }}
+                  />
                   {/* High-Fidelity Lock Indicator */}
                   {isLocked && (
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#f59e0b] opacity-[0.03] blur-3xl pointer-events-none" />
@@ -179,85 +229,137 @@ const Aptitude = () => {
                     <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ backgroundColor: '#f59e0b' }} />
                   )}
 
-                  <div className="flex flex-col gap-5 flex-1 relative z-10">
-                    <div className="flex items-center gap-4">
+                  <div className="flex flex-col gap-4 relative z-10 h-full">
+                    <div className="flex flex-wrap items-center gap-3">
                       <span className="text-[10px] font-black uppercase tracking-ultra px-3 py-1 rounded-lg" style={{ backgroundColor: isLocked ? 'rgba(245,158,11,0.1)' : `${catColor}15`, color: isLocked ? '#f59e0b' : catColor }}>
                         {topic.week}
                       </span>
-                      <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
-                        <HelpCircle size={12} style={{ opacity: 0.5 }} /> {topic.questions?.length || 0} Qns
-                      </span>
-                      <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
-                        <Timer size={12} style={{ opacity: 0.5 }} /> {topic.timeLimit} min
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
+                          <HelpCircle size={12} style={{ opacity: 0.5 }} /> {topic.questions?.length || 0} Qns
+                        </span>
+                        <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
+                          <Timer size={12} style={{ opacity: 0.5 }} /> {topic.timeLimit} min
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-2">
-                       <h4 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
-                        {topic.topic}
-                        {isLocked && (
-                          <span className="ml-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f59e0b10] border border-[#f59e0b20] text-[#f59e0b] text-[9px] font-black uppercase tracking-widest">
-                            <Target size={10} /> Protocol Lockdown
-                          </span>
-                        )}
-                      </h4>
-                      <p className="text-xs font-medium max-w-md" style={{ color: 'var(--text-muted)' }}>
-                        {isLocked 
-                          ? `Protocol sequence scheduled to initialize on ${new Date(topic.unlockTime).toLocaleDateString()} at ${new Date(topic.unlockTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`
-                          : `Focused practice module covering core concepts for ${topic.topic.toLowerCase()}.`
-                        }
-                      </p>
-                    </div>
-                  </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', alignSelf: 'flex-start', flexShrink: 0 }}>
-                    {!isLocked && ytLink && (
-                      <button
-                        onClick={() => window.open(ytLink, '_blank', 'noopener,noreferrer')}
-                        title="Watch on YouTube"
-                        style={{ padding: '10px', borderRadius: '12px', background: 'rgba(255,0,0,0.1)', color: '#ff4444', border: '1px solid rgba(255,0,0,0.2)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
-                      >
-                        <PlayCircle size={16} />
-                      </button>
-                    )}
-                    
-                    {isLocked ? (
-                       <div className="px-8 py-3.5 rounded-2xl bg-[#f59e0b08] border border-[#f59e0b30] text-[#f59e0b] font-black uppercase tracking-widest text-xs flex items-center gap-3 shadow-[0_0_20px_rgba(245,158,11,0.05)]">
-                         <Timer size={16} className="animate-pulse" />
-                         Scheduled
-                       </div>
-                    ) : result ? (
-                      <button
-                        onClick={() => setActiveAssessment({ ...topic, previousResult: result })}
-                        className="nx-btn-primary px-8 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all hover:scale-[1.03] active:scale-95"
-                        style={{ 
-                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', 
-                          color: 'white', 
-                          minWidth: '130px', 
-                          justifyContent: 'center',
-                          boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.4)',
-                          border: 'none'
-                        }}
-                      >
-                        <span className="font-black uppercase tracking-widest text-xs">Review</span>
-                        <Award size={16} fill="white" />
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => setActiveAssessment(topic)}
-                        className="nx-btn-primary px-8 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all hover:scale-[1.03] active:scale-95"
-                        style={{ 
-                          background: 'var(--accent-gradient)', 
-                          color: 'white',
-                          minWidth: '130px', 
-                          justifyContent: 'center',
-                          boxShadow: '0 10px 25px -5px rgba(0, 242, 254, 0.4)',
-                          border: 'none'
-                        }}
-                      >
-                        <span className="font-black uppercase tracking-widest text-xs">Start</span>
-                        <Zap size={16} fill="white" />
-                      </button>
-                    )}
+                    <div className="flex flex-col gap-3">
+                       <h4 className="text-2xl font-black tracking-tight leading-tight" style={{ color: 'var(--text-primary)' }}>
+                        {topic.topic}
+                      </h4>
+                      
+                      {isLocked ? (
+                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#f59e0b10] border border-[#f59e0b20] text-[#f59e0b] text-[9px] font-black uppercase tracking-ultra self-start">
+                          <Target size={10} /> Protocol Lockdown
+                        </div>
+                      ) : (
+                        <p className="text-xs font-medium text-muted line-clamp-3 leading-relaxed">
+                          Focused practice module covering core concepts for {topic.topic.toLowerCase()}.
+                        </p>
+                      )}
+
+                      {isLocked && (
+                         <p className="text-[10px] font-bold text-muted mt-2">
+                           INITIALIZING ON {new Date(topic.unlockTime).toLocaleDateString()} AT {new Date(topic.unlockTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                         </p>
+                      )}
+                    </div>
+
+                    <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-4">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {!isLocked && ytLink && (
+                          <button
+                            onClick={() => window.open(ytLink, '_blank', 'noopener,noreferrer')}
+                            title="Watch on YouTube"
+                            style={{ padding: '10px', borderRadius: '12px', background: 'rgba(255,0,0,0.1)', color: '#ff4444', border: '1px solid rgba(255,0,0,0.2)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                          >
+                            <PlayCircle size={16} />
+                          </button>
+                        )}
+                        
+                        {isLocked ? (
+                           <div className="px-8 py-3.5 rounded-2xl bg-[#f59e0b08] border border-[#f59e0b30] text-[#f59e0b] font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-[0_0_20px_rgba(245,158,11,0.05)]">
+                             <Timer size={14} className="animate-pulse" />
+                             Scheduled
+                           </div>
+                        ) : result ? (
+                          <button
+                            onClick={() => setActiveAssessment({ ...topic, previousResult: result })}
+                            className="relative overflow-hidden px-6 py-2 font-black text-[9px] uppercase tracking-ultra outline-none duration-300 group active:opacity-75"
+                            style={{ 
+                              background: '#10b98115', 
+                              color: '#10b981', 
+                              border: '1px solid #10b98140',
+                              borderBottom: '4px solid #10b981',
+                              borderRadius: '9999px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              cursor: 'pointer',
+                              justifyContent: 'center'
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.filter = 'brightness(1.5)';
+                              e.currentTarget.style.borderTopWidth = '4px';
+                              e.currentTarget.style.borderBottomWidth = '1px';
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.filter = 'none';
+                              e.currentTarget.style.borderTopWidth = '1px';
+                              e.currentTarget.style.borderBottomWidth = '4px';
+                            }}
+                          >
+                            <span 
+                              className="absolute -top-[150%] left-0 inline-flex w-[400px] h-[5px] opacity-50 duration-500 group-hover:top-[150%]"
+                              style={{ 
+                                background: '#10b981', 
+                                boxShadow: '0 0 10px 10px #10b98140',
+                                borderRadius: '999px'
+                              }}
+                            />
+                            Review <Award size={14} className="transition-transform" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setActiveAssessment(topic)}
+                            className="relative overflow-hidden px-14 py-4 font-black text-[9px] uppercase tracking-ultra outline-none duration-300 group active:opacity-75"
+                            style={{ 
+                              background: `${catColor}10`, 
+                              color: catColor, 
+                              border: `1px solid ${catColor}40`,
+                              borderBottom: `4px solid ${catColor}`,
+                              borderRadius: '9999px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              cursor: 'pointer',
+                              justifyContent: 'center'
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.filter = 'brightness(1.5)';
+                              e.currentTarget.style.borderTopWidth = '4px';
+                              e.currentTarget.style.borderBottomWidth = '1px';
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.filter = 'none';
+                              e.currentTarget.style.borderTopWidth = '1px';
+                              e.currentTarget.style.borderBottomWidth = '4px';
+                            }}
+                          >
+                            <span 
+                              className="absolute -top-[150%] left-0 inline-flex w-[400px] h-[5px] opacity-50 duration-500 group-hover:top-[150%]"
+                              style={{ 
+                                background: catColor, 
+                                boxShadow: `0 0 10px 10px ${catColor}40`,
+                                borderRadius: '999px'
+                              }}
+                            />
+                            Start <Zap size={14} className="transition-transform" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               );

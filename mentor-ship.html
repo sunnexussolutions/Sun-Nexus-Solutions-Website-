@@ -64,14 +64,17 @@
       <p style="font-size: 1.8rem; color: #ddd; margin-bottom: 0;">Academic Year: September 2024 - May 2025</p>
     </section> -->
 
-    <!-- Statistics Section -->
-    <section class="mentees" style="padding: 60px 20px;">
-      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 60px; background: rgba(99,102,241,0.06); padding: 48px; border-radius: 24px; border: 1.5px dashed var(--color-primary);">
-        <h2 style="margin: 0 0 16px 0; font-size: 3rem; color: var(--text-primary);">Ready to Start Your Journey?</h2>
-        <p style="font-size: 1.6rem; color: var(--text-secondary); max-width: 600px; margin-bottom: 32px;">Not sure which domain to choose? Take our 30-second interest assessment and get matched with a mentor today.</p>
-        <button class="btn btn-primary btn-lg" onclick="startInterestQuiz()" style="font-size:1.8rem; padding: 16px 48px; border-radius: 12px; transform: scale(1); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🎯 Find My Perfect Domain</button>
+    <!-- Quiz Interest Section -->
+    <section class="quiz-cta-container">
+      <div class="quiz-cta-card">
+        <h2>Ready to Start Your Journey?</h2>
+        <p>Not sure which domain to choose? Take our interest assessment and discover the perfect tech path for your career today.</p>
+        <button class="btn-primary" onclick="startInterestQuiz()">🎯 Find My Perfect Domain</button>
       </div>
+    </section>
 
+    <!-- Statistics Section -->
+    <section class="mentees" style="padding: 60px 48px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
         <div style="text-align: left;">
           <h2 style="margin: 0; color: var(--text-primary);">Membership Statistics</h2>
@@ -220,53 +223,58 @@
 
   <!-- Interest Quiz Modal -->
   <div id="quizModal" style="display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);">
-    <div style="background: var(--bg-card, #16181f); border: 1px solid var(--border-color, rgba(99,102,241,0.22)); border-radius: 24px; width: 90%; max-width: 600px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 48px; box-shadow: 0 0 50px rgba(99,102,241,0.2);">
-      <button onclick="document.getElementById('quizModal').style.display='none'" style="position:absolute; top:20px; right:30px; background:none; border:none; color:var(--text-secondary,#94a3b8); font-size:2rem; cursor:pointer;">✕</button>
+    <div style="background: var(--bg-card, #16181f); border: 1px solid var(--border-color, rgba(0, 242, 254, 0.22)); border-radius: 32px; width: 95%; max-width: 600px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 48px; box-shadow: 0 0 60px rgba(0, 242, 254, 0.15);">
+      <button onclick="document.getElementById('quizModal').style.display='none'" style="position:absolute; top:24px; right:30px; background:none; border:none; color:var(--text-secondary,#94a3b8); font-size:2.5rem; cursor:pointer; transition: color 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-secondary)'">✕</button>
+      
       <div id="quiz-step-1">
-        <h3 style="font-size:2.5rem; color:var(--text-primary,#f1f5f9); margin-bottom:16px;">What excites you more?</h3>
-        <p style="color:#ddd; margin-bottom:32px;">Pick one to help us narrow down your path.</p>
-        <div style="display:grid; gap:16px;">
-          <button class="btn btn-secondary w-full" onclick="nextQuizStep(2, 'web-dev')" style="text-align:left; font-size:1.6rem; padding:20px;">Creating beautiful visual interfaces</button>
-          <button class="btn btn-secondary w-full" onclick="nextQuizStep(2, 'data-analytics')" style="text-align:left; font-size:1.6rem; padding:20px;">Solving complex data problems</button>
-          <button class="btn btn-secondary w-full" onclick="nextQuizStep(2, 'cyber-security')" style="text-align:left; font-size:1.6rem; padding:20px;">Protecting information from hackers</button>
-          <button class="btn btn-secondary w-full" onclick="nextQuizStep(2, 'ai-ml')" style="text-align:left; font-size:1.6rem; padding:20px;">Building intelligent, thinking machines</button>
+        <h3 class="quiz-step-title">What excites you more?</h3>
+        <p class="quiz-step-subtitle">Pick one to help us narrow down your path.</p>
+        <div style="display:grid; gap:12px;">
+          <button class="quiz-option-btn" onclick="nextQuizStep(2, 'web-dev')">Creating beautiful visual interfaces</button>
+          <button class="quiz-option-btn" onclick="nextQuizStep(2, 'data-analytics')">Solving complex data problems</button>
+          <button class="quiz-option-btn" onclick="nextQuizStep(2, 'cyber-security')">Protecting information from hackers</button>
+          <button class="quiz-option-btn" onclick="nextQuizStep(2, 'ai-ml')">Building intelligent, thinking machines</button>
         </div>
       </div>
+
       <div id="quiz-step-2" style="display:none;">
-        <h3 style="font-size:2.5rem; color:var(--text-primary,#f1f5f9); margin-bottom:16px;">Which "Superpower" sounds better?</h3>
-        <p style="color:#ddd; margin-bottom:32px;">Almost there...</p>
-        <div style="display:grid; gap:16px;">
-          <button class="btn btn-secondary w-full" onclick="nextQuizStep(3, 'web-dev')" style="text-align:left; font-size:1.6rem; padding:20px;">Building apps used by millions</button>
-          <button class="btn btn-secondary w-full" onclick="nextQuizStep(3, 'ai-ml')" style="text-align:left; font-size:1.6rem; padding:20px;">Predicting the future with data</button>
-          <button class="btn btn-secondary w-full" onclick="nextQuizStep(3, 'cyber-security')" style="text-align:left; font-size:1.6rem; padding:20px;">Outsmarting digital criminals</button>
-          <button class="btn btn-secondary w-full" onclick="nextQuizStep(3, 'data-analytics')" style="text-align:left; font-size:1.6rem; padding:20px;">Finding hidden truths in numbers</button>
+        <h3 class="quiz-step-title">Which "Superpower" sounds better?</h3>
+        <p class="quiz-step-subtitle">Almost there...</p>
+        <div style="display:grid; gap:12px;">
+          <button class="quiz-option-btn" onclick="nextQuizStep(3, 'web-dev')">Building apps used by millions</button>
+          <button class="quiz-option-btn" onclick="nextQuizStep(3, 'ai-ml')">Predicting the future with data</button>
+          <button class="quiz-option-btn" onclick="nextQuizStep(3, 'cyber-security')">Outsmarting digital criminals</button>
+          <button class="quiz-option-btn" onclick="nextQuizStep(3, 'data-analytics')">Finding hidden truths in numbers</button>
         </div>
       </div>
+
       <div id="quiz-step-3" style="display:none;">
-        <h3 style="font-size:2.5rem; color:var(--text-primary,#f1f5f9); margin-bottom:16px;">Your ideal work result is:</h3>
-        <p style="color:#ddd; margin-bottom:32px;">Just two more...</p>
-        <div style="display:grid; gap:16px;">
-          <button class="btn btn-secondary w-full" onclick="nextQuizStep(4, 'web-dev')" style="text-align:left; font-size:1.6rem; padding:20px;">A pixel-perfect, interactive website</button>
-          <button class="btn btn-secondary w-full" onclick="nextQuizStep(4, 'ai-ml')" style="text-align:left; font-size:1.6rem; padding:20px;">An AI that can recognize objects or speech</button>
-          <button class="btn btn-secondary w-full" onclick="nextQuizStep(4, 'data-analytics')" style="text-align:left; font-size:1.6rem; padding:20px;">A dashboard showing business insights</button>
-          <button class="btn btn-secondary w-full" onclick="nextQuizStep(4, 'cyber-security')" style="text-align:left; font-size:1.6rem; padding:20px;">A secure, unhackable infrastructure</button>
+        <h3 class="quiz-step-title">Your ideal work result is:</h3>
+        <p class="quiz-step-subtitle">Just two more...</p>
+        <div style="display:grid; gap:12px;">
+          <button class="quiz-option-btn" onclick="nextQuizStep(4, 'web-dev')">A pixel-perfect, interactive website</button>
+          <button class="quiz-option-btn" onclick="nextQuizStep(4, 'ai-ml')">An AI that can recognize objects or speech</button>
+          <button class="quiz-option-btn" onclick="nextQuizStep(4, 'data-analytics')">A dashboard showing business insights</button>
+          <button class="quiz-option-btn" onclick="nextQuizStep(4, 'cyber-security')">A secure, unhackable infrastructure</button>
         </div>
       </div>
+
       <div id="quiz-step-4" style="display:none;">
-        <h3 style="font-size:2.5rem; color:var(--text-primary,#f1f5f9); margin-bottom:16px;">Pick your favorite "Toolbox":</h3>
-        <p style="color:#ddd; margin-bottom:32px;">Last one!</p>
-        <div style="display:grid; gap:16px;">
-          <button class="btn btn-secondary w-full" onclick="finishQuiz('web-dev')" style="text-align:left; font-size:1.6rem; padding:20px;">React, Tailwind & JavaScript</button>
-          <button class="btn btn-secondary w-full" onclick="finishQuiz('ai-ml')" style="text-align:left; font-size:1.6rem; padding:20px;">Python, PyTorch & GPU Clusters</button>
-          <button class="btn btn-secondary w-full" onclick="finishQuiz('data-analytics')" style="text-align:left; font-size:1.6rem; padding:20px;">SQL, Power BI & Statistics</button>
-          <button class="btn btn-secondary w-full" onclick="finishQuiz('cyber-security')" style="text-align:left; font-size:1.6rem; padding:20px;">Kali Linux, Wireshark & Encryption</button>
+        <h3 class="quiz-step-title">Pick your favorite "Toolbox":</h3>
+        <p class="quiz-step-subtitle">Last one!</p>
+        <div style="display:grid; gap:12px;">
+          <button class="quiz-option-btn" onclick="finishQuiz('web-dev')">React, Tailwind & JavaScript</button>
+          <button class="quiz-option-btn" onclick="finishQuiz('ai-ml')">Python, PyTorch & GPU Clusters</button>
+          <button class="quiz-option-btn" onclick="finishQuiz('data-analytics')">SQL, Power BI & Statistics</button>
+          <button class="quiz-option-btn" onclick="finishQuiz('cyber-security')">Kali Linux, Wireshark & Encryption</button>
         </div>
       </div>
+
       <div id="quiz-result" style="display:none; text-align:center;">
-        <div style="font-size:5rem; margin-bottom:20px;">🎉</div>
-        <h3 style="font-size:2.8rem; color:var(--color-primary-light,#818cf8); margin-bottom:16px;">It's a Match!</h3>
-        <p id="matchText" style="font-size:1.8rem; color:#ddd; margin-bottom:32px;"></p>
-        <button class="btn btn-primary" id="quizActionBtn" style="width:100%; font-size:1.8rem; padding:16px;">View This Module</button>
+        <div class="quiz-result-emoji">🚀</div>
+        <h3 class="quiz-match-title">It's a Match!</h3>
+        <p id="matchText" style="font-size:1.8rem; color:var(--text-secondary); margin-bottom:32px; line-height:1.6;"></p>
+        <button class="btn-primary" id="quizActionBtn" style="width:100%;">View This Module</button>
       </div>
     </div>
   </div>

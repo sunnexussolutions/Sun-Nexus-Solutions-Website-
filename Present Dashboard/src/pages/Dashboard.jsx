@@ -15,8 +15,9 @@ const StatCard = ({ icon: Icon, label, value, color, delay }) => (
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay, duration: 0.5 }}
     className="nx-card p-4 sm:p-6 flex items-center gap-3 sm:gap-5"
+    style={{ borderRadius: '2rem' }}
   >
-    <div className="flex items-center justify-center p-3 sm:p-4 rounded-xl sm:rounded-2xl flex-shrink-0" style={{ backgroundColor: `${color}15`, color }}>
+    <div className="flex items-center justify-center p-3 sm:p-4 rounded-2xl sm:rounded-3xl flex-shrink-0" style={{ backgroundColor: `${color}15`, color }}>
       <Icon size={clampNumber(18, 24)} />
     </div>
     <div className="min-w-0">
@@ -67,7 +68,7 @@ const Dashboard = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          <div className="nx-card px-6 py-4 flex items-center gap-4 border-accent-primary/20">
+          <div className="nx-card px-6 py-4 flex items-center gap-4 border-accent-primary/20" style={{ borderRadius: '1.5rem' }}>
             <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500">
               <Flame size={20} />
             </div>
@@ -93,7 +94,8 @@ const Dashboard = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
-          className="lg-col-span-8 nx-card p-5 sm:p-8 flex flex-col gap-6"
+          className="lg-col-span-8 nx-card p-6 sm:p-10 flex flex-col gap-6"
+          style={{ borderRadius: '2rem' }}
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -113,7 +115,7 @@ const Dashboard = () => {
 
         {/* Recent Activity */}
         <div className="lg-col-span-4 flex flex-col gap-6">
-          <div className="nx-card p-8 h-full flex flex-col gap-6">
+          <div className="nx-card p-8 h-full flex flex-col gap-6" style={{ borderRadius: '2rem' }}>
             <h3 className="text-xl font-black tracking-tight">Recent Sessions</h3>
             
             <div className="flex flex-col gap-4">
@@ -124,7 +126,7 @@ const Dashboard = () => {
                 </div>
               ) : (
                 recentAssms.map((res, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-subtle hover:bg-white/[0.04] transition-colors group">
+                  <div key={i} className="flex items-center justify-between p-4 rounded-3xl bg-white/[0.02] border border-subtle hover:bg-white/[0.04] transition-colors group">
                     <div className="flex flex-col gap-0.5">
                       <p className="text-sm font-bold truncate max-w-[150px]">{res.topic}</p>
                       <p className="text-[10px] font-medium text-muted uppercase tracking-widest">

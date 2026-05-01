@@ -236,13 +236,40 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                     </div>
 
                     <button onClick={() => setResultTab('review')}
+                      className="relative overflow-hidden w-100 py-4 font-black text-[10px] uppercase tracking-ultra outline-none duration-300 group active:opacity-75"
                       style={{ 
-                        width: '100%', padding: '12px', borderRadius: '14px', fontWeight: 700, fontSize: '13px', 
-                        color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.25)', 
-                        background: 'rgba(99,102,241,0.07)', cursor: 'pointer', display: 'flex', 
-                        alignItems: 'center', justifyContent: 'center', gap: '8px' 
-                      }}>
-                      <BookOpen size={15} /> 
+                        background: '#10b98115', 
+                        color: '#10b981', 
+                        border: '1px solid #10b98140',
+                        borderBottom: '4px solid #10b981',
+                        borderRadius: '9999px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        justifyContent: 'center',
+                        width: '100%'
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.filter = 'brightness(1.5)';
+                        e.currentTarget.style.borderTopWidth = '4px';
+                        e.currentTarget.style.borderBottomWidth = '1px';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.filter = 'none';
+                        e.currentTarget.style.borderTopWidth = '1px';
+                        e.currentTarget.style.borderBottomWidth = '4px';
+                      }}
+                    >
+                      <span 
+                        className="absolute -top-[150%] left-0 inline-flex w-[400px] h-[5px] opacity-50 duration-500 group-hover:top-[150%]"
+                        style={{ 
+                          background: '#10b981', 
+                          boxShadow: '0 0 10px 10px #10b98140',
+                          borderRadius: '999px'
+                        }}
+                      />
+                      {/* <BookOpen size={15} className="transition-transform" />  */}
                       {finalScore === total ? 'Review All Questions & Explanations' : `Review ${total - finalScore} Mistake${total - finalScore > 1 ? 's' : ''} & Explanations`}
                     </button>
 
@@ -251,8 +278,39 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                         Close
                       </button>
                       <button onClick={() => { setPhase('result'); setResultTab('review'); }}
-                        style={{ flex: 1, padding: '13px', borderRadius: '14px', fontWeight: 800, fontSize: '14px', color: 'white', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)' }}>
-                        <BookOpen size={14} /> Review Answers
+                        className="relative overflow-hidden flex-1 py-3.5 font-black text-[10px] uppercase tracking-ultra outline-none duration-300 group active:opacity-75"
+                        style={{ 
+                          background: '#10b98115', 
+                          color: '#10b981', 
+                          border: '1px solid #10b98140',
+                          borderBottom: '4px solid #10b981',
+                          borderRadius: '9999px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          cursor: 'pointer',
+                          justifyContent: 'center'
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.filter = 'brightness(1.5)';
+                          e.currentTarget.style.borderTopWidth = '4px';
+                          e.currentTarget.style.borderBottomWidth = '1px';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.filter = 'none';
+                          e.currentTarget.style.borderTopWidth = '1px';
+                          e.currentTarget.style.borderBottomWidth = '4px';
+                        }}
+                      >
+                        <span 
+                          className="absolute -top-[150%] left-0 inline-flex w-[400px] h-[5px] opacity-50 duration-500 group-hover:top-[150%]"
+                          style={{ 
+                            background: '#10b981', 
+                            boxShadow: '0 0 10px 10px #10b98140',
+                            borderRadius: '999px'
+                          }}
+                        />
+                        Review Answers
                       </button>
                     </div>
                   </>
@@ -318,11 +376,8 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                     </div>
 
                     <div style={{ display: 'flex', gap: '12px' }}>
-                      <button onClick={() => setResultTab('summary')} style={{ flex: 1, padding: '13px', borderRadius: '14px', fontWeight: 700, fontSize: '14px', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.08)', background: 'transparent', cursor: 'pointer' }}>
-                        Back to Summary
-                      </button>
                       <button onClick={() => setResultTab('summary')}
-                        style={{ flex: 1, padding: '13px', borderRadius: '14px', fontWeight: 800, fontSize: '14px', color: 'white', background: 'var(--accent-gradient)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        style={{ width: '100%', padding: '13px', borderRadius: '14px', fontWeight: 800, fontSize: '14px', color: 'white', background: 'var(--accent-gradient)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                         <Trophy size={14} /> Back to Summary
                       </button>
                     </div>

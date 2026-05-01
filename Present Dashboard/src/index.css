@@ -125,6 +125,8 @@ button {
 .justify-between { justify-content: space-between; }
 .justify-end { justify-content: flex-end; }
 .flex-wrap { flex-wrap: wrap; }
+.inline-flex { display: inline-flex; }
+.items-stretch { align-items: stretch; }
 
 .grid { display: grid; }
 .cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
@@ -140,6 +142,8 @@ button {
 .gap-6 { gap: 1.5rem; }
 .gap-8 { gap: 2rem; }
 .gap-12 { gap: 3rem; }
+.gap-16 { gap: 4rem; }
+.gap-20 { gap: 5rem; }
 
 .hidden { display: none; }
 
@@ -182,6 +186,7 @@ button {
 .p-6 { padding: var(--space-md); }
 .p-8 { padding: var(--space-lg); }
 .p-10 { padding: var(--space-lg); }
+.p-14 { padding: clamp(2rem, 5vw, 4rem); }
 .px-4 { padding-left: var(--space-sm); padding-right: var(--space-sm); }
 .px-6 { padding-left: var(--space-md); padding-right: var(--space-md); }
 .px-8 { padding-left: var(--space-lg); padding-right: var(--space-lg); }
@@ -190,11 +195,29 @@ button {
 .py-6 { padding-top: var(--space-md); padding-bottom: var(--space-md); }
 .pt-8 { padding-top: var(--space-lg); }
 .pt-12 { padding-top: var(--space-xl); }
+.pt-16 { padding-top: 4rem; }
+.pt-20 { padding-top: 5rem; }
+.pt-24 { padding-top: 6rem; }
+.pt-28 { padding-top: 7rem; }
+.pt-32 { padding-top: 8rem; }
 .pb-10 { padding-bottom: var(--space-lg); }
 .mt-8 { margin-top: var(--space-lg); }
 .mt-12 { margin-top: var(--space-xl); }
 .mb-8 { margin-bottom: var(--space-lg); }
 .mb-10 { margin-bottom: var(--space-lg); }
+.mx-4 { margin-left: var(--space-md); margin-right: var(--space-md); }
+.mx-8 { margin-left: var(--space-lg); margin-right: var(--space-lg); }
+.mx-12 { margin-left: var(--space-xl); margin-right: var(--space-xl); }
+.mx-16 { margin-left: clamp(3rem, 5vw, 5rem); margin-right: clamp(3rem, 5vw, 5rem); }
+.mx-20 { margin-left: clamp(4rem, 7vw, 7rem); margin-right: clamp(4rem, 7vw, 7rem); }
+.mx-24 { margin-left: clamp(5rem, 10vw, 10rem); margin-right: clamp(5rem, 10vw, 10rem); }
+.my-8 { margin-top: var(--space-lg); margin-bottom: var(--space-lg); }
+.my-12 { margin-top: var(--space-xl); margin-bottom: var(--space-xl); }
+.my-16 { margin-top: 4rem; margin-bottom: 4rem; }
+.my-20 { margin-top: 6rem; margin-bottom: 6rem; }
+.my-24 { margin-top: 8rem; margin-bottom: 8rem; }
+.m-8 { margin: var(--space-lg); }
+.m-12 { margin: var(--space-xl); }
 
 /* --- TYPOGRAPHY SCALE (Fluid) --- */
 .text-xs { font-size: clamp(0.7rem, 0.7vw + 0.5rem, 0.8rem); line-height: 1rem; }
@@ -243,6 +266,15 @@ button {
   .md-hidden { display: none !important; }
   .md-items-center { align-items: center; }
   .md-mt-0 { margin-top: 0; }
+  .md-mx-8 { margin-left: var(--space-lg); margin-right: var(--space-lg); }
+  .md-mx-12 { margin-left: var(--space-xl); margin-right: var(--space-xl); }
+  .md-mx-16 { margin-left: clamp(4rem, 8vw, 8rem); margin-right: clamp(4rem, 8vw, 8rem); }
+  .md-mx-20 { margin-left: clamp(6rem, 12vw, 12rem); margin-right: clamp(6rem, 12vw, 12rem); }
+  .md-mx-24 { margin-left: clamp(8rem, 15vw, 15rem); margin-right: clamp(8rem, 15vw, 15rem); }
+  .md-my-16 { margin-top: 5rem; margin-bottom: 5rem; }
+  .md-my-20 { margin-top: 7rem; margin-bottom: 7rem; }
+  .md-p-14 { padding: 3.5rem; }
+  .md-m-12 { margin: var(--space-xl); }
 }
 
 @media (min-width: 1024px) {
@@ -268,6 +300,14 @@ button {
   .lg-flex { display: flex !important; }
   .lg-hidden { display: none; }
   .lg-ml-280 { margin-left: var(--sidebar-width); }
+  .lg-mx-8 { margin-left: var(--space-lg); margin-right: var(--space-lg); }
+  .lg-mx-12 { margin-left: var(--space-xl); margin-right: var(--space-xl); }
+  .lg-mx-16 { margin-left: clamp(5rem, 10vw, 12rem); margin-right: clamp(5rem, 10vw, 12rem); }
+  .lg-mx-20 { margin-left: clamp(8rem, 15vw, 15rem); margin-right: clamp(8rem, 15vw, 15rem); }
+  .lg-mx-24 { margin-left: clamp(10rem, 20vw, 20rem); margin-right: clamp(10rem, 20vw, 20rem); }
+  .lg-flex-row { flex-direction: row; }
+  .lg-p-14 { padding: 4rem; }
+  .lg-m-12 { margin: var(--space-xl); }
 }
 
 /* --- PREMIUM COMPONENTS --- */
@@ -340,9 +380,10 @@ button {
 .nx-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: 2rem !important;
   transition: var(--transition-base);
   box-shadow: var(--shadow-sm);
+  overflow: hidden !important;
 }
 
 .nx-card:hover {

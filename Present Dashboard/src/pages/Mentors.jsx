@@ -66,7 +66,7 @@ const Mentors = () => {
       <motion.div 
         whileHover={{ y: -4 }}
         className="nx-card p-8 md:p-12 relative overflow-hidden group"
-        style={{ borderRadius: '2.5rem', background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(34,211,238,0.05) 100%)' }}
+        style={{ borderRadius: '2rem', background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(34,211,238,0.05) 100%)' }}
       >
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="max-w-xl text-center md:text-left">
@@ -96,6 +96,7 @@ const Mentors = () => {
             transition={{ delay: i * 0.1 }}
             whileHover={{ y: -8 }}
             className="nx-card p-8 flex flex-col gap-6 group cursor-pointer"
+            style={{ borderRadius: '2rem' }}
             onClick={() => setSelectedDomain(domain)}
           >
             <div className="flex items-start justify-between">
@@ -127,7 +128,7 @@ const Mentors = () => {
       </div>
 
       {/* Program Details Sidebar/Bottom Card */}
-      <div className="nx-card p-6 md:p-10 flex flex-col md:flex-row items-center gap-10">
+      <div className="nx-card p-6 md:p-10 flex flex-col md:flex-row items-center gap-10" style={{ borderRadius: '2rem' }}>
         <div className="flex-1 w-full">
           <h3 className="text-xl font-black mb-6 tracking-tight">The Nexus Methodology</h3>
           <ul className="grid cols-1 sm-cols-2 gap-8">
