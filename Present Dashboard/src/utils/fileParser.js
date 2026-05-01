@@ -44,36 +44,43 @@ export const extractTextFromWord = async (file) => {
 
 /**
  * Shared parser logic for MCQs.
- * Works for both PDF and Word as it operates on raw text.
+ * Works for PDF, Word, and Text as it operates on raw text.
  */
 export const parseMCQsFromText = (text) => {
   // Normalize text: remove multiple spaces and non-standard characters
   const normalizedText = text.replace(/\s+/g, ' ').trim();
   
-  const chunks = normalizedText.split(/(?=\d+[\.\)]\s+)/);
+  // Split into chunks based on question numbering patterns: 1. or 1) or Q1: or Question 1:
+  const chunks = normalizedText.split(/(?=(?:Question\s+)?\d+[\.\-\):]\s+)/i);
   const questions = [];
 
   chunks.forEach(chunk => {
     if (!chunk.trim()) return;
 
     // 1. Extract Question Text
-    const qMatch = chunk.match(/^\d+[\.\)]\s+(.*?)(?=\s?[\(\[]?[A-D][\)\.]\s+)/i);
+    // Matches: 1. Question? (A) ... or Question 1: What? A) ...
+    const qMatch = chunk.match(/^(?:Question\s+)?\d+[\.\-\):]\s+(.*?)(?=\s?[\(\[]?[A-D][\)\.\:]\s+)/i);
     if (!qMatch) return;
     
     const questionText = qMatch[1].trim();
 
     // 2. Extract Options
     const options = [];
-    const optRegex = /[\(\[]?([A-D])[\)\.]\s+(.*?)(?=\s?[\(\[]?[A-D][\)\.]\s+|Ans:|Answer:|$)/gi;
+    // Matches: A. Option or (A) Option or A: Option
+    const optRegex = /[\(\[]?([A-D])[\)\.\:]\s+(.*?)(?=\s?[\(\[]?[A-D][\)\.\:]\s+|Ans:|Answer:|Exp:|Explanation:|Rationale:|Reason:|$)/gi;
     let match;
     while ((match = optRegex.exec(chunk)) !== null) {
       options.push(match[2].trim());
     }
 
     // 3. Extract Answer
-    const ansMatch = chunk.match(/(?:Ans(?:wer)?:\s?([A-D]))/i);
+    const ansMatch = chunk.match(/(?:Ans(?:wer)?:\s?[\(\[]?([A-D])[\)\.]?)/i);
     const answerChar = ansMatch ? ansMatch[1].toUpperCase() : 'A';
     const answerIndex = ['A', 'B', 'C', 'D'].indexOf(answerChar);
+
+    // 4. Extract Explanation
+    const expMatch = chunk.match(/(?:Exp(?:lanation)?|Rationale|Reason):\s?(.*?)(?=(?:Question\s+)?\d+[\.\-\):]\s+|$)/i);
+    const explanation = expMatch ? expMatch[1].trim() : 'Auto-extracted from bulk data.';
 
     if (questionText && options.length >= 2) {
       const paddedOptions = options.slice(0, 4);
@@ -83,7 +90,7 @@ export const parseMCQsFromText = (text) => {
         text: questionText,
         options: paddedOptions,
         answer: answerIndex !== -1 ? answerIndex : 0,
-        explanation: 'Auto-extracted from bulk data.'
+        explanation: explanation
       });
     }
   });
@@ -119,6 +126,7 @@ export const extractQuestionsFromExcel = async (file) => {
       const optC = findCol(row, ['option c', 'opt c', 'C', '3']) || Object.keys(row)[3];
       const optD = findCol(row, ['option d', 'opt d', 'D', '4']) || Object.keys(row)[4];
       const ansCol = findCol(row, ['answer', 'ans', 'correct']) || Object.keys(row)[5];
+      const expCol = findCol(row, ['explanation', 'exp', 'rationale', 'reason']);
 
       const options = [
         String(row[optA] || ''),
@@ -139,7 +147,7 @@ export const extractQuestionsFromExcel = async (file) => {
         text: String(row[qCol] || 'Untitled Question'),
         options,
         answer: ansIndex,
-        explanation: row['Explanation'] || 'Auto-extracted from spreadsheet.'
+        explanation: row[expCol] || 'Auto-extracted from spreadsheet.'
       };
     });
   } catch (error) {

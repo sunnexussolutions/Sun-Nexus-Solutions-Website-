@@ -53,8 +53,16 @@ const Sidebar = ({ isOpen, toggleSidebar, activePage, setActivePage }) => {
           <div className="p-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div
-                className="flex items-center justify-center"
-                style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}
+                className="flex items-center justify-center relative"
+                style={{ 
+                  width: '48px', 
+                  height: '48px', 
+                  borderRadius: 'var(--radius-md)', 
+                  overflow: 'hidden',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  backgroundColor: 'rgba(255,255,255,0.02)',
+                  boxShadow: '0 0 15px var(--accent-primary)'
+                }}
               >
                 <img 
                   src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" 

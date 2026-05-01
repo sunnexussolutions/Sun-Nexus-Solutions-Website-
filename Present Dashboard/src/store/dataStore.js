@@ -6,70 +6,93 @@ const KEYS = {
   NOTIFICATIONS: 'nexus-notifications',
   RESULTS: 'nexus-results',
   SESSION: 'nexus-session',
+  DOMAINS: 'nexus-domains-db',
 };
 
-const DEFAULT_ASSESSMENTS = [
+// Initial default domains
+const DEFAULT_DOMAINS = [
   {
-    id: 'qa-fractions',
-    category: 'Quantitative',
-    topic: 'Fractions and Decimals',
-    week: 'Week 1',
-    timeLimit: 20,
-    unlockTime: "2024-01-01T00:00:00.000Z",
-    questions: [
-      { id: 1, text: 'What is 3/4 + 1/8?', options: ['7/8', '4/12', '1/2', '5/8'], answer: 0, explanation: '3/4 = 6/8. So 6/8 + 1/8 = 7/8.' },
-      { id: 2, text: 'Convert 0.625 to a fraction in simplest form.', options: ['5/8', '6/10', '3/5', '7/11'], answer: 0, explanation: '0.625 = 625/1000. Divide both by 125 → 5/8.' },
-      { id: 3, text: 'What is 2/3 × 9/4?', options: ['3/2', '18/12', '2/1', '3/1'], answer: 0, explanation: '(2×9)/(3×4) = 18/12 = 3/2. Simplify by dividing by 6.' },
-      { id: 4, text: 'Which is greater: 5/6 or 7/9?', options: ['5/6', '7/9', 'They are equal', 'Cannot determine'], answer: 0, explanation: 'LCM of 6 and 9 is 18. 5/6 = 15/18, 7/9 = 14/18. So 5/6 > 7/9.' },
-      { id: 5, text: 'What is 1.75 as a fraction?', options: ['7/4', '3/2', '5/3', '9/5'], answer: 0, explanation: '1.75 = 175/100 = 7/4 after dividing numerator and denominator by 25.' },
-    ],
+    id: 'full-stack',
+    title: 'Full Stack Development',
+    icon: 'Code2',
+    color: '#6366f1',
+    desc: 'Master frontend & backend engineering. Build complete, scalable web ecosystems from scratch.',
+    stats: '150+ Enrolled',
+    trending: true,
+    topics: ['HTTP & HTTPS', 'Browser Internals', 'Internet Protocols', 'OSI Model'],
+    subDomains: [
+      { 
+        id: 'fs-frontend', 
+        title: 'Frontend Development', 
+        icon: 'Palette', 
+        color: '#ec4899', 
+        desc: 'Craft beautiful, responsive user interfaces using React, Vue, and modern CSS architectures.', 
+        stats: '85+ Enrolled',
+        topics: ['HTTP/HTTPS', 'Browser Engines', 'DOM API', 'Rendering Pipeline']
+      },
+      { 
+        id: 'fs-backend', 
+        title: 'Backend Development', 
+        icon: 'Server', 
+        color: '#10b981', 
+        desc: 'Architect scalable server-side logic, APIs, and microservices using Node.js, Go, or Python.', 
+        stats: '70+ Enrolled',
+        topics: ['REST/GraphQL', 'Auth Flow', 'Event Loop', 'Server Architecture']
+      },
+      { 
+        id: 'fs-database', 
+        title: 'Database', 
+        icon: 'Database', 
+        color: '#f59e0b', 
+        desc: 'Design and optimize complex relational and NoSQL data structures for high-performance apps.', 
+        stats: '65+ Enrolled',
+        topics: ['ACID Properties', 'Indexing', 'Query Optimization', 'Internet Protocols']
+      }
+    ]
   },
   {
-    id: 'qa-simplification',
-    category: 'Quantitative',
-    topic: 'Simplification',
-    week: 'Week 2',
-    timeLimit: 20,
-    unlockTime: "2024-01-01T00:00:00.000Z",
-    questions: [
-      { id: 1, text: 'Simplify: 144 ÷ 12 × 3 + 5', options: ['41', '36', '39', '44'], answer: 0, explanation: 'BODMAS: 144÷12=12, 12×3=36, 36+5=41.' },
-      { id: 2, text: 'What is 25% of 480?', options: ['120', '100', '140', '110'], answer: 0, explanation: '25% = 1/4. 480 ÷ 4 = 120.' },
-      { id: 3, text: 'Simplify: (18 + 6) ÷ 4 × 2', options: ['12', '6', '24', '8'], answer: 0, explanation: 'Brackets first: 18+6=24. Then 24÷4=6, 6×2=12.' },
-      { id: 4, text: 'Find the value of √196', options: ['14', '13', '15', '16'], answer: 0, explanation: '14 × 14 = 196. So √196 = 14.' },
-      { id: 5, text: '3³ + 4² = ?', options: ['43', '37', '49', '27'], answer: 0, explanation: '3³ = 27, 4² = 16. 27 + 16 = 43.' },
-    ],
+    id: 'ai-ml',
+    title: 'Artificial Intelligence',
+    icon: 'BrainCircuit',
+    color: '#06b6d4',
+    desc: 'Neural networks, machine learning models, and predictive analytics driving the future.',
+    stats: '95+ Enrolled'
   },
   {
-    id: 'lr-syllogisms',
-    category: 'Logical Reasoning',
-    topic: 'Syllogisms',
-    week: 'Week 1',
-    timeLimit: 20,
-    unlockTime: "2024-01-01T00:00:00.000Z",
-    questions: [
-      { id: 1, text: 'All cats are animals. All animals have life. Conclusion: All cats have life?', options: ['True', 'False', 'Uncertain', 'Partially true'], answer: 0, explanation: 'Universal affirmative chain: All cats → animals → have life. Conclusion follows definitively.' },
-      { id: 2, text: 'No pen is a book. Some books are copies. Conclusion: Some copies are not pens?', options: ['True', 'False', 'Uncertain', 'Cannot say'], answer: 0, explanation: 'Since no pen is a book, and some books are copies, those copies cannot be pens.' },
-      { id: 3, text: 'All roses are flowers. Some flowers fade quickly. Conclusion: Some roses fade quickly?', options: ['Uncertain', 'True', 'False', 'Always true'], answer: 0, explanation: 'We only know some flowers fade — those may or may not be roses. Conclusion is uncertain.' },
-      { id: 4, text: 'All birds can fly. Penguins are birds. Conclusion: Penguins can fly?', options: ['True by logic', 'False in reality', 'Uncertain', 'True'], answer: 0, explanation: 'In formal logic, if the premise says all birds fly and penguins are birds, the conclusion is logically true — even if false in reality.' },
-      { id: 5, text: 'Some A are B. All B are C. Conclusion: Some A are C?', options: ['True', 'False', 'Uncertain', 'Partially'], answer: 0, explanation: 'The A that are B must also be C (since all B are C). So some A are definitely C.' },
-    ],
+    id: 'cybersecurity',
+    title: 'Cyber Security',
+    icon: 'ShieldCheck',
+    color: '#ef4444',
+    desc: 'Deep-dive into ethical hacking, infrastructure protection, and digital forensic defense.',
+    stats: '60+ Enrolled'
   },
   {
-    id: 'va-synonyms',
-    category: 'Verbal Ability',
-    topic: 'Synonyms & Antonyms',
-    week: 'Week 1',
-    timeLimit: 20,
-    unlockTime: "2024-01-01T00:00:00.000Z",
-    questions: [
-      { id: 1, text: 'Synonym of BENEVOLENT:', options: ['Kind', 'Cruel', 'Angry', 'Lazy'], answer: 0, explanation: 'Benevolent means well-meaning and kindly. "Kind" is the closest synonym.' },
-      { id: 2, text: 'Antonym of VERBOSE:', options: ['Concise', 'Wordy', 'Lengthy', 'Detailed'], answer: 0, explanation: 'Verbose means using more words than needed. Its antonym is "Concise" — brief and to the point.' },
-      { id: 3, text: 'Synonym of EPHEMERAL:', options: ['Transient', 'Permanent', 'Eternal', 'Lasting'], answer: 0, explanation: 'Ephemeral means lasting for a very short time. "Transient" shares the same meaning.' },
-      { id: 4, text: 'Antonym of DILIGENT:', options: ['Lazy', 'Hardworking', 'Careful', 'Sincere'], answer: 0, explanation: 'Diligent means hardworking and careful. Its antonym is "Lazy".' },
-      { id: 5, text: 'Synonym of CANDID:', options: ['Frank', 'Deceptive', 'Shy', 'Reserved'], answer: 0, explanation: 'Candid means truthful and straightforward. "Frank" is its synonym.' },
-    ],
+    id: 'data-science',
+    title: 'Data Science',
+    icon: 'Database',
+    color: '#f59e0b',
+    desc: 'Transform raw data into strategic intelligence using advanced statistical modeling.',
+    stats: '85+ Enrolled'
   },
+  {
+    id: 'ui-ux',
+    title: 'UI/UX Design',
+    icon: 'Palette',
+    color: '#ec4899',
+    desc: 'Design pixel-perfect, user-centric interfaces that blend aesthetics with functionality.',
+    stats: '70+ Enrolled'
+  },
+  {
+    id: 'cloud',
+    title: 'Cloud Computing',
+    icon: 'Cloud',
+    color: '#3b82f6',
+    desc: 'Architecting resilient, distributed systems on AWS, Azure, and Google Cloud Platform.',
+    stats: '45+ Enrolled'
+  }
 ];
+
+const DEFAULT_ASSESSMENTS = [];
 
 // ── Assessments ───────────────────────────────────────────────────────────────
 export const getAssessments = () => {
@@ -221,3 +244,52 @@ export const addNotification = (notif) => {
 };
 export const deleteNotification = (id) => localStorage.setItem(KEYS.NOTIFICATIONS, JSON.stringify(getNotifications().filter(n => n.id !== id)));
 export const markNotificationRead = (id) => localStorage.setItem(KEYS.NOTIFICATIONS, JSON.stringify(getNotifications().map(n => n.id === id ? { ...n, read: true } : n)));
+
+// ── Domains ───────────────────────────────────────────────────────────────────
+export const getDomains = () => {
+  const stored = localStorage.getItem(KEYS.DOMAINS);
+  if (stored) {
+    const parsed = JSON.parse(stored);
+    // Simple migration: if the first domain is missing topics, it's probably stale.
+    // We merge the default sub-domains topics into the existing ones.
+    const merged = parsed.map(d => {
+      const defaultMatch = DEFAULT_DOMAINS.find(def => def.id === d.id);
+      if (defaultMatch) {
+        let updatedDom = { ...d };
+        if (defaultMatch.topics && (!d.topics || d.topics.length === 0)) {
+          updatedDom.topics = defaultMatch.topics;
+        }
+        if (defaultMatch.subDomains && d.subDomains) {
+          updatedDom.subDomains = d.subDomains.map(s => {
+            const defSub = defaultMatch.subDomains.find(ds => ds.id === s.id);
+            if (defSub && defSub.topics && (!s.topics || s.topics.length === 0)) {
+              return { ...s, topics: defSub.topics };
+            }
+            return s;
+          });
+        }
+        return updatedDom;
+      }
+      return d;
+    });
+    return merged;
+    return merged;
+  }
+  localStorage.setItem(KEYS.DOMAINS, JSON.stringify(DEFAULT_DOMAINS));
+  return DEFAULT_DOMAINS;
+};
+export const saveDomains = (data) => localStorage.setItem(KEYS.DOMAINS, JSON.stringify(data));
+export const addDomain = (d) => {
+  const all = getDomains();
+  all.push({ ...d, id: `domain-${Date.now()}` });
+  saveDomains(all);
+};
+export const updateDomain = (updated) => {
+  const all = getDomains();
+  const idx = all.findIndex(d => d.id === updated.id);
+  if (idx !== -1) {
+    all[idx] = updated;
+    saveDomains(all);
+  }
+};
+export const deleteDomain = (id) => saveDomains(getDomains().filter(d => d.id !== id));

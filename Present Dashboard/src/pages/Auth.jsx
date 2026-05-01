@@ -148,15 +148,25 @@ export default function Auth() {
             initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
             style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '5rem' }}
           >
-            <img 
-              src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4" 
-              alt="Sun Nexus Logo"
+            <div
+              className="flex items-center justify-center relative"
               style={{ 
-                width: '64px', height: '64px', 
-                objectFit: 'contain', 
-                filter: 'drop-shadow(0 0 25px rgba(0, 242, 254, 0.7))' 
-              }} 
-            />
+                width: '64px', 
+                height: '64px', 
+                borderRadius: '16px', 
+                overflow: 'hidden',
+                border: '1px solid rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(255,255,255,0.02)',
+                boxShadow: '0 0 20px var(--accent-primary)'
+              }}
+            >
+              <img 
+                src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" 
+                alt="Sun Nexus Logo" 
+                className="w-full h-full object-contain"
+                style={{ filter: 'drop-shadow(0 0 8px var(--accent-primary))' }}
+              />
+            </div>
             <h1 style={brandingStyles.title}>Sun Nexus Solutions</h1>
           </motion.div>
 

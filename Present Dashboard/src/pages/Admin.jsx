@@ -4,13 +4,14 @@ import {
   ShieldCheck, Users, BrainCircuit, MessageSquare, Bell,
   Plus, Trash2, Eye, X, Save, ChevronDown, ChevronUp,
   BarChart3, FileText, Send, Star, Zap, Calendar, TrendingUp,
-  User
+  User, Layers, Code2, Database, Palette, Server, Smartphone, Cloud
 } from 'lucide-react';
 import {
   getAssessments, addAssessment, updateAssessment, deleteAssessment,
   getUsers, getResults, deleteUser, updateUserStatus,
   getDiscussions, addDiscussion, deleteDiscussion,
-  getNotifications, addNotification, deleteNotification
+  getNotifications, addNotification, deleteNotification,
+  getDomains, addDomain, updateDomain, deleteDomain
 } from '../store/dataStore';
 import { extractTextFromPDF, extractTextFromWord, extractQuestionsFromExcel, parseMCQsFromText } from '../utils/fileParser';
 import { UserPerformanceGraph, CollectivePerformanceGraph } from '../components/AnalyticsCharts';
@@ -21,12 +22,18 @@ import UnderProgress from '../components/UnderProgress';
 const TABS = [
   { id: 'overview',      label: 'Overview',      icon: BarChart3 },
   { id: 'assessments',   label: 'Assessments',   icon: BrainCircuit },
+  { id: 'domains',       label: 'Domains',       icon: Layers },
   { id: 'users',         label: 'Users',         icon: Users },
   { id: 'discussions',   label: 'Discussions',   icon: MessageSquare },
   { id: 'notifications', label: 'Notifications', icon: Bell },
 ];
 
 const CATEGORIES = ['Quantitative', 'Logical Reasoning', 'Verbal Ability'];
+
+const ICON_MAP = {
+  Layers, Code2, BrainCircuit, ShieldCheck, 
+  Database, Smartphone, Cloud, Palette, Server
+};
 
 // ── Reusable card ─────────────────────────────────────────────────────────────
 const Card = ({ children, style = {} }) => (
@@ -130,6 +137,47 @@ const QuestionBuilder = ({ questions, setQuestions, attempted = false }) => {
   );
 };
 
+// ── Sub-domain builder ────────────────────────────────────────────────────────
+const SubDomainBuilder = ({ subs, setSubs, inputStyle }) => {
+  const add = () => setSubs(s => [...(s || []), { id: `sub-${Date.now()}`, title: '', icon: 'Code2', color: '#6366f1', desc: '', stats: '' }]);
+  const remove = (id) => setSubs(s => (s || []).filter(item => item.id !== id));
+  const update = (id, field, val) => setSubs(s => (s || []).map(item => item.id === id ? { ...item, [field]: val } : item));
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px', padding: '15px', background: 'rgba(255,255,255,0.02)', borderRadius: '15px', border: '1px solid var(--border-subtle)' }}>
+      <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Specializations (Sub-Domains)</label>
+      {(subs || []).map(s => (
+        <div key={s.id} style={{ display: 'flex', gap: '10px', background: 'var(--bg-tertiary)', padding: '12px', borderRadius: '12px', alignItems: 'center' }}>
+          <div style={{ flex: 2 }}>
+            <input value={s.title} onChange={e => update(s.id, 'title', e.target.value)} placeholder="Sub Title..." style={{ ...inputStyle, marginBottom: '5px' }} />
+            <input value={s.stats} onChange={e => update(s.id, 'stats', e.target.value)} placeholder="Stats (e.g. 50+ Enrolled)" style={{ ...inputStyle, marginBottom: '5px' }} />
+            <input 
+              value={(s.topics || []).join(', ')} 
+              onChange={e => update(s.id, 'topics', e.target.value.split(',').map(t => t.trim()))} 
+              placeholder="Topics (comma separated)..." 
+              style={inputStyle} 
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <select value={s.icon} onChange={e => update(s.id, 'icon', e.target.value)} style={inputStyle}>
+              {Object.keys(ICON_MAP).map(k => <option key={k} value={k}>{k}</option>)}
+            </select>
+          </div>
+          <button onClick={() => remove(s.id)} style={{ color: '#ef4444', background: 'rgba(239,68,68,0.1)', border: 'none', borderRadius: '8px', padding: '8px', cursor: 'pointer' }}>
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ))}
+      <button 
+        onClick={add} 
+        style={{ background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', padding: '10px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, border: '1px dashed var(--accent-primary)', cursor: 'pointer', marginTop: '5px' }}
+      >
+        + Add Specialization
+      </button>
+    </div>
+  );
+};
+
 // ── Main Admin Component ──────────────────────────────────────────────────────
 const Admin = () => {
   const { user } = useAuth();
@@ -149,6 +197,16 @@ const Admin = () => {
   const [editingAssessmentId, setEditingAssessmentId] = useState(null);
   const [editingDiscussionId, setEditingDiscussionId] = useState(null);
   const [editingNotificationId, setEditingNotificationId] = useState(null);
+  const [editingDomainId, setEditingDomainId] = useState(null);
+
+  // Domains state
+  const [domains, setDomains] = useState([]);
+  const [showDomainForm, setShowDomainForm] = useState(false);
+  const [domForm, setDomForm] = useState({ 
+    title: '', icon: 'Code2', color: '#6366f1', 
+    desc: '', stats: '', trending: false, 
+    subDomains: [] 
+  });
 
   // Assessment form
   const [showAssessmentForm, setShowAssessmentForm] = useState(false);
@@ -178,6 +236,7 @@ const Admin = () => {
     setResults(getResults());
     setDiscussions(getDiscussions());
     setNotifications(getNotifications());
+    setDomains(getDomains());
   }, []);
 
   useEffect(() => { refresh(); }, [tab, refresh]);
@@ -242,6 +301,30 @@ const Admin = () => {
     refresh();
   };
 
+  const handleAddDomain = () => {
+    if (!domForm.title.trim() || !domForm.desc.trim()) return;
+    
+    const newDom = { ...domForm };
+    if (editingDomainId) {
+      newDom.id = editingDomainId;
+      updateDomain(newDom);
+    } else {
+      addDomain(newDom);
+    }
+    
+    setDomForm({ title: '', icon: 'Code2', color: '#6366f1', desc: '', stats: '', trending: false, subDomains: [] });
+    setEditingDomainId(null);
+    setShowDomainForm(false);
+    refresh();
+  };
+
+  const handleDeleteDomain = (id) => {
+    if (confirm('Delete this domain and all its specializations?')) {
+      deleteDomain(id);
+      refresh();
+    }
+  };
+
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -257,10 +340,13 @@ const Admin = () => {
       } else if (extension === '.docx') {
         const text = await extractTextFromWord(file);
         parsedQuestions = parseMCQsFromText(text);
+      } else if (extension === '.txt') {
+        const text = await file.text();
+        parsedQuestions = parseMCQsFromText(text);
       } else if (['.xlsx', '.xls', '.csv'].includes(extension)) {
         parsedQuestions = await extractQuestionsFromExcel(file);
       } else {
-        throw new Error('Unsupported file format. Please upload a PDF, Word, or spreadsheet file.');
+        throw new Error('Unsupported file format. Please upload a PDF, Word, Text, or spreadsheet file.');
       }
 
       if (parsedQuestions.length > 0) {
@@ -504,7 +590,7 @@ const Admin = () => {
             type="file" 
             ref={pdfInputRef} 
             onChange={handleFileUpload} 
-            accept=".pdf,.docx,.xlsx,.xls,.csv" 
+            accept=".pdf,.docx,.txt,.xlsx,.xls,.csv" 
             style={{ display: 'none' }} 
           />
           {/* Buttons moved to tab header */}
@@ -608,6 +694,119 @@ const Admin = () => {
               </div>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* DOMAINS */}
+      {tab === 'domains' && (
+        <div className="flex flex-col gap-5">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>Domain Management</h3>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Define career paths and nested specializations</p>
+            </div>
+            <button 
+              onClick={() => { setShowDomainForm(!showDomainForm); setEditingDomainId(null); setDomForm({ title: '', icon: 'Code2', color: '#6366f1', desc: '', stats: '', trending: false, subDomains: [] }); }}
+              style={{ padding: '10px 20px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', fontWeight: 800, fontSize: '13px', cursor: 'pointer', border: 'none' }}
+            >
+              {showDomainForm ? 'Cancel' : 'New Domain'}
+            </button>
+          </div>
+
+          <AnimatePresence>
+            {showDomainForm && (
+              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                <Card>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '20px' }}>{editingDomainId ? 'Edit' : 'Create'} Domain</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                    <div className="md:col-span-2">
+                      <label style={labelStyle}>Title</label>
+                      <input value={domForm.title} onChange={e => setDomForm({ ...domForm, title: e.target.value })} placeholder="e.g. Full Stack Development" style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Icon</label>
+                      <select value={domForm.icon} onChange={e => setDomForm({ ...domForm, icon: e.target.value })} style={inputStyle}>
+                        {Object.keys(ICON_MAP).map(k => <option key={k} value={k}>{k}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                    <div>
+                      <label style={labelStyle}>Color (Hex)</label>
+                      <input value={domForm.color} onChange={e => setDomForm({ ...domForm, color: e.target.value })} placeholder="#6366f1" style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Stats Label</label>
+                      <input value={domForm.stats} onChange={e => setDomForm({ ...domForm, stats: e.target.value })} placeholder="e.g. 150+ Enrolled" style={inputStyle} />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', pt: '20px' }}>
+                      <input type="checkbox" checked={domForm.trending} onChange={e => setDomForm({ ...domForm, trending: e.target.checked })} style={{ width: '18px', height: '18px' }} />
+                      <label style={{ ...labelStyle, marginBottom: 0 }}>Trending Domain</label>
+                    </div>
+                  </div>
+                  <div className="mb-5">
+                    <label style={labelStyle}>Description</label>
+                    <textarea value={domForm.desc} onChange={e => setDomForm({ ...domForm, desc: e.target.value })} placeholder="Domain overview..." style={{ ...inputStyle, minHeight: '80px' }} />
+                  </div>
+                  <div className="mb-5">
+                    <label style={labelStyle}>Global "Under the Hood" Topics (Comma separated)</label>
+                    <input 
+                      value={(domForm.topics || []).join(', ')} 
+                      onChange={e => setDomForm({ ...domForm, topics: e.target.value.split(',').map(t => t.trim()) })} 
+                      placeholder="e.g. HTTP, HTTPS, Browsers, Internet" 
+                      style={inputStyle} 
+                    />
+                  </div>
+
+                  <SubDomainBuilder subs={domForm.subDomains} setSubs={(s) => setDomForm(f => ({ ...f, subDomains: typeof s === 'function' ? s(f.subDomains) : s }))} inputStyle={inputStyle} />
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
+                    <button onClick={handleAddDomain} style={{ padding: '12px 30px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', fontWeight: 800, fontSize: '14px', border: 'none', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.2)' }}>
+                      {editingDomainId ? 'Update' : 'Launch'} Domain
+                    </button>
+                  </div>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {domains.length === 0 ? (
+              <Card><p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No domains defined.</p></Card>
+            ) : (
+              domains.map(d => {
+                const Icon = ICON_MAP[d.icon] || Code2;
+                return (
+                  <Card key={d.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', borderLeft: `4px solid ${d.color}` }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <div style={{ p: '10px', borderRadius: '12px', background: `${d.color}15`, color: d.color }}>
+                        <Icon size={24} />
+                      </div>
+                      <div>
+                        <p style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '2px' }}>{d.title}</p>
+                        <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{d.subDomains?.length || 0} Specializations · {d.stats}</p>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button onClick={() => { 
+                        setEditingDomainId(d.id);
+                        setDomForm({ ...d, subDomains: d.subDomains || [] });
+                        setShowDomainForm(true);
+                        window.scrollTo({ top: 100, behavior: 'smooth' });
+                      }}
+                        style={{ padding: '8px 14px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                        Edit
+                      </button>
+                      <button onClick={() => handleDeleteDomain(d.id)}
+                        style={{ padding: '8px 14px', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                        Delete
+                      </button>
+                    </div>
+                  </Card>
+                );
+              })
+            )}
+          </div>
         </div>
       )}
 
