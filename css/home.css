@@ -182,7 +182,7 @@
 .log-book-branding { width: 400px; height: 240px; background: var(--logbook-branding-bg); border-radius: var(--radius-lg); display: flex; align-items: center; padding: 30px; gap: 20px; }
 .log-book-branding-logo { width: 100px; height: 100px; object-fit: contain; }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .log-book-card { flex-direction: column-reverse; padding: 30px; text-align: center; }
   .log-book-branding { width: 100%; height: auto; padding: 20px; }
 }

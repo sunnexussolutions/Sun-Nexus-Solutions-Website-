@@ -803,6 +803,21 @@ body {
   margin: 0 auto;
   line-height: 1.6;
 }
+
+/* Tablet & Mobile Layout Enhancements */
+@media (max-width: 1024px) {
+  .log-book-card {
+    flex-direction: column-reverse !important;
+    padding: 30px 15px !important;
+    text-align: center !important;
+  }
+  .log-book-branding {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
+
 @media (max-width: 768px) {
   .page-hero h1,
   .events-hero h1 { 
@@ -840,9 +855,14 @@ body {
 
   /* Flexbox Wrappers */
   .events-section, 
-  .about-container, 
-  .log-book-card {
+  .about-container {
     flex-direction: column !important;
+    padding: 30px 15px !important;
+    text-align: center !important;
+  }
+
+  .log-book-card {
+    flex-direction: column-reverse !important;
     padding: 30px 15px !important;
     text-align: center !important;
   }

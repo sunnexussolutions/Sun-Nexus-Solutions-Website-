@@ -388,7 +388,6 @@ export default function Auth() {
         }
         
         html, body {
-          background-color: #050507 !important;
           scroll-behavior: smooth !important;
           -webkit-overflow-scrolling: touch;
           margin: 0;
