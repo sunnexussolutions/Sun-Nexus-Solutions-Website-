@@ -4,16 +4,21 @@ import {
   ShieldCheck, Users, BrainCircuit, MessageSquare, Bell,
   Plus, Trash2, Eye, X, Save, ChevronDown, ChevronUp,
   BarChart3, FileText, Send, Star, Zap, Calendar, TrendingUp,
-  User, Layers, Code2, Database, Palette, Server, Smartphone, Cloud
+  User, Layers, Code2, Database, Palette, Server, Smartphone, Cloud,
+  Rocket, ArrowRight, GitBranch, Link as LinkIcon
 } from 'lucide-react';
 import {
   getAssessments, addAssessment, updateAssessment, deleteAssessment,
   getUsers, getResults, deleteUser, updateUserStatus,
   getDiscussions, addDiscussion, deleteDiscussion,
   getNotifications, addNotification, deleteNotification,
-  getDomains, addDomain, updateDomain, deleteDomain
+  getDomains, addDomain, updateDomain, deleteDomain,
+  getProjects, addProject, updateProject, deleteProject
 } from '../store/dataStore';
-import { extractTextFromPDF, extractTextFromWord, extractQuestionsFromExcel, parseMCQsFromText } from '../utils/fileParser';
+import { 
+  extractTextFromPDF, extractTextFromWord, extractQuestionsFromExcel, parseMCQsFromText,
+  extractProjectsFromExcel
+} from '../utils/fileParser';
 import { UserPerformanceGraph, CollectivePerformanceGraph } from '../components/AnalyticsCharts';
 import { prepareUserChartData, prepareCollectiveChartData } from '../utils/analytics';
 import { useAuth } from '../contexts/AuthContext';
@@ -23,6 +28,7 @@ const TABS = [
   { id: 'overview',      label: 'Overview',      icon: BarChart3 },
   { id: 'assessments',   label: 'Assessments',   icon: BrainCircuit },
   { id: 'domains',       label: 'Domains',       icon: Layers },
+  { id: 'projects',      label: 'Projects',      icon: Rocket },
   { id: 'users',         label: 'Users',         icon: Users },
   { id: 'discussions',   label: 'Discussions',   icon: MessageSquare },
   { id: 'notifications', label: 'Notifications', icon: Bell },
@@ -198,8 +204,13 @@ const Admin = () => {
   const [editingDiscussionId, setEditingDiscussionId] = useState(null);
   const [editingNotificationId, setEditingNotificationId] = useState(null);
   const [editingDomainId, setEditingDomainId] = useState(null);
+  const [editingProjectId, setEditingProjectId] = useState(null);
 
-  // Domains state
+  // Projects state
+  const [projects, setProjects] = useState([]);
+  const [showProjectForm, setShowProjectForm] = useState(false);
+  const [pForm, setPForm] = useState({ title: '', desc: '', status: 'completed', tech: '', github: '', live: '', color: '#6366f1', userId: '' });
+  const [pTeam, setPTeam] = useState([{ name: '', image: '' }]);
   const [domains, setDomains] = useState([]);
   const [showDomainForm, setShowDomainForm] = useState(false);
   const [domForm, setDomForm] = useState({ 
@@ -214,7 +225,9 @@ const Admin = () => {
   const [aQuestions, setAQuestions] = useState([emptyQuestion()]);
   const [aAttempted, setAAttempted] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
+  const [isParsingProjects, setIsParsingProjects] = useState(false);
   const pdfInputRef = React.useRef(null);
+  const projectFileInputRef = React.useRef(null);
 
   // field border: neutral before attempt, red if empty, green if filled
   const fieldBorder = (val) => {
@@ -253,7 +266,8 @@ const Admin = () => {
       getResults(),
       getDiscussions(),
       getNotifications(),
-      getDomains()
+      getDomains(),
+      getProjects()
     ]);
     setAssessments(a);
     setUsers(u);
@@ -261,6 +275,7 @@ const Admin = () => {
     setDiscussions(d);
     setNotifications(n);
     setDomains(doms);
+    setProjects(p);
   }, []);
 
   useEffect(() => { refresh(); }, [tab, refresh]);
@@ -449,6 +464,38 @@ const Admin = () => {
     } finally {
       setIsParsing(false);
       if (pdfInputRef.current) pdfInputRef.current.value = '';
+    }
+  };
+
+  const handleProjectFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsParsingProjects(true);
+    try {
+      const extension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (!['.xlsx', '.xls', '.csv'].includes(extension)) {
+        throw new Error('Please upload an Excel or CSV file for bulk project fetching.');
+      }
+
+      const parsedProjects = await extractProjectsFromExcel(file);
+
+      if (parsedProjects.length > 0) {
+        if (confirm(`Parsed ${parsedProjects.length} projects. Would you like to upload them all to the database now?`)) {
+          for (const p of parsedProjects) {
+            await addProject(p);
+          }
+          alert(`Successfully uploaded ${parsedProjects.length} projects to the platform!`);
+          await refresh();
+        }
+      } else {
+        alert('Could not find any project data in the expected format.');
+      }
+    } catch (err) {
+      alert('Error parsing projects: ' + err.message);
+    } finally {
+      setIsParsingProjects(false);
+      if (projectFileInputRef.current) projectFileInputRef.current.value = '';
     }
   };
 
@@ -673,7 +720,176 @@ const Admin = () => {
         </div>
       )}
 
-      {/* ASSESSMENTS */}
+      {/* PROJECTS */}
+      {tab === 'projects' && (
+        <div className="flex flex-col gap-6">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>System Project Hub</h3>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Manage platform-wide projects and team assignments</p>
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <input 
+                type="file" 
+                ref={projectFileInputRef} 
+                onChange={handleProjectFileUpload} 
+                accept=".xlsx,.xls,.csv" 
+                style={{ display: 'none' }} 
+              />
+              <button 
+                onClick={() => projectFileInputRef.current?.click()}
+                disabled={isParsingProjects}
+                style={{ 
+                  display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '10px', 
+                  background: 'rgba(99,102,241,0.08)', color: 'var(--accent-primary)', border: '1.5px solid rgba(99,102,241,0.2)', 
+                  fontWeight: 700, fontSize: '12px', cursor: 'pointer', opacity: isParsingProjects ? 0.6 : 1, transition: 'all 0.2s' 
+                }}
+              >
+                <FileText size={14} /> {isParsingProjects ? 'Processing...' : 'Bulk Fetch'}
+              </button>
+              <button 
+                onClick={() => { setShowProjectForm(v => !v); setEditingProjectId(null); setPForm({ title: '', desc: '', status: 'completed', tech: '', github: '', live: '', color: '#6366f1', userId: '' }); setPTeam([{ name: '', image: '' }]); }}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}
+              >
+                <Plus size={16} /> {showProjectForm ? 'Cancel' : 'Upload New Project'}
+              </button>
+            </div>
+          </div>
+
+          <AnimatePresence>
+            {showProjectForm && (
+              <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+                <Card>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '20px' }}>{editingProjectId ? 'Edit' : 'Upload'} Project Details</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                    <div className="md:col-span-2">
+                      <label style={labelStyle}>Project Title</label>
+                      <input value={pForm.title} onChange={e => setPForm({ ...pForm, title: e.target.value })} placeholder="e.g. AI Attendance System" style={inputStyle} />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label style={labelStyle}>Detailed Report / Description</label>
+                      <textarea value={pForm.desc} onChange={e => setPForm({ ...pForm, desc: e.target.value })} placeholder="Comprehensive project report..." style={{ ...inputStyle, minHeight: '120px', resize: 'vertical' }} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Status</label>
+                      <select value={pForm.status} onChange={e => setPForm({ ...pForm, status: e.target.value })} style={inputStyle}>
+                        <option value="completed">🏆 Completed</option>
+                        <option value="ongoing">⚡ Ongoing</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Assigned User ID (Optional)</label>
+                      <input value={pForm.userId} onChange={e => setPForm({ ...pForm, userId: e.target.value })} placeholder="user_123..." style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>GitHub Repository</label>
+                      <input value={pForm.github} onChange={e => setPForm({ ...pForm, github: e.target.value })} placeholder="https://github.com/..." style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Live Demo URL</label>
+                      <input value={pForm.live} onChange={e => setPForm({ ...pForm, live: e.target.value })} placeholder="https://..." style={inputStyle} />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label style={labelStyle}>Tech Stack (Comma Separated)</label>
+                      <input value={pForm.tech} onChange={e => setPForm({ ...pForm, tech: e.target.value })} placeholder="React, Node.js, AI" style={inputStyle} />
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: '24px' }}>
+                    <label style={labelStyle}>Project Team (Council Members)</label>
+                    <div className="flex flex-col gap-3 mt-3">
+                      {pTeam.map((m, i) => (
+                        <div key={i} className="flex gap-3 items-center">
+                          <input value={m.name} onChange={e => {
+                            const newTeam = [...pTeam];
+                            newTeam[i].name = e.target.value;
+                            setPTeam(newTeam);
+                          }} placeholder="Member Name" style={{ ...inputStyle, flex: 2 }} />
+                          <input value={m.image} onChange={e => {
+                            const newTeam = [...pTeam];
+                            newTeam[i].image = e.target.value;
+                            setPTeam(newTeam);
+                          }} placeholder="Avatar URL" style={{ ...inputStyle, flex: 3 }} />
+                          <button onClick={() => setPTeam(pTeam.filter((_, idx) => idx !== i))} style={{ color: '#ef4444', background: 'rgba(239,68,68,0.1)', border: 'none', padding: '10px', borderRadius: '10px', cursor: 'pointer' }}>
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      ))}
+                      <button onClick={() => setPTeam([...pTeam, { name: '', image: '' }])} style={{ background: 'transparent', border: '1px dashed var(--accent-primary)', color: 'var(--accent-primary)', padding: '10px', borderRadius: '12px', fontSize: '12px', fontWeight: 800, cursor: 'pointer' }}>
+                        + Add Member
+                      </button>
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={async () => {
+                      if (!pForm.title.trim()) return alert("Title is required.");
+                      const data = { ...pForm, tech: pForm.tech.split(',').map(t => t.trim()), team: pTeam.filter(m => m.name.trim()) };
+                      if (editingProjectId) {
+                        data.id = editingProjectId;
+                        await updateProject(data);
+                        alert("Project updated!");
+                      } else {
+                        await addProject(data);
+                        alert("Project uploaded!");
+                      }
+                      setShowProjectForm(false);
+                      refresh();
+                    }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '14px', background: 'var(--accent-gradient)', color: 'white', border: 'none', fontWeight: 900, fontSize: '14px', cursor: 'pointer' }}
+                  >
+                    <Save size={18} /> {editingProjectId ? 'Update' : 'Publish'} to Platform
+                  </button>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {projects.map(p => (
+              <Card key={p.id}>
+                <div className="flex justify-between items-start mb-4">
+                  <div style={{ padding: '8px', borderRadius: '10px', background: `${p.color}15`, color: p.color }}>
+                    <Rocket size={20} />
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => {
+                      setEditingProjectId(p.id);
+                      setPForm({ ...p, tech: p.tech.join(', '), userId: p.user_id || '' });
+                      setPTeam(p.team.length ? p.team : [{ name: '', image: '' }]);
+                      setShowProjectForm(true);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }} style={{ color: 'var(--accent-primary)', background: 'rgba(99,102,241,0.1)', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer' }}>
+                      <FileText size={16} />
+                    </button>
+                    <button onClick={async () => {
+                      if (confirm('Delete this project?')) { await deleteProject(p.id); refresh(); }
+                    }} style={{ color: '#ef4444', background: 'rgba(239,68,68,0.1)', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer' }}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+                <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '4px' }}>{p.title}</h4>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: p.status === 'completed' ? '#22c55e' : '#f59e0b' }}>
+                    {p.status}
+                  </span>
+                  <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)' }}>
+                    {p.team.length} Members
+                  </span>
+                </div>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5, height: '3.6em', overflow: 'hidden' }}>{p.desc}</p>
+                <div className="flex gap-4 mt-4 pt-4 border-t border-subtle">
+                  {p.github && <GitBranch size={14} style={{ color: 'var(--text-muted)' }} />}
+                  {p.live && <LinkIcon size={14} style={{ color: 'var(--text-muted)' }} />}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ASSESSMENTS (existing code continues...) */}
       {tab === 'assessments' && (
         <div className="flex flex-col gap-5">
           <div style={{ marginBottom: '4px' }}>

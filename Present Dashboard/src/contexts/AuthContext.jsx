@@ -99,11 +99,36 @@ export const AuthProvider = ({ children }) => {
     setUser(updated);
     localStorage.setItem('nexus_user', JSON.stringify(updated));
 
-    await query(`
-      UPDATE profiles 
-      SET first_name = $1, last_name = $2, headline = $3, avatar = $4, location = $5
-      WHERE id = $6
-    `, [updates.firstName || user.firstName, updates.lastName || user.lastName, updates.headline || user.headline, updates.avatar || user.avatar, updates.location || user.location, user.id]);
+    // SENIOR DEV TIP: Use a dynamic query or COALESCE to ensure we only update what's provided
+    try {
+      await query(`
+        UPDATE profiles 
+        SET 
+          first_name = COALESCE($1, first_name),
+          last_name = COALESCE($2, last_name),
+          headline = COALESCE($3, headline),
+          avatar = COALESCE($4, avatar),
+          location = COALESCE($5, location),
+          banner = COALESCE($6, banner),
+          skills = COALESCE($7, skills),
+          projects = COALESCE($8, projects),
+          name = COALESCE($9, name)
+        WHERE id = $10
+      `, [
+        updates.firstName || null, 
+        updates.lastName || null, 
+        updates.headline || null, 
+        updates.avatar || null, 
+        updates.location || null,
+        updates.banner || null,
+        updates.skills ? JSON.stringify(updates.skills) : null,
+        updates.projects ? JSON.stringify(updates.projects) : null,
+        updates.name || null,
+        user.id
+      ]);
+    } catch (err) {
+      console.error("DB_SYNC_ERROR:", err);
+    }
 
     window.dispatchEvent(new Event('nexus-data-updated'));
     return { success: true };

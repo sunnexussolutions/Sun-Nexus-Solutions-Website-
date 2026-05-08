@@ -255,3 +255,61 @@ export const extractQuestionsFromExcel = async (file) => {
     throw new Error('Excel parsing failed: ' + error.message);
   }
 };
+
+/**
+ * Extracts Projects from Excel (.xlsx, .xls) or CSV files.
+ */
+export const extractProjectsFromExcel = async (file) => {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+    const firstSheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[firstSheetName];
+    const rows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+    if (!rows || rows.length === 0) throw new Error('Spreadsheet is empty.');
+
+    const findCol = (row, markers) => {
+      const keys = Object.keys(row);
+      return keys.find(k => markers.some(m => k.toLowerCase().replace(/[^a-z0-9]/g, '').includes(m.toLowerCase().replace(/[^a-z0-9]/g, ''))));
+    };
+
+    return rows.filter(r => Object.values(r).some(v => v)).map(row => {
+      const titleCol = findCol(row, ['title', 'project name', 'name', 'heading']) || Object.keys(row)[0];
+      const sumCol   = findCol(row, ['summary', 'short', 'brief']) || Object.keys(row)[1];
+      const descCol  = findCol(row, ['description', 'report', 'details', 'body']) || Object.keys(row)[2];
+      const statCol  = findCol(row, ['status', 'state', 'progress']) || Object.keys(row)[3];
+      const techCol  = findCol(row, ['tech', 'stack', 'technologies', 'tools']) || Object.keys(row)[4];
+      const gitCol   = findCol(row, ['github', 'repo', 'repository', 'code']) || Object.keys(row)[5];
+      const liveCol  = findCol(row, ['live', 'demo', 'url', 'visit']) || Object.keys(row)[6];
+      const teamCol  = findCol(row, ['team', 'members', 'council', 'people']) || Object.keys(row)[7];
+
+      // Parse status
+      let status = String(row[statCol] || 'ongoing').toLowerCase();
+      if (status.includes('comp')) status = 'completed';
+      else status = 'ongoing';
+
+      // Parse tech stack
+      const tech = String(row[techCol] || '').split(',').map(t => t.trim()).filter(t => t);
+
+      // Parse team
+      const teamRaw = String(row[teamCol] || '').split(',').map(t => t.trim()).filter(t => t);
+      const team = teamRaw.map(name => ({ name, image: 'https://via.placeholder.com/150' }));
+
+      return {
+        title: String(row[titleCol] || 'Untitled Project'),
+        summary: String(row[sumCol] || ''),
+        desc: String(row[descCol] || ''),
+        status,
+        tech,
+        github: String(row[gitCol] || '#'),
+        live: String(row[liveCol] || '#'),
+        team,
+        color: '#6366f1'
+      };
+    });
+  } catch (error) {
+    console.error('Project Excel Extraction Error:', error);
+    throw new Error('Project spreadsheet parsing failed: ' + error.message);
+  }
+};

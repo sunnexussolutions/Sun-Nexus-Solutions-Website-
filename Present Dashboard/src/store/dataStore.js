@@ -11,6 +11,57 @@ const setLocal = (key, data) => {
   window.dispatchEvent(new Event('nexus-data-updated'));
 };
 
+// ── Projects (System-wide) ───────────────────────────────────────────────────
+export const getProjects = async (userId) => {
+  const local = getLocal('system_projects');
+  try {
+    const sql = userId ? 'SELECT * FROM projects WHERE user_id = $1 ORDER BY created_at DESC' : 'SELECT * FROM projects ORDER BY created_at DESC';
+    const params = userId ? [userId] : [];
+    const cloud = await query(sql, params);
+    if (cloud) {
+      const mapped = cloud.map(p => ({
+        ...p,
+        desc: p.description,
+        tech: typeof p.tech === 'string' ? JSON.parse(p.tech) : (p.tech || []),
+        team: typeof p.team === 'string' ? JSON.parse(p.team) : (p.team || []),
+        createdAt: p.created_at
+      }));
+      setLocal('system_projects', mapped);
+      return mapped;
+    }
+  } catch (err) {
+    console.warn("Using local projects fallback");
+  }
+  return local;
+};
+
+export const addProject = async (p) => {
+  const id = crypto.randomUUID();
+  const newP = { ...p, id, created_at: new Date().toISOString() };
+  setLocal('system_projects', [...getLocal('system_projects'), newP]);
+
+  await query(`
+    INSERT INTO projects (id, title, description, status, tech, github, live, team, color, user_id)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+  `, [id, p.title, p.desc, p.status, JSON.stringify(p.tech || []), p.github, p.live, JSON.stringify(p.team || []), p.color, p.userId || null]);
+  
+  return newP;
+};
+
+export const updateProject = async (p) => {
+  setLocal('system_projects', getLocal('system_projects').map(item => item.id === p.id ? { ...item, ...p } : item));
+  await query(`
+    UPDATE projects 
+    SET title = $1, description = $2, status = $3, tech = $4, github = $5, live = $6, team = $7, color = $8, user_id = $9
+    WHERE id = $10
+  `, [p.title, p.desc, p.status, JSON.stringify(p.tech || []), p.github, p.live, JSON.stringify(p.team || []), p.color, p.userId || null, p.id]);
+};
+
+export const deleteProject = async (id) => {
+  setLocal('system_projects', getLocal('system_projects').filter(p => p.id !== id));
+  await query('DELETE FROM projects WHERE id = $1', [id]);
+};
+
 // ── Assessments ───────────────────────────────────────────────────────────────
 export const getAssessments = async () => {
   const local = getLocal('assessments');
