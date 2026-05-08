@@ -22,12 +22,28 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
   const notifRef = useRef(null);
   const searchRef = useRef(null);
 
-  const refreshNotifs = () => setNotifications(getNotifications());
+  const refreshNotifs = async () => {
+    if (!user?.id) return;
+    try {
+      const res = await getNotifications(user.id);
+      setNotifications(Array.isArray(res) ? res : []);
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+      setNotifications([]);
+    }
+  };
 
-  useEffect(() => { refreshNotifs(); }, []);
-  useEffect(() => { if (isNotifOpen) refreshNotifs(); }, [isNotifOpen]);
+  useEffect(() => { 
+    if (user?.id) refreshNotifs(); 
+  }, [user?.id]);
+  
+  useEffect(() => { 
+    if (isNotifOpen && user?.id) refreshNotifs(); 
+  }, [isNotifOpen, user?.id]);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = Array.isArray(notifications) 
+    ? notifications.filter(n => !n.read).length 
+    : 0;
 
   const mockSearchResults = [
     { title: 'Advanced React Architecture', category: 'Course', icon: Zap },
@@ -298,16 +314,22 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
             className={`flex items-center gap-3 p-1.5 pr-4 rounded-2xl transition-all ${isProfileOpen ? 'bg-black/5 dark:bg-white/5' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
           >
             <div className="flex flex-col items-end hidden lg-block">
-              <span className="text-sm font-bold leading-tight">{user?.name || 'Bhargav'}</span>
+              <span className="text-sm font-bold leading-tight">
+                {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : (user?.username || 'Nexus Member')}
+              </span>
               <div className="flex items-center gap-1">
                 <ShieldCheck size={10} className="text-accent-primary" />
-                <span className="uppercase font-bold" style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{user?.level || 'Pro Member'}</span>
+                <span className="uppercase font-bold" style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{user?.isAdmin ? 'Platform Admin' : (user?.headline || 'Pro Member')}</span>
               </div>
             </div>
             <div className="relative">
               <div className="flex items-center justify-center font-bold text-white shadow-lg overflow-hidden"
                 style={{ width: '40px', height: '40px', borderRadius: '14px', background: 'var(--accent-gradient)' }}>
-                {user?.avatar || <User size={20} />}
+                {user?.avatar?.length > 5 ? (
+                  <img src={user.avatar} alt="User" className="w-full h-full object-cover" />
+                ) : (
+                  (user?.firstName?.[0] || user?.username?.[0] || 'U')
+                )}
               </div>
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900" />
             </div>
@@ -333,17 +355,23 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
                 <div style={{ padding: '20px', background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(168,85,247,0.06) 100%)', borderBottom: '1px solid var(--border-subtle)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                     <div style={{ position: 'relative' }}>
-                      <div style={{ width: '52px', height: '52px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--accent-gradient)', color: 'white', fontWeight: 900, fontSize: '22px', boxShadow: '0 4px 16px rgba(99,102,241,0.35)' }}>
-                        {user?.avatar || (user?.name?.[0] || 'B')}
+                      <div style={{ width: '52px', height: '52px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--accent-gradient)', color: 'white', fontWeight: 900, fontSize: '22px', boxShadow: '0 4px 16px rgba(99,102,241,0.35)', overflow: 'hidden' }}>
+                        {user?.avatar?.length > 5 ? (
+                          <img src={user.avatar} alt="User" className="w-full h-full object-cover" />
+                        ) : (
+                          (user?.firstName?.[0] || user?.username?.[0] || 'U')
+                        )}
                       </div>
                       <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '14px', height: '14px', background: '#22c55e', borderRadius: '50%', border: '2px solid var(--bg-primary)' }} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontWeight: 800, fontSize: '15px', color: 'var(--text-primary)', lineHeight: 1.2 }}>{user?.name || 'Bhargav'}</p>
-                      <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email || 'bhargav@nexus.pro'}</p>
+                      <p style={{ fontWeight: 800, fontSize: '15px', color: 'var(--text-primary)', lineHeight: 1.2 }}>
+                        {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : (user?.username || 'Nexus Member')}
+                      </p>
+                      <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email || 'member@nexus.pro'}</p>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px' }}>
                         <span style={{ padding: '2px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.12)', fontSize: '10px', fontWeight: 800, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          {user?.level || 'Expert'}
+                          {user?.isAdmin ? 'ADMIN' : (user?.headline || 'PRO')}
                         </span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: 'rgba(234,179,8,0.12)', color: '#eab308' }}>
                           <ZapIcon size={10} fill="currentColor" />

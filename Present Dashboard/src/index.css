@@ -161,9 +161,11 @@ button {
 
 .w-full { width: 100%; }
 .w-fit { width: fit-content; }
+.w-18 { width: 16rem; }
 .h-full { height: 100%; }
 .min-h-screen { min-height: 100vh; }
 .h-20 { height: 5rem; }
+.h-18 { height: 16rem; }
 .w-280 { width: var(--sidebar-width); }
 .self-start { align-self: flex-start; }
 
@@ -179,6 +181,13 @@ button {
 .gap-4 { gap: 1rem; }
 .gap-6 { gap: 1.5rem; }
 .gap-8 { gap: 2rem; }
+.gap-9 { gap: 2.25rem; }
+.gap-10 { gap: 2.5rem; }
+.gap-12 { gap: 3rem; }
+.gap-16 { gap: 4rem; }
+.gap-18 { gap: 4.5rem; }
+.gap-20 {gap: 5rem; }
+
 .cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
 .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
 
@@ -187,6 +196,23 @@ button {
 .p-8 { padding: var(--space-lg); }
 .p-10 { padding: var(--space-lg); }
 .p-14 { padding: clamp(2rem, 5vw, 4rem); }
+.p-16 { padding: 4rem; }
+.p-18 { padding: 4.5rem; }
+.p-20 { padding: 5rem; }
+.p-24 { padding: 6rem; }
+.p-28 { padding: 7rem; }
+.p-32 { padding: 8rem; }
+.px-10 { padding-left: 2.5rem; padding-right: 2.5rem; }
+.px-12 { padding-left: 3rem; padding-right: 3rem; }
+.px-14 { padding-left: 3.5rem; padding-right: 3.5rem; }
+.px-16 { padding-left: 4rem; padding-right: 4rem; }
+.px-20 { padding-left: 5rem; padding-right: 5rem; }
+.py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+.py-10 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+.py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+.py-14 { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+.py-16 { padding-top: 4rem; padding-bottom: 4rem; }
+.py-20 { padding-top: 5rem; padding-bottom: 5rem; }
 .px-4 { padding-left: var(--space-sm); padding-right: var(--space-sm); }
 .px-6 { padding-left: var(--space-md); padding-right: var(--space-md); }
 .px-8 { padding-left: var(--space-lg); padding-right: var(--space-lg); }
@@ -310,7 +336,220 @@ button {
   .lg-m-12 { margin: var(--space-xl); }
 }
 
+
+/* --- EXTENDED UTILITIES (Future-Proofing) --- */
+
+/* Additional Spacing (Individual Sides) */
+.mt-0 { margin-top: 0; } .mb-0 { margin-bottom: 0; } .ml-0 { margin-left: 0; } .mr-0 { margin-right: 0; }
+.mt-1 { margin-top: 0.25rem; } .mb-1 { margin-bottom: 0.25rem; } .ml-1 { margin-left: 0.25rem; } .mr-1 { margin-right: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; } .mb-2 { margin-bottom: 0.5rem; } .ml-2 { margin-left: 0.5rem; } .mr-2 { margin-right: 0.5rem; }
+.mt-4 { margin-top: 1rem; } .mb-4 { margin-bottom: 1rem; } .ml-4 { margin-left: 1rem; } .mr-4 { margin-right: 1rem; }
+.mt-6 { margin-top: 1.5rem; } .mb-6 { margin-bottom: 1.5rem; } .ml-6 { margin-left: 1.5rem; } .mr-6 { margin-right: 1.5rem; }
+
+.pt-0 { padding-top: 0; } .pb-0 { padding-bottom: 0; } .pl-0 { padding-left: 0; } .pr-0 { padding-right: 0; }
+.pt-1 { padding-top: 0.25rem; } .pb-1 { padding-bottom: 0.25rem; } .pl-1 { padding-left: 0.25rem; } .pr-1 { padding-right: 0.25rem; }
+.pt-2 { padding-top: 0.5rem; } .pb-2 { padding-bottom: 0.5rem; } .pl-2 { padding-left: 0.5rem; } .pr-2 { padding-right: 0.5rem; }
+.pt-4 { padding-top: 1rem; } .pb-4 { padding-bottom: 1rem; } .pl-4 { padding-left: 1rem; } .pr-4 { padding-right: 1rem; }
+.pt-6 { padding-top: 1.5rem; } .pb-6 { padding-bottom: 1.5rem; } .pl-6 { padding-left: 1.5rem; } .pr-6 { padding-right: 1.5rem; }
+
+/* Width & Height Percentages */
+.w-1\/2 { width: 50%; } .w-1\/3 { width: 33.333%; } .w-2\/3 { width: 66.666%; }
+.w-1\/4 { width: 25%; } .w-3\/4 { width: 75%; }
+.h-screen { height: 100vh; } .h-fit { height: fit-content; }
+
+/* Flexbox Extras */
+.flex-grow { flex-grow: 1; }
+.flex-shrink-0 { flex-shrink: 0; }
+.justify-start { justify-content: flex-start; }
+.content-center { align-content: center; }
+
+/* Grid Extras */
+.col-span-1 { grid-column: span 1 / span 1; }
+.col-span-2 { grid-column: span 2 / span 2; }
+.col-span-3 { grid-column: span 3 / span 3; }
+.col-span-full { grid-column: 1 / -1; }
+
+/* Visibility & Effects */
+.opacity-0 { opacity: 0; }
+.opacity-50 { opacity: 0.5; }
+.opacity-100 { opacity: 1; }
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+.pointer-events-none { pointer-events: none; }
+.select-none { user-select: none; }
+
+
+/* Z-Index Scale */
+.z-0 { z-index: 0; }
+.z-10 { z-index: 10; }
+.z-20 { z-index: 20; }
+
+/* Interactivity & Behavior */
+.cursor-pointer { cursor: pointer; }
+.cursor-default { cursor: default; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+/* Text Alignment */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.whitespace-nowrap { white-space: nowrap; }
+
+/* Media & Objects */
+.object-cover { object-fit: cover; }
+.object-contain { object-fit: contain; }
+.aspect-square { aspect-ratio: 1 / 1; }
+.aspect-video { aspect-ratio: 16 / 9; }
+
+/* Border Radius Extras */
+.rounded-none { border-radius: 0; }
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-full { border-radius: var(--radius-full); }
+
 /* --- PREMIUM COMPONENTS --- */
+
+.nx-icon-btn-3d {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  outline: none;
+}
+
+.nx-icon-btn-3d:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-top: 3px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateY(1px);
+}
+
+.nx-btn-3d, .nx-btn-3d-muted {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  padding: 1rem 1.5rem;
+  outline: none;
+}
+
+.nx-btn-3d {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  border-bottom: 4px solid #6366f1;
+}
+
+.nx-btn-3d-muted {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 4px solid rgba(255, 255, 255, 0.4);
+}
+
+.nx-btn-3d:hover {
+  filter: brightness(1.3);
+  border-top: 4px solid #6366f1;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.4);
+  transform: translateY(2px);
+}
+
+.nx-btn-3d-muted:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-top: 4px solid rgba(255, 255, 255, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateY(2px);
+}
+
+.nx-btn-3d:active, .nx-btn-3d-muted:active {
+  opacity: 0.75;
+  transform: translateY(4px);
+}
+
+.nx-btn-3d .sweep, .nx-btn-3d-muted .sweep {
+  position: absolute;
+  top: -150%;
+  left: 0;
+  width: 400px;
+  height: 5px;
+  background: currentColor;
+  box-shadow: 0 0 15px 10px rgba(99, 102, 241, 0.2);
+  border-radius: 999px;
+  opacity: 0.3;
+  transition: 0.6s;
+  pointer-events: none;
+}
+
+.nx-btn-3d:hover .sweep, .nx-btn-3d-muted:hover .sweep {
+  top: 150%;
+}
+
+.nx-btn-edit {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  backdrop-filter: blur(12px);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 0 0 10px rgba(255, 255, 255, 0.03);
+}
+
+.nx-btn-edit::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.nx-btn-edit:hover::before {
+  left: 100%;
+}
+
+.nx-btn-edit:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #ffffff;
+  box-shadow: 
+    0 0 30px rgba(99, 102, 241, 0.2),
+    inset 0 0 15px rgba(99, 102, 241, 0.1);
+  transform: translateY(-3px);
+  letter-spacing: 0.1em;
+}
+
+.nx-btn-edit:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
 .nx-glass {
   background: var(--glass-bg);
   backdrop-filter: blur(20px);

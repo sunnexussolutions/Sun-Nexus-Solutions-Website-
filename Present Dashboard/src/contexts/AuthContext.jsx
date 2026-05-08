@@ -1,162 +1,122 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { storage } from '../utils/storage';
+import { query } from '../lib/neon';
 
 const AuthContext = createContext();
 
-const ADMIN_USERNAMES = ['admin', 'sunnexus_admin', 'admin@sunnexus.824'];
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser]                       = useState(null);
+  const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading]                 = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  // Restore session on mount
   useEffect(() => {
-    const session = storage.get('SESSION');
-    if (session) {
-      const users = storage.get('USERS') || [];
-      const found = users.find(u => u.username === session.username);
-      if (found) {
-        const { password: _, ...safe } = found;
-        setUser(safe);
-        setIsAuthenticated(true);
-      } else {
-        storage.remove('SESSION');
-      }
+    const savedUser = localStorage.getItem('nexus_user');
+    if (savedUser) {
+      const u = JSON.parse(savedUser);
+      setUser(u);
+      setIsAuthenticated(true);
+      refreshProfile(u.id);
     }
     setLoading(false);
   }, []);
 
-  // Register new user
-  const register = ({ firstName, lastName, dob, username, email, password }) => {
-    const users = storage.get('USERS') || [];
-
-    if (users.find(u => u.username.toLowerCase() === username.toLowerCase()))
-      return { success: false, error: 'Username already taken.' };
-
-    if (users.find(u => u.email.toLowerCase() === email.toLowerCase()))
-      return { success: false, error: 'Email already registered.' };
-
-    const isAdmin = ADMIN_USERNAMES.includes(username.toLowerCase());
-    const status  = isAdmin ? 'active' : 'pending';
-    const newUser = {
-      id:        Date.now(),
-      firstName,
-      lastName,
-      name:      `${firstName} ${lastName}`,
-      dob,
-      username,
-      email:     email.toLowerCase(),
-      password,  
-      avatar:    firstName[0].toUpperCase(),
-      level:     isAdmin ? 'Administrator' : 'Member',
-      isAdmin,
-      status,
-      xp:        0,
-      streak:    0,
-      results:   [],
-      joinedAt:  new Date().toISOString(),
-    };
-
-    storage.set('USERS', [...users, newUser]);
-
-    if (status === 'pending') {
-      return { success: true, pending: true };
+  const refreshProfile = async (id) => {
+    const cloud = await query('SELECT * FROM profiles WHERE id = $1', [id]);
+    if (cloud && cloud.length > 0) {
+      const u = cloud[0];
+      const updated = { ...u, firstName: u.first_name, lastName: u.last_name, isAdmin: u.is_admin };
+      setUser(updated);
+      localStorage.setItem('nexus_user', JSON.stringify(updated));
     }
-
-    const { password: _, ...safe } = newUser;
-    storage.set('SESSION', safe);
-    setUser(safe);
-    setIsAuthenticated(true);
-    return { success: true };
   };
 
-  const login = (username, password) => {
-    // --- TEMPORARY BYPASS START ---
-    if (username.toLowerCase() === 'admin@sunnexus.824' && password === 'admin@sunnexus.824') {
-      const adminSession = {
-        id: 999,
-        name: 'Sun Nexus Admin',
-        username: 'admin@sunnexus.824',
-        email: 'admin@sunnexus.824',
-        level: 'Administrator',
-        isAdmin: true,
-        xp: 1000,
-        streak: 1,
-        joinedAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString()
-      };
-      storage.set('SESSION', adminSession);
-      setUser(adminSession);
-      setIsAuthenticated(true);
-      return { success: true };
-    }
-    // --- TEMPORARY BYPASS END ---
-
-    const users = storage.get('USERS') || [];
-    const foundIdx = users.findIndex(
-      u => u.username.toLowerCase() === username.toLowerCase() && u.password === password
-    );
-
-    if (foundIdx === -1) return { success: false, error: 'Invalid username or password.' };
-    const found = users[foundIdx];
-
-    // --- CHECK STATUS ---
-    if (found.status === 'suspended') {
-      return { success: false, error: 'Your account has been suspended. Please contact support.' };
-    }
-    
-    if (found.status === 'pending') {
-      return { success: false, error: 'Account Pending. Your access requires administrator approval.' };
-    }
-
-    if (found.status === 'banned') {
-      return { success: false, error: 'Account Banned. Global access revoked.' };
-    }
-    if (found.status === 'banned') {
-      return { success: false, error: 'Your account has been permanently banned.' };
-    }
-    // --- END CHECK ---
-
-    // Update lastLogin
-    users[foundIdx].lastLogin = new Date().toISOString();
-    storage.set('USERS', users);
-
-    const { password: _, ...safe } = users[foundIdx];
-    storage.set('SESSION', safe);
-    setUser(safe);
-    setIsAuthenticated(true);
-    return { success: true };
-  };
-
-  // Update user profile
-  const updateProfile = (updates) => {
-    if (!user) return { success: false, error: 'Not logged in' };
-    
-    const users = storage.get('USERS') || [];
-    const idx = users.findIndex(u => u.email === user.email);
-    
-    if (idx !== -1) {
-      const updatedUser = { ...users[idx], ...updates };
-      users[idx] = updatedUser;
-      storage.set('USERS', users);
+  const login = async (identifier, password) => {
+    setLoading(true);
+    try {
+      // SENIOR DEV TIP: Search by Email OR Username to make it user-friendly.
+      const cloud = await query('SELECT * FROM profiles WHERE email = $1 OR username = $2', [identifier, identifier]);
       
-      const { password: _, ...safe } = updatedUser;
-      storage.set('SESSION', safe);
-      setUser(safe);
-      return { success: true };
+      if (cloud && cloud.length > 0) {
+        const found = cloud[0];
+        // Professional Check: Allow Admin master bypass OR saved password
+        if (
+          (identifier === 'admin@nexus.com' && password === 'admin123') || 
+          (found.password === password)
+        ) {
+          const u = { 
+            ...found, 
+            firstName: found.first_name, 
+            lastName: found.last_name, 
+            isAdmin: found.is_admin 
+          };
+          setUser(u);
+          setIsAuthenticated(true);
+          localStorage.setItem('nexus_user', JSON.stringify(u));
+          setLoading(false);
+          return { success: true };
+        }
+      }
+      
+      setLoading(false);
+      return { success: false, error: 'Identity check failed. Verify your password.' };
+    } catch (err) {
+      console.error("LOGIN_ERROR:", err);
+      setLoading(false);
+      return { success: false, error: 'Connection to Cloud Hub interrupted.' };
     }
-    return { success: false, error: 'User not found' };
+  };
+
+  const register = async (userData) => {
+    setLoading(true);
+    const id = `user_${Date.now()}`;
+    
+    try {
+      const res = await query(`
+        INSERT INTO profiles (id, email, first_name, last_name, username, password, is_admin)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING *
+      `, [id, userData.email, userData.firstName, userData.lastName, userData.username, userData.password, false]);
+
+      if (res) {
+        // Also save locally for Admin Panel visibility (until it's fully cloud-migrated)
+        const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+        localStorage.setItem('nexus_users', JSON.stringify([...localUsers, { ...userData, id, isAdmin: false, status: 'pending' }]));
+        
+        setLoading(false);
+        return { success: true };
+      }
+      
+      setLoading(false);
+      return { success: false, error: 'Database rejected signup. Email might already exist.' };
+    } catch (err) {
+      setLoading(false);
+      return { success: false, error: `Critical Failure: ${err.message}` };
+    }
+  };
+
+  const updateProfile = async (updates) => {
+    if (!user) return;
+    const updated = { ...user, ...updates };
+    setUser(updated);
+    localStorage.setItem('nexus_user', JSON.stringify(updated));
+
+    await query(`
+      UPDATE profiles 
+      SET first_name = $1, last_name = $2, headline = $3, avatar = $4, location = $5
+      WHERE id = $6
+    `, [updates.firstName || user.firstName, updates.lastName || user.lastName, updates.headline || user.headline, updates.avatar || user.avatar, updates.location || user.location, user.id]);
+
+    window.dispatchEvent(new Event('nexus-data-updated'));
+    return { success: true };
   };
 
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
-    storage.remove('SESSION');
+    localStorage.removeItem('nexus_user');
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, register, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, logout, register, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

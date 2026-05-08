@@ -127,14 +127,41 @@ const Sidebar = ({ isOpen, toggleSidebar, activePage, setActivePage }) => {
                 style={{ backgroundColor: 'var(--bg-tertiary)', minWidth: 0 }}
               >
                 <div className="relative flex-shrink-0">
-                  <div className="flex items-center justify-center font-bold shadow-md transition-transform group-hover:scale-105" style={{ width: '36px', height: '36px', borderRadius: '10px', background: isAdmin ? 'linear-gradient(135deg,#f59e0b,#ef4444)' : 'var(--accent-gradient)', color: 'white', fontSize: '14px' }}>
-                    {user?.avatar || (user?.name?.[0] || 'U')}
+                  <svg width="0" height="0" className="absolute">
+                    <defs>
+                      <clipPath id="sidebarSquircle" clipPathUnits="objectBoundingBox">
+                        <path d="M .5,0 C .1,0 0,.1 0,.5 0,.9 .1,1 .5,1 .9,1 1,.9 1,.5 1,.1 .9,0 .5,0 Z" />
+                      </clipPath>
+                    </defs>
+                  </svg>
+                  <div 
+                    className="flex items-center justify-center font-bold shadow-md transition-transform group-hover:scale-105 overflow-hidden" 
+                    style={{ 
+                      width: '36px', height: '36px', 
+                      clipPath: 'url(#sidebarSquircle)',
+                      background: isAdmin ? 'linear-gradient(135deg,#f59e0b,#ef4444)' : 'var(--accent-gradient)', 
+                      color: 'white', fontSize: '14px' 
+                    }}
+                  >
+                    {user?.avatar?.length > 5 ? (
+                      <img 
+                        src={user.avatar} 
+                        alt="User" 
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      (user?.firstName?.[0] || user?.username?.[0] || 'U')
+                    )}
                   </div>
                   <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-[var(--bg-tertiary)]" />
                 </div>
                 <div className="flex flex-col items-start overflow-hidden">
-                  <span className="text-[13px] font-bold truncate w-full text-left" style={{ color: 'var(--text-primary)' }}>{user?.name || 'Bhargav'}</span>
-                  <span style={{ fontSize: '8px', color: isAdmin ? '#f59e0b' : 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{user?.level || 'Pro Operator'}</span>
+                  <span className="text-[13px] font-bold truncate w-full text-left" style={{ color: 'var(--text-primary)' }}>
+                    {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : (user?.username || 'Nexus Member')}
+                  </span>
+                  <span style={{ fontSize: '8px', color: isAdmin ? '#f59e0b' : 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {user?.headline || (isAdmin ? 'Nexus Administrator' : 'Identity Verified')}
+                  </span>
                 </div>
               </button>
 

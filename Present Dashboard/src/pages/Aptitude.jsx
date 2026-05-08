@@ -37,22 +37,44 @@ const Aptitude = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [activeAssessment, setActiveAssessment] = useState(null);
   const [allResults, setAllResults] = useState([]);
+  const [assessments, setAssessments] = useState([]);
   
-  const assessments = getAssessments();
+  const refreshResults = async () => {
+    const res = await getResults();
+    setAllResults(res);
+  };
 
-  const refreshResults = () => {
-    setAllResults(getResults());
+  const loadAssessments = async () => {
+    const data = await getAssessments();
+    setAssessments(data);
   };
 
   useEffect(() => {
+    loadAssessments();
     refreshResults();
+
+    const handleUpdate = () => {
+      loadAssessments();
+      refreshResults();
+    };
+
+    window.addEventListener('nexus-data-updated', handleUpdate);
+    return () => window.removeEventListener('nexus-data-updated', handleUpdate);
   }, []);
 
-  const getTopicResult = (topicId) => 
-    allResults.find(r => r.assessmentId === topicId && r.userEmail === user?.email);
+  const getTopicResult = (topicId) => {
+    if (!allResults || !user) return null;
+    return allResults.find(r => r.assessmentId === topicId && r.userId === user.id);
+  };
 
-  const topicsForCategory = (category) =>
-    assessments.filter(a => a.category === category);
+  const topicsForCategory = (category) => {
+    if (!assessments || !category) return [];
+    const searchCat = category.toLowerCase().trim();
+    return assessments.filter(a => {
+      const aCat = (a.category || '').toLowerCase().trim();
+      return aCat === searchCat;
+    });
+  };
 
   return (
     <div className="flex flex-col gap-8 animate-slide-up">
@@ -233,6 +255,12 @@ const Aptitude = () => {
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="text-[10px] font-black uppercase tracking-ultra px-3 py-1 rounded-lg" style={{ backgroundColor: isLocked ? 'rgba(245,158,11,0.1)' : `${catColor}15`, color: isLocked ? '#f59e0b' : catColor }}>
                         {topic.week}
+                      </span>
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-muted">
+                        {topic.unlockTime 
+                          ? `Unlocks: ${new Date(topic.unlockTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                          : `Published: ${new Date(topic.created_at).toLocaleDateString()}`
+                        }
                       </span>
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>

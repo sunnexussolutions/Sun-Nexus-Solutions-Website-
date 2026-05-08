@@ -10,19 +10,19 @@ export const prepareUserChartData = (userResults = []) => {
   if (!userResults || userResults.length === 0) return [];
   
   const points = [...userResults]
-    .sort((a, b) => new Date(a.submittedAt) - new Date(b.submittedAt))
+    .sort((a, b) => new Date(a.submitted_at || 0) - new Date(b.submitted_at || 0))
     .slice(-7)
     .map(r => ({
-      date: new Date(r.submittedAt).toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + 
-            new Date(r.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      date: new Date(r.submitted_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + 
+            new Date(r.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       score: Math.round(r.percentage || 0),
-      fullDate: new Date(r.submittedAt).toLocaleString(),
+      fullDate: new Date(r.submitted_at).toLocaleString(),
       topic: r.topic
     }));
 
   // If only one point, add a zero base-line at a slightly earlier time to draw a line
   if (points.length === 1) {
-    const firstPointDate = new Date(userResults[0].submittedAt);
+    const firstPointDate = new Date(userResults[0].submitted_at);
     const baselineDate = new Date(firstPointDate.getTime() - 1000 * 60 * 60); // 1 hour earlier
     const baseline = {
       date: 'Origin',
@@ -54,7 +54,7 @@ export const prepareCollectiveChartData = (allResults = [], activeAssessments = 
   // Aggregate results into the topics
   const activeIds = new Set(activeAssessments.map(a => a.id));
   allResults.forEach(res => {
-    if (activeIds.has(res.assessmentId) && topicMap[res.topic]) {
+    if (activeIds.has(res.assessment_id) && topicMap[res.topic]) {
       topicMap[res.topic].sum += (res.percentage || 0);
       topicMap[res.topic].count += 1;
     }

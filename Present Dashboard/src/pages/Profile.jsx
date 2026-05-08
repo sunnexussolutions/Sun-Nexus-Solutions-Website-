@@ -1,426 +1,359 @@
-import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
-import {
-  Edit3, Camera, Save, CheckCircle2, X, Briefcase, User,
-  Code2, Zap, Star, Award, GitBranch, BookOpen, TrendingUp, MapPin, Calendar, ExternalLink
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  User, Mail, MapPin, Globe, Award, Shield,
+  Linkedin, Github, Twitter, Zap, Cpu, Layout, Brain,
+  X, ArrowUpRight, Activity, Star, BarChart3, Fingerprint, Search, Bell, Menu,
+  Clock, CheckCircle2, MessageSquare, Calendar, UserPlus, Briefcase, GraduationCap, Laptop, Settings, Target, Users,
+  FileText, Share2, Eye, Download, Check, Camera, Upload, Loader2
+} from 'lucide-react';
+import { getResults } from '../store/dataStore';
+import { uploadToCloudinary } from '../lib/cloudinary';
 
-const DEFAULT_SKILLS = ['Python', 'React', 'Node.js', 'TensorFlow', 'FastAPI', 'PostgreSQL', 'Docker', 'TypeScript'];
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.08 } },
-};
-const itemVariants = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 20 } },
-};
+const StatCard = ({ icon: Icon, label, value, subtext, color, progress }) => (
+  <div className="bg-[#16181f] border border-[#232733] rounded-2xl p-5 flex flex-col gap-4 relative overflow-hidden group hover:border-white/10 transition-colors">
+    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: `radial-gradient(circle at top right, ${color}10, transparent 70%)` }} />
+    
+    <div className="flex items-center gap-3 relative z-10">
+      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: color + '15', color: color }}>
+        <Icon size={16} strokeWidth={2.5} />
+      </div>
+      <span className="text-[11px] text-white/50 font-bold">{label}</span>
+    </div>
+    
+    <div className="flex items-baseline gap-1.5 relative z-10">
+      <span className="text-3xl font-black tracking-tight text-white">{value}</span>
+      {subtext && <span className="text-[10px] text-white/40 font-medium">{subtext}</span>}
+    </div>
+    
+    <div className="w-full h-1.5 rounded-full bg-[#232733] mt-2 overflow-hidden relative z-10">
+      <motion.div 
+        initial={{ width: 0 }}
+        animate={{ width: progress }}
+        transition={{ duration: 1, ease: "easeOut" }}
+        className="h-full rounded-full" 
+        style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}80` }} 
+      />
+    </div>
+  </div>
+);
 
 const Profile = () => {
   const { user, updateProfile } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const [tempSkills, setTempSkills] = useState("");
+  const [draftData, setDraftData] = useState({});
   const [profileData, setProfileData] = useState({
-    name: user?.name || user?.username || 'Nexus Member',
-    headline: user?.headline || 'Member of Sun Nexus Solutions',
-    location: user?.location || 'Global',
-    joined: user?.joinedAt ? new Date(user.joinedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Jan 2024',
-    avatar: user?.avatar || (user?.name || user?.username || 'N')[0].toUpperCase(),
-    skills: user?.skills || [...DEFAULT_SKILLS],
+    name: '',
+    headline: '',
+    location: '',
+    avatar: '',
+    skills: [],
+    score: 0,
+    stats: {
+      completion: '0%',
+      applications: '0',
+      interviews: '0',
+      endorsed: '0',
+      reviews: '0',
+      growth: '0%'
+    }
   });
-  
-  const [newSkill, setNewSkill] = useState('');
-  
-  const [draftData, setDraftData] = useState({ ...profileData });
 
-  // Sync state if user changes (e.g. after update)
-  React.useEffect(() => {
+  const [uploading, setUploading] = useState(false);
+  const [userResults, setUserResults] = useState([]);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    const imageUrl = await uploadToCloudinary(file);
+    if (imageUrl) {
+      setDraftData({ ...draftData, avatar: imageUrl });
+      // If we are not in the modal, we can update immediately
+      if (!isModalOpen) {
+        updateProfile({ avatar: imageUrl });
+      }
+    }
+    setUploading(false);
+  };
+
+  const loadData = () => {
     if (user) {
+      const nameStr = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Nexus Member';
       setProfileData({
-        name: user.name || user.username,
-        headline: user.headline || 'Member of Sun Nexus Solutions',
-        location: user.location || 'Global',
-        joined: new Date(user.joinedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-        avatar: user.avatar || (user.name || user.username)[0].toUpperCase(),
-        skills: user.skills || [...DEFAULT_SKILLS],
+        name: nameStr,
+        headline: user.headline || 'Product Developer',
+        location: user.location || 'Nexus Global',
+        avatar: user.avatar || 'https://res.cloudinary.com/djw0g8duw/image/upload/v1763865310/link_img_rusktx.png',
+        skills: user.skills?.length ? user.skills : ['Javascript', 'React', 'Node.js', 'UI/UX'],
+        score: user.xp ? Math.min(100, Math.floor(user.xp / 100)) : 85,
+        stats: {
+          completion: user.profileCompletion || '100%',
+          applications: user.applications || '0',
+          interviews: user.interviews || '0',
+          endorsed: user.skillsEndorsed || '0',
+          reviews: user.projectReviews || '5.0/5',
+          growth: user.networkGrowth || '+0%'
+        }
       });
     }
+  };
+
+  useEffect(() => {
+    loadData();
+    const fetchUserResults = async () => {
+      if (user?.id) {
+        const results = await getResults(user.id);
+        setUserResults(results);
+        
+        // Calculate Dynamic Score
+        if (results.length > 0) {
+          const avg = Math.round(results.reduce((a, r) => a + (r.percentage || 0), 0) / results.length);
+          setProfileData(prev => ({ ...prev, score: avg }));
+        } else {
+          setProfileData(prev => ({ ...prev, score: 0 }));
+        }
+      }
+    };
+    fetchUserResults();
+    
+    window.addEventListener('nexus-data-updated', loadData);
+    return () => window.removeEventListener('nexus-data-updated', loadData);
   }, [user]);
 
-  const STATS = [
-    { label: 'Total XP', value: user?.xp || 0, icon: GitBranch },
-    { label: 'Accuracy', value: user?.results?.length ? Math.round(user.results.reduce((a, r) => a + (r.percentage || 0), 0) / user.results.length) + '%' : 'N/A', icon: Code2 },
-    { label: 'Streak', value: (user?.streak || 0) + 'd', icon: Zap },
-    { label: 'Submissions', value: user?.results?.length || 0, icon: Award },
-  ];
+  const skillColors = {
+    Python: '#a855f7', AWS: '#eab308', React: '#10b981', 'Data Science': '#6366f1',
+    AI: '#a855f7', Docker: '#0ea5e9', SQL: '#eab308', Kubernetes: '#3b82f6', GraphQL: '#ec4899',
+    Javascript: '#f7df1e', 'Node.js': '#339933', 'UI/UX': '#ff61f6'
+  };
 
-  const ACTIVITY = (user?.results || []).slice(-4).reverse().map(r => ({
-    icon: TrendingUp,
-    color: '#10b981',
-    text: `Completed ${r.topic}`,
-    time: new Date(r.submittedAt).toLocaleDateString()
-  }));
+  const getSkillColor = (skill) => skillColors[skill] || '#6366f1';
 
-  if (ACTIVITY.length === 0) {
-    ACTIVITY.push({ icon: Star, color: '#f59e0b', text: 'Welcome to Sun Nexus!', time: 'Now' });
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const currentMonthIdx = new Date().getMonth();
+  const last6Months = [];
+  for (let i = 5; i >= 0; i--) {
+    const idx = (currentMonthIdx - i + 12) % 12;
+    last6Months.push(months[idx]);
   }
 
-  const openModal = () => { setDraftData({ ...profileData }); setIsModalOpen(true); };
-  const handleSave = async () => { 
-    try {
-      const res = await updateProfile({ 
-        name: draftData.name, 
-        headline: draftData.headline, 
-        location: draftData.location,
-        skills: draftData.skills
-      });
-      if (res.success) setIsModalOpen(false);
-    } catch (err) {
-      console.error("Save failed:", err);
-    }
-  };
-
-  const addSkill = () => {
-    if (newSkill.trim() && !draftData.skills.includes(newSkill.trim())) {
-      setDraftData(prev => ({ ...prev, skills: [...prev.skills, newSkill.trim()] }));
-      setNewSkill('');
-    }
-  };
-
-  const removeSkill = (skillToRemove) => {
-    setDraftData(prev => ({ ...prev, skills: prev.skills.filter(s => s !== skillToRemove) }));
-  };
+  const chartData = last6Months.map(month => ({
+    m: month,
+    p: Math.floor(Math.random() * 40) + 40,
+    a: Math.floor(Math.random() * 40) + 30,
+    mng: Math.floor(Math.random() * 40) + 20,
+  }));
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="show"
-      className="flex flex-col gap-8 pb-12 animate-slide-up" style={{ maxWidth: '860px', margin: '0 auto', width: '100%' }}>
+    <div className="flex min-h-screen bg-[#0b0c10] text-white font-sans overflow-hidden">
+      
+      {/* ── SIDEBAR ── */}
+      <div className="w-[280px] bg-[#12141a] border-r border-[#1f222b] p-6 flex flex-col h-screen overflow-y-auto shrink-0 relative">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[80px] pointer-events-none" />
+        
+        <div className="flex items-center gap-3 mb-8 px-2 relative z-10">
+          <div className="relative flex items-center justify-center">
+            <div className="w-6 h-6 rounded-full border-[3px] border-cyan-400 absolute left-0" />
+            <div className="w-6 h-6 rounded-full border-[3px] border-indigo-500 absolute left-3 mix-blend-screen" />
+            <div className="w-9 h-6" />
+          </div>
+          <span className="text-base font-black tracking-tight text-white/90 uppercase tracking-widest">Nexus Careers</span>
+        </div>
 
-      {/* ── Identity Card ── */}
-      <motion.div variants={itemVariants} className="nx-card relative overflow-hidden"
-        style={{ borderRadius: '2rem', border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-lg)' }}>
-
-        {/* Banner */}
-        <div style={{ height: '200px', position: 'relative', overflow: 'hidden', background: '#0d0d14' }}>
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(135deg, rgba(99,102,241,0.45) 0%, rgba(34,211,238,0.3) 60%, transparent 100%)',
-          }} />
-          {/* Decorative orbs */}
-          <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '220px', height: '220px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%)', filter: 'blur(30px)' }} />
-          <div style={{ position: 'absolute', bottom: '-20px', left: '30%', width: '160px', height: '160px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,211,238,0.2) 0%, transparent 70%)', filter: 'blur(24px)' }} />
-          {/* Edit banner hint */}
-            {/* Edit Profile Action */}
-            <button 
-              onClick={openModal} 
-              className="md:absolute md:top-4 md:right-4 flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-black/45 backdrop-blur-md border border-white/10 text-white/90 text-xs font-bold cursor-pointer transition-all hover:bg-indigo-500/50"
-              style={{
-                zIndex: 20,
-                position: window.innerWidth < 768 ? 'fixed' : 'absolute',
-                bottom: window.innerWidth < 768 ? '24px' : 'auto',
-                right: window.innerWidth < 768 ? '24px' : '16px',
-                top: window.innerWidth < 768 ? 'auto' : '16px',
-                boxShadow: window.innerWidth < 768 ? '0 10px 25px rgba(0,0,0,0.4)' : 'none'
+        <div 
+          className="relative rounded-[20px] p-5 flex flex-col items-center bg-gradient-to-b from-[#1c202a] to-[#12141a] border border-[#232733] z-10 group shadow-lg"
+        >
+          <div className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-indigo-500/10 to-transparent rounded-t-[20px] pointer-events-none" />
+          
+          <div className="relative group/avatar" style={{ position: 'relative' }}>
+            <div 
+              className="rounded-full border-[2px] border-[#2a2e3d] overflow-hidden mb-3 relative transition-all"
+              style={{ 
+                width: '48px', 
+                height: '48px', 
+                position: 'relative',
+                border: '2px solid #2a2e3d'
               }}
             >
-              <Edit3 size={14} /> 
-              <span className="hidden sm:inline">Edit Profile</span>
-            </button>
-        </div>
-
-        {/* Avatar + Info */}
-        <div style={{ padding: '0 2rem 2rem', position: 'relative' }}>
-          <div className="flex flex-col md:flex-row md:items-end justify-between items-center gap-4">
-            {/* Avatar */}
-            <div className="relative -mt-16 md:-mt-20">
-              <div style={{
-                width: '120px', height: '120px', borderRadius: '50%',
-                border: '5px solid var(--bg-secondary)', boxShadow: 'var(--shadow-lg)',
-                background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', color: 'white', fontSize: '3rem', fontWeight: 900,
-              }}>
-                {profileData.name.charAt(0).toUpperCase()}
-              </div>
-              <div style={{
-                position: 'absolute', bottom: '4px', right: '4px', width: '28px', height: '28px',
-                borderRadius: '50%', background: '#22c55e', border: '3px solid var(--bg-secondary)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <CheckCircle2 size={14} color="white" />
-              </div>
+              <img src={profileData.avatar} alt="Profile" className="w-full h-full object-cover" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {uploading && (
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center" style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Loader2 className="animate-spin text-white" size={14} />
+                </div>
+              )}
             </div>
-
-            {/* Badge */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px',
-              background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)',
-              borderRadius: '999px', marginBottom: '0.5rem',
-            }}>
-              <Star size={13} style={{ color: '#f59e0b' }} fill="#f59e0b" />
-              <span style={{ fontSize: '11px', fontWeight: 900, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Elite Member</span>
-            </div>
-          </div>
-
-          {/* Name & meta */}
-          <div className="mt-4 flex flex-col items-center md:items-start gap-2 text-center md:text-left">
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-              {profileData.name}
-            </h1>
-            <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', fontWeight: 500, lineHeight: 1.5 }}>
-              {profileData.headline}
-            </p>
-            <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', marginTop: '4px' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>
-                <MapPin size={12} /> {profileData.location}
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>
-                <Calendar size={12} /> Joined {profileData.joined}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats bar */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 border-t border-white/5">
-          {STATS.map(({ label, value, icon: Icon }, i) => (
-            <div key={i} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.25rem 1rem',
-              borderRight: i < 3 ? '1px solid var(--border-subtle)' : 'none',
-              transition: 'background 0.2s', cursor: 'default',
-            }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-tertiary)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            <label 
+              className="absolute cursor-pointer shadow-xl transition-all border border-white/20"
+              style={{ 
+                position: 'absolute',
+                bottom: '-8px',
+                right: '-8px',
+                padding: '10px',
+                backgroundColor: '#4f46e5',
+                borderRadius: '50%',
+                boxShadow: '0 0 15px rgba(79,70,229,0.6)',
+                zIndex: 20,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
             >
-              <Icon size={16} style={{ color: 'var(--accent-primary)', marginBottom: '6px' }} />
-              <span style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>{value}</span>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '4px' }}>{label}</span>
+              <Camera size={22} style={{ color: 'white' }} />
+              <input type="file" className="hidden" style={{ display: 'none' }} accept="image/*" onChange={handleImageUpload} />
+            </label>
+          </div>
+          
+          <h2 className="text-[15px] font-bold text-white/90 text-center">{profileData.name}</h2>
+          <div className="flex items-center gap-1.5 bg-teal-500/10 text-teal-400 px-3 py-1 rounded-full mt-2 border border-teal-500/20 shadow-[0_0_10px_rgba(20,184,129,0.1)]">
+            <div className="bg-teal-400 rounded-full p-[1px] text-[#12141a]">
+              <Check size={8} strokeWidth={4} />
             </div>
+            <span className="text-[9px] font-bold tracking-wide">Verified Identity</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1 mt-6 z-10">
+          {[
+            { icon: Layout, label: 'Dashboard', active: true },
+            { icon: User, label: 'Profile' },
+            { icon: FileText, label: 'Assessments' },
+          ].map((item, i) => (
+            <button key={i} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-all ${item.label === 'Profile' ? 'bg-white/10 text-white shadow-sm' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+              <item.icon size={16} strokeWidth={item.label === 'Profile' ? 2.5 : 2} /> {item.label}
+            </button>
           ))}
         </div>
-      </motion.div>
 
-      {/* Skills & Activity row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-        {/* Skills */}
-        <motion.div variants={itemVariants} className="nx-card p-6 flex flex-col gap-5">
-          <h3 style={{ fontSize: '1rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
-            <Code2 size={18} style={{ color: 'var(--accent-primary)' }} /> Tech Stack
-          </h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {profileData.skills.map((skill, i) => (
-              <motion.span key={i} whileHover={{ scale: 1.06, y: -2 }} style={{
-                padding: '6px 14px', borderRadius: '999px', fontSize: '12px', fontWeight: 700,
-                background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)',
-                color: 'var(--text-secondary)', cursor: 'default', transition: 'all 0.2s',
-              }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.color = 'var(--accent-primary)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-subtle)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
-              >
-                {skill}
-              </motion.span>
-            ))}
+        <div className="mt-auto pt-8 border-t border-[#1f222b] z-10">
+          <h3 className="text-[13px] font-bold text-white/90 mb-5 text-center">Skill Landscape</h3>
+          <div className="flex flex-wrap gap-2.5 justify-center px-2">
+            {profileData.skills.map((s, i) => {
+              const color = getSkillColor(s);
+              return (
+                <span key={i} className="px-3 py-1.5 rounded-xl text-[11px] font-bold border" style={{ color: color, borderColor: color + '40', backgroundColor: color + '08' }}>
+                  {s}
+                </span>
+              )
+            })}
           </div>
-        </motion.div>
-
-        {/* Recent Activity */}
-        <motion.div variants={itemVariants} className="nx-card p-6 flex flex-col gap-5">
-          <h3 style={{ fontSize: '1rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
-            <Zap size={18} style={{ color: '#f59e0b' }} /> Recent Activity
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {ACTIVITY.map(({ icon: Icon, color, text, time }, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{
-                  width: '32px', height: '32px', borderRadius: '10px', flexShrink: 0,
-                  background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <Icon size={15} style={{ color }} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{text}</p>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>{time}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+        </div>
       </div>
 
-      {/* ── Completed Projects ── */}
-      <motion.div variants={itemVariants} className="nx-card p-6 flex flex-col gap-6" style={{ marginTop: '1.5rem' }}>
-        <h3 style={{ fontSize: '1.25rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
-          <Briefcase size={20} style={{ color: 'var(--accent-primary)' }} /> Completed Projects
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            { title: 'Nexus Authentication Protocol', desc: 'High-fidelity access management system with role-based JWT handshake.', tech: ['React', 'Node.js', 'Framer Motion'], repo: '#' },
-            { title: 'Cognitive Assessment Engine', desc: 'Dynamic MCQ delivery and real-time performance analytics module.', tech: ['Vite', 'PostgreSQL', 'FastAPI'], repo: '#' },
-          ].map((proj, i) => (
-            <div key={i} style={{ 
-              background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)', borderRadius: '1.25rem', padding: '1.5rem', 
-              transition: 'all 0.3s', cursor: 'pointer', position: 'relative' 
-            }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(99,102,241,0.1)'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-subtle)'; e.currentTarget.style.boxShadow = 'none'; }}
+      <div className="flex-1 p-8 lg:p-10 xl:p-12 h-screen overflow-y-auto relative">
+        <div className="absolute top-0 right-0 w-[600px] h-[300px] bg-gradient-to-bl from-cyan-500/10 via-purple-500/5 to-transparent blur-[100px] pointer-events-none" />
+        
+        <div className="max-w-[1200px] mx-auto flex flex-col gap-8 relative z-10">
+          <div className="flex items-center justify-between">
+            <h1 className="text-[22px] font-bold text-white/90">Identity Vault</h1>
+            <button 
+              onClick={() => {
+                setDraftData({ ...profileData });
+                setTempSkills(profileData.skills.join(', '));
+                setIsModalOpen(true);
+              }}
+              className="px-6 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold hover:bg-indigo-500/20 transition-all"
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>{proj.title}</h4>
-                <a href={proj.repo} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', transition: 'color 0.2s' }}
-                   onMouseEnter={e => e.currentTarget.style.color = '#00f2fe'}
-                   onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>
-                  <ExternalLink size={16} />
-                </a>
-              </div>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '16px' }}>{proj.desc}</p>
-              
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                {proj.tech.map((t, idx) => (
-                  <span key={idx} style={{ 
-                    padding: '4px 10px', borderRadius: '6px', fontSize: '10px', fontWeight: 800, 
-                    textTransform: 'uppercase', letterSpacing: '0.05em', background: 'rgba(99,102,241,0.1)', 
-                    color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)' 
-                  }}>
-                    {t}
-                  </span>
-                ))}
+              Update Credentials
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-1 gap-4">
+               <StatCard icon={User} label="Vault Integrity" value={profileData.stats.completion} color="#a855f7" progress="100%" />
+            </div>
+
+            <div className="lg:col-span-5 flex flex-col gap-6">
+              <div className="bg-[#16181f] border border-[#232733] rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden h-[240px]">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-purple-500/20 blur-[60px] rounded-full pointer-events-none" />
+                <div className="relative z-10 w-full h-full flex items-center justify-center">
+                  <svg width="200" height="200" viewBox="0 0 200 200">
+                    <path d="M 40 160 A 85 85 0 1 1 160 160" fill="none" stroke="#232733" strokeWidth="14" strokeLinecap="round" />
+                    <motion.path d="M 40 160 A 85 85 0 1 1 160 160" fill="none" stroke="#8b5cf6" strokeWidth="14" strokeLinecap="round" strokeDasharray="400" initial={{ strokeDashoffset: 400 }} animate={{ strokeDashoffset: 400 - (400 * (profileData.score / 100)) }} transition={{ duration: 1.5 }} />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pt-4">
+                    <span className="text-5xl font-black tracking-tighter text-white">{profileData.score}</span>
+                    <span className="text-[11px] text-white/50 font-bold mt-1 uppercase tracking-widest">Nexus XP</span>
+                  </div>
+                </div>
               </div>
             </div>
-          ))}
+          </div>
+
+          <div className="flex flex-col gap-4 mt-2">
+            <h3 className="text-[15px] font-bold text-white/90">Assessment Log</h3>
+            <div className="bg-[#16181f] border border-[#232733] rounded-2xl p-5 overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[800px]">
+                <thead>
+                  <tr className="text-[10px] text-white/40 font-bold uppercase tracking-widest border-b border-[#232733]">
+                    <th className="pb-4 pl-2">Subject</th>
+                    <th className="pb-4">Status</th>
+                    <th className="pb-4">Score</th>
+                    <th className="pb-4">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {userResults.length > 0 ? userResults.map((r, i) => (
+                    <tr key={i} className="border-b border-[#232733]/50 hover:bg-white/[0.02] transition-colors">
+                      <td className="py-4 pl-2 font-bold text-[13px]">{r.topic}</td>
+                      <td className="py-4"><span className="px-3 py-1 rounded-lg text-[9px] font-black bg-teal-500/10 text-teal-400 border border-teal-500/20">COMPLETED</span></td>
+                      <td className="py-4 text-[13px] font-bold">{r.percentage}%</td>
+                      <td className="py-4 text-[12px] text-white/40">{new Date(r.submittedAt).toLocaleDateString()}</td>
+                    </tr>
+                  )) : (
+                    <tr><td colSpan="4" className="py-8 text-center text-white/20 font-bold uppercase tracking-widest text-xs">No activity logged</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* ── Edit Modal ── */}
       {createPortal(
         <AnimatePresence>
           {isModalOpen && (
-            <div role="dialog" style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-              <motion.div key="backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                onClick={() => setIsModalOpen(false)}
-                style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(16px)', cursor: 'pointer' }} />
-
-              <motion.div key="modal" initial={{ opacity: 0, scale: 0.92, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.92, y: 20 }} transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-                style={{
-                  width: '100%', maxWidth: '520px', background: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-strong)', borderRadius: '2rem',
-                  boxShadow: '0 40px 80px rgba(0,0,0,0.6)', overflow: 'hidden', position: 'relative', zIndex: 10,
-                }}>
-                <div style={{ height: '6px', background: 'var(--accent-gradient)' }} />
-
-                <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                  {/* Header */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(99,102,241,0.12)', color: 'var(--accent-primary)' }}>
-                        <Edit3 size={18} />
-                      </div>
-                      <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>Edit Profile</h2>
+            <>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(14px)' }} />
+              <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', pointerEvents: 'none' }}>
+                <motion.div initial={{ opacity: 0, scale: 0.93, y: 24 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.93, y: 24 }} style={{ pointerEvents: 'auto', width: '100%', maxWidth: '560px', background: '#16181f', border: '1px solid #232733', borderRadius: '2rem', overflow: 'hidden' }}>
+                  <div style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyBetween: 'space-between' }}>
+                      <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#fff', letterSpacing: '-0.05em' }}>Modify Identity</h2>
+                      <button onClick={() => setIsModalOpen(false)} style={{ color: 'white' }}><X size={24}/></button>
                     </div>
-                    <button onClick={() => setIsModalOpen(false)} style={{ padding: '6px', borderRadius: '8px', color: 'var(--text-muted)', transition: 'background 0.2s' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                      <X size={20} />
-                    </button>
-                  </div>
-
-                  {/* Avatar row */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem', background: 'var(--bg-tertiary)', borderRadius: '1.25rem', border: '1px solid var(--border-subtle)' }}>
-                    <div style={{ position: 'relative', width: '64px', height: '64px', borderRadius: '50%', background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.75rem', fontWeight: 900, flexShrink: 0, cursor: 'pointer', overflow: 'hidden' }}>
-                      {draftData.name.charAt(0).toUpperCase()}
-                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s', borderRadius: '50%' }}
-                        onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0}>
-                        <Camera size={18} color="white" />
-                      </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                       <input className="nx-input-modern" placeholder="Full Name" value={draftData.name} onChange={e => setDraftData({ ...draftData, name: e.target.value })} />
+                       <input className="nx-input-modern" placeholder="Headline" value={draftData.headline} onChange={e => setDraftData({ ...draftData, headline: e.target.value })} />
+                       <input className="nx-input-modern" placeholder="Avatar URL" value={draftData.avatar} onChange={e => setDraftData({ ...draftData, avatar: e.target.value })} />
+                       <input className="nx-input-modern" placeholder="Skills (Comma separated)" value={tempSkills} onChange={e => setTempSkills(e.target.value)} />
                     </div>
-                    <div>
-                      <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>Profile Photo</p>
-                      <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Click to upload a new avatar</p>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <button onClick={() => setIsModalOpen(false)} className="flex-1 nx-btn-3d-muted">Cancel</button>
+                      <button 
+                        onClick={() => { 
+                          const nameParts = draftData.name.trim().split(/\s+/);
+                          const updated = { ...draftData, firstName: nameParts[0] || "", lastName: nameParts.slice(1).join(" ") || "", skills: tempSkills.split(',').map(s => s.trim()).filter(s => s !== "") };
+                          updateProfile(updated);
+                          setIsModalOpen(false); 
+                        }} 
+                        className="flex-[1.5] nx-btn-3d"
+                      >Update Identity</button>
                     </div>
                   </div>
-
-                  {/* Fields */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    {[
-                      { label: 'Display Name', name: 'name', icon: User, type: 'input' },
-                      { label: 'Professional Headline', name: 'headline', icon: Briefcase, type: 'textarea' },
-                      { label: 'Location', name: 'location', icon: MapPin, type: 'input' },
-                    ].map(({ label, name, icon: Icon, type }) => (
-                      <div key={name} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <label style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px', paddingLeft: '4px' }}>
-                          <Icon size={11} /> {label}
-                        </label>
-                        {type === 'textarea' ? (
-                          <textarea name={name} value={draftData[name]} onChange={e => setDraftData(p => ({ ...p, [name]: e.target.value }))}
-                            style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-subtle)', borderRadius: '1rem', padding: '0.875rem 1.25rem', color: 'var(--text-primary)', fontWeight: 500, outline: 'none', resize: 'none', minHeight: '90px', lineHeight: 1.6, fontSize: '14px', transition: 'border 0.2s', fontFamily: 'inherit' }}
-                            onFocus={e => e.currentTarget.style.borderColor = 'var(--accent-primary)'}
-                            onBlur={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'} />
-                        ) : (
-                          <input type="text" name={name} value={draftData[name]} onChange={e => setDraftData(p => ({ ...p, [name]: e.target.value }))}
-                            style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-subtle)', borderRadius: '1rem', padding: '0.875rem 1.25rem', color: 'var(--text-primary)', fontWeight: 600, outline: 'none', fontSize: '14px', transition: 'border 0.2s' }}
-                            onFocus={e => e.currentTarget.style.borderColor = 'var(--accent-primary)'}
-                            onBlur={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'} />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {/* Skills Section */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <label style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px', paddingLeft: '4px' }}>
-                      <Code2 size={11} /> Proficiency Stack
-                    </label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
-                      {draftData.skills.map((skill, i) => (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)', borderRadius: '10px', fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>
-                          {skill}
-                          <button onClick={() => removeSkill(skill)} style={{ color: 'var(--text-muted)', cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={e => e.currentTarget.style.color = '#ef4444'} onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}><X size={12} /></button>
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <input 
-                        type="text" 
-                        placeholder="Add professional skill..." 
-                        value={newSkill}
-                        onChange={e => setNewSkill(e.target.value)}
-                        onKeyPress={e => e.key === 'Enter' && addSkill()}
-                        style={{ flex: 1, background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-subtle)', borderRadius: '1rem', padding: '0.875rem 1.25rem', color: 'var(--text-primary)', outline: 'none', fontSize: '14px', transition: 'border 0.2s' }}
-                        onFocus={e => e.currentTarget.style.borderColor = 'var(--accent-primary)'}
-                        onBlur={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
-                      />
-                      <button onClick={addSkill} style={{ padding: '0 1.25rem', borderRadius: '1rem', background: 'var(--bg-tertiary)', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer' }}>Add</button>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                    <button 
-                      type="button"
-                      onClick={() => setIsModalOpen(false)} 
-                      style={{ flex: 1, padding: '1rem', borderRadius: '1rem', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', transition: 'all 0.2s', border: '1px solid var(--border-subtle)', background: 'transparent' }}
-                      onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-tertiary)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}>
-                      Cancel
-                    </button>
-                    <button 
-                      type="button"
-                      onClick={handleSave} 
-                      className="nx-btn-primary" 
-                      style={{ flex: 2, padding: '1rem', borderRadius: '1rem', fontWeight: 900, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                    >
-                      <Save size={16} /> Save Changes
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
+                </motion.div>
+              </div>
+            </>
           )}
         </AnimatePresence>,
         document.body
       )}
-    </motion.div>
+    </div>
   );
 };
 

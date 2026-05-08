@@ -33,22 +33,31 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [results, setResults] = React.useState([]);
   
-  const refreshData = React.useCallback(() => {
-    const all = getResults();
-    setResults(all.filter(r => r.userEmail === user?.email));
+  const [currentTime, setCurrentTime] = React.useState(new Date());
+  const [lastSyncTime, setLastSyncTime] = React.useState(new Date());
+
+  const refreshData = React.useCallback(async () => {
+    if (!user) return;
+    const all = await getResults();
+    setResults(all.filter(r => r.userId === user.id));
+    setLastSyncTime(new Date());
   }, [user]);
 
   React.useEffect(() => {
     refreshData();
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     window.addEventListener('nexus-data-updated', refreshData);
-    return () => window.removeEventListener('nexus-data-updated', refreshData);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('nexus-data-updated', refreshData);
+    };
   }, [refreshData]);
 
   const chartData = useMemo(() => prepareUserChartData(results), [results]);
   const stats = useMemo(() => calculateUserStats(results), [results]);
 
   const recentAssms = [...results]
-    .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
+    .sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))
     .slice(0, 4);
 
   return (
@@ -68,6 +77,16 @@ const Dashboard = () => {
         </div>
         
         <div className="flex items-center gap-4">
+          <div className="nx-card px-6 py-4 flex flex-col items-end border-accent-primary/10" style={{ borderRadius: '1.5rem', background: 'rgba(255,255,255,0.02)' }}>
+            <p className="text-[10px] font-black uppercase tracking-ultra text-accent-primary mb-1">System Time</p>
+            <p className="text-2xl font-black tracking-tighter tabular-nums">
+              {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </p>
+            <p className="text-[9px] font-bold text-muted uppercase tracking-widest mt-1">
+              {currentTime.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}
+            </p>
+          </div>
+
           <div className="nx-card px-6 py-4 flex items-center gap-4 border-accent-primary/20" style={{ borderRadius: '1.5rem' }}>
             <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500">
               <Flame size={20} />
@@ -104,7 +123,9 @@ const Dashboard = () => {
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-subtle self-start sm:self-center">
               <Clock size={12} className="text-accent-primary" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">Updated Just Now</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">
+                Sync: {lastSyncTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
             </div>
           </div>
 

@@ -81,16 +81,16 @@ export default function Auth() {
     }, 1500);
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
     if (!lUser || !lPass) return setError('Mandatory credentials missing.');
-    const res = login(lUser.trim(), lPass);
+    const res = await login(lUser.trim(), lPass);
     if (!res.success) setError(res.error);
   };
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -99,15 +99,14 @@ export default function Auth() {
       return setError('Strategy requires all parameters.');
     if (d.pass !== d.conf) return setError('Security handshake failed: Passwords mismatch.');
     
-    const res = register({ 
+    const res = await register({ 
       firstName: d.first, lastName: d.last, dob: d.dob, 
       username: d.user, email: d.email, password: d.pass 
     });
     if (res.success) {
-      if (res.pending) {
-        setSuccess('Strategy Initiated. Account created successfully and awaiting administrator approval.');
-        setSignupData({ first: '', last: '', dob: '', user: '', email: '', pass: '', conf: '' });
-      }
+      setSuccess('Strategy Initiated. Account created successfully! Please login with your email.');
+      setSignupData({ first: '', last: '', dob: '', user: '', email: '', pass: '', conf: '' });
+      setTimeout(() => setMode('login'), 2000);
     } else {
       setError(res.error);
     }
@@ -238,7 +237,7 @@ export default function Auth() {
 
                       <div style={{ position: 'relative' }}>
                         <User size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#0ea5e9' }} />
-                        <input value={lUser} onChange={e => setLUser(e.target.value)} placeholder="Username" style={inputStyle(error && !lUser)} />
+                        <input value={lUser} onChange={e => setLUser(e.target.value)} placeholder="Email Address" style={inputStyle(error && !lUser)} />
                       </div>
 
                       <div style={{ position: 'relative' }}>

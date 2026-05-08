@@ -230,13 +230,37 @@ const Admin = () => {
   const [showNForm, setShowNForm] = useState(false);
   const [nForm, setNForm] = useState({ title: '', message: '', type: 'info' });
 
-  const refresh = React.useCallback(() => {
-    setAssessments(getAssessments());
-    setUsers(getUsers());
-    setResults(getResults());
-    setDiscussions(getDiscussions());
-    setNotifications(getNotifications());
-    setDomains(getDomains());
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    } catch (e) {
+      return '';
+    }
+  };
+
+  const refresh = React.useCallback(async () => {
+    const [a, u, r, d, n, doms] = await Promise.all([
+      getAssessments(),
+      getUsers(),
+      getResults(),
+      getDiscussions(),
+      getNotifications(),
+      getDomains()
+    ]);
+    setAssessments(a);
+    setUsers(u);
+    setResults(r);
+    setDiscussions(d);
+    setNotifications(n);
+    setDomains(doms);
   }, []);
 
   useEffect(() => { refresh(); }, [tab, refresh]);
@@ -246,82 +270,144 @@ const Admin = () => {
     return () => window.removeEventListener('nexus-data-updated', refresh);
   }, [refresh]);
 
-  const handleAddAssessment = () => {
+  const handleAddAssessment = async () => {
     setAAttempted(true);
-    const questionsValid = aQuestions.every(q => q.text.trim() && q.options.every(o => o.trim()) && q.explanation?.trim());
-    if (!aForm.topic.trim() || !aForm.week.trim() || !aForm.timeLimit || !questionsValid) return;
+    
+    // Validate all fields
+    const isTopicValid = aForm.topic.trim().length > 0;
+    const isWeekValid = aForm.week.trim().length > 0;
+    const isTimeValid = aForm.timeLimit > 0;
+    const questionsValid = aQuestions.length > 0 && aQuestions.every((q, i) => {
+      const hasText = q.text.trim().length > 0;
+      const hasOptions = q.options.every(o => o.trim().length > 0);
+      return hasText && hasOptions;
+    });
 
-    const newAssessment = { ...aForm, questions: aQuestions.map((q, i) => ({ ...q, id: i + 1 })), unlockTime: aForm.unlockTime || new Date().toISOString() };
-    
-    if (editingAssessmentId) {
-      newAssessment.id = editingAssessmentId;
-      updateAssessment(newAssessment);
-    } else {
-      addAssessment(newAssessment);
+    if (!isTopicValid || !isWeekValid || !isTimeValid || !questionsValid) {
+      alert("Please fill in the Topic, Week, Time Limit, and all Question texts and options.");
+      return;
     }
-    
-    setAForm({ category: 'Quantitative', topic: '', week: 'Week 1', timeLimit: 20, unlockTime: '', videoUrl: '' });
-    setAQuestions([emptyQuestion()]);
-    setAAttempted(false);
-    setShowAssessmentForm(false);
-    setEditingAssessmentId(null);
-    refresh();
+
+    try {
+      const newAssessment = { 
+        ...aForm, 
+        questions: aQuestions.map((q, i) => ({ 
+          ...q, 
+          id: i + 1,
+          explanation: q.explanation?.trim() || "Consult study materials for detailed walkthrough."
+        })), 
+        unlockTime: aForm.unlockTime || null 
+      };
+      
+      if (editingAssessmentId) {
+        newAssessment.id = editingAssessmentId;
+        await updateAssessment(newAssessment);
+        alert("Assessment updated successfully!");
+      } else {
+        await addAssessment(newAssessment);
+        alert("Assessment published successfully!");
+      }
+      
+      setAForm({ category: 'Quantitative', topic: '', week: 'Week 1', timeLimit: 20, unlockTime: '', videoUrl: '' });
+      setAQuestions([emptyQuestion()]);
+      setAAttempted(false);
+      setShowAssessmentForm(false);
+      setEditingAssessmentId(null);
+      await refresh();
+    } catch (err) {
+      console.error("Publish error:", err);
+      alert("Failed to publish assessment: " + err.message);
+    }
   };
 
-  const handleDeleteAssessment = (id) => { 
+  const handleAddNotification = async () => {
+    if (!nForm.title.trim() || !nForm.message.trim()) return alert("Title and Message are required.");
+    
+    try {
+      if (editingNotificationId) {
+        // If we are editing, we delete the old one first for now 
+        // (or we could implement an updateNotification tool)
+        await deleteNotification(editingNotificationId);
+      }
+
+      await addNotification({
+        title: nForm.title,
+        message: nForm.message,
+        type: nForm.type,
+        read: false
+      });
+      
+      alert(editingNotificationId ? "Broadcast updated successfully!" : "Broadcast sent successfully!");
+      setNForm({ title: '', message: '', type: 'info' });
+      setShowNForm(false);
+      setEditingNotificationId(null);
+      await refresh();
+    } catch (err) {
+      console.error("NOTIFICATION_ERROR:", err);
+      alert("Failed to send broadcast: " + err.message);
+    }
+  };
+
+  const handleDeleteAssessment = async (id) => { 
     if (confirm('Permanently delete this assessment and all associated results? This action cannot be undone.')) {
-      deleteAssessment(id); 
-      refresh(); 
+      await deleteAssessment(id); 
+      await refresh(); 
     }
   };
 
-  const handleAddDiscussion = () => {
+  const handleAddDiscussion = async () => {
     if (!dForm.title.trim() || !dForm.body.trim()) return;
-    if (editingDiscussionId) deleteDiscussion(editingDiscussionId);
+    if (editingDiscussionId) await deleteDiscussion(editingDiscussionId);
     
     const newD = { ...dForm, author: 'Admin' };
     if (editingDiscussionId) newD.id = editingDiscussionId;
-    addDiscussion(newD);
+    await addDiscussion(newD);
     
     setDForm({ title: '', body: '', tag: 'Announcement' });
     setEditingDiscussionId(null);
-    refresh();
+    await refresh();
   };
 
-  const handleAddNotification = () => {
-    if (!nForm.title.trim() || !nForm.message.trim()) return;
-    if (editingNotificationId) deleteNotification(editingNotificationId);
-
-    const newN = { ...nForm, author: 'Admin' };
-    if (editingNotificationId) newN.id = editingNotificationId;
-    addNotification(newN);
-
-    setNForm({ title: '', message: '', type: 'info' });
-    setEditingNotificationId(null);
-    refresh();
-  };
-
-  const handleAddDomain = () => {
-    if (!domForm.title.trim() || !domForm.desc.trim()) return;
+  const handleAddDomain = async () => {
+    if (!domForm.title.trim()) return alert("Domain Title is required.");
+    if (!domForm.desc.trim()) return alert("Domain Description is required.");
     
-    const newDom = { ...domForm };
-    if (editingDomainId) {
-      newDom.id = editingDomainId;
-      updateDomain(newDom);
-    } else {
-      addDomain(newDom);
+    try {
+      const newDom = { ...domForm };
+      if (editingDomainId) {
+        newDom.id = editingDomainId;
+        await updateDomain(newDom);
+        alert("Domain updated successfully!");
+      } else {
+        await addDomain(newDom);
+        alert("Domain launched successfully!");
+      }
+      
+      setDomForm({ title: '', icon: 'Code2', color: '#6366f1', desc: '', stats: '', trending: false, subDomains: [] });
+      setEditingDomainId(null);
+      setShowDomainForm(false);
+      await refresh();
+    } catch (err) {
+      console.error("DOMAIN_LAUNCH_ERROR:", err);
+      // SAFETY NET: If cloud fails, save locally so they don't lose work
+      alert("Cloud Sync failed, but we've saved it LOCALLY so you don't lose your work! \n\nError: " + err.message);
+      
+      const newDom = { ...domForm, id: crypto.randomUUID(), created_at: new Date().toISOString() };
+      const local = JSON.parse(localStorage.getItem('nexus_domains') || '[]');
+      localStorage.setItem('nexus_domains', JSON.stringify([...local, newDom]));
+      window.dispatchEvent(new Event('nexus-data-updated'));
+
+      setDomForm({ title: '', icon: 'Code2', color: '#6366f1', desc: '', stats: '', trending: false, subDomains: [] });
+      setEditingDomainId(null);
+      setShowDomainForm(false);
+      await refresh();
     }
-    
-    setDomForm({ title: '', icon: 'Code2', color: '#6366f1', desc: '', stats: '', trending: false, subDomains: [] });
-    setEditingDomainId(null);
-    setShowDomainForm(false);
-    refresh();
   };
 
-  const handleDeleteDomain = (id) => {
+  const handleDeleteDomain = async (id) => {
     if (confirm('Delete this domain and all its specializations?')) {
-      deleteDomain(id);
-      refresh();
+      await deleteDomain(id);
+      await refresh();
     }
   };
 
@@ -371,6 +457,14 @@ const Admin = () => {
 
   return (
     <div className="flex flex-col gap-6 md:gap-8 animate-slide-up">
+      {/* Hidden file input for bulk fetch */}
+      <input 
+        type="file" 
+        ref={pdfInputRef} 
+        onChange={handleFileUpload} 
+        style={{ display: 'none' }} 
+        accept=".pdf,.docx,.txt,.xlsx,.xls,.csv" 
+      />
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <div style={{ padding: '12px', borderRadius: '14px', background: 'rgba(245,158,11,0.12)', color: '#f59e0b' }}>
@@ -488,7 +582,7 @@ const Admin = () => {
                               <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{u.email}</p>
                             </div>
                           </div>
-                          <button onClick={() => { updateUserStatus(u.email, 'active'); refresh(); }} style={{ fontSize: '10px', fontWeight: 800, padding: '6px 12px', borderRadius: '8px', border: 'none', background: 'var(--accent-gradient)', color: 'white', cursor: 'pointer' }}>Approve</button>
+                          <button onClick={() => { updateUserStatus(u.id, 'active'); refresh(); }} style={{ fontSize: '10px', fontWeight: 800, padding: '6px 12px', borderRadius: '8px', border: 'none', background: 'var(--accent-gradient)', color: 'white', cursor: 'pointer' }}>Approve</button>
                         </div>
                       ))
                   )}
@@ -669,9 +763,12 @@ const Admin = () => {
                   {[a.category, a.week, `${a.questions?.length || 0} Qs`, `${a.timeLimit} min`].map((tag, i) => (
                     <span key={i} style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)' }}>{tag}</span>
                   ))}
-                  {a.unlockTime && new Date(a.unlockTime) > new Date() && (
+                  <span style={{ fontSize: '10px', fontWeight: 900, padding: '2px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
+                    Updated: {new Date(a.updated_at || a.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  {a.unlockTime && (
                     <span style={{ fontSize: '10px', fontWeight: 900, padding: '2px 8px', borderRadius: '6px', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', textTransform: 'uppercase' }}>
-                      Scheduled: {new Date(a.unlockTime).toLocaleString()}
+                      Schedule: {new Date(a.unlockTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </span>
                   )}
                 </div>
@@ -679,7 +776,14 @@ const Admin = () => {
               <div style={{ display: 'flex', gap: '10px' }}>
                 <button onClick={() => { 
                   setEditingAssessmentId(a.id);
-                  setAForm({ category: a.category, topic: a.topic, week: a.week, timeLimit: a.timeLimit, unlockTime: a.unlockTime || '', videoUrl: a.videoUrl || '' });
+                  setAForm({ 
+                    category: a.category, 
+                    topic: a.topic, 
+                    week: a.week, 
+                    timeLimit: a.timeLimit, 
+                    unlockTime: formatDateForInput(a.unlockTime), 
+                    videoUrl: a.videoUrl || '' 
+                  });
                   setAQuestions(a.questions || [emptyQuestion()]);
                   setShowAssessmentForm(true);
                   window.scrollTo({ top: 100, behavior: 'smooth' });
@@ -942,7 +1046,7 @@ const Admin = () => {
                           
                           {u.status === 'pending' && (
                             <button 
-                              onClick={(e) => { e.stopPropagation(); updateUserStatus(u.email, 'active'); refresh(); }}
+                              onClick={(e) => { e.stopPropagation(); updateUserStatus(u.id, 'active'); refresh(); }}
                               style={{ padding: '8px 16px', borderRadius: '10px', background: 'var(--accent-gradient)', color: 'white', border: 'none', fontWeight: 800, fontSize: '12px', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0, 242, 254, 0.2)' }}
                             >
                               Approve Operator
@@ -951,28 +1055,28 @@ const Admin = () => {
                           
                           {u.status === 'suspended' ? (
                             <button 
-                              onClick={(e) => { e.stopPropagation(); updateUserStatus(u.email, 'active'); refresh(); }}
+                              onClick={(e) => { e.stopPropagation(); updateUserStatus(u.id, 'active'); refresh(); }}
                               style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(34,197,94,0.1)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.2)', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}
                             >
                               Activate User
                             </button>
                           ) : (
                             <button 
-                              onClick={(e) => { e.stopPropagation(); updateUserStatus(u.email, 'suspended'); refresh(); }}
+                              onClick={(e) => { e.stopPropagation(); updateUserStatus(u.id, 'suspended'); refresh(); }}
                               style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}
                             >
                               Suspend User
                             </button>
                           )}
                           <button 
-                            onClick={(e) => { e.stopPropagation(); if(confirm(`Are you sure you want to ${u.status === 'banned' ? 'unban' : 'ban'} this user?`)) { updateUserStatus(u.email, u.status === 'banned' ? 'active' : 'banned'); refresh(); }}}
+                            onClick={(e) => { e.stopPropagation(); if(confirm(`Are you sure you want to ${u.status === 'banned' ? 'unban' : 'ban'} this user?`)) { updateUserStatus(u.id, u.status === 'banned' ? 'active' : 'banned'); refresh(); }}}
                             style={{ padding: '8px 16px', borderRadius: '10px', background: u.status === 'banned' ? 'rgba(99,102,241,0.1)' : 'rgba(239,68,68,0.1)', color: u.status === 'banned' ? '#6366f1' : '#ef4444', border: `1px solid ${u.status === 'banned' ? 'rgba(99,102,241,0.2)' : 'rgba(239,68,68,0.2)'}`, fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}
                           >
                             {u.status === 'banned' ? 'Unban User' : 'Ban User'}
                           </button>
                           {!u.isAdmin && (
                             <button 
-                              onClick={(e) => { e.stopPropagation(); if(confirm('PERMANENTLY DELETE user? This cannot be undone.')) { deleteUser(u.email); refresh(); }}}
+                              onClick={(e) => { e.stopPropagation(); if(confirm('PERMANENTLY DELETE user? This cannot be undone.')) { deleteUser(u.id); refresh(); }}}
                               style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', fontWeight: 800, fontSize: '11px', cursor: 'pointer', marginLeft: 'auto', textTransform: 'uppercase' }}
                             >
                               Delete User

@@ -17,8 +17,15 @@ const Domains = () => {
   const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
-    setDomains(getDomains());
-    const handleUpdate = () => setDomains(getDomains());
+    const load = async () => {
+      const data = await getDomains();
+      setDomains(data);
+    };
+    load();
+    const handleUpdate = async () => {
+      const data = await getDomains();
+      setDomains(data);
+    };
     window.addEventListener('nexus-data-updated', handleUpdate);
     return () => window.removeEventListener('nexus-data-updated', handleUpdate);
   }, []);

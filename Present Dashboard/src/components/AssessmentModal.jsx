@@ -56,7 +56,8 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
       percentage: Math.round((score / total) * 100),
       answers: ans,
       userEmail: user?.email || 'guest',
-      userName: user?.name || 'Guest',
+      userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.username || 'Guest',
+      userId: user?.id,
     };
     saveResult(result);
     setAnswers(ans);
