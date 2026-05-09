@@ -1171,9 +1171,25 @@ const Admin = () => {
                         {u.status}
                       </span>
                     )}
-                    <span style={{ fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '6px', background: 'rgba(34,197,94,0.1)', color: '#22c55e' }}>
-                      {userResults.length} submissions
-                    </span>
+                    
+                    {/* Summary Analytics Row */}
+                    <div style={{ display: 'flex', gap: '12px', marginRight: '8px', padding: '4px 12px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)' }}>SUBS:</span>
+                        <span style={{ fontSize: '11px', fontWeight: 900, color: 'var(--accent-primary)' }}>{userResults.length}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)' }}>AVG:</span>
+                        <span style={{ 
+                          fontSize: '11px', 
+                          fontWeight: 900, 
+                          color: userResults.length ? (Math.round(userResults.reduce((a, r) => a + (r.percentage || 0), 0) / userResults.length) >= 80 ? '#22c55e' : '#f59e0b') : 'var(--text-muted)' 
+                        }}>
+                          {userResults.length ? Math.round(userResults.reduce((a, r) => a + (r.percentage || 0), 0) / userResults.length) + '%' : 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+
                     <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                       Joined {new Date(u.joinedAt).toLocaleDateString()}
                     </span>

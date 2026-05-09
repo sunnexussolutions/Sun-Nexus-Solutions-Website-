@@ -23,7 +23,13 @@ export const AuthProvider = ({ children }) => {
     const cloud = await query('SELECT * FROM profiles WHERE id = $1', [id]);
     if (cloud && cloud.length > 0) {
       const u = cloud[0];
-      const updated = { ...u, firstName: u.first_name, lastName: u.last_name, isAdmin: u.is_admin };
+      const updated = { 
+        ...u, 
+        firstName: u.first_name, 
+        lastName: u.last_name, 
+        isAdmin: u.is_admin,
+        joinedAt: u.joined_at
+      };
       setUser(updated);
       localStorage.setItem('nexus_user', JSON.stringify(updated));
     }
@@ -46,7 +52,8 @@ export const AuthProvider = ({ children }) => {
             ...found, 
             firstName: found.first_name, 
             lastName: found.last_name, 
-            isAdmin: found.is_admin 
+            isAdmin: found.is_admin,
+            joinedAt: found.joined_at
           };
           setUser(u);
           setIsAuthenticated(true);
@@ -69,12 +76,14 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     const id = `user_${Date.now()}`;
     
+    const fullName = `${userData.firstName} ${userData.lastName}`;
+    
     try {
       const res = await query(`
-        INSERT INTO profiles (id, email, first_name, last_name, username, password, is_admin)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO profiles (id, email, first_name, last_name, name, username, password, is_admin, status, joined_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING *
-      `, [id, userData.email, userData.firstName, userData.lastName, userData.username, userData.password, false]);
+      `, [id, userData.email, userData.firstName, userData.lastName, fullName, userData.username, userData.password, false, 'active', new Date().toISOString()]);
 
       if (res) {
         // Also save locally for Admin Panel visibility (until it's fully cloud-migrated)

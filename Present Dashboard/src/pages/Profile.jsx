@@ -128,6 +128,40 @@ const ResponsiveStyles = () => (
       50% { box-shadow: 0 0 35px rgba(255, 255, 255, 0.6), 0 0 55px rgba(255, 255, 255, 0.2); }
       100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.3), 0 0 30px rgba(99, 102, 241, 0.1); }
     }
+
+    .nexus-modal {
+      width: 100%;
+      max-width: 520px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-strong);
+      border-radius: 2rem;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-body {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    @media (max-width: 480px) {
+      .nexus-modal {
+        border-radius: 1.5rem;
+      }
+      .modal-body {
+        padding: 1.25rem;
+        gap: 1.5rem;
+      }
+    }
   `}</style>
 );
 
@@ -540,20 +574,10 @@ const Profile = () => {
                 animate={{ opacity: 1, scale: 1, y: 0 }} 
                 exit={{ opacity: 0, scale: 0.92, y: 20 }} 
                 transition={{ type: 'spring', stiffness: 300, damping: 26 }} 
-                style={{ 
-                  width: '100%', 
-                  maxWidth: '520px', 
-                  background: 'var(--bg-secondary)', 
-                  border: '1px solid var(--border-strong)', 
-                  borderRadius: '2rem', 
-                  boxShadow: '0 40px 80px rgba(0,0,0,0.6)', 
-                  overflow: 'hidden', 
-                  position: 'relative', 
-                  zIndex: 10 
-                }}
+                className="nexus-modal"
               >
-                <div style={{ height: '6px', background: 'var(--accent-gradient)' }} />
-                <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <div style={{ height: '6px', background: 'var(--accent-gradient)', flexShrink: 0 }} />
+                <div className="modal-body">
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(99,102,241,0.12)', color: 'var(--accent-primary)' }}><Edit3 size={18} /></div>

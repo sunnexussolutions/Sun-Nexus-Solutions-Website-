@@ -133,6 +133,7 @@ export const getResults = async (userId) => {
       const mapped = cloud.map(r => ({
         ...r,
         userId: r.user_id,
+        userEmail: r.user_email,
         assessmentId: r.assessment_id,
         submittedAt: r.submitted_at
       }));
@@ -151,9 +152,9 @@ export const saveResult = async (res) => {
   setLocal('results', [...getLocal('results'), newRes]);
 
   await query(`
-    INSERT INTO results (id, user_id, assessment_id, topic, score, total, percentage, category)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-  `, [id, res.userId, res.assessmentId, res.topic, res.score, res.total, res.percentage, res.category]);
+    INSERT INTO results (id, user_id, assessment_id, topic, score, total, percentage, category, user_name, user_email)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+  `, [id, res.userId, res.assessmentId, res.topic, res.score, res.total, res.percentage, res.category, res.userName || 'Anonymous', res.userEmail]);
   return newRes;
 };
 
@@ -164,9 +165,11 @@ export const getUsers = async () => {
     if (cloud) {
       const mapped = cloud.map(u => ({
         ...u,
+        name: u.name || `${u.first_name} ${u.last_name}`.trim() || u.username,
         firstName: u.first_name,
         lastName: u.last_name,
-        isAdmin: u.is_admin
+        isAdmin: u.is_admin,
+        joinedAt: u.joined_at
       }));
       setLocal('users', mapped);
       return mapped;
