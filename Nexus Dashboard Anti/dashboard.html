@@ -47,12 +47,12 @@
       background: rgba(0,242,254,0.08);
       border: 1px solid rgba(0,242,254,0.25);
       border-radius: var(--radius-full);
-      padding: 6px 18px;
-      font-size: 1.3rem;
-      font-weight: 600;
+      padding: 6px 20px;
+      font-size: 1.5rem;
+      font-weight: 700;
       color: var(--color-primary);
       margin-bottom: 28px;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
     }
 
     .dashboard-title {
@@ -68,10 +68,10 @@
     }
 
     .dashboard-subtitle {
-      font-size: 1.8rem;
+      font-size: 2.1rem;
       color: var(--text-secondary);
-      max-width: 560px;
-      line-height: 1.6;
+      max-width: 680px;
+      line-height: 1.7;
       margin-bottom: 48px;
     }
 
@@ -104,6 +104,7 @@
       box-shadow: 0 0 40px rgba(0,242,254,0.5);
       color: #fff;
       text-decoration: none;
+      height: fit-content;
     }
 
     .launch-arrow { font-size: 2rem; transition: transform 0.3s; }
@@ -116,7 +117,7 @@
       border: 1px solid var(--border-color);
       border-radius: var(--radius-xl);
       padding: 32px 40px;
-      max-width: 560px;
+      max-width: 600px;
       width: 100%;
       position: relative;
       overflow: hidden;
@@ -129,26 +130,28 @@
       background: var(--gradient-primary);
     }
     .info-card h3 {
-      font-size: 1.6rem;
-      font-weight: 700;
+      font-size: 2.0rem;
+      font-weight: 800;
       color: var(--text-primary);
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
     .info-steps {
       list-style: none;
       padding: 0; margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
       text-align: left;
     }
     .info-steps li {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      font-size: 1.4rem;
+      gap: 16px;
+      font-size: 1.7rem;
       color: var(--text-secondary);
-      line-height: 1.5;
+      line-height: 1.6;
     }
     .step-num {
       flex-shrink: 0;
@@ -166,16 +169,17 @@
     .info-steps code {
       background: rgba(0,242,254,0.1);
       border: 1px solid rgba(0,242,254,0.2);
-      border-radius: 6px;
-      padding: 2px 8px;
-      font-size: 1.3rem;
+      border-radius: 8px;
+      padding: 3px 10px;
+      font-size: 1.6rem;
       color: var(--color-primary);
       font-family: 'Courier New', monospace;
+      font-weight: 700;
     }
 
     @media (max-width: 768px) {
       .dashboard-title { font-size: 3.8rem; }
-      .dashboard-subtitle { font-size: 1.6rem; }
+      .dashboard-subtitle { font-size: 1.8rem; }
       .info-card { padding: 24px 20px; }
     }
   </style>
@@ -196,6 +200,7 @@
       <li class="active"><a href="dashboard.html">Dashboard</a></li>
       <li><a href="../events.html">Events</a></li>
       <li><a href="../mentor-ship.html">Mentorship</a></li>
+      <li><a href="../contact.html">Contact</a></li>
     </ul>
 
     <div class="nav-actions">

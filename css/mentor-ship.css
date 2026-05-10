@@ -131,7 +131,7 @@ main { margin-top: 10rem; margin-bottom: 6rem; }
 
 .domain-card p { 
   color: var(--text-secondary) !important; 
-  font-size: 1.6rem; 
+  font-size: 1.8rem; 
   line-height: 1.7;
   max-width: 320px;
   margin: 0 auto;
@@ -203,7 +203,7 @@ main { margin-top: 10rem; margin-bottom: 6rem; }
   color: var(--text-secondary) !important; 
   margin: 4px 0 !important; 
   line-height: 1.5; 
-  font-size: 1.5rem !important;
+  font-size: 1.7rem !important;
   font-weight: 500;
 }
 
@@ -315,7 +315,7 @@ main { margin-top: 10rem; margin-bottom: 6rem; }
 }
 
 .resource-desc {
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 24px;
@@ -443,7 +443,7 @@ main { margin-top: 10rem; margin-bottom: 6rem; }
 }
 
 .quiz-cta-card p {
-  font-size: 1.8rem;
+  font-size: 2.0rem;
   color: var(--text-secondary);
   max-width: 650px;
   margin-bottom: 40px;
@@ -500,7 +500,7 @@ main { margin-top: 10rem; margin-bottom: 6rem; }
 }
 
 .quiz-step-subtitle {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   color: var(--text-secondary);
   margin-bottom: 32px;
   opacity: 0.8;

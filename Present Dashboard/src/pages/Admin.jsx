@@ -602,7 +602,25 @@ const Admin = () => {
                       : users.filter(u => u.status === 'active' || !u.status).map((u, i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', borderRadius: '12px', background: 'var(--bg-tertiary)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800 }}>{u.avatar || u.name?.[0]}</div>
+                            <div style={{ 
+                              width: '36px', 
+                              height: '36px', 
+                              borderRadius: '10px', 
+                              background: 'var(--accent-gradient)', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              color: 'white', 
+                              fontWeight: 800,
+                              overflow: 'hidden',
+                              border: '1px solid rgba(255,255,255,0.1)'
+                            }}>
+                              {u.avatar ? (
+                                <img src={u.avatar} alt={u.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement.innerText = u.name?.[0] || 'U'; }} />
+                              ) : (
+                                u.name?.[0] || 'U'
+                              )}
+                            </div>
                             <div>
                               <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{u.name}</p>
                               <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{u.email}</p>
@@ -623,7 +641,25 @@ const Admin = () => {
                       : users.filter(u => u.status === 'pending').map((u, i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', borderRadius: '12px', background: 'var(--bg-tertiary)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800 }}>{u.avatar || u.name?.[0]}</div>
+                            <div style={{ 
+                              width: '36px', 
+                              height: '36px', 
+                              borderRadius: '10px', 
+                              background: '#f59e0b', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              color: 'white', 
+                              fontWeight: 800,
+                              overflow: 'hidden',
+                              border: '1px solid rgba(255,255,255,0.1)'
+                            }}>
+                              {u.avatar ? (
+                                <img src={u.avatar} alt={u.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement.innerText = u.name?.[0] || 'U'; }} />
+                              ) : (
+                                u.name?.[0] || 'U'
+                              )}
+                            </div>
                             <div>
                               <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{u.name}</p>
                               <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{u.email}</p>
@@ -1157,8 +1193,30 @@ const Admin = () => {
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', padding: '1.5rem', background: 'var(--bg-secondary)', cursor: 'pointer' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '16px' }}>
-                      {u.avatar || u.name?.[0] || 'U'}
+                    <div style={{ 
+                      width: '42px', 
+                      height: '42px', 
+                      borderRadius: '12px', 
+                      background: 'var(--accent-gradient)', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      color: 'white', 
+                      fontWeight: 800, 
+                      fontSize: '16px',
+                      overflow: 'hidden',
+                      border: '1px solid rgba(255,255,255,0.1)'
+                    }}>
+                      {u.avatar ? (
+                        <img 
+                          src={u.avatar} 
+                          alt={u.name} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                          onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement.innerText = u.name?.[0] || 'U'; }}
+                        />
+                      ) : (
+                        u.name?.[0] || 'U'
+                      )}
                     </div>
                     <div>
                       <p style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '14px' }}>{u.name}</p>

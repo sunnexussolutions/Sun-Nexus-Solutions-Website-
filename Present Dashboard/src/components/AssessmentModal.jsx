@@ -112,10 +112,41 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                     <Timer size={14} style={{ color: timerColor }} />
                     <span style={{ fontSize: '14px', fontWeight: 800, color: timerColor, fontVariantNumeric: 'tabular-nums' }}>{formatTime(timeLeft)}</span>
                   </div>
-                  <button onClick={onClose} style={{ padding: '6px', borderRadius: '8px', color: 'var(--text-muted)', background: 'transparent', cursor: 'pointer' }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                    <X size={18} />
+                  <button 
+                    onClick={() => {
+                      if (phase === 'quiz' && !submitted) {
+                        if (confirm('Exit Assessment? Progress will not be saved.')) onClose();
+                      } else {
+                        onClose();
+                      }
+                    }}
+                    style={{ 
+                      padding: '8px 16px', 
+                      borderRadius: '12px', 
+                      color: '#ef4444', 
+                      background: 'rgba(239,68,68,0.1)', 
+                      border: '1px solid rgba(239,68,68,0.2)',
+                      fontWeight: 800,
+                      fontSize: '12px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = '#ef4444';
+                      e.currentTarget.style.color = 'white';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = 'rgba(239,68,68,0.1)';
+                      e.currentTarget.style.color = '#ef4444';
+                    }}
+                  >
+                    <span>Exit</span>
+                    <X size={14} />
                   </button>
                 </div>
               </div>

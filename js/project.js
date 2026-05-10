@@ -425,7 +425,7 @@ document.querySelectorAll("#ongoingProjectsContainer .view-details-btn").forEach
           teamList.appendChild(div);
       });
 
-      modal.style.display = "block";
+      modal.style.display = "flex";
       document.body.style.overflow = "hidden"; // prevent scrolling behind modal
   }
 

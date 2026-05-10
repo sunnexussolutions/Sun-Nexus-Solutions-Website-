@@ -94,14 +94,15 @@
 .hero-content h1 { font-size: 8rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
 .gradient-text { font-weight: 800; animation: pulse 3s ease-in-out infinite; }
 .yellow { background: var(--gradient-indigo); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.white { color: #f1f5f9; }
+.white { color: var(--text-primary); }
 
 .subtitle {
-  font-size: 2rem;
+  font-size: 2.4rem;
   margin-top: 18px;
+  padding-left: 18px;
   color: var(--text-secondary);
   font-weight: 400;
-  max-width: 540px;
+  max-width: 740px;
   line-height: 1.5;
   animation: fadeInUp 1s ease-out 0.4s both;
 }
@@ -135,8 +136,8 @@
 .about-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gradient-indigo); }
 .about-text { flex: 1 1 450px; }
 .about-text h2 { font-size: 3.2rem; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.02em; color: var(--text-primary); }
-.about-text p { font-size: 1.6rem; line-height: 1.7; margin-bottom: 28px; color: var(--text-secondary); }
-.learn-more-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--gradient-primary); color: #fff; border: none; padding: 12px 26px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: transform var(--transition-base), box-shadow var(--transition-base); font-size: 1.6rem; box-shadow: var(--shadow-glow); }
+.about-text p { font-size: 1.9rem; line-height: 1.7; margin-bottom: 28px; color: var(--text-secondary); }
+.learn-more-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--gradient-primary); color: #fff; border: none; padding: 12px 26px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: transform var(--transition-base), box-shadow var(--transition-base); font-size: 1.8rem; box-shadow: var(--shadow-glow); }
 .about-image { flex: 1 1 400px; display: flex; justify-content: center; }
 .about-image img { width: 100%; max-width: 400px; border-radius: var(--radius-lg); transition: transform var(--transition-slow); border: 1px solid var(--border-subtle); }
 
@@ -150,13 +151,13 @@
 ════════════════════════════════ */
 .why-nexus { background: var(--bg-secondary); text-align: center; padding: 100px 40px; position: relative; overflow: hidden; }
 .why-nexus h2 { font-size: 3.6rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; color: var(--text-primary); }
-.why-intro { color: var(--text-secondary); max-width: 640px; margin: 0 auto 64px; font-size: 1.7rem; line-height: 1.7; }
+.why-intro { color: var(--text-secondary); max-width: 800px; margin: 0 auto 64px; font-size: 2.0rem; line-height: 1.7; }
 .why-container { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; align-items: stretch; }
 .why-card { display: flex; flex-direction: column; align-items: center; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 48px 36px; max-width: 380px; width: 100%; flex: 1 1 320px; transition: all var(--transition-base); text-align: center; position: relative; overflow: hidden; box-shadow: var(--shadow-md); }
 .why-card:hover { transform: translateY(-10px); border-color: var(--color-primary); background: var(--bg-card-hover); }
 .why-icon { width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 3.2rem; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 20px; margin-bottom: 28px; }
 .why-text h3 { color: var(--text-primary); font-size: 2.2rem; font-weight: 800; margin-bottom: 14px; }
-.why-text p { color: var(--text-secondary); font-size: 1.55rem; line-height: 1.6; }
+.why-text p { color: var(--text-secondary); font-size: 1.8rem; line-height: 1.6; }
 
 /* ════════════════════════════════
    INTERNSHIP SECTION
@@ -177,10 +178,13 @@
 ════════════════════════════════ */
 .log-book-section { padding: 80px 20px; background: var(--bg-primary); display: flex; justify-content: center; align-items: center; }
 .log-book-card { width: 100%; max-width: 1100px; background: var(--logbook-card-bg); border: 2px solid var(--logbook-accent); border-radius: var(--radius-xl); padding: 48px; display: flex; align-items: center; justify-content: space-between; gap: 40px; box-shadow: var(--shadow-glow); transition: all var(--transition-base); }
-.log-book-content h2 { color: var(--text-primary); font-size: 3.6rem; font-weight: 800; margin-bottom: 20px; }
-.log-book-btn { display: inline-flex; align-items: center; padding: 14px 34px; background: var(--gradient-primary); color: #fff; font-weight: 700; font-size: 1.6rem; border-radius: var(--radius-md); text-decoration: none; box-shadow: var(--shadow-glow); }
+.log-book-content h2 { color: var(--text-primary); font-size: 3.6rem; font-weight: 800; margin-bottom: 20px; line-height: 1.1; }
+.log-book-content p { font-size: 1.9rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 30px; }
+.log-book-btn { display: inline-flex; align-items: center; padding: 14px 34px; background: var(--gradient-primary); color: #fff; font-weight: 700; font-size: 1.8rem; border-radius: var(--radius-md); text-decoration: none; box-shadow: var(--shadow-glow); }
 .log-book-branding { width: 400px; height: 240px; background: var(--logbook-branding-bg); border-radius: var(--radius-lg); display: flex; align-items: center; padding: 30px; gap: 20px; }
-.log-book-branding-logo { width: 100px; height: 100px; object-fit: contain; }
+.log-book-branding-logo { width: 100px; height: 100px; object-fit: contain; border-radius: 12px; }
+.log-book-branding-text h3 { font-size: 3.2rem; font-weight: 900; color: var(--text-primary); margin: 0; line-height: 1; letter-spacing: 0.05em; }
+.log-book-branding-text p { font-size: 1.8rem; color: var(--color-primary); margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
 
 @media (max-width: 1024px) {
   .log-book-card { flex-direction: column-reverse; padding: 30px; text-align: center; }
