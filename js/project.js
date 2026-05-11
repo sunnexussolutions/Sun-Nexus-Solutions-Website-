@@ -376,19 +376,7 @@ Object.keys(ongoingProjectData).forEach((projectName, index) => {
     ongoingContainer.appendChild(card);
 });
 
-document.querySelectorAll("#ongoingProjectsContainer .view-details-btn").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-        // same code as inside your current listener
-        e.preventDefault();
-        const projectName = btn.getAttribute("data-project");
-        const data = ongoingProjectData[projectName];  // ← use the right object
-        // ... rest same as your existing modal code ...
-    });
-});
-
-
-
-   // ───────────────────────────────────────────────
+  // ───────────────────────────────────────────────
   //           MODAL SETUP – ONLY ONCE
   // ───────────────────────────────────────────────
 
@@ -429,13 +417,18 @@ document.querySelectorAll("#ongoingProjectsContainer .view-details-btn").forEach
       document.body.style.overflow = "hidden"; // prevent scrolling behind modal
   }
 
-  // Attach click to ALL view details buttons (only once!)
-  document.querySelectorAll(".view-details-btn").forEach(btn => {
-      btn.addEventListener("click", (e) => {
+  // ───────────────────────────────────────────────
+  //           GLOBAL INTERACTION HANDLER
+  // ───────────────────────────────────────────────
+
+  // Use Event Delegation to handle ALL "View Details" clicks (including dynamic cards)
+  document.addEventListener("click", (e) => {
+      const btn = e.target.closest(".view-details-btn");
+      if (btn) {
           e.preventDefault();
           const projectName = btn.getAttribute("data-project");
           showProjectModal(projectName);
-      });
+      }
   });
 
   // ── Close handlers ───────────────────────────────────────
@@ -462,3 +455,23 @@ document.querySelectorAll("#ongoingProjectsContainer .view-details-btn").forEach
       }
   });
 });
+
+/**
+ * ── Accordion Toggle Logic ──
+ * Handles the high-fidelity expansion of project tracks.
+ */
+function toggleAccordion(type) {
+    const accordion = document.getElementById(`accordion-${type}`);
+    if (!accordion) return;
+
+    const isOpen = accordion.classList.contains('open');
+    
+    // Close others if desired (optional: currently allows multiple open)
+    // document.querySelectorAll('.project-accordion').forEach(acc => acc.classList.remove('open'));
+
+    if (isOpen) {
+        accordion.classList.remove('open');
+    } else {
+        accordion.classList.add('open');
+    }
+}

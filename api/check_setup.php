@@ -21,9 +21,9 @@ try {
     require_once 'db_config.php';
     $response['database']['connected'] = true;
 
-    // Check tables
-    $stmt = $pdo->query("SHOW TABLES LIKE 'users'");
-    if ($stmt->fetch()) {
+    // Check tables (PostgreSQL check)
+    $stmt = $pdo->query("SELECT to_regclass('users')");
+    if ($stmt->fetchColumn()) {
         $response['database']['users_table_exists'] = true;
         
         // Check for admin user

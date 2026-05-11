@@ -65,10 +65,10 @@ if ($method === 'POST') {
         // Update Course Progress if provided
         if (isset($data['progress'])) {
             foreach ($data['progress'] as $course_id => $progress) {
-                // UPSERT pattern
+                // PostgreSQL ON CONFLICT pattern
                 $stmt = $pdo->prepare("INSERT INTO course_progress (user_id, course_id, progress) VALUES (?, ?, ?) 
-                                      ON DUPLICATE KEY UPDATE progress = ?");
-                $stmt->execute([$user_id, $course_id, $progress, $progress]);
+                                      ON CONFLICT (user_id, course_id) DO UPDATE SET progress = EXCLUDED.progress");
+                $stmt->execute([$user_id, $course_id, $progress]);
             }
         }
 

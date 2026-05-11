@@ -95,6 +95,72 @@ body {
   text-shadow: none;
 }
 
+/* ── Accordion Dropdowns ── */
+.project-accordion {
+  margin: 40px 0;
+  width: 100%;
+}
+
+.accordion-header {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px 40px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.accordion-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 4px; height: 100%;
+  background: var(--gradient-primary);
+  opacity: 0.7;
+}
+
+.accordion-header:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 30px var(--color-primary-glow);
+  transform: translateY(-2px);
+}
+
+.accordion-header .level-heading {
+  margin: 0 !important;
+  text-align: left;
+  font-size: 2.8rem;
+}
+
+.chevron {
+  font-size: 2.4rem;
+  color: var(--color-primary);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  text-shadow: 0 0 10px var(--color-primary-glow);
+}
+
+.project-accordion.open .chevron {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  opacity: 0;
+}
+
+.project-accordion.open .accordion-content {
+  max-height: 5000px; /* Large enough for dynamic content */
+  opacity: 1;
+  padding-top: 20px;
+}
+
 /* ── Project Grid & Cards ── */
 .projects {
   display: grid;

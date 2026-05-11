@@ -1,11 +1,11 @@
 <?php
 /**
- * DATABASE CONFIGURATION — NEON DB (PostgreSQL)
+ * DATABASE CONFIGURATION — NEON DB (PostgreSQL) — AP-SOUTHEAST-1
  */
-$host = 'ep-crimson-mouse-apqu5ds3.c-7.us-east-1.aws.neon.tech';
+$host = 'ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech';
 $db_name = 'neondb';
 $username = 'neondb_owner';
-$password = 'npg_aUrtH17eWAbn';
+$password = 'npg_izrW7bvHTnO6';
 $port = '5432';
 
 try {

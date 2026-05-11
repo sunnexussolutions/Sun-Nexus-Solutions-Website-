@@ -72,18 +72,34 @@
         <!-- Advanced project cards will be dynamically inserted here -->
       </div>
 
-      <div class="col-12" style="margin: 20px 0;">
-        <h2 class="level-heading">Beginner Level</h2>
-      </div>
-      <div class="projects animate_animated animate_zoomIn" id="beginnerProjectsContainer">
-        <!-- Beginner project cards will be dynamically inserted here -->
+      <!-- Beginner Level Accordion -->
+      <div class="col-12">
+        <div class="project-accordion" id="accordion-beginner">
+          <div class="accordion-header" onclick="toggleAccordion('beginner')">
+            <h2 class="level-heading">Beginner Level</h2>
+            <span class="chevron" id="chevron-beginner">▼</span>
+          </div>
+          <div class="accordion-content" id="content-beginner">
+            <div class="projects" id="beginnerProjectsContainer">
+              <!-- Beginner project cards will be dynamically inserted here -->
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="banner-section animate_animated animate_fadeInDown col-12" id="bannerSection">
-        <h1 class="banner-heading animate_animated animate_bounceIn gradient-text">ON GOING PROJECTS</h1>
-      </div>
-      <div class="projects animate_animated animate_zoomIn" id="ongoingProjectsContainer">
-        <!-- Project cards will be dynamically inserted here -->
+      <!-- Ongoing Projects Accordion -->
+      <div class="col-12" style="margin-top: 40px;">
+        <div class="project-accordion" id="accordion-ongoing">
+          <div class="accordion-header" onclick="toggleAccordion('ongoing')">
+            <h2 class="level-heading" style="background: var(--gradient-indigo); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Ongoing Projects</h2>
+            <span class="chevron" id="chevron-ongoing">▼</span>
+          </div>
+          <div class="accordion-content" id="content-ongoing">
+            <div class="projects" id="ongoingProjectsContainer">
+              <!-- Ongoing project cards will be dynamically inserted here -->
+            </div>
+          </div>
+        </div>
       </div>
       <div class="domains animate_animated animate_slideInLeft">
         <div class="header-section animate_animated animate_fadeInUp col-12">
@@ -131,7 +147,13 @@
       <span class="close">&times;</span>
       <h2 id="modalTitle"></h2>
       <div id="modalDetails"></div>
-      <button id="closeModal">Close Protocol</button>
+      
+      <div class="team-section">
+        <h4 style="color: var(--text-primary); margin-bottom: 20px; font-weight: 800; letter-spacing: 0.05em;">PROJECT TEAM</h4>
+        <div id="teamList" class="team-grid"></div>
+      </div>
+
+      <button id="closeModal" style="margin-top: 40px;">Close Protocol</button>
     </div>
   </div>
   
