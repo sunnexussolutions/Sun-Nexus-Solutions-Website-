@@ -94,17 +94,18 @@
 .hero-content h1 { font-size: 8rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
 .gradient-text { font-weight: 800; animation: pulse 3s ease-in-out infinite; }
 .yellow { background: var(--gradient-indigo); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.white { color: var(--text-primary); }
+.white { color: #f8fafc; }
 
 .subtitle {
   font-size: 2.4rem;
   margin-top: 18px;
   padding-left: 18px;
-  color: var(--text-secondary);
+  color: #f8fafc; /* Forced light color for visibility against dark hero image */
   font-weight: 400;
   max-width: 740px;
   line-height: 1.5;
   animation: fadeInUp 1s ease-out 0.4s both;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
 .cta-btn {
@@ -189,4 +190,146 @@
 @media (max-width: 1024px) {
   .log-book-card { flex-direction: column-reverse; padding: 30px; text-align: center; }
   .log-book-branding { width: 100%; height: auto; padding: 20px; }
+}
+/* ════════════════════════════════
+   NEXUS HIRING MODAL
+   ════════════════════════════════ */
+.nexus-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(10, 14, 28, 0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 20px;
+}
+
+.nexus-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nexus-modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 40px;
+  padding: 60px;
+  max-width: 650px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7), 0 0 50px var(--color-primary-glow);
+}
+
+.modal-header-branding {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.hiring-badge {
+  background: rgba(0, 242, 254, 0.1);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  color: var(--color-primary);
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 3.2rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.modal-close-btn:hover { color: var(--color-primary); }
+
+.hiring-title {
+  font-size: 5rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  margin-bottom: 24px;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.hiring-text {
+  font-size: 2.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.hiring-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+.role-tag {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  padding: 10px 24px;
+  border-radius: 16px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.role-tag span { color: var(--color-primary); }
+
+.join-nexus-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--gradient-primary);
+  color: #fff;
+  padding: 20px 48px;
+  border-radius: 24px;
+  font-size: 2rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(0, 242, 254, 0.4);
+  transition: all 0.4s;
+}
+.join-nexus-btn:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(0, 242, 254, 0.5);
+  color: #fff;
+}
+
+.scanner-line {
+  position: absolute;
+  bottom: 0; left: 0; width: 100%;
+  height: 4px;
+  background: var(--gradient-primary);
+  box-shadow: 0 0 20px var(--color-primary);
+  animation: scanModal 4s linear infinite;
+}
+
+@keyframes scanModal {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-800px); opacity: 0; }
+}
+
+@media (max-width: 768px) {
+  .nexus-modal-content { padding: 40px 24px; border-radius: 30px; }
+  .hiring-title { font-size: 3.2rem; }
+  .hiring-text { font-size: 1.7rem; }
+  .join-nexus-btn { width: 100%; justify-content: center; padding: 16px; font-size: 1.8rem; }
 }

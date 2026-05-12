@@ -250,8 +250,62 @@
 
       document.querySelectorAll(".why-card, .log-book-card").forEach(el => observer.observe(el));
     });
+
+    // Hiring Modal Auto-Start
+    window.addEventListener('load', () => {
+      const modal = document.getElementById('hiringModal');
+      const closeBtn = document.getElementById('closeHiring');
+
+      if (!modal) return;
+
+      // Add a slight delay for impact
+      setTimeout(() => {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }, 800);
+
+      closeBtn.addEventListener('click', () => {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      });
+
+      window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+          document.body.style.overflow = 'auto';
+        }
+      });
+    });
   </script>
+  <!-- Nexus Hiring Modal -->
+  <div id="hiringModal" class="nexus-modal">
+    <div class="nexus-modal-content animate__animated animate__zoomIn">
+      <div class="modal-header-branding">
+        <div class="hiring-badge">JOIN THE CORE TEAM</div>
+        <button class="modal-close-btn" id="closeHiring">&times;</button>
+      </div>
+      <div class="modal-body-hiring">
+        <h2 class="hiring-title">NEXUS IS <span class="gradient-text">HIRING!</span></h2>
+        <p class="hiring-text">
+          We're seeking the next generation of pioneers to forge the future of technology. Are you ready to build, innovate, and lead?
+        </p>
+        <div class="hiring-roles">
+          <div class="role-tag"><span>●</span> AI & ML</div>
+          <div class="role-tag"><span>●</span> Full Stack Dev</div>
+          <div class="role-tag"><span>●</span> </div>
+        </div>
+        <div class="modal-actions">
+          <a href="contact.html" class="join-nexus-btn">Join Nexus Now <span class="arrow">→</span></a>
+        </div>
+      </div>
+      <div class="modal-footer-decoration">
+        <div class="scanner-line"></div>
+      </div>
+    </div>
+  </div>
+
   <script src="js/nav-active.js"></script>
+  <script src="js/home.js"></script>
 </body>
 
 </html>

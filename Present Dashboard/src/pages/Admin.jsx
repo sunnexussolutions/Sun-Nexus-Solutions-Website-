@@ -12,8 +12,8 @@ import {
   getUsers, getResults, deleteUser, updateUserStatus,
   getDiscussions, addDiscussion, deleteDiscussion,
   getNotifications, addNotification, deleteNotification,
-  getDomains, addDomain, updateDomain, deleteDomain,
-  getProjects, addProject, updateProject, deleteProject
+  getProjects, addProject, updateProject, deleteProject,
+  getHiringSubmissions, deleteHiringSubmission, getDomains
 } from '../store/dataStore';
 import { 
   extractTextFromPDF, extractTextFromWord, extractQuestionsFromExcel, parseMCQsFromText,
@@ -32,6 +32,7 @@ const TABS = [
   { id: 'users',         label: 'Users',         icon: Users },
   { id: 'discussions',   label: 'Discussions',   icon: MessageSquare },
   { id: 'notifications', label: 'Notifications', icon: Bell },
+  { id: 'hiring',        label: 'Hiring',        icon: ShieldCheck },
 ];
 
 const CATEGORIES = ['Quantitative', 'Logical Reasoning', 'Verbal Ability'];
@@ -198,6 +199,10 @@ const Admin = () => {
   const [results, setResults] = useState([]);
   const [discussions, setDiscussions] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [submissions, setSubmissions] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [domains, setDomains] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [overviewDetail, setOverviewDetail] = useState(null);
   const [expandedUser, setExpandedUser] = useState(null);
   const [editingAssessmentId, setEditingAssessmentId] = useState(null);
@@ -205,19 +210,6 @@ const Admin = () => {
   const [editingNotificationId, setEditingNotificationId] = useState(null);
   const [editingDomainId, setEditingDomainId] = useState(null);
   const [editingProjectId, setEditingProjectId] = useState(null);
-
-  // Projects state
-  const [projects, setProjects] = useState([]);
-  const [showProjectForm, setShowProjectForm] = useState(false);
-  const [pForm, setPForm] = useState({ title: '', desc: '', status: 'completed', tech: '', github: '', live: '', color: '#6366f1', userId: '' });
-  const [pTeam, setPTeam] = useState([{ name: '', image: '' }]);
-  const [domains, setDomains] = useState([]);
-  const [showDomainForm, setShowDomainForm] = useState(false);
-  const [domForm, setDomForm] = useState({ 
-    title: '', icon: 'Code2', color: '#6366f1', 
-    desc: '', stats: '', trending: false, 
-    subDomains: [] 
-  });
 
   // Assessment form
   const [showAssessmentForm, setShowAssessmentForm] = useState(false);
@@ -243,6 +235,27 @@ const Admin = () => {
   const [showNForm, setShowNForm] = useState(false);
   const [nForm, setNForm] = useState({ title: '', message: '', type: 'info' });
 
+  const refresh = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      const [a, u, r, d, n, s, p, doms] = await Promise.all([
+        getAssessments(), getUsers(), getResults(), 
+        getDiscussions(), getNotifications(), getHiringSubmissions(),
+        getProjects(), getDomains()
+      ]);
+      setAssessments(a); setUsers(u); setResults(r); 
+      setDiscussions(d); setNotifications(n); setSubmissions(s);
+      setProjects(p); setDomains(doms);
+    } catch (err) {
+      console.error("Refresh error:", err);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh, tab]);
+
   const formatDateForInput = (dateString) => {
     if (!dateString) return '';
     try {
@@ -258,25 +271,6 @@ const Admin = () => {
       return '';
     }
   };
-
-  const refresh = React.useCallback(async () => {
-    const [a, u, r, d, n, doms] = await Promise.all([
-      getAssessments(),
-      getUsers(),
-      getResults(),
-      getDiscussions(),
-      getNotifications(),
-      getDomains(),
-      getProjects()
-    ]);
-    setAssessments(a);
-    setUsers(u);
-    setResults(r);
-    setDiscussions(d);
-    setNotifications(n);
-    setDomains(doms);
-    setProjects(p);
-  }, []);
 
   useEffect(() => { refresh(); }, [tab, refresh]);
 
@@ -1524,6 +1518,77 @@ const Admin = () => {
                 </Card>
               );
             })
+          )}
+        </div>
+      </div>
+    )}
+
+    {/* ── HIRING SUBMISSIONS ── */}
+    {tab === 'hiring' && (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>Hiring Protocol</h3>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Manage core team candidate submissions</p>
+          </div>
+          <button onClick={refresh} style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+            Sync Submissions
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {submissions.length === 0 ? (
+            <Card><p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No candidate submissions yet.</p></Card>
+          ) : (
+            submissions.map(s => (
+              <Card key={s.id} style={{ position: 'relative' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                  <div>
+                    <h4 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)', marginBottom: '4px' }}>{s.name}</h4>
+                    <p style={{ fontSize: '13px', color: 'var(--accent-primary)', fontWeight: 600 }}>{s.email}</p>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 800, padding: '4px 12px', borderRadius: '8px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
+                      {s.academicYear} | {s.branch}
+                    </span>
+                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Graduation: {s.graduationYear}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl bg-black/20 border border-white/5 mb-4">
+                  <div>
+                    <h5 style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Technical Profile</h5>
+                    <p style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>Domain:</strong> {s.domain}</p>
+                    {s.specialization && <p style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>Specialization:</strong> {s.specialization}</p>}
+                    {s.languages && <p style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>Stack:</strong> {s.languages}</p>}
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '8px' }}><strong>Skills:</strong> {s.skills}</p>
+                  </div>
+                  <div>
+                    <h5 style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Portfolios & Proof</h5>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px' }}>
+                      {s.github && <a href={s.github} target="_blank" rel="noreferrer" style={{ padding: '6px 12px', borderRadius: '8px', background: '#24292e', color: 'white', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>GitHub</a>}
+                      {s.linkedin && <a href={s.linkedin} target="_blank" rel="noreferrer" style={{ padding: '6px 12px', borderRadius: '8px', background: '#0077b5', color: 'white', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>LinkedIn</a>}
+                      {s.codechef && <a href={s.codechef} target="_blank" rel="noreferrer" style={{ padding: '6px 12px', borderRadius: '8px', background: '#5b4638', color: 'white', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>CodeChef</a>}
+                      {s.hackerrank && <a href={s.hackerrank} target="_blank" rel="noreferrer" style={{ padding: '6px 12px', borderRadius: '8px', background: '#2ec866', color: 'white', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>HackerRank</a>}
+                    </div>
+                    {s.projects && (
+                      <div style={{ marginTop: '12px' }}>
+                        <h6 style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)' }}>Project:</h6>
+                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{s.projects}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Submitted: {new Date(s.createdAt).toLocaleString()}</span>
+                  <button onClick={() => { if(confirm('Revoke this candidate submission?')) { deleteHiringSubmission(s.id); refresh(); } }}
+                    style={{ padding: '8px 14px', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                    Revoke Submission
+                  </button>
+                </div>
+              </Card>
+            ))
           )}
         </div>
       </div>
