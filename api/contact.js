@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
                 ${projects || null}, ${github || null}, ${linkedin || null}, 
                 ${codechef || null}, ${hackerrank || null}, ${languages || null}
             )
-        `;
+        `;  
 
         res.status(200).json({ 
             success: true, 

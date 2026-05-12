@@ -411,13 +411,24 @@
               } else {
                 alert('⚠️ ' + result.message);
               }
-            } catch (error) {
-              console.error('Network Error:', error);
-              alert('❌ Connection Protocol Failed. Please verify your network and server status.');
+            } catch (err) {
+              console.error("Submission Error:", err);
+              // Professional Alert for Cloud Debugging
+              if (window.location.hostname !== 'localhost') {
+                 alert('Cloud Hub Error: ' + err.message + '\n\nProtocol Tip: Ensure your "api/" folder is deployed and Neon DB URL is set.');
+              } else {
+                 alert('❌ Connection Protocol Failed. Please verify your local Node server is running on port 3000.');
+              }
+              
+              const submitBtn = document.getElementById('submitBtn');
+              submitBtn.innerHTML = '<span>Join Nexus Membership</span>';
+              submitBtn.disabled = false;
+              submitBtn.style.opacity = '1';
             } finally {
-              btn.disabled = false;
-              btn.textContent = originalBtnText;
-              btn.style.opacity = '1';
+              if (!btn.disabled) {
+                btn.textContent = originalBtnText;
+                btn.style.opacity = '1';
+              }
             }
           });
         </script>
