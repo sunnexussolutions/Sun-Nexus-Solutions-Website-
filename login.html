@@ -597,10 +597,15 @@
           throw new Error(result.message || 'Login failed');
         }
       } catch (err) {
+        console.error("LOGIN_ERROR:", err);
         error.textContent = '❌ ' + err.message;
         error.style.display = 'block';
         button.disabled = false;
         button.textContent = '🚀 Login';
+        // Professional Alert for Cloud Debugging
+        if (window.location.hostname !== 'localhost') {
+           alert('Cloud Authentication Error: ' + err.message);
+        }
         setTimeout(() => {
           error.style.display = 'none';
         }, 5000);
