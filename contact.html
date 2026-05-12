@@ -61,6 +61,13 @@
       box-shadow: var(--shadow-lg);
     }
 
+    .contact-map-card {
+      height: 750px;
+      align-self: start;
+      display: flex;
+      flex-direction: column;
+    }
+
     .form-group { margin-bottom: 24px; position: relative; }
     .form-group label {
       display: block;
@@ -73,19 +80,44 @@
     }
     .form-control-nexus {
       width: 100%;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-subtle);
+      background: var(--bg-secondary) !important;
+      border: 1px solid var(--border-color) !important;
       border-radius: var(--radius-md);
       padding: 16px 22px;
-      color: var(--text-primary);
+      color: var(--text-primary) !important;
       font-size: 1.7rem;
       outline: none;
       transition: all 0.3s;
     }
+
+    /* Specific styling for dropdowns ONLY */
+    select.form-control-nexus {
+      padding-right: 45px;
+      appearance: none !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300f2fe' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 15px center !important;
+      background-size: 20px !important;
+    }
+    
+    /* Brute-force visibility for options */
+    .form-control-nexus option {
+      background-color: #0a0e1c !important; /* Dark solid background */
+      color: #ffffff !important;           /* Pure white text */
+      padding: 15px;
+    }
+
+    [data-theme="light"] .form-control-nexus option {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+    }
+
     .form-control-nexus:focus {
-      border-color: var(--color-primary);
-      box-shadow: 0 0 15px var(--color-primary-glow);
-      background: rgba(255,255,255,0.02);
+      border-color: var(--color-primary) !important;
+      box-shadow: 0 0 20px var(--color-primary-glow) !important;
     }
 
     .map-frame {
@@ -181,24 +213,169 @@
             <input type="email" name="email" class="form-control-nexus" placeholder="name@example.com" required>
           </div>
           <div class="form-group">
-            <label>Inquiry Core (Subject)</label>
-            <input type="text" name="subject" class="form-control-nexus" placeholder="What are we building?" required>
+            <label>Academic Year</label>
+            <select name="academic_year" id="academic_year" class="form-control-nexus" required>
+              <option value="" disabled selected>Select your year</option>
+              <option value="1st Year">1st Year</option>
+              <option value="2nd Year">2nd Year</option>
+              <option value="3rd Year">3rd Year</option>
+            </select>
           </div>
+
           <div class="form-group">
-            <label>Transmission (Message)</label>
-            <textarea name="message" class="form-control-nexus" rows="5" placeholder="Details of your inquiry..." required></textarea>
+            <label>Graduation Year</label>
+            <select name="graduation_year" class="form-control-nexus" required>
+              <option value="" disabled selected>Select graduation year</option>
+              <option value="2030">2030</option>
+              <option value="2029">2029</option>
+              <option value="2028">2028</option>
+            </select>
           </div>
-          <button type="submit" id="submitBtn" class="btn-nexus" style="width: 100%;">Transmit Message</button>
+
+          <div class="form-group">
+            <label>Branch</label>
+            <select name="branch" id="branch" class="form-control-nexus" required>
+              <option value="" disabled selected>Select your branch</option>
+              <option value="CSE">CSE</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <!-- Specify Branch (Conditional for Other) -->
+          <div id="other-branch-container" class="form-group" style="display: none;">
+            <label>Specify Branch</label>
+            <input type="text" name="other_branch" class="form-control-nexus" placeholder="e.g. Mechanical, Civil, EEE">
+          </div>
+
+          <!-- Specialization (Conditional for CSE) -->
+          <div id="specialization-container" class="form-group" style="display: none;">
+            <label>Specialization</label>
+            <select name="specialization" class="form-control-nexus">
+              <option value="" disabled selected>Select specialization</option>
+              <option value="AIML">AIML</option>
+              <option value="Cyber Security">Cyber Security</option>
+              <option value="Cloud Computing">Cloud Computing</option>
+            </select>
+          </div>
+
+          <!-- Dynamic Content Based on Year -->
+          <div id="dynamic-year-content">
+            <!-- Content will be injected here by JS -->
+          </div>
+
+          <button type="submit" id="submitBtn" class="btn-nexus" style="width: 100%; margin-top: 20px;">Complete Registration</button>
         </form>
 
         <script>
+          const academicYearSelect = document.getElementById('academic_year');
+          const branchSelect = document.getElementById('branch');
+          const otherBranchContainer = document.getElementById('other-branch-container');
+          const specContainer = document.getElementById('specialization-container');
+          const dynamicContainer = document.getElementById('dynamic-year-content');
+
+          // Branch logic
+          branchSelect.addEventListener('change', function() {
+            otherBranchContainer.style.display = this.value === 'Other' ? 'block' : 'none';
+            specContainer.style.display = this.value === 'CSE' ? 'block' : 'none';
+          });
+
+          // Year logic
+          academicYearSelect.addEventListener('change', function() {
+            const year = this.value;
+            let html = '';
+
+            if (year === '1st Year') {
+              html = `
+                <div class="form-group">
+                  <label>Technical Skills (Optional)</label>
+                  <input type="text" name="skills" class="form-control-nexus" placeholder="e.g. Python, HTML, CSS">
+                </div>
+                <div class="form-group">
+                  <label>Primary Domain</label>
+                  <select name="domain" class="form-control-nexus" required>
+                    <option value="" disabled selected>Select domain</option>
+                    <option value="AIML">AIML</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Cyber Security">Cyber Security</option>
+                    <option value="Data Analyst">Data Analyst</option>
+                  </select>
+                </div>
+              `;
+            } else if (year === '2nd Year' || year === '3rd Year') {
+              const isRequired = (year === '3rd Year') ? 'required' : '';
+              html = `
+                <div class="form-group">
+                  <label>Technical Skills</label>
+                  <input type="text" name="skills" class="form-control-nexus" placeholder="e.g. JavaScript, Java, React" required>
+                </div>
+                <div class="form-group">
+                  <label>Project Details ${year === '2nd Year' ? '(Optional)' : '(Required)'}</label>
+                  <input type="text" name="projects" class="form-control-nexus" placeholder="Link or description of your best project" ${isRequired}>
+                </div>
+                
+                <div class="social-links-list" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+                  <div class="form-group">
+                    <label>GitHub (Required)</label>
+                    <input type="url" name="github" class="form-control-nexus" placeholder="https://github.com/..." required>
+                  </div>
+                  <div class="form-group">
+                    <label>LinkedIn (Required)</label>
+                    <input type="url" name="linkedin" class="form-control-nexus" placeholder="https://linkedin.com/in/..." required>
+                  </div>
+                  <div class="form-group">
+                    <label>CodeChef (Optional)</label>
+                    <input type="url" name="codechef" class="form-control-nexus" placeholder="Profile URL">
+                  </div>
+                  <div class="form-group">
+                    <label>HackerRank (Optional)</label>
+                    <input type="url" name="hackerrank" class="form-control-nexus" placeholder="Profile URL">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Primary Domain</label>
+                  <select name="domain" id="domain-select" class="form-control-nexus" required>
+                    <option value="" disabled selected>Select domain</option>
+                    <option value="Full Stack Web Development">Full Stack Web Development</option>
+                    <option value="App Development">App Development</option>
+                    <option value="ML">ML</option>
+                    <option value="Data Analyst">Data Analyst</option>
+                    <option value="Cloud Computing">Cloud Computing</option>
+                  </select>
+                </div>
+
+                <div id="language-container" class="form-group" style="display: none;">
+                  <label>Languages / Tech Stack</label>
+                  <select name="languages" class="form-control-nexus">
+                    <option value="" disabled selected>Select stack</option>
+                    <option value="React.js">React.js</option>
+                    <option value="Node.js">Node.js</option>
+                    <option value="Both">React.js & Node.js</option>
+                  </select>
+                </div>
+              `;
+            }
+
+            dynamicContainer.innerHTML = html;
+
+            // Re-attach domain logic if exists
+            const domainSelect = document.getElementById('domain-select');
+            if (domainSelect) {
+              domainSelect.addEventListener('change', function() {
+                const langContainer = document.getElementById('language-container');
+                if (langContainer) {
+                  langContainer.style.display = this.value === 'Full Stack Web Development' ? 'block' : 'none';
+                }
+              });
+            }
+          });
+
           document.getElementById('nexusContactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const form = e.target;
             const btn = document.getElementById('submitBtn');
             const originalBtnText = btn.textContent;
             
-            // Loading state
             btn.disabled = true;
             btn.textContent = 'Transmitting...';
             btn.style.opacity = '0.7';
@@ -207,23 +384,35 @@
             const data = Object.fromEntries(formData.entries());
 
             try {
-              const response = await fetch('api/contact.php', {
+              const response = await fetch('http://localhost:3000/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
               });
 
-              const result = await response.json();
+              const text = await response.text();
+              console.log('Raw Response:', text);
+              
+              let result;
+              try {
+                result = JSON.parse(text);
+              } catch (e) {
+                console.error('JSON Parse Error:', e);
+                alert('❌ Protocol Mismatch: The server sent an invalid response. Check console for details.');
+                return;
+              }
 
               if (result.success) {
                 alert('🏆 ' + result.message);
                 form.reset();
+                dynamicContainer.innerHTML = '';
+                specContainer.style.display = 'none';
               } else {
                 alert('⚠️ ' + result.message);
               }
             } catch (error) {
-              console.error('Error:', error);
-              alert('❌ Connection Protocol Failed. Please check your network or try again later.');
+              console.error('Network Error:', error);
+              alert('❌ Connection Protocol Failed. Please verify your network and server status.');
             } finally {
               btn.disabled = false;
               btn.textContent = originalBtnText;

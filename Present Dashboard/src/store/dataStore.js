@@ -293,3 +293,33 @@ export const addDiscussion = async (d) => {
 export const deleteDiscussion = async (id) => {
   setLocal('discussions', getLocal('discussions').filter(d => d.id !== id));
 };
+
+// ── Hiring Submissions (Registration) ────────────────────────────────────────
+export const getHiringSubmissions = async () => {
+  console.log("📂 INITIATING_DIRECT_SYNC: Hiring Submissions...");
+  try {
+    const cloud = await query('SELECT * FROM contact_inquiries ORDER BY created_at DESC');
+    console.log("📊 RAW_CLOUD_SYNC_RESULT:", cloud);
+    
+    if (cloud && Array.isArray(cloud)) {
+      const mapped = cloud.map(s => ({
+        ...s,
+        academicYear: s.academic_year || s.academicYear || 'N/A',
+        graduationYear: s.graduation_year || s.graduationYear || 'N/A',
+        createdAt: s.created_at || s.createdAt || new Date().toISOString()
+      }));
+      console.log("✅ SYNC_COMPLETE:", mapped.length, "candidates mapped.");
+      setLocal('hiring_submissions', mapped);
+      return mapped;
+    }
+    console.warn("⚠️ SYNC_WARNING: Cloud response was empty or invalid structure.");
+  } catch (err) {
+    console.error("❌ SYNC_CRITICAL_FAILURE:", err.message);
+  }
+  return getLocal('hiring_submissions');
+};
+
+export const deleteHiringSubmission = async (id) => {
+  setLocal('hiring_submissions', getLocal('hiring_submissions').filter(s => s.id !== id));
+  await query('DELETE FROM contact_inquiries WHERE id = $1', [id]);
+};
