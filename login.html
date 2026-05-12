@@ -569,8 +569,8 @@
         }
         // --- TEMPORARY BYPASS END ---
 
-        const response = await fetch('api/auth.php?action=login', {
-
+        const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
+        const response = await fetch(`${baseUrl}/api/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })

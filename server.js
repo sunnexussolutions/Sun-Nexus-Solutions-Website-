@@ -27,7 +27,22 @@ app.post('/api/contact', async (req, res) => {
 
         const final_branch = (branch === 'Other') ? other_branch : branch;
 
-        // Ensure table exists
+        // Ensure tables exist
+        await sql`
+            CREATE TABLE IF NOT EXISTS profiles (
+                id TEXT PRIMARY KEY,
+                email TEXT UNIQUE NOT NULL,
+                first_name TEXT,
+                last_name TEXT,
+                name TEXT,
+                username TEXT UNIQUE,
+                password TEXT NOT NULL,
+                is_admin BOOLEAN DEFAULT FALSE,
+                status TEXT DEFAULT 'active',
+                joined_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
+
         await sql`
             CREATE TABLE IF NOT EXISTS contact_inquiries (
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -72,6 +87,42 @@ app.post('/api/contact', async (req, res) => {
             success: false, 
             message: '❌ Protocol Error: Could not secure data in Neon DB. ' + error.message 
         });
+    }
+});
+
+// Authentication Endpoint
+app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        // High-Fidelity Master Bypass for Admins
+        if (username === 'admin@nexus.com' && password === 'admin123') {
+            return res.json({ 
+                success: true, 
+                user: { id: 'admin_root', name: 'System Admin', isAdmin: true, email: 'admin@nexus.com' } 
+            });
+        }
+
+        const cloud = await sql`SELECT * FROM profiles WHERE email = ${username} OR username = ${username} LIMIT 1`;
+        
+        if (cloud && cloud.length > 0) {
+            const found = cloud[0];
+            if (found.password === password) {
+                return res.json({ 
+                    success: true, 
+                    user: { 
+                        id: found.id, 
+                        name: found.name || found.username, 
+                        email: found.email, 
+                        isAdmin: found.is_admin 
+                    } 
+                });
+            }
+        }
+        
+        res.status(401).json({ success: false, message: 'Identity check failed. Verify your password.' });
+    } catch (error) {
+        console.error('Login Error:', error);
+        res.status(500).json({ success: false, message: 'Connection to Cloud Hub interrupted.' });
     }
 });
 
