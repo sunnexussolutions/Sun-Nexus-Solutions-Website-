@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join Nexus - Create Account</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <style>
+    :root {
+      --bg-primary:        #050a18;
+      --bg-card:           #0a0f1d;
+      --color-primary:     #00f2fe;
+      --color-primary-glow: rgba(0, 242, 254, 0.4);
+      --color-primary-light: #70ffff;
+      --text-primary:      #f1f5f9;
+      --text-secondary:    #94a3b8;
+      --text-muted:        #64748b;
+      --border-color:      rgba(0, 242, 254, 0.25);
+      --gradient-primary:  linear-gradient(135deg, #00f2fe, #4facfe);
+      --shadow-glow:       0 0 28px rgba(0, 242, 254, 0.25);
+      --shadow-lg:         0 15px 50px rgba(0,0,0,0.6);
+      --radius-sm: 6px; --radius-md: 12px; --radius-xl: 20px;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; font-family:"Inter",sans-serif; }
+
+    body {
+      background: var(--bg-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      padding: 20px;
+    }
+    body::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0, 242, 254, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      top: -200px; right: -200px;
+      animation: float 7s ease-in-out infinite;
+    }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+    .signup-container {
+      background: var(--bg-card);
+      padding: 40px;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
+      border: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 550px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.6s cubic-bezier(0.4,0,0.2,1);
+    }
+    @keyframes slideUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+
+    h2 { color: var(--text-primary); margin-bottom: 8px; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em; }
+    .subtitle { color: var(--text-secondary); font-size: 1rem; margin-bottom: 32px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      text-align: left;
+    }
+    @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }
+
+    .form-group { margin-bottom: 20px; }
+    .full-width { grid-column: span 2; }
+    @media (max-width: 480px) { .full-width { grid-column: span 1; } }
+
+    label { display: block; color: var(--color-primary-light); margin-bottom: 8px; font-size: 0.9rem; font-weight: 600; }
+    input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: rgba(99,102,241,0.05);
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.2); }
+
+    .error {
+      color: #f87171;
+      font-size: 0.9rem;
+      margin-top: 14px;
+      padding: 12px;
+      background: rgba(239,68,68,0.1);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid #ef4444;
+      display: none;
+      text-align: left;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 16px;
+      background: var(--gradient-primary);
+      border: none;
+      border-radius: var(--radius-md);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: var(--shadow-glow);
+      margin-top: 10px;
+    }
+    button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0, 242, 254, 0.4); }
+    button[type="submit"]:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    .login-link { color: var(--text-secondary); font-size: 0.95rem; margin-top: 24px; }
+    .login-link a { color: var(--color-primary-light); text-decoration: none; font-weight: 600; transition: color 0.2s; }
+    .login-link a:hover { color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <div class="signup-container">
+    <h2>Join the Nexus</h2>
+    <p class="subtitle">Start your strikingly stable journey with us today.</p>
+    
+    <form id="signupForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" placeholder="John" required>
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" placeholder="Doe" required>
+        </div>
+        <div class="form-group full-width">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="john@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="johndoe123" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div style="position: relative;">   
+            <input type="password" id="password" placeholder="••••••••" required>
+            <span id="togglePassword" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--color-primary-light); font-size: 1.1rem; transition: color 0.2s;" onmouseover="this.style.color='#f1f5f9'" onmouseout="this.style.color='#70ffff'">👁️</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="error" id="error"></div>
+      
+      <button type="submit" id="submitBtn">🚀 Create Account</button>
+    </form>
+
+    <div class="login-link">
+      Already a member? <a href="login.html">Sign In</a>
+    </div>
+    <div class="login-link" style="margin-top: 15px;">
+      <a href="index.html" style="color: #64748b; font-size: 0.85rem;">← Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    const toggleBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+
+    toggleBtn.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.textContent = type === 'password' ? '👁️' : '🙈';
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const email = document.getElementById('email').value;
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('error');
+      const btn = document.getElementById('submitBtn');
+      
+      btn.disabled = true;
+      btn.innerHTML = '⌛ Transmitting Protocol...';
+      btn.style.opacity = '0.7';
+      errorDiv.style.display = 'none';
+
+      console.log("🚀 PROTOCOL_INITIATED: Handshaking with backend...");
+
+      try {
+        const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
+        console.log(`🔗 TARGET_ENDPOINT: ${baseUrl}/api/register`);
+
+        const response = await fetch(`${baseUrl}/api/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ firstName, lastName, email, username, password })
+        });
+        
+        console.log("📡 SIGNAL_RECEIVED: Status", response.status);
+        const result = await response.json();
+
+        if (result.success) {
+          console.log("✅ PROTOCOL_COMPLETE: Identity Secured.");
+          btn.innerHTML = '✅ Protocol: Strategy Initiated';
+          btn.style.background = 'linear-gradient(135deg, #43e97b, #38f9d7)';
+          btn.style.boxShadow = '0 0 30px rgba(67, 233, 123, 0.4)';
+          
+          const notice = document.createElement('div');
+          notice.style.cssText = `
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(10, 15, 29, 0.95); border: 1px solid var(--color-primary);
+            padding: 20px 40px; border-radius: 12px; color: #fff; z-index: 9999;
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.3); font-weight: 800;
+            backdrop-filter: blur(10px); animation: slideDown 0.5s ease-out;
+            letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.9rem;
+          `;
+          notice.innerHTML = '<span style="color: var(--color-primary); margin-right: 12px;">●</span> Strategy Initiated: Identity Secured';
+          document.body.appendChild(notice);
+
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 2000);
+        } else {
+          console.warn("⚠️ PROTOCOL_REJECTED:", result.message);
+          throw new Error(result.message || 'Registration failed');
+        }
+      } catch (err) {
+        console.error("❌ PROTOCOL_CRITICAL_FAILURE:", err.message);
+        
+        let displayMsg = err.message;
+        if (err.message === 'Failed to fetch' && window.location.hostname === 'localhost') {
+           displayMsg = 'Protocol Error: Local Backend (server.js) is not running. Please start it with "node server.js".';
+        }
+
+        errorDiv.innerHTML = '❌ ' + displayMsg;
+        errorDiv.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '🚀 Create Account';
+        btn.style.opacity = '1';
+      }
+    });
+  </script>
+</body>
+</html>
