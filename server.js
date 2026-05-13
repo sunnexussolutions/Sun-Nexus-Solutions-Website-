@@ -13,6 +13,7 @@ const sql = neon("postgresql://neondb_owner:npg_izrW7bvHTnO6@ep-autumn-grass-aok
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('.')); // Serve static files from the root
 
 // Registration Endpoint
 app.post('/api/contact', async (req, res) => {
@@ -90,7 +91,7 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// Authentication Endpoint
+// Authentication Endpoints
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     try {
@@ -123,6 +124,68 @@ app.post('/api/login', async (req, res) => {
     } catch (error) {
         console.error('Login Error:', error);
         res.status(500).json({ success: false, message: 'Connection to Cloud Hub interrupted.' });
+    }
+});
+
+app.post('/api/register', async (req, res) => {
+    const { firstName, lastName, email, username, password } = req.body;
+    const id = `user_${Date.now()}`;
+    const name = `${firstName} ${lastName}`;
+
+    console.log(`📝 ATTEMPTING_REGISTRATION: ${email} (${username})`);
+
+    try {
+        await sql`
+            INSERT INTO profiles (id, email, first_name, last_name, name, username, password, is_admin, status, joined_at)
+            VALUES (${id}, ${email}, ${firstName}, ${lastName}, ${name}, ${username}, ${password}, false, 'active', ${new Date().toISOString()})
+        `;
+        
+        console.log(`✅ REGISTRATION_SUCCESS: ${email}`);
+        res.json({ success: true, message: '🏆 Welcome to the Nexus! Profile activated.' });
+    } catch (error) {
+        console.error('❌ DATABASE_PROTOCOL_ERROR:', error.message);
+        let msg = 'Protocol Error: Could not secure account.';
+        if (error.message.includes('unique constraint')) {
+            msg = '❌ Identity Conflict: Email or Username already exists.';
+        }
+        res.status(500).json({ success: false, message: msg });
+    }
+});
+
+// Admin Proxy Endpoints
+app.get('/api/users', async (req, res) => {
+    try {
+        const cloud = await sql`SELECT * FROM profiles ORDER BY joined_at DESC`;
+        res.json(cloud);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/assessments', async (req, res) => {
+    try {
+        const cloud = await sql`SELECT * FROM assessments ORDER BY created_at DESC`;
+        res.json(cloud);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/results', async (req, res) => {
+    try {
+        const cloud = await sql`SELECT * FROM results ORDER BY submitted_at DESC`;
+        res.json(cloud);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/domains', async (req, res) => {
+    try {
+        const cloud = await sql`SELECT * FROM domains ORDER BY created_at ASC`;
+        res.json(cloud);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 

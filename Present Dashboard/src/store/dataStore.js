@@ -11,6 +11,23 @@ const setLocal = (key, data) => {
   window.dispatchEvent(new Event('nexus-data-updated'));
 };
 
+const getBaseUrl = () => {
+  return window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
+};
+
+const fetchApi = async (endpoint, method = 'GET', body = null) => {
+  const url = `${getBaseUrl()}${endpoint}`;
+  const options = {
+    method,
+    headers: { 'Content-Type': 'application/json' }
+  };
+  if (body) options.body = JSON.stringify(body);
+  
+  const response = await fetch(url, options);
+  if (!response.ok) throw new Error(`API_ERROR: ${response.status}`);
+  return await response.json();
+};
+
 // ── Projects (System-wide) ───────────────────────────────────────────────────
 export const getProjects = async (userId) => {
   const local = getLocal('system_projects');
@@ -66,7 +83,7 @@ export const deleteProject = async (id) => {
 export const getAssessments = async () => {
   const local = getLocal('assessments');
   try {
-    const cloud = await query('SELECT * FROM assessments ORDER BY created_at DESC');
+    const cloud = await fetchApi('/api/assessments');
     if (cloud) {
       const mapped = cloud.map(a => ({
         ...a,
@@ -79,7 +96,7 @@ export const getAssessments = async () => {
       return mapped;
     }
   } catch (err) {
-    console.warn("Using local assessments fallback");
+    console.warn("Using local assessments fallback", err);
   }
   return local;
 };
@@ -125,12 +142,10 @@ export const deleteAssessment = async (id) => {
 export const getResults = async (userId) => {
   const local = getLocal('results');
   try {
-    const sql = userId ? 'SELECT * FROM results WHERE user_id = $1' : 'SELECT * FROM results';
-    const params = userId ? [userId] : [];
-    
-    const cloud = await query(sql, params);
+    const cloud = await fetchApi('/api/results');
     if (cloud) {
-      const mapped = cloud.map(r => ({
+      const filtered = userId ? cloud.filter(r => r.user_id === userId) : cloud;
+      const mapped = filtered.map(r => ({
         ...r,
         userId: r.user_id,
         userEmail: r.user_email,
@@ -141,7 +156,7 @@ export const getResults = async (userId) => {
       return mapped;
     }
   } catch (err) {
-    console.warn("Using local results fallback");
+    console.warn("Using local results fallback", err);
   }
   return local;
 };
@@ -161,7 +176,7 @@ export const saveResult = async (res) => {
 // ── Users ─────────────────────────────────────────────────────────────────────
 export const getUsers = async () => {
   try {
-    const cloud = await query('SELECT * FROM profiles ORDER BY joined_at DESC');
+    const cloud = await fetchApi('/api/users');
     if (cloud) {
       const mapped = cloud.map(u => ({
         ...u,
@@ -175,7 +190,7 @@ export const getUsers = async () => {
       return mapped;
     }
   } catch (err) {
-    console.warn("Using local users fallback");
+    console.warn("Using local users fallback", err);
   }
   return getLocal('users');
 };
@@ -193,7 +208,7 @@ export const updateUserStatus = async (id, status) => {
 export const getDomains = async () => {
   const local = getLocal('domains');
   try {
-    const cloud = await query('SELECT * FROM domains ORDER BY created_at ASC');
+    const cloud = await fetchApi('/api/domains');
     if (cloud) {
       const mapped = cloud.map(d => ({
         ...d,
@@ -205,7 +220,7 @@ export const getDomains = async () => {
       return mapped;
     }
   } catch (err) {
-    console.warn("Using local domains fallback");
+    console.warn("Using local domains fallback", err);
   }
   return local;
 };

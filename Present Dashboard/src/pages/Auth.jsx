@@ -63,6 +63,10 @@ export default function Auth() {
     first: '', last: '', dob: '', user: '', email: '', pass: '', conf: ''
   });
 
+  const [showLPass, setShowLPass] = useState(false);
+  const [showSPass, setShowSPass] = useState(false);
+  const [showCPass, setShowCPass] = useState(false);
+
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotStatus, setForgotStatus] = useState('idle'); // idle | loading | success | error
 
@@ -242,7 +246,14 @@ export default function Auth() {
 
                       <div style={{ position: 'relative' }}>
                         <Lock size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#0ea5e9' }} />
-                        <input type="password" value={lPass} onChange={e => setLPass(e.target.value)} placeholder="Password" style={inputStyle(error && !lPass)} />
+                        <input type={showLPass ? "text" : "password"} value={lPass} onChange={e => setLPass(e.target.value)} placeholder="Password" style={inputStyle(error && !lPass)} />
+                        <button 
+                          type="button" 
+                          onClick={() => setShowLPass(!showLPass)}
+                          style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                        >
+                          {showLPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
                       </div>
 
                       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-8px' }}>
@@ -275,8 +286,29 @@ export default function Auth() {
                       <input type="date" value={signupData.dob} onChange={e => setSignupData({...signupData, dob: e.target.value})} style={inputStyle()} />
                       <input value={signupData.user} onChange={e => setSignupData({...signupData, user: e.target.value})} placeholder="Username" style={inputStyle()} />
                       <input type="email" value={signupData.email} onChange={e => setSignupData({...signupData, email: e.target.value})} placeholder="Email Address" style={inputStyle()} />
-                      <input type="password" value={signupData.pass} onChange={e => setSignupData({...signupData, pass: e.target.value})} placeholder="Master Password" style={inputStyle()} />
-                      <input type="password" value={signupData.conf} onChange={e => setSignupData({...signupData, conf: e.target.value})} placeholder="Confirm Password" style={inputStyle()} />
+                      <div style={{ position: 'relative' }}>
+                        <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(0, 242, 254, 0.4)', opacity: 0.7 }} />
+                        <input type={showSPass ? "text" : "password"} value={signupData.pass} onChange={e => setSignupData({...signupData, pass: e.target.value})} placeholder="Master Password" style={inputStyle()} />
+                        <button 
+                          type="button" 
+                          onClick={() => setShowSPass(!showSPass)}
+                          style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                        >
+                          {showSPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                      
+                      <div style={{ position: 'relative' }}>
+                        <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(0, 242, 254, 0.4)', opacity: 0.7 }} />
+                        <input type={showCPass ? "text" : "password"} value={signupData.conf} onChange={e => setSignupData({...signupData, conf: e.target.value})} placeholder="Confirm Password" style={inputStyle()} />
+                        <button 
+                          type="button" 
+                          onClick={() => setShowCPass(!showCPass)}
+                          style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                        >
+                          {showCPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
                       
                       {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 700, padding: '12px', background: 'rgba(239,68,68,0.1)', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.2)' }}>{error}</div>}
                       {success && <div style={{ color: '#22c55e', fontSize: '0.85rem', fontWeight: 700, padding: '12px', background: 'rgba(34,197,94,0.1)', borderRadius: '12px', border: '1px solid rgba(34,197,94,0.2)' }}>{success}</div>}
