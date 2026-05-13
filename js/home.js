@@ -1,41 +1,35 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // ── Background Carousel Engine ──────────────────────────────────────────
+    const slides = document.querySelectorAll('.carousel-slide');
+    let currentSlide = 0;
 
-document.addEventListener("DOMContentLoaded", () => {
-  
-  const menuToggle = document.getElementById("menuToggle");
-  const navLinks = document.getElementById("navLinks");
+    if (slides.length > 0) {
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
 
-  if (menuToggle && navLinks) {
-    menuToggle.addEventListener("click", () => {
-      navLinks.classList.toggle("active");
-      const isExpanded = navLinks.classList.contains("active");
-      menuToggle.setAttribute("aria-expanded", isExpanded);
-      
-      menuToggle.textContent = isExpanded ? "✕" : "☰";
+        // Cycle every 5 seconds
+        setInterval(nextSlide, 5000);
+    }
+
+    // ── Intersection Observer for Scroll Animations ────────────────────────
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.why-card, .log-book-card, .about-container').forEach(el => {
+        observer.observe(el);
     });
-  }
-
-  const observerOptions = {
-    root: null,
-    rootMargin: "0px",
-    threshold: 0.1
-  };
-
-  const observer = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("animate__animated", "animate__fadeInUp");
-        observer.unobserve(entry.target); 
-      }
-    });
-  }, observerOptions);
-
-
-  document.querySelectorAll(".why-card").forEach(card => {
-    observer.observe(card);
-  });
-
- 
-  document.querySelectorAll(".opportunity-card").forEach(card => {
-    observer.observe(card);
-  });
 });
