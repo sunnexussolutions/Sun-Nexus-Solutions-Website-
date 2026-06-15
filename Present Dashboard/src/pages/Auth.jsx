@@ -283,7 +283,15 @@ export default function Auth() {
                         <input value={signupData.first} onChange={e => setSignupData({...signupData, first: e.target.value})} placeholder="First" style={inputStyle()} />
                         <input value={signupData.last} onChange={e => setSignupData({...signupData, last: e.target.value})} placeholder="Last" style={inputStyle()} />
                       </div>
-                      <input type="date" value={signupData.dob} onChange={e => setSignupData({...signupData, dob: e.target.value})} style={inputStyle()} />
+                      <input 
+                        type={signupData.dob ? "date" : "text"} 
+                        onFocus={(e) => (e.target.type = "date")} 
+                        onBlur={(e) => { if(!e.target.value) e.target.type = "text"; }} 
+                        value={signupData.dob} 
+                        onChange={e => setSignupData({...signupData, dob: e.target.value})} 
+                        placeholder="Date of Birth" 
+                        style={inputStyle()} 
+                      />
                       <input value={signupData.user} onChange={e => setSignupData({...signupData, user: e.target.value})} placeholder="Username" style={inputStyle()} />
                       <input type="email" value={signupData.email} onChange={e => setSignupData({...signupData, email: e.target.value})} placeholder="Email Address" style={inputStyle()} />
                       <div style={{ position: 'relative' }}>
