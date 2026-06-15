@@ -32,7 +32,7 @@
 
   .nav-links.active {
     display: flex;
-    animation: slideInRight 0.3s ease-out;
+    animation: nexusSlideRight 0.3s ease-out;
   }
 
   .menu-toggle { display: block; }

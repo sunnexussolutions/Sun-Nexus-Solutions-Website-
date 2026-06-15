@@ -1,12 +1,13 @@
 /* ════════════════════════════════════════════════════
    SUN NEXUS SOLUTIONS — GLOBAL NAVIGATION LOGIC
    Handles: Active states, Mobile Toggle
-════════════════════════════════════════════════════ */
+   Version 2.1 — Authoritative Protocol
+   ════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Nav-Active.js initialized');
+    console.log('Nexus Navigation Engine: Activated');
 
-    // 1. Active Page Highlighting
+    // ── 1. Active Page Protocol ─────────────────────────────────────────────
     const navItems = document.querySelectorAll('.nav-links li');
     if (navItems.length > 0) {
         const path = window.location.pathname;
@@ -19,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!link) return;
             
             const href = link.getAttribute('href');
-            // Remove active from all first
             li.classList.remove('active');
             
             if (href === currentPage || 
@@ -31,44 +31,54 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 2. Mobile Menu Toggle
+    // ── 2. Mobile Menu Toggle Protocol ──────────────────────────────────────
     const menuToggle = document.getElementById('menuToggle');
     const navLinks = document.getElementById('navLinks');
     
     if (menuToggle && navLinks) {
-        console.log('Menu Toggle and Nav Links found');
-        
-        // Remove any existing listeners by cloning (to be safe if script runs twice)
-        const newToggle = menuToggle.cloneNode(true);
-        menuToggle.parentNode.replaceChild(newToggle, menuToggle);
-        
-        newToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            console.log('Menu Toggle clicked');
-            navLinks.classList.toggle('active');
+        // Robust state management
+        function toggleMenu(forceClose = false) {
+            const isOpening = forceClose ? false : !navLinks.classList.contains('active');
             
-            const isActive = navLinks.classList.contains('active');
-            newToggle.textContent = isActive ? '✕' : '☰';
-            newToggle.style.transform = isActive ? 'rotate(90deg)' : 'rotate(0deg)';
+            if (isOpening) {
+                navLinks.classList.add('active');
+                menuToggle.textContent = '✕';
+                menuToggle.style.transform = 'rotate(90deg)';
+                menuToggle.setAttribute('aria-expanded', 'true');
+                document.body.style.overflow = 'hidden'; // Prevent scroll when menu open
+            } else {
+                navLinks.classList.remove('active');
+                menuToggle.textContent = '☰';
+                menuToggle.style.transform = 'rotate(0deg)';
+                menuToggle.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMenu();
+        });
+
+        // Close menu when clicking links (important for anchors/UX)
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => toggleMenu(true));
         });
 
         // Close menu when clicking outside
         document.addEventListener('click', (e) => {
             if (navLinks.classList.contains('active')) {
-                if (!navLinks.contains(e.target) && !newToggle.contains(e.target)) {
-                    navLinks.classList.remove('active');
-                    newToggle.textContent = '☰';
-                    newToggle.style.transform = 'rotate(0deg)';
+                if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) {
+                    toggleMenu(true);
                 }
             }
         });
 
-        // Prevent clicks inside navLinks from closing the menu
-        navLinks.addEventListener('click', (e) => {
-            e.stopPropagation();
+        // ESC key support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+                toggleMenu(true);
+            }
         });
-    } else {
-        console.warn('Navbar elements not found:', { menuToggle, navLinks });
     }
 });
-

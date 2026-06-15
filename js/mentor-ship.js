@@ -5,16 +5,7 @@ const mentorData = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  const menuToggle = document.getElementById("menuToggle");
-  const navLinks = document.getElementById("navLinks");
-
-  if (menuToggle && navLinks) {
-    menuToggle.addEventListener("click", () => {
-      navLinks.classList.toggle("active");
-      menuToggle.setAttribute("aria-expanded", navLinks.classList.contains("active"));
-      menuToggle.textContent = navLinks.classList.contains("active") ? "✕" : "☰";
-    });
-  }
+  // Menu toggle logic moved to global nav-active.js
 
   // Populate Mentees
   const menteesGrid = document.getElementById("mentees-grid");
