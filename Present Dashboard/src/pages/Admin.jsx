@@ -616,8 +616,8 @@ const Admin = () => {
                               )}
                             </div>
                             <div>
-                              <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{u.name}</p>
-                              <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{u.email}</p>
+                              <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{u.name || u.first_name || u.username}</p>
+                              <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>@{u.username} • {u.email}</p>
                             </div>
                           </div>
                           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -655,8 +655,8 @@ const Admin = () => {
                               )}
                             </div>
                             <div>
-                              <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{u.name}</p>
-                              <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{u.email}</p>
+                              <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{u.name || u.first_name || u.username}</p>
+                              <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>@{u.username} • {u.email}</p>
                             </div>
                           </div>
                           <button onClick={() => { updateUserStatus(u.id, 'active'); refresh(); }} style={{ fontSize: '10px', fontWeight: 800, padding: '6px 12px', borderRadius: '8px', border: 'none', background: 'var(--accent-gradient)', color: 'white', cursor: 'pointer' }}>Approve</button>
@@ -1213,8 +1213,8 @@ const Admin = () => {
                       )}
                     </div>
                     <div>
-                      <p style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '14px' }}>{u.name}</p>
-                      <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{u.email}</p>
+                      <p style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '14px' }}>{u.name || u.first_name || u.username}</p>
+                      <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>@{u.username} • {u.email}</p>
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
