@@ -10,7 +10,7 @@ export default async (req, res) => {
     
     try {
         // High-Fidelity Table Governance
-        await sql(`
+        await sql`
             CREATE TABLE IF NOT EXISTS profiles (
                 id TEXT PRIMARY KEY,
                 email TEXT UNIQUE NOT NULL,
@@ -20,17 +20,17 @@ export default async (req, res) => {
                 username TEXT UNIQUE,
                 password TEXT NOT NULL,
                 is_admin BOOLEAN DEFAULT FALSE,
-                status TEXT DEFAULT 'active',
+                status TEXT DEFAULT 'pending',
                 joined_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             )
-        `);
+        `;
 
         const id = `user_${Date.now()}`;
         const name = `${firstName} ${lastName}`;
 
         await sql`
             INSERT INTO profiles (id, email, first_name, last_name, name, username, password, is_admin, status, joined_at)
-            VALUES (${id}, ${email}, ${firstName}, ${lastName}, ${name}, ${username}, ${password}, false, 'active', ${new Date().toISOString()})
+            VALUES (${id}, ${email}, ${firstName}, ${lastName}, ${name}, ${username}, ${password}, false, 'pending', ${new Date().toISOString()})
         `;
 
         res.status(200).json({ success: true, message: '🏆 Welcome to the Nexus! Profile activated.' });

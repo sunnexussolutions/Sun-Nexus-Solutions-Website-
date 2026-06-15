@@ -20,7 +20,7 @@ export default async (req, res) => {
                 username TEXT UNIQUE,
                 password TEXT NOT NULL,
                 is_admin BOOLEAN DEFAULT FALSE,
-                status TEXT DEFAULT 'active',
+                status TEXT DEFAULT 'pending',
                 joined_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             )
         `;
@@ -38,6 +38,9 @@ export default async (req, res) => {
         if (cloud && cloud.length > 0) {
             const found = cloud[0];
             if (found.password === password) {
+                if (found.status === 'pending') {
+                    return res.status(403).json({ success: false, message: 'Your account is pending admin approval.' });
+                }
                 return res.status(200).json({ 
                     success: true, 
                     user: { 
