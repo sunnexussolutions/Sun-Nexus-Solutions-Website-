@@ -108,6 +108,9 @@ app.post('/api/login', async (req, res) => {
         if (cloud && cloud.length > 0) {
             const found = cloud[0];
             if (found.password === password) {
+                if (found.status === 'pending') {
+                    return res.status(403).json({ success: false, message: 'Your account is pending admin approval.' });
+                }
                 return res.json({ 
                     success: true, 
                     user: { 
@@ -137,7 +140,7 @@ app.post('/api/register', async (req, res) => {
     try {
         await sql`
             INSERT INTO profiles (id, email, first_name, last_name, name, username, password, is_admin, status, joined_at)
-            VALUES (${id}, ${email}, ${firstName}, ${lastName}, ${name}, ${username}, ${password}, false, 'active', ${new Date().toISOString()})
+            VALUES (${id}, ${email}, ${firstName}, ${lastName}, ${name}, ${username}, ${password}, false, 'pending', ${new Date().toISOString()})
         `;
         
         console.log(`✅ REGISTRATION_SUCCESS: ${email}`);
