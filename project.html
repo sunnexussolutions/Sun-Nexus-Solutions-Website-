@@ -62,11 +62,24 @@
   <div class="container">
     <div class="row">
       <div class="banner-section animate_animated animate_fadeInDown col-12" id="bannerSection">
-        <h1 class="banner-heading animate_animated animate_bounceIn gradient-text">COMPLETED PROJECTS</h1>
+        <h1 class="banner-heading animate_animated animate_bounceIn">
+          <span class="text-cyan-glow">COMPLETED</span> <span class="gradient-text-purple">PROJECTS</span>
+        </h1>
+        <div class="banner-cube-divider">
+          <span class="divider-line-left"></span>
+          <div class="cube-icon-wrapper">
+            <svg class="cube-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00f2fe" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          </div>
+          <span class="divider-line-right"></span>
+        </div>
       </div>
 
-      <div class="col-12" style="margin: 40px 0 20px 0;">
-        <h2 class="level-heading highlight-advanced-header">Advanced Level</h2>
+      <div class="col-12">
+        <div class="section-divider-header">
+          <span class="header-line"></span>
+          <h2 class="level-heading highlight-advanced-header">Advanced Level</h2>
+          <span class="header-line"></span>
+        </div>
       </div>
       <div class="projects animate_animated animate_zoomIn highlight-advanced-section" id="advancedProjectsContainer">
         <!-- Advanced project cards will be dynamically inserted here -->
@@ -76,7 +89,10 @@
       <div class="col-12">
         <div class="project-accordion" id="accordion-beginner">
           <div class="accordion-header" onclick="toggleAccordion('beginner')">
-            <h2 class="level-heading">Beginner Level</h2>
+            <div class="accordion-title-wrap">
+              <span class="accordion-star-icon">☆</span>
+              <h2 class="level-heading accordion-heading">Beginner Level</h2>
+            </div>
             <span class="chevron" id="chevron-beginner">▼</span>
           </div>
           <div class="accordion-content" id="content-beginner">
@@ -88,10 +104,13 @@
       </div>
 
       <!-- Ongoing Projects Accordion -->
-      <div class="col-12" style="margin-top: 40px;">
+      <div class="col-12">
         <div class="project-accordion" id="accordion-ongoing">
           <div class="accordion-header" onclick="toggleAccordion('ongoing')">
-            <h2 class="level-heading" style="background: var(--gradient-indigo); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Ongoing Projects</h2>
+            <div class="accordion-title-wrap">
+              <span class="accordion-folder-icon">🗂️</span>
+              <h2 class="level-heading accordion-heading">Ongoing Projects</h2>
+            </div>
             <span class="chevron" id="chevron-ongoing">▼</span>
           </div>
           <div class="accordion-content" id="content-ongoing">
@@ -101,42 +120,74 @@
           </div>
         </div>
       </div>
-      <div class="domains animate_animated animate_slideInLeft">
-        <div class="header-section animate_animated animate_fadeInUp col-12">
-          <h1>Need a Project? Let's Build Something Amazing!</h1>
-          <p>Turn your ideas into reality with Sun Nexus Solutions. Whether it's AI, IoT, automation, or web apps, we've
-            got you covered!</p>
-        </div>
-        <div class="card">
-          <h3>AI & Machine Learning</h3>
-          <p>Predictive models, deep learning, NLP & more.</p>
-        </div>
-        <div class="card">
-          <h3>Web & App Development</h3>
-          <p>Full-stack websites & mobile apps.</p>
-        </div>
-        <div class="card">
-          <h3>Data Science & Analytics</h3>
-          <p>Data processing, analytics & insights.</p>
-        </div>
-        <div class="card">
-          <h3>Cyber Security & Cloud</h3>
-          <p>Secure systems & scalable cloud architecture.</p>
-        </div>
-      </div>
-      <div class="how-it-works animate_animated animate_slideInRight">
-        <h2>How It Works:</h2>
-        <div class="card">Step 1
-          <p>Share your idea or problem statement</p>
-        </div>
-        <div class="card">Step 2
-          <p>We analyze feasibility & provide a project plan</p>
-        </div>
-        <div class="card">Step 3
-          <p>Development with regular updates & feedback</p>
-        </div>
-        <div class="card">Step 4
-          <p>Project completion with deployment & documentation</p>
+
+      <!-- Need a Project? Let's Build Something Amazing! Section -->
+      <div class="col-12">
+        <div class="need-project-matrix-card">
+          <div class="need-project-header">
+            <h2>Need a Project? Let's Build<br>Something Amazing!</h2>
+            <p>Turn your ideas into reality with Sun Nexus Solutions. Whether it's AI, IoT, automation, or web apps, we've got you covered!</p>
+          </div>
+
+          <div class="domains-grid">
+            <div class="domain-card">
+              <div class="domain-icon-box box-purple">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a8 8 0 0 0-8 8c0 3.2 1.8 5.9 4.5 7.2V19a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2v-1.8c2.7-1.3 4.5-4 4.5-7.2a8 8 0 0 0-8-8z"></path><path d="M9 10h.01"></path><path d="M15 10h.01"></path><path d="M9.5 13a3.5 3.5 0 0 0 5 0"></path></svg>
+              </div>
+              <h3>AI & Machine Learning</h3>
+              <p>Predictive models, deep learning, NLP & more.</p>
+            </div>
+            <div class="domain-card">
+              <div class="domain-icon-box box-cyan">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+              </div>
+              <h3>Web & App Development</h3>
+              <p>Full-stack websites & mobile apps.</p>
+            </div>
+            <div class="domain-card">
+              <div class="domain-icon-box box-green">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              </div>
+              <h3>Data Science & Analytics</h3>
+              <p>Data processing, analytics & insights.</p>
+            </div>
+            <div class="domain-card">
+              <div class="domain-icon-box box-orange">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              </div>
+              <h3>Cyber Security & Cloud</h3>
+              <p>Secure systems & scalable cloud architecture.</p>
+            </div>
+          </div>
+
+          <div class="how-it-works-section">
+            <h3 class="how-title">How It Works:</h3>
+            <div class="steps-timeline-grid">
+              <div class="step-card">
+                <div class="step-number num-cyan">1</div>
+                <h4 class="step-title">Step 1</h4>
+                <p class="step-desc">Share your idea or problem statement</p>
+              </div>
+              <div class="step-line"></div>
+              <div class="step-card">
+                <div class="step-number num-purple">2</div>
+                <h4 class="step-title">Step 2</h4>
+                <p class="step-desc">We analyze feasibility & provide a project plan</p>
+              </div>
+              <div class="step-line"></div>
+              <div class="step-card">
+                <div class="step-number num-cyan">3</div>
+                <h4 class="step-title">Step 3</h4>
+                <p class="step-desc">Development with regular updates & feedback</p>
+              </div>
+              <div class="step-line"></div>
+              <div class="step-card">
+                <div class="step-number num-purple">4</div>
+                <h4 class="step-title">Step 4</h4>
+                <p class="step-desc">Project completion with deployment & documentation</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -157,22 +208,30 @@
     </div>
   </div>
   
-  <!-- Join Nexus CTA -->
+  <!-- Ready to Forge the Future CTA Section -->
   <section class="nexus-cta-section">
     <div class="nexus-cta-card">
       <div class="cta-content">
-        <h2 class="cta-title">Ready to Forge the Future?</h2>
+        <h2 class="cta-title">Ready to Forge <span class="text-cyan">the Future?</span></h2>
         <p class="cta-text">
           Join the Nexus ecosystem today. Whether you're a student looking to learn or a professional looking to innovate, there's a place for you here. Work with us, build with us, and grow with us.
         </p>
         <div class="cta-actions">
-          <a href="contact.html" class="cta-btn">Join Nexus</a>
+          <a href="contact.html" class="cta-btn-nexus">
+            <svg class="cta-btn-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path></svg>
+            <span class="cta-btn-text">Join Nexus</span>
+            <svg class="cta-btn-arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </a>
         </div>
       </div>
       <div class="cta-visual">
-        <div class="cta-glow"></div>
-        <div class="cta-scanner"></div>
-        <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" alt="Nexus Logo" style="width: 120px; border-radius: 18px; filter: drop-shadow(0 0 20px var(--color-primary-glow)); position: relative; z-index: 2;">
+        <div class="cta-visual-brain">
+          <div class="brain-ring-outer"></div>
+          <div class="brain-ring-inner"></div>
+          <div class="brain-icon-glow">
+            <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" alt="Sun Nexus Logo" class="brain-3d-logo">
+          </div>
+        </div>
       </div>
     </div>
   </section>

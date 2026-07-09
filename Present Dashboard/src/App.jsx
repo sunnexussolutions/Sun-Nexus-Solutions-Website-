@@ -31,7 +31,7 @@ function App() {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} activePage={activePage} setActivePage={setActivePage} />
       <div className="flex flex-col lg-ml-280 min-h-screen">
         <Navbar toggleSidebar={toggleSidebar} setActivePage={setActivePage} />
-        <main className="flex-1 flex flex-col p-6 md:p-8" style={{ marginTop: '5rem' }}>
+        <main className="flex-1 flex flex-col p-6 md:p-10 lg:p-12" style={{ marginTop: '5rem' }}>
           {activePage === 'dashboard'  && <Dashboard />}
           {activePage === 'learning'   && <Learning />}
           {activePage === 'domains'    && <Domains />}

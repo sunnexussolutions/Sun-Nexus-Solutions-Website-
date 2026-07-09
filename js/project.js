@@ -1,16 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   
-  const menuToggle = document.getElementById("menuToggle");
-  const navLinks = document.getElementById("navLinks");
-
-  if (menuToggle && navLinks) {
-    menuToggle.addEventListener("click", () => {
-      navLinks.classList.toggle("active");
-      const isExpanded = navLinks.classList.contains("active");
-      menuToggle.setAttribute("aria-expanded", isExpanded);
-      menuToggle.textContent = isExpanded ? "✕" : "☰"; 
-    });
-  }
+  // Mobile navigation is handled globally by js/nav-active.js
 
   const observerOptions = {
     root: null,
@@ -324,15 +314,40 @@ document.addEventListener("DOMContentLoaded", () => {
   // ------------------ Populate ADVANCED PROJECTS ------------------
   const advancedContainer = document.getElementById("advancedProjectsContainer");
   if (advancedContainer) {
+    const projectIcons = {
+      "Sun Nexus Solutions Website": { color: "box-cyan", svg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>' },
+      "Lab Manage System": { color: "box-green", svg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>' },
+      "Whatsapp Chatbot": { color: "box-purple", svg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' },
+      "Exam invigilation management system": { color: "box-purple", svg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>' },
+      "AI assignment evaluator": { color: "box-cyan", svg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line></svg>' },
+      "Startup Management System": { color: "box-orange", svg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path></svg>' },
+      "Meeting Summarizer": { color: "box-cyan", svg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>' },
+      "Smart Attendance System": { color: "box-cyan", svg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="m9 16 2 2 4-4"></path></svg>' },
+      "Automated Timetable Management System": { color: "box-purple", svg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>' },
+      "Crowd-Sheild": { color: "box-cyan", svg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>' },
+      "AI-Powered Resume Analyzer": { color: "box-orange", svg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>' }
+    };
+
     Object.keys(advancedProjectData).forEach((projectName, index) => {
       const project = advancedProjectData[projectName];
+      const iconInfo = projectIcons[projectName] || { color: "box-cyan", svg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>' };
+      const displayTitle = projectName === "Crowd-Sheild" ? "Crowd-Shield" : projectName;
+      
       const card = document.createElement("div");
-      card.className = "card";
-      card.style.animationDelay = `${0.2 * (index + 1)}s`;
+      card.className = "card advanced-project-card";
+      card.style.animationDelay = `${0.1 * (index + 1)}s`;
       card.innerHTML = `
-        <h3>${projectName}</h3>
-        <p>${project.summary}</p>
-        <a href="#" class="view-details-btn" data-project="${projectName}" data-type="advanced">View Details</a>
+        <div class="project-ribbon"><span>ADVANCED</span></div>
+        <div class="advanced-card-header">
+          <div class="project-icon-box ${iconInfo.color}">
+            ${iconInfo.svg}
+          </div>
+          <h3>${displayTitle}</h3>
+        </div>
+        <p class="project-summary">${project.summary}</p>
+        <div class="card-btn-wrap">
+          <a href="#" class="view-details-btn" data-project="${projectName}" data-type="advanced">VIEW DETAILS →</a>
+        </div>
       `;
       advancedContainer.appendChild(card);
     });

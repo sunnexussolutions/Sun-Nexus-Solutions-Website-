@@ -10,28 +10,37 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('nexus_user');
-    if (savedUser) {
-      const u = JSON.parse(savedUser);
-      setUser(u);
-      setIsAuthenticated(true);
-      refreshProfile(u.id);
+    if (savedUser && savedUser !== 'undefined' && savedUser !== 'null') {
+      try {
+        const u = JSON.parse(savedUser);
+        setUser(u);
+        setIsAuthenticated(true);
+        refreshProfile(u.id);
+      } catch (err) {
+        console.error("Failed to parse nexus_user from localStorage:", err);
+        localStorage.removeItem('nexus_user');
+      }
     }
     setLoading(false);
   }, []);
 
   const refreshProfile = async (id) => {
-    const cloud = await query('SELECT * FROM profiles WHERE id = $1', [id]);
-    if (cloud && cloud.length > 0) {
-      const u = cloud[0];
-      const updated = { 
-        ...u, 
-        firstName: u.first_name, 
-        lastName: u.last_name, 
-        isAdmin: u.is_admin,
-        joinedAt: u.joined_at
-      };
-      setUser(updated);
-      localStorage.setItem('nexus_user', JSON.stringify(updated));
+    try {
+      const cloud = await query('SELECT * FROM profiles WHERE id = $1', [id]);
+      if (cloud && cloud.length > 0) {
+        const u = cloud[0];
+        const updated = { 
+          ...u, 
+          firstName: u.first_name, 
+          lastName: u.last_name, 
+          isAdmin: u.is_admin,
+          joinedAt: u.joined_at
+        };
+        setUser(updated);
+        localStorage.setItem('nexus_user', JSON.stringify(updated));
+      }
+    } catch (err) {
+      console.warn("Profile refresh failed or offline:", err.message);
     }
   };
 

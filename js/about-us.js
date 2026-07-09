@@ -1,20 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
  
-  const menuToggle = document.getElementById("menuToggle");
-  const navLinks = document.getElementById("navLinks");
-
-  if (menuToggle && navLinks) {
-    menuToggle.addEventListener("click", () => {
-      navLinks.classList.toggle("active");
-      const isExpanded = navLinks.classList.contains("active");
-      menuToggle.setAttribute("aria-expanded", isExpanded);
-      menuToggle.textContent = isExpanded ? "✕" : "☰"; 
-    });
-
-   
+  // Mobile navigation is handled globally by js/nav-active.js
+  if (typeof $ !== 'undefined' && $.fn.dropdown) {
     $('.dropdown-toggle').dropdown();
-  } else {
-    console.error("Menu toggle or nav links not found in the DOM.");
   }
 
   

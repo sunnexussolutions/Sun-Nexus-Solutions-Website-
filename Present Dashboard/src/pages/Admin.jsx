@@ -13,7 +13,8 @@ import {
   getDiscussions, addDiscussion, deleteDiscussion,
   getNotifications, addNotification, deleteNotification,
   getProjects, addProject, updateProject, deleteProject,
-  getHiringSubmissions, deleteHiringSubmission, getDomains
+  getHiringSubmissions, deleteHiringSubmission, getDomains,
+  getHomeContent, saveHomeContent, DEFAULT_HOME_CONTENT
 } from '../store/dataStore';
 import { 
   extractTextFromPDF, extractTextFromWord, extractQuestionsFromExcel, parseMCQsFromText,
@@ -26,6 +27,7 @@ import UnderProgress from '../components/UnderProgress';
 
 const TABS = [
   { id: 'overview',      label: 'Overview',      icon: BarChart3 },
+  { id: 'home_content',  label: 'Home Page',     icon: Palette },
   { id: 'assessments',   label: 'Assessments',   icon: BrainCircuit },
   { id: 'domains',       label: 'Domains',       icon: Layers },
   { id: 'projects',      label: 'Projects',      icon: Rocket },
@@ -185,6 +187,150 @@ const SubDomainBuilder = ({ subs, setSubs, inputStyle }) => {
   );
 };
 
+// ── Dynamic Calendar ─────────────────────────────────────────────────────────
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_NAMES   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+const DynamicCalendar = ({ assessments = [], results = [] }) => {
+  const today = new Date();
+  const [viewDate, setViewDate] = React.useState({ year: today.getFullYear(), month: today.getMonth() });
+  const [selectedDay, setSelectedDay] = React.useState(null);
+
+  // Build event map: { 'YYYY-MM-DD': [{label, color, type}] }
+  const eventMap = React.useMemo(() => {
+    const map = {};
+    const push = (date, event) => {
+      const key = date.toISOString().slice(0, 10);
+      if (!map[key]) map[key] = [];
+      map[key].push(event);
+    };
+    assessments.forEach(a => {
+      if (a.createdAt) push(new Date(a.createdAt), { label: `📘 ${a.topic} (Published)`, color: '#6366f1', type: 'assessment' });
+      if (a.unlockTime) push(new Date(a.unlockTime), { label: `🔓 ${a.topic} (Unlocks)`, color: '#06b6d4', type: 'unlock' });
+    });
+    results.forEach(r => {
+      if (r.submittedAt) push(new Date(r.submittedAt), { label: `✅ Submission by ${r.userEmail || r.userName || 'User'}`, color: '#22c55e', type: 'submission' });
+    });
+    return map;
+  }, [assessments, results]);
+
+  const { year, month } = viewDate;
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  const prevMonth = () => setViewDate(v => v.month === 0 ? { year: v.year - 1, month: 11 } : { year: v.year, month: v.month - 1 });
+  const nextMonth = () => setViewDate(v => v.month === 11 ? { year: v.year + 1, month: 0 } : { year: v.year, month: v.month + 1 });
+  const getKey = (d) => `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  const isToday = (d) => today.getDate() === d && today.getMonth() === month && today.getFullYear() === year;
+  const isSelected = (d) => selectedDay === getKey(d);
+  const selectedEvents = selectedDay ? (eventMap[selectedDay] || []) : [];
+
+  return (
+    <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '1.5rem', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(99,102,241,0.12)', color: '#6366f1' }}><Calendar size={18} /></div>
+          <div>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>Activity Calendar</h3>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Live from platform data</p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button onClick={prevMonth} style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '6px 10px', cursor: 'pointer', color: 'var(--text-primary)', fontWeight: 700, fontSize: '14px', lineHeight: 1 }}>‹</button>
+          <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', minWidth: '130px', textAlign: 'center' }}>{MONTH_NAMES[month]} {year}</span>
+          <button onClick={nextMonth} style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '6px 10px', cursor: 'pointer', color: 'var(--text-primary)', fontWeight: 700, fontSize: '14px', lineHeight: 1 }}>›</button>
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+        {[
+          { color: '#6366f1', label: 'Assessment Published' },
+          { color: '#06b6d4', label: 'Assessment Unlocks' },
+          { color: '#22c55e', label: 'Quiz Submission' },
+        ].map(l => (
+          <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: l.color, flexShrink: 0 }} />
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>{l.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
+        {DAY_NAMES.map(d => (
+          <div key={d} style={{ textAlign: 'center', fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '6px 0' }}>{d}</div>
+        ))}
+        {cells.map((d, i) => {
+          if (!d) return <div key={`empty-${i}`} />;
+          const key = getKey(d);
+          const events = eventMap[key] || [];
+          const uniqueColors = [...new Set(events.map(e => e.color))];
+          const today_ = isToday(d);
+          const sel = isSelected(d);
+          return (
+            <button
+              key={key}
+              onClick={() => setSelectedDay(v => v === key ? null : key)}
+              style={{
+                position: 'relative',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                padding: '6px 2px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+                background: sel ? 'rgba(99,102,241,0.15)' : today_ ? 'rgba(99,102,241,0.08)' : 'transparent',
+                outline: sel ? '2px solid #6366f1' : today_ ? '2px solid rgba(99,102,241,0.4)' : 'none',
+                transition: 'all 0.15s',
+                minHeight: '44px',
+              }}
+              onMouseEnter={e => { if (!sel) e.currentTarget.style.background = 'var(--bg-tertiary)'; }}
+              onMouseLeave={e => { if (!sel) e.currentTarget.style.background = today_ ? 'rgba(99,102,241,0.08)' : 'transparent'; }}
+            >
+              <span style={{ fontSize: '13px', fontWeight: today_ || sel ? 900 : 600, color: sel ? '#6366f1' : today_ ? 'var(--accent-primary)' : 'var(--text-primary)' }}>{d}</span>
+              {uniqueColors.length > 0 && (
+                <div style={{ display: 'flex', gap: '2px', marginTop: '3px' }}>
+                  {uniqueColors.slice(0, 3).map((c, ci) => (
+                    <div key={ci} style={{ width: '5px', height: '5px', borderRadius: '50%', background: c }} />
+                  ))}
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Selected Day Events */}
+      {selectedDay && (
+        <motion.div
+          key={selectedDay}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          style={{ background: 'var(--bg-tertiary)', borderRadius: '12px', padding: '14px 16px', border: '1px solid var(--border-subtle)' }}
+        >
+          <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
+            {new Date(selectedDay + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+          </p>
+          {selectedEvents.length === 0 ? (
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No events on this day.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {selectedEvents.map((ev, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', borderRadius: '8px', background: `${ev.color}10`, border: `1px solid ${ev.color}25` }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: ev.color, flexShrink: 0 }} />
+                  <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{ev.label}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
 // ── Main Admin Component ──────────────────────────────────────────────────────
 const Admin = () => {
   const { user } = useAuth();
@@ -202,6 +348,7 @@ const Admin = () => {
   const [submissions, setSubmissions] = useState([]);
   const [projects, setProjects] = useState([]);
   const [domains, setDomains] = useState([]);
+  const [homeContent, setHomeContent] = useState(DEFAULT_HOME_CONTENT);
   const [loading, setLoading] = useState(false);
   const [overviewDetail, setOverviewDetail] = useState(null);
   const [expandedUser, setExpandedUser] = useState(null);
@@ -238,19 +385,28 @@ const Admin = () => {
   const refresh = React.useCallback(async () => {
     setLoading(true);
     try {
-      const [a, u, r, d, n, s, p, doms] = await Promise.all([
+      const [a, u, r, d, n, s, p, doms, hc] = await Promise.all([
         getAssessments(), getUsers(), getResults(), 
         getDiscussions(), getNotifications(), getHiringSubmissions(),
-        getProjects(), getDomains()
+        getProjects(), getDomains(), getHomeContent()
       ]);
       setAssessments(a); setUsers(u); setResults(r); 
       setDiscussions(d); setNotifications(n); setSubmissions(s);
-      setProjects(p); setDomains(doms);
+      setProjects(p); setDomains(doms); setHomeContent(hc);
     } catch (err) {
       console.error("Refresh error:", err);
     }
     setLoading(false);
   }, []);
+
+  const handleSaveHomeContent = async () => {
+    try {
+      await saveHomeContent(homeContent);
+      alert('✅ Home page content successfully saved and published!');
+    } catch (err) {
+      alert('❌ Error saving content: ' + err.message);
+    }
+  };
 
   useEffect(() => {
     refresh();
@@ -747,6 +903,254 @@ const Admin = () => {
             </div>
             <CollectivePerformanceGraph data={prepareCollectiveChartData(results, assessments)} height={300} />
           </div>
+
+          {/* Dynamic Calendar */}
+          <DynamicCalendar assessments={assessments} results={results} />
+        </div>
+      )}
+
+      {/* HOME PAGE CONTENT CMS */}
+      {tab === 'home_content' && (
+        <div className="flex flex-col gap-6">
+          <Card style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.1), rgba(6,182,212,0.1))', border: '1px solid rgba(0, 242, 254, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', padding: '1.5rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Palette className="text-cyan-400" /> Homepage CMS & Live Control Panel
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                Modify text, images, badges, and leadership members. Clicking save publishes instantly to <code>index.html</code>.
+              </p>
+            </div>
+            <button 
+              onClick={handleSaveHomeContent}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', border: 'none', fontWeight: 800, fontSize: '14px', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0, 242, 254, 0.4)', transition: 'transform 0.2s' }}
+            >
+              <Save size={18} /> Publish & Save Changes
+            </button>
+          </Card>
+
+          {/* Hero Section */}
+          <Card>
+            <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--accent-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Rocket size={18} /> Hero Section Configuration
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label style={labelStyle}>Main Title</label>
+                <input value={homeContent?.hero?.titleMain || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, titleMain: e.target.value } })} style={inputStyle} placeholder="Sun Nexus" />
+              </div>
+              <div>
+                <label style={labelStyle}>Gradient Highlight Word</label>
+                <input value={homeContent?.hero?.titleGradient || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, titleGradient: e.target.value } })} style={inputStyle} placeholder="Solutions" />
+              </div>
+              <div className="md:col-span-2">
+                <label style={labelStyle}>Subtitle</label>
+                <input value={homeContent?.hero?.subtitle || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, subtitle: e.target.value } })} style={inputStyle} />
+              </div>
+              <div className="md:col-span-2">
+                <label style={labelStyle}>Hero Description</label>
+                <textarea value={homeContent?.hero?.description || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, description: e.target.value } })} style={{ ...inputStyle, minHeight: '80px' }} />
+              </div>
+              <div>
+                <label style={labelStyle}>Explore Button Text</label>
+                <input value={homeContent?.hero?.exploreBtnText || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, exploreBtnText: e.target.value } })} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Explore Button Link URL</label>
+                <input value={homeContent?.hero?.exploreBtnLink || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, exploreBtnLink: e.target.value } })} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Join Community Button Text</label>
+                <input value={homeContent?.hero?.joinBtnText || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, joinBtnText: e.target.value } })} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Join Community Button Link URL</label>
+                <input value={homeContent?.hero?.joinBtnLink || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, joinBtnLink: e.target.value } })} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Badge 1 Number & Label (Active Students)</label>
+                <div className="flex gap-2">
+                  <input value={homeContent?.hero?.badge1Number || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, badge1Number: e.target.value } })} style={{ ...inputStyle, width: '40%' }} placeholder="10K+" />
+                  <input value={homeContent?.hero?.badge1Label || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, badge1Label: e.target.value } })} style={{ ...inputStyle, width: '60%' }} placeholder="Active Students" />
+                </div>
+              </div>
+              <div>
+                <label style={labelStyle}>Badge 2 Number & Label (Expert Mentors)</label>
+                <div className="flex gap-2">
+                  <input value={homeContent?.hero?.badge2Number || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, badge2Number: e.target.value } })} style={{ ...inputStyle, width: '40%' }} placeholder="200+" />
+                  <input value={homeContent?.hero?.badge2Label || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, badge2Label: e.target.value } })} style={{ ...inputStyle, width: '60%' }} placeholder="Expert Mentors" />
+                </div>
+              </div>
+              <div className="md:col-span-2">
+                <label style={labelStyle}>Hero Image URL (Primary / Fallback)</label>
+                <input value={homeContent?.hero?.image || ''} onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, image: e.target.value } })} style={inputStyle} />
+              </div>
+              <div className="md:col-span-2">
+                <label style={labelStyle}>Hero Carousel Image URLs (comma separated)</label>
+                <textarea 
+                  value={(homeContent?.hero?.carouselImages || []).join(', ')} 
+                  onChange={e => setHomeContent({ ...homeContent, hero: { ...homeContent.hero, carouselImages: e.target.value.split(',').map(s => s.trim()).filter(Boolean) } })} 
+                  style={{ ...inputStyle, minHeight: '60px' }} 
+                  placeholder="https://...img1.jpg, https://...img2.jpg"
+                />
+              </div>
+            </div>
+          </Card>
+
+          {/* Stats Grid */}
+          <Card>
+            <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--accent-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <TrendingUp size={18} /> Hero Stats Row
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(homeContent?.stats || []).map((stat, idx) => (
+                <div key={idx} style={{ padding: '12px', background: 'var(--bg-tertiary)', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
+                  <label style={{ ...labelStyle, marginBottom: '8px' }}>Stat Box {idx + 1}</label>
+                  <div className="flex gap-2 mb-2">
+                    <input value={stat.value} onChange={e => {
+                      const newStats = [...(homeContent.stats || [])];
+                      newStats[idx] = { ...stat, value: e.target.value };
+                      setHomeContent({ ...homeContent, stats: newStats });
+                    }} placeholder="50+" style={{ ...inputStyle, width: '40%', fontWeight: '800' }} />
+                    <input value={stat.label} onChange={e => {
+                      const newStats = [...(homeContent.stats || [])];
+                      newStats[idx] = { ...stat, label: e.target.value };
+                      setHomeContent({ ...homeContent, stats: newStats });
+                    }} placeholder="Domains" style={{ ...inputStyle, width: '60%' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Core Values */}
+          <Card>
+            <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--accent-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ShieldCheck size={18} /> Core Values Section
+            </h4>
+            <div className="grid grid-cols-1 gap-4 mb-4">
+              <div>
+                <label style={labelStyle}>Section Title</label>
+                <input value={homeContent?.values?.title || ''} onChange={e => setHomeContent({ ...homeContent, values: { ...homeContent.values, title: e.target.value } })} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Section Subtitle</label>
+                <input value={homeContent?.values?.subtitle || ''} onChange={e => setHomeContent({ ...homeContent, values: { ...homeContent.values, subtitle: e.target.value } })} style={inputStyle} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(homeContent?.values?.items || []).map((item, idx) => (
+                <div key={idx} style={{ padding: '12px', background: 'var(--bg-tertiary)', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
+                  <label style={{ ...labelStyle, marginBottom: '8px' }}>Value Card {idx + 1}</label>
+                  <input value={item.title} onChange={e => {
+                    const newItems = [...(homeContent.values.items || [])];
+                    newItems[idx] = { ...item, title: e.target.value };
+                    setHomeContent({ ...homeContent, values: { ...homeContent.values, items: newItems } });
+                  }} placeholder="Title" style={{ ...inputStyle, marginBottom: '6px', fontWeight: '800' }} />
+                  <textarea value={item.desc} onChange={e => {
+                    const newItems = [...(homeContent.values.items || [])];
+                    newItems[idx] = { ...item, desc: e.target.value };
+                    setHomeContent({ ...homeContent, values: { ...homeContent.values, items: newItems } });
+                  }} placeholder="Description" style={{ ...inputStyle, minHeight: '60px' }} />
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Leadership Team */}
+          <Card>
+            <div className="flex justify-between items-center mb-4">
+              <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Users size={18} /> Leadership Team Members
+              </h4>
+              <button
+                onClick={() => {
+                  const newMember = { id: String(Date.now()), name: 'New Leader', role: 'Role / Title', image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80', linkedin: '#', twitter: '#', facebook: '#' };
+                  setHomeContent({ ...homeContent, leadership: { ...homeContent.leadership, members: [...(homeContent.leadership?.members || []), newMember] } });
+                }}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 800, fontSize: '12px', cursor: 'pointer' }}
+              >
+                <Plus size={14} /> Add Leader
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(homeContent?.leadership?.members || []).map((m, idx) => (
+                <div key={m.id || idx} style={{ padding: '16px', background: 'var(--bg-tertiary)', borderRadius: '12px', border: '1px solid var(--border-subtle)', position: 'relative' }}>
+                  <button
+                    onClick={() => {
+                      if (confirm(`Remove ${m.name} from leadership?`)) {
+                        const updated = (homeContent.leadership?.members || []).filter((_, i) => i !== idx);
+                        setHomeContent({ ...homeContent, leadership: { ...homeContent.leadership, members: updated } });
+                      }
+                    }}
+                    style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'none', borderRadius: '8px', padding: '6px', cursor: 'pointer' }}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                  <div className="flex gap-4 mb-3 items-center">
+                    <img src={m.image} alt={m.name} style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
+                    <div style={{ flex: 1 }}>
+                      <input value={m.name} onChange={e => {
+                        const updated = [...(homeContent.leadership?.members || [])];
+                        updated[idx] = { ...m, name: e.target.value };
+                        setHomeContent({ ...homeContent, leadership: { ...homeContent.leadership, members: updated } });
+                      }} style={{ ...inputStyle, fontWeight: '800', marginBottom: '4px' }} placeholder="Name" />
+                      <input value={m.role} onChange={e => {
+                        const updated = [...(homeContent.leadership?.members || [])];
+                        updated[idx] = { ...m, role: e.target.value };
+                        setHomeContent({ ...homeContent, leadership: { ...homeContent.leadership, members: updated } });
+                      }} style={{ ...inputStyle, fontSize: '12px' }} placeholder="Role" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                    <input value={m.image} onChange={e => {
+                      const updated = [...(homeContent.leadership?.members || [])];
+                      updated[idx] = { ...m, image: e.target.value };
+                      setHomeContent({ ...homeContent, leadership: { ...homeContent.leadership, members: updated } });
+                    }} style={{ ...inputStyle, fontSize: '12px' }} placeholder="Image URL" />
+                    <input value={m.linkedin} onChange={e => {
+                      const updated = [...(homeContent.leadership?.members || [])];
+                      updated[idx] = { ...m, linkedin: e.target.value };
+                      setHomeContent({ ...homeContent, leadership: { ...homeContent.leadership, members: updated } });
+                    }} style={{ ...inputStyle, fontSize: '12px' }} placeholder="LinkedIn URL" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Log Book & Why Nexus Section */}
+          <Card>
+            <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--accent-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FileText size={18} /> Logbook & Why Nexus Configuration
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label style={labelStyle}>Logbook Title</label>
+                <input value={homeContent?.logbook?.title || ''} onChange={e => setHomeContent({ ...homeContent, logbook: { ...homeContent.logbook, title: e.target.value } })} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Logbook Button Text</label>
+                <input value={homeContent?.logbook?.btnText || ''} onChange={e => setHomeContent({ ...homeContent, logbook: { ...homeContent.logbook, btnText: e.target.value } })} style={inputStyle} />
+              </div>
+              <div className="md:col-span-2">
+                <label style={labelStyle}>Logbook Description</label>
+                <textarea value={homeContent?.logbook?.description || ''} onChange={e => setHomeContent({ ...homeContent, logbook: { ...homeContent.logbook, description: e.target.value } })} style={{ ...inputStyle, minHeight: '60px' }} />
+              </div>
+              <div className="md:col-span-2">
+                <label style={labelStyle}>Logbook Button URL</label>
+                <input value={homeContent?.logbook?.btnLink || ''} onChange={e => setHomeContent({ ...homeContent, logbook: { ...homeContent.logbook, btnLink: e.target.value } })} style={inputStyle} />
+              </div>
+              <div className="md:col-span-2 border-t border-white/10 pt-4 mt-2">
+                <label style={labelStyle}>Why Nexus Section Title</label>
+                <input value={homeContent?.whyNexus?.title || ''} onChange={e => setHomeContent({ ...homeContent, whyNexus: { ...homeContent.whyNexus, title: e.target.value } })} style={inputStyle} />
+              </div>
+              <div className="md:col-span-2">
+                <label style={labelStyle}>Why Nexus Subtext</label>
+                <textarea value={homeContent?.whyNexus?.subtext || ''} onChange={e => setHomeContent({ ...homeContent, whyNexus: { ...homeContent.whyNexus, subtext: e.target.value } })} style={{ ...inputStyle, minHeight: '60px' }} />
+              </div>
+            </div>
+          </Card>
         </div>
       )}
 

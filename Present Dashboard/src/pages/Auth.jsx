@@ -13,8 +13,8 @@ const FEATURES = [
 
 const brandingStyles = {
   logo: {
-    width: '56px',
-    height: '56px',
+    width: '64px',
+    height: '64px',
     borderRadius: '16px',
     background: 'var(--accent-gradient)',
     display: 'flex',
@@ -146,10 +146,10 @@ export default function Auth() {
       <div className="auth-container">
         
         {/* LEFT: Branding & Vision */}
-        <div className="auth-branding-panel" style={{ flex: 1.2, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '5vw' }}>
+        <div className="auth-branding-panel" style={{ flex: 1.2, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '3.5vh 6vw' }}>
           <motion.div 
             initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
-            style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '5rem' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '1.5rem' }}
           >
             <div
               className="flex items-center justify-center relative"
@@ -177,17 +177,17 @@ export default function Auth() {
             initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
           >
-            <h2 style={{ fontSize: 'clamp(3rem, 6vw, 5rem)', fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.04em', marginBottom: '2rem' }}>
+            <h2 style={{ fontSize: 'clamp(3rem, 5vw, 5rem)', fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.04em', marginBottom: '1rem' }}>
               Think.<br />
               <span style={{ background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Innovate.</span><br />
               Master.
             </h2>
-            <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', maxWidth: '32rem', lineHeight: 1.6, marginBottom: '4rem' }}>
+            <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', maxWidth: '32rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
               The definitive ecosystem for future-ready engineers. Elevate your cognitive potential with the Sun Nexus flagship platform.
             </p>
           </motion.div>
 
-          <div className="auth-features-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', maxWidth: '35rem' }}>
+          <div className="auth-features-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', maxWidth: '35rem' }}>
             {FEATURES.map((f, i) => (
               <motion.div 
                 key={i} 
@@ -200,7 +200,7 @@ export default function Auth() {
                   </div>
                   <span style={{ fontSize: '0.95rem', fontWeight: 800 }}>{f.label}</span>
                 </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>{f.desc}</p>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -208,13 +208,13 @@ export default function Auth() {
         </div>
 
         {/* RIGHT: High-End Auth Portal */}
-        <div className="auth-portal-panel" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+        <div className="auth-portal-panel" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3.5vh 5vw' }}>
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
             style={{ width: '100%', maxWidth: '480px' }}
           >
             <div className="glass-card">
-              <div style={{ display: 'flex', background: '#0a0a0f', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '6px', marginBottom: '2.5rem' }}>
+              <div style={{ display: 'flex', background: '#0a0a0f', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '6px', marginBottom: '1.5rem' }}>
                 {['login', 'signup'].map(m => (
                   <button key={m} onClick={() => { setMode(m); setError(''); }}
                     className={mode === m ? "hover-glow-btn" : ""}
@@ -233,7 +233,7 @@ export default function Auth() {
               <AnimatePresence mode="wait">
                 <motion.div key={mode} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
                   {mode === 'login' ? (
-                    <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                       <div>
                         <h3 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '8px', color: '#fff', letterSpacing: '-0.02em' }}>Executive Portal</h3>
                         <p style={{ color: '#9ca3af', fontSize: '0.95rem' }}>Authorize your session to continue.</p>
@@ -273,7 +273,7 @@ export default function Auth() {
                       </button>
                     </form>
                   ) : mode === 'signup' ? (
-                    <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                       <div>
                         <h3 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '8px' }}>Join the Nexus</h3>
                         <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Create your operator identity.</p>
@@ -400,7 +400,7 @@ export default function Auth() {
           border: 1px solid rgba(0, 242, 254, 0.4);
           border-radius: 1.5rem;
           box-shadow: none;
-          padding: 3rem 2.5rem;
+          padding: 2.5rem 3rem;
           transition: box-shadow 0.3s ease-in-out;
         }
 
@@ -451,6 +451,7 @@ export default function Auth() {
           height: 100%;
           position: relative;
           z-index: 1;
+          align-items: center;
         }
         
         @media (max-width: 1024px) { 

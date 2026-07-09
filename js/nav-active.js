@@ -1,12 +1,10 @@
 /* ════════════════════════════════════════════════════
    SUN NEXUS SOLUTIONS — GLOBAL NAVIGATION LOGIC
-   Handles: Active states, Mobile Toggle
-   Version 2.1 — Authoritative Protocol
+   Handles: Active states, Mobile Toggle (Authoritative)
+   Version 3.0 — Unified & Conflict-Free Protocol
    ════════════════════════════════════════════════════ */
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Nexus Navigation Engine: Activated');
-
+function initNexusNavigation() {
     // ── 1. Active Page Protocol ─────────────────────────────────────────────
     const navItems = document.querySelectorAll('.nav-links li');
     if (navItems.length > 0) {
@@ -25,18 +23,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if (href === currentPage || 
                 (currentPage === '' && href === 'index.html') ||
                 (currentPage === 'index.html' && href === 'index.html') ||
-                (href.includes(currentPage) && currentPage !== '')) {
+                (href && currentPage !== '' && href.includes(currentPage))) {
                 li.classList.add('active');
             }
         });
     }
 
-    // ── 2. Mobile Menu Toggle Protocol ──────────────────────────────────────
-    const menuToggle = document.getElementById('menuToggle');
+    // ── 2. Mobile Menu Toggle Protocol (Authoritative Engine) ───────────────
+    const oldToggle = document.getElementById('menuToggle');
     const navLinks = document.getElementById('navLinks');
     
-    if (menuToggle && navLinks) {
-        // Robust state management
+    if (oldToggle && navLinks) {
+        // Clone and replace menuToggle to strip any duplicate/conflicting click listeners
+        const menuToggle = oldToggle.cloneNode(true);
+        oldToggle.parentNode.replaceChild(menuToggle, oldToggle);
+
         function toggleMenu(forceClose = false) {
             const isOpening = forceClose ? false : !navLinks.classList.contains('active');
             
@@ -45,24 +46,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 menuToggle.textContent = '✕';
                 menuToggle.style.transform = 'rotate(90deg)';
                 menuToggle.setAttribute('aria-expanded', 'true');
-                document.body.style.overflow = 'hidden'; // Prevent scroll when menu open
             } else {
                 navLinks.classList.remove('active');
                 menuToggle.textContent = '☰';
                 menuToggle.style.transform = 'rotate(0deg)';
                 menuToggle.setAttribute('aria-expanded', 'false');
-                document.body.style.overflow = 'auto';
             }
         }
 
         menuToggle.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             toggleMenu();
         });
 
-        // Close menu when clicking links (important for anchors/UX)
+        // Close menu when clicking navigation links
         navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => toggleMenu(true));
+            link.addEventListener('click', () => {
+                toggleMenu(true);
+            });
         });
 
         // Close menu when clicking outside
@@ -74,11 +76,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // ESC key support
+        // Close menu on ESC key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && navLinks.classList.contains('active')) {
                 toggleMenu(true);
             }
         });
+
+        // Close menu automatically if window resized above mobile breakpoint (992px)
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 992 && navLinks.classList.contains('active')) {
+                toggleMenu(true);
+            }
+        });
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNexusNavigation);
+} else {
+    initNexusNavigation();
+}
