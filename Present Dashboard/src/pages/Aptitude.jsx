@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
   HelpCircle, ChevronLeft, Timer, Award, Trophy,
-  Target, Zap, Brain, MessageSquare, ArrowRight,
+  Target, Zap, Brain, MessageSquare, BookOpen, ArrowRight,
   TrendingUp, X, PlayCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,9 +11,9 @@ import AssessmentModal from '../components/AssessmentModal';
 import { useAuth } from '../contexts/AuthContext';
 
 const CATEGORY_META = [
-  { title: 'Quantitative',      code: 'QA', icon: Target,        color: '#4f46e5' },
+  { title: 'Quantitative',      code: 'QA', icon: Target,        color: '#7c3aed' },
   { title: 'Logical Reasoning', code: 'LR', icon: Brain,         color: '#06b6d4' },
-  { title: 'Verbal Ability',    code: 'VA', icon: MessageSquare, color: '#f59e0b' },
+  { title: 'Verbal Ability',    code: 'VA', icon: BookOpen,      color: '#f59e0b' },
 ];
 
 const YOUTUBE_LINKS = {
@@ -95,88 +95,217 @@ const Aptitude = () => {
 
       {/* Category list */}
       {!selectedCategory && (
-        <div className="flex flex-col gap-12">
-          <div className="flex flex-col md-flex-row items-end justify-between gap-6">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg" style={{ background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)' }}>
-                  <TrendingUp size={20} />
-                </div>
-                <span className="font-bold uppercase tracking-[0.2em] text-xs" style={{ color: 'var(--text-muted)' }}>Skill Assessment</span>
-              </div>
-              <h1 className="text-5xl font-extrabold tracking-tight">
-                Aptitude & <span style={{ background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Reasoning</span>
-              </h1>
-              <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>Master the logic behind every challenge.</p>
-            </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', position: 'relative' }}>
+          {/* Flowing Neon Soundwave Mesh Background matching reference image */}
+          <div 
+            style={{
+              position: 'absolute',
+              right: '-20px',
+              top: '-40px',
+              width: '680px',
+              height: '380px',
+              pointerEvents: 'none',
+              zIndex: 0,
+              opacity: 0.95
+            }}
+          >
+            <svg viewBox="0 0 700 400" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
+              <defs>
+                <linearGradient id="waveGrad1" x1="0" y1="0" x2="700" y2="400" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#38bdf8" stopOpacity="0" />
+                  <stop offset="40%" stopColor="#818cf8" stopOpacity="0.85" />
+                  <stop offset="80%" stopColor="#c084fc" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
+                </linearGradient>
+                <linearGradient id="waveGrad2" x1="100" y1="0" x2="600" y2="350" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#06b6d4" stopOpacity="0" />
+                  <stop offset="50%" stopColor="#a855f7" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#ec4899" stopOpacity="0.15" />
+                </linearGradient>
+              </defs>
+              <path d="M0 250 C 150 150, 250 320, 420 180 C 550 70, 600 200, 700 120" stroke="url(#waveGrad1)" strokeWidth="1.5" fill="none" />
+              <path d="M20 270 C 170 170, 270 340, 440 200 C 570 90, 620 220, 700 140" stroke="url(#waveGrad1)" strokeWidth="1" strokeDasharray="4 4" fill="none" />
+              <path d="M40 290 C 190 190, 290 360, 460 220 C 590 110, 640 240, 700 160" stroke="url(#waveGrad2)" strokeWidth="2" fill="none" />
+              <path d="M60 310 C 210 210, 310 380, 480 240 C 610 130, 660 260, 700 180" stroke="url(#waveGrad2)" strokeWidth="1" fill="none" />
+              <path d="M80 330 C 230 230, 330 400, 500 260 C 630 150, 680 280, 700 200" stroke="url(#waveGrad1)" strokeWidth="1.5" fill="none" />
+              <path d="M100 350 C 250 250, 350 420, 520 280 C 650 170, 690 300, 700 220" stroke="url(#waveGrad2)" strokeWidth="1" fill="none" />
+              <path d="M120 370 C 270 270, 370 440, 540 300 C 670 190, 700 320, 700 240" stroke="url(#waveGrad1)" strokeWidth="0.8" fill="none" />
+              <circle cx="430" cy="160" r="2.5" fill="#a855f7" />
+              <circle cx="510" cy="110" r="2" fill="#38bdf8" />
+              <circle cx="580" cy="190" r="3" fill="#ec4899" />
+              <circle cx="640" cy="140" r="2" fill="#c084fc" />
+              <circle cx="370" cy="230" r="2" fill="#06b6d4" />
+            </svg>
           </div>
 
-          <div className="grid cols-1 md-cols-2 lg-cols-3 gap-12 mt-10">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', position: 'relative', zIndex: 10 }}>
+            <div style={{ marginBottom: '0.75rem' }}>
+              <div 
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '6px 16px',
+                  borderRadius: '9999px',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  backgroundColor: '#1e3a8a',
+                  border: '1px solid rgba(99, 102, 241, 0.6)',
+                  color: '#e0e7ff',
+                  boxShadow: '0 0 20px rgba(37, 99, 235, 0.4)'
+                }}
+              >
+                <TrendingUp size={15} />
+                <span>SKILL ASSESSMENT</span>
+              </div>
+            </div>
+            <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.8rem)', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: '1.05', color: 'var(--text-primary)' }}>
+              Aptitude &{' '}
+              <span style={{ background: 'linear-gradient(135deg, #00f2fe 0%, #a855f7 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                Reasoning
+              </span>
+            </h1>
+            <p style={{ fontSize: '1.15rem', fontWeight: 500, color: 'var(--text-secondary)' }}>
+              Master the logic behind every challenge.
+            </p>
+          </div>
+
+          <div 
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
+              gap: '2rem',
+              marginTop: '1.25rem',
+              width: '100%',
+              position: 'relative',
+              zIndex: 10
+            }}
+          >
             {CATEGORY_META.map((cat, i) => (
               <motion.div
                 key={i}
-                whileHover={{ scale: 1.05, y: -10 }}
+                whileHover={{ y: -6 }}
                 onClick={() => setSelectedCategory(cat.title)}
-                className="nx-card p-10 flex flex-col gap-8 cursor-pointer relative group overflow-hidden"
-                style={{ borderRadius: '2rem' }}
+                className="cursor-pointer relative group overflow-hidden transition-all duration-300"
+                style={{
+                  borderRadius: '1.75rem',
+                  backgroundColor: 'var(--bg-secondary)',
+                  backdropFilter: 'blur(24px)',
+                  WebkitBackdropFilter: 'blur(24px)',
+                  border: `2px solid ${cat.color}65`,
+                  boxShadow: `0 10px 40px -10px ${cat.color}35`,
+                  padding: '2rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  minHeight: '380px'
+                }}
               >
-                {/* Individually Spread Shade */}
+                {/* Ambient Corner Glow & Dot Pattern */}
                 <div 
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                   style={{ 
-                    background: `linear-gradient(135deg, ${cat.color}10 0%, ${cat.color}05 100%)`,
+                    background: `linear-gradient(135deg, ${cat.color}18 0%, ${cat.color}05 100%)`,
                     borderRadius: 'inherit'
                   }}
                 />
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-500" style={{ background: `${cat.color}08` }} />
-                <div className="flex items-center justify-between relative z-10">
-                  <div className="flex items-center justify-center p-5 rounded-3xl shadow-xl" style={{ backgroundColor: `${cat.color}15`, color: cat.color }}>
-                    {React.createElement(cat.icon, { size: 32 })}
+                <div className="absolute top-0 right-0 w-36 h-36 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-500" style={{ background: `${cat.color}15` }} />
+
+                {/* Top Row: Icon Box & Tag Badge */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 10 }}>
+                  <div 
+                    style={{
+                      width: '56px',
+                      height: '56px',
+                      borderRadius: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: `${cat.color}20`,
+                      border: `1px solid ${cat.color}50`,
+                      color: cat.color,
+                      boxShadow: `0 4px 15px ${cat.color}35`
+                    }}
+                  >
+                    {React.createElement(cat.icon, { size: 28 })}
                   </div>
-                  <span className="font-black text-xs tracking-ultra px-3 py-1 rounded-lg uppercase" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}>
+                  <span 
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      fontSize: '0.75rem',
+                      fontWeight: 800,
+                      letterSpacing: '0.1em',
+                      backgroundColor: 'var(--bg-tertiary)',
+                      border: '1px solid var(--border-strong)',
+                      color: 'var(--text-secondary)'
+                    }}
+                  >
                     {cat.code}
                   </span>
                 </div>
-                <div className="relative z-10">
-                  <h3 className="text-2xl font-black mb-2 tracking-tight">{cat.title}</h3>
-                  <p className="text-sm font-bold uppercase tracking-widest opacity-40">
-                    {topicsForCategory(cat.title).length} Topics
+
+                {/* Middle Section: Title & Topic Count */}
+                <div style={{ marginTop: '1.75rem', position: 'relative', zIndex: 10 }}>
+                  <h3 
+                    style={{
+                      fontSize: '1.85rem',
+                      fontWeight: 900,
+                      lineHeight: '1.15',
+                      letterSpacing: '-0.03em',
+                      color: 'var(--text-primary)',
+                      marginBottom: '0.5rem'
+                    }}
+                  >
+                    {cat.title}
+                  </h3>
+                  <p 
+                    style={{
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.15em',
+                      color: 'var(--text-muted)'
+                    }}
+                  >
+                    {topicsForCategory(cat.title).length} TOPICS
                   </p>
-                </div>
-                <button 
-                  className="relative overflow-hidden px-6 py-4 font-black text-[9px] uppercase tracking-ultra outline-none duration-300 group active:opacity-75 mt-auto self-start"
-                  style={{ 
-                    background: `${cat.color}10`, 
-                    color: cat.color, 
-                    border: `1px solid ${cat.color}40`,
-                    borderBottom: `4px solid ${cat.color}`,
-                    borderRadius: '9999px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    cursor: 'pointer',
-                    zIndex: 20
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.filter = 'brightness(1.5)';
-                    e.currentTarget.style.borderTopWidth = '4px';
-                    e.currentTarget.style.borderBottomWidth = '1px';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.filter = 'none';
-                    e.currentTarget.style.borderTopWidth = '1px';
-                    e.currentTarget.style.borderBottomWidth = '4px';
-                  }}
-                >
-                  <span 
-                    className="absolute -top-[150%] left-0 inline-flex w-[400px] h-[5px] opacity-50 duration-500 group-hover:top-[150%]"
-                    style={{ 
-                      background: cat.color, 
-                      boxShadow: `0 0 10px 10px ${cat.color}40`,
-                      borderRadius: '999px'
+                  <div 
+                    style={{
+                      height: '1px',
+                      width: '100%',
+                      margin: '1.5rem 0',
+                      backgroundColor: 'var(--border-strong)'
                     }}
                   />
-                  Explore Topics <ArrowRight size={14} className="transition-transform" />
+                </div>
+
+                {/* Bottom Explore Topics Button */}
+                <button 
+                  style={{ 
+                    width: '100%',
+                    padding: '14px 24px',
+                    borderRadius: '9999px',
+                    fontSize: '0.75rem',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.12em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '10px',
+                    backgroundColor: 'var(--explore-btn-bg)',
+                    color: cat.color,
+                    border: `1.5px solid ${cat.color}`,
+                    boxShadow: `0 0 15px ${cat.color}35`,
+                    cursor: 'pointer',
+                    position: 'relative',
+                    zIndex: 10
+                  }}
+                >
+                  <span>EXPLORE TOPICS</span>
+                  <ArrowRight size={16} />
                 </button>
               </motion.div>
             ))}
@@ -200,7 +329,7 @@ const Aptitude = () => {
             <p className="font-medium" style={{ color: 'var(--text-muted)' }}>Select a module to sharpen your skills.</p>
           </div>
 
-          <div className="grid cols-1 md-cols-2 lg-cols-3 gap-12 pt-10 pb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 pt-4 pb-12">
             {topicsForCategory(selectedCategory).length === 0 && (
               <div className="nx-card p-10 text-center" style={{ borderRadius: '2rem' }}>
                 <p style={{ color: 'var(--text-muted)' }}>No assessments posted yet for this category. Check back soon!</p>

@@ -18,5 +18,19 @@
       const current = document.documentElement.getAttribute('data-theme');
       applyTheme(current === 'light' ? 'dark' : 'light');
     });
+
+    // Navbar dynamic scroll scaling and glassmorphism styling
+    const navbar = document.querySelector('.navbar');
+    if (navbar) {
+      function handleNavbarScroll() {
+        if (window.scrollY > 30) {
+          navbar.classList.add('navbar-scrolled');
+        } else {
+          navbar.classList.remove('navbar-scrolled');
+        }
+      }
+      window.addEventListener('scroll', handleNavbarScroll, { passive: true });
+      handleNavbarScroll(); // Initial check on page load
+    }
   });
 })();

@@ -192,6 +192,50 @@ app.get('/api/domains', async (req, res) => {
     }
 });
 
+// Home Page Content Endpoints
+app.get('/api/home-content', async (req, res) => {
+    try {
+        await sql`
+            CREATE TABLE IF NOT EXISTS site_content (
+                key TEXT PRIMARY KEY,
+                data TEXT NOT NULL,
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
+        const cloud = await sql`SELECT data FROM site_content WHERE key = 'home_content' LIMIT 1`;
+        if (cloud && cloud.length > 0) {
+            return res.json({ success: true, content: JSON.parse(cloud[0].data) });
+        }
+        res.json({ success: true, content: null });
+    } catch (error) {
+        console.error('Error fetching home content:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.post('/api/home-content', async (req, res) => {
+    try {
+        const { content } = req.body;
+        const jsonString = JSON.stringify(content);
+        await sql`
+            CREATE TABLE IF NOT EXISTS site_content (
+                key TEXT PRIMARY KEY,
+                data TEXT NOT NULL,
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
+        await sql`
+            INSERT INTO site_content (key, data, updated_at)
+            VALUES ('home_content', ${jsonString}, CURRENT_TIMESTAMP)
+            ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = EXCLUDED.updated_at
+        `;
+        res.json({ success: true, message: 'Home page content saved to cloud successfully!' });
+    } catch (error) {
+        console.error('Error saving home content:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 app.listen(port, () => {
     console.log(`🚀 Nexus Backend Signal Active at http://localhost:${port}`);
 });

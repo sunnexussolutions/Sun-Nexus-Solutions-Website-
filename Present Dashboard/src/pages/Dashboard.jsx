@@ -61,7 +61,7 @@ const Dashboard = () => {
     .slice(0, 4);
 
   return (
-    <div className="flex flex-col gap-8 animate-slide-up pb-10">
+    <div className="flex flex-col gap-8 animate-slide-up p-4 md:p-6 lg:p-8 pb-14">
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
@@ -175,6 +175,9 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+
+
     </div>
   );
 };

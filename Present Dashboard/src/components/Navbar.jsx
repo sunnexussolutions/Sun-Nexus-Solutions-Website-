@@ -113,7 +113,7 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
   };
 
   return (
-    <nav className="fixed top-0 right-0 nx-glass z-30 px-4 md:px-6 flex items-center justify-between h-20" style={{ left: '0', transition: 'var(--transition-base)' }}>
+    <nav className="fixed top-0 right-0 nx-glass z-30 px-3 md:px-6 flex items-center justify-between h-16 md:h-20" style={{ left: '0', transition: 'var(--transition-base)' }}>
       {/* Search */}
       <div className="flex items-center gap-4 flex-1" style={{ maxWidth: '600px' }}>
         <button className="lg-hidden" style={{ color: 'var(--text-secondary)' }} onClick={toggleSidebar}>
@@ -237,7 +237,6 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
                   transition={{ duration: 0.2, ease: 'easeOut' }}
                    className="absolute right-0 top-full mt-4 z-50 overflow-hidden notification-portal"
                    style={{
-                     width: window.innerWidth < 768 ? '92vw' : '420px',
                      borderRadius: '1.5rem',
                      border: '1px solid var(--border-strong)',
                      backgroundColor: theme === 'light' ? 'rgba(255,255,255,0.97)' : 'rgba(15,15,20,0.97)',
@@ -261,7 +260,7 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
                   </div>
 
                   {/* List */}
-                  <div style={{ maxHeight: '380px', overflowY: 'auto', padding: '8px' }} className="no-scrollbar">
+                  <div style={{ maxHeight: '380px', overflowY: 'auto', padding: '8px' }} className="no-scrollbar notification-list-container">
                     {notifications.length === 0 ? (
                       <div style={{ padding: '40px 20px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
                         <Bell size={32} style={{ color: 'var(--text-muted)', opacity: 0.3 }} />
@@ -343,7 +342,7 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.98 }}
                 transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="absolute right-0 top-full mt-4 w-80 rounded-3xl overflow-hidden z-50"
+                className="absolute right-0 top-full mt-4 w-80 rounded-3xl overflow-hidden z-50 profile-portal"
                 style={{
                   border: '1px solid var(--border-strong)',
                   backgroundColor: theme === 'light' ? 'rgba(255,255,255,0.97)' : 'rgba(15,15,20,0.97)',

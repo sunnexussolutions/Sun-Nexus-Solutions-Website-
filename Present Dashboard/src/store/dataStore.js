@@ -3,7 +3,14 @@ import { query } from '../lib/neon';
 // Helper for local management
 const getLocal = (key, fallback = []) => {
   const data = localStorage.getItem(`nexus_${key}`);
-  return data ? JSON.parse(data) : fallback;
+  if (!data || data === 'undefined' || data === 'null') return fallback;
+  try {
+    return JSON.parse(data);
+  } catch (err) {
+    console.error(`Failed to parse nexus_${key} from localStorage:`, err);
+    localStorage.removeItem(`nexus_${key}`);
+    return fallback;
+  }
 };
 
 const setLocal = (key, data) => {
@@ -337,4 +344,92 @@ export const getHiringSubmissions = async () => {
 export const deleteHiringSubmission = async (id) => {
   setLocal('hiring_submissions', getLocal('hiring_submissions').filter(s => s.id !== id));
   await query('DELETE FROM contact_inquiries WHERE id = $1', [id]);
+};
+
+// ── Home Page Content Management ──────────────────────────────────────────────
+export const DEFAULT_HOME_CONTENT = {
+  hero: {
+    titleMain: "Sun Nexus",
+    titleGradient: "Solutions",
+    subtitle: "Sun Nexus Solutions Club — Where innovation meets heart",
+    description: "Empowering students with real-world tech skills, projects, and mentorship at Sandip University, Nashik.",
+    exploreBtnText: "Explore More",
+    exploreBtnLink: "project.html",
+    joinBtnText: "Join Our Community",
+    joinBtnLink: "contact.html",
+    badge1Number: "10K+",
+    badge1Label: "Active Students",
+    badge2Number: "200+",
+    badge2Label: "Expert Mentors",
+    image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772689390/IMG20260214121123_01.jpg_rvmrw2.jpg",
+    carouselImages: [
+      "https://res.cloudinary.com/dseg9nty3/image/upload/v1772689390/IMG20260214121123_01.jpg_rvmrw2.jpg",
+      "https://res.cloudinary.com/dseg9nty3/image/upload/v1772689359/IMG20260214104936.jpg_qq8apz.jpg",
+      "https://res.cloudinary.com/dseg9nty3/image/upload/v1772689999/WhatsApp_Image_2026-03-05_at_11.17.39_AM_ghi5gj.jpg",
+      "https://res.cloudinary.com/dseg9nty3/image/upload/v1772689415/20260214_102511.jpg_vtdmdr.jpg"
+    ]
+  },
+  stats: [
+    { icon: "fa-globe", value: "50+", label: "Domains", color: "blue" },
+    { icon: "fa-code", value: "1K+", label: "Projects Published", color: "cyan" },
+    { icon: "fa-calendar-check", value: "100+", label: "Events Organized", color: "blue" },
+    { icon: "fa-infinity", value: "∞", label: "Possibilities", color: "purple" }
+  ],
+  values: {
+    title: "Driving Innovation. Building Futures.",
+    subtitle: "We are a community of innovators, problem-solvers, and creators.",
+    items: [
+      { icon: "fa-regular fa-lightbulb", title: "Innovation", desc: "We embrace creativity and new ideas.", color: "cyan" },
+      { icon: "fa-solid fa-shield-halved", title: "Integrity", desc: "We do all work through transparency.", color: "purple" },
+      { icon: "fa-solid fa-award", title: "Excellence", desc: "We strive for the highest standards.", color: "blue" },
+      { icon: "fa-solid fa-hand-holding-heart", title: "Empathy", desc: "We care for our community and grow together.", color: "pink" }
+    ]
+  },
+  leadership: {
+    title: "Leadership Team",
+    members: [
+      { id: "1", name: "Arjun Sharma", role: "Founder & CEO", image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80", linkedin: "https://www.linkedin.com/company/sunnexussolutions/", twitter: "#", facebook: "#" },
+      { id: "2", name: "Priya Patel", role: "CTO", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80", linkedin: "https://www.linkedin.com/company/sunnexussolutions/", twitter: "#", facebook: "#" },
+      { id: "3", name: "Rohit Verma", role: "Head of Academics", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80", linkedin: "https://www.linkedin.com/company/sunnexussolutions/", twitter: "#", facebook: "#" },
+      { id: "4", name: "Sneha Iyer", role: "Community Lead", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80", linkedin: "https://www.linkedin.com/company/sunnexussolutions/", twitter: "#", facebook: "#" }
+    ]
+  },
+  logbook: {
+    title: "Log Book",
+    description: "Track your startup journey with our comprehensive Log Book system. Manage projects, monitor progress, and collaborate with your team in real-time.",
+    btnText: "Access Log Book",
+    btnLink: "https://startup-management-system-backend-u.vercel.app/"
+  },
+  whyNexus: {
+    title: "Why Nexus Solutions?",
+    subtext: "At Nexus Solutions, we are more than just a tech club — we are a driven community of innovators, problem-solvers, and creators."
+  }
+};
+
+export const getHomeContent = async () => {
+  const local = getLocal('home_content', null);
+  try {
+    const cloud = await query("SELECT data FROM site_content WHERE key = 'home_content' LIMIT 1");
+    if (cloud && cloud.length > 0) {
+      const parsed = JSON.parse(cloud[0].data);
+      setLocal('home_content', parsed);
+      return parsed;
+    }
+  } catch (err) {
+    console.warn("Using local home content fallback");
+  }
+  return local || DEFAULT_HOME_CONTENT;
+};
+
+export const saveHomeContent = async (content) => {
+  setLocal('home_content', content);
+  try {
+    await query(`
+      INSERT INTO site_content (key, data, updated_at)
+      VALUES ('home_content', $1, CURRENT_TIMESTAMP)
+      ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = EXCLUDED.updated_at
+    `, [JSON.stringify(content)]);
+  } catch (err) {
+    console.error("Failed to save home content to cloud:", err);
+  }
 };

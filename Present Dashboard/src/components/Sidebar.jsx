@@ -71,9 +71,14 @@ const Sidebar = ({ isOpen, toggleSidebar, activePage, setActivePage }) => {
                   style={{ filter: 'drop-shadow(0 0 8px var(--accent-primary))' }}
                 />
               </div>
-              <span className="text-xl font-bold" style={{ background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                Sun Nexus
-              </span>
+              <div className="flex flex-col leading-none">
+                <span className="text-xl font-extrabold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+                  Sun Nexus
+                </span>
+                <span className="text-base font-extrabold tracking-wide" style={{ background: 'linear-gradient(90deg, #38bdf8 0%, #6366f1 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  Solutions
+                </span>
+              </div>
             </div>
             <button className="lg-hidden" style={{ color: 'var(--text-secondary)' }} onClick={toggleSidebar}>
               <X size={24} />

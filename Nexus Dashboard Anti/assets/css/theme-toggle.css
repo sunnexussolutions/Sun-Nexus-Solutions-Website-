@@ -1,87 +1,168 @@
 /* ── Theme Toggle Button ── */
-.nav-theme-toggle {
+.nav-theme-toggle,
+.nav-actions {
   display: flex;
   align-items: center;
 }
 
 .theme-toggle-btn {
   position: relative;
-  width: 56px;
-  height: 28px;
-  border-radius: 9999px;
-  border: 1.5px solid rgba(0, 242, 254, 0.35);
-  background: rgba(0, 242, 254, 0.08);
+  width: 72px;
+  height: 38px;
+  border-radius: 50px;
+  border: 1.5px solid rgba(0, 242, 254, 0.45);
+  background: rgba(10, 16, 30, 0.95);
   cursor: pointer;
-  padding: 0;
+  padding: 3px;
   outline: none;
-  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   flex-shrink: 0;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 242, 254, 0.25);
+  overflow: hidden;
 }
 
 .theme-toggle-btn:hover {
-  box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
-  border-color: rgba(0, 242, 254, 0.6);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 24px rgba(0, 242, 254, 0.5);
+  border-color: #00f2fe;
+  transform: scale(1.04);
 }
 
-/* Glow ring */
+/* ── Glow Effect ── */
 .toggle-glow {
   position: absolute;
-  inset: -3px;
-  border-radius: 9999px;
-  background: transparent;
-  transition: background 0.3s;
+  inset: 0;
+  background: radial-gradient(circle at 75% 50%, rgba(0, 242, 254, 0.35), transparent 70%);
+  transition: all 0.4s ease;
   pointer-events: none;
 }
 
-/* Sliding knob */
+/* ── Sliding Knob (Supports new HTML structure) ── */
 .toggle-knob {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 22px;
-  height: 22px;
+  top: 3px;
+  left: calc(100% - 35px);
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
-  box-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 1.5px solid #00f2fe;
+  box-shadow: 0 0 12px #00f2fe, 0 2px 6px rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s;
-  font-size: 1.2rem;
-  line-height: 1;
+  transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s, border-color 0.4s, box-shadow 0.4s;
+  z-index: 2;
 }
 
-/* Icon visibility */
+/* Icons inside toggle-knob */
+.toggle-knob span,
 .sun-icon,
 .moon-icon {
-  position: absolute;
-  font-size: 1.1rem;
-  transition: opacity 0.25s, transform 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
   line-height: 1;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: absolute;
 }
 
-/* Dark mode (default): show moon, hide sun */
-.sun-icon  { opacity: 0; transform: scale(0.6) rotate(-30deg); }
-.moon-icon { opacity: 1; transform: scale(1) rotate(0deg); }
-
-/* Light mode: show sun, hide moon */
-[data-theme="light"] .sun-icon  { opacity: 1; transform: scale(1) rotate(0deg); }
-[data-theme="light"] .moon-icon { opacity: 0; transform: scale(0.6) rotate(30deg); }
-
-/* Slide knob to the right in light mode */
-[data-theme="light"] .toggle-knob {
-  transform: translateX(28px);
-  background: linear-gradient(135deg, #f59e0b, #fbbf24);
-  box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+/* In Dark Mode: Show moon inside knob, hide sun */
+.moon-icon {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+.sun-icon {
+  opacity: 0;
+  transform: scale(0.2) rotate(-90deg);
 }
 
-/* Light mode button styling */
+/* ── Legacy Support (toggle-icon / toggle-thumb) ── */
+.toggle-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  z-index: 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  padding: 0 4px;
+}
+.toggle-moon {
+  opacity: 1;
+  transform: scale(1);
+}
+.toggle-sun {
+  opacity: 0;
+  transform: scale(0.5);
+  position: absolute;
+  right: 8px;
+}
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #00f2fe;
+  box-shadow: 0 0 12px #00f2fe, 0 0 20px #00f2fe;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 2;
+}
+
+/* ════════════════════════════════
+   LIGHT MODE STYLING
+════════════════════════════════ */
 [data-theme="light"] .theme-toggle-btn {
-  background: rgba(251, 191, 36, 0.12);
-  border-color: rgba(251, 191, 36, 0.45);
+  background: #ffffff;
+  border: 1.5px solid #f59e0b;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.06), 0 2px 14px rgba(245, 158, 11, 0.25);
 }
 
 [data-theme="light"] .theme-toggle-btn:hover {
-  box-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
-  border-color: rgba(251, 191, 36, 0.7);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.06), 0 2px 20px rgba(245, 158, 11, 0.45);
+  border-color: #d97706;
+  transform: scale(1.04);
+}
+
+[data-theme="light"] .toggle-glow {
+  background: radial-gradient(circle at 25% 50%, rgba(245, 158, 11, 0.3), transparent 70%);
+}
+
+/* Slide knob to the left in Light Mode */
+[data-theme="light"] .toggle-knob {
+  left: 3px;
+  background: linear-gradient(135deg, #fef08a, #f59e0b);
+  border-color: #f59e0b;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.8), 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* In Light Mode: Show sun inside knob, hide moon */
+[data-theme="light"] .sun-icon {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+[data-theme="light"] .moon-icon {
+  opacity: 0;
+  transform: scale(0.2) rotate(90deg);
+}
+
+/* Legacy Light Mode */
+[data-theme="light"] .toggle-moon {
+  opacity: 0;
+  transform: scale(0.5);
+  position: absolute;
+  left: 8px;
+}
+[data-theme="light"] .toggle-sun {
+  opacity: 1;
+  transform: scale(1);
+  position: static;
+}
+[data-theme="light"] .toggle-thumb {
+  top: 3px;
+  right: calc(100% - 33px);
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.8), 0 0 20px rgba(251, 191, 36, 0.5);
 }

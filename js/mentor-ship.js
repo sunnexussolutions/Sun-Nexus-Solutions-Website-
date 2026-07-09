@@ -12,10 +12,15 @@ document.addEventListener("DOMContentLoaded", () => {
   mentorData.mentees.forEach(mentee => {
     menteesGrid.innerHTML += `
       <div class="mentee-card">
-        <img src="${mentee.img}" alt="${mentee.name}">
-        <div class="mentee-info">
-          <h3 class="name">${mentee.name}</h3>
-          <p class="role">${mentee.role}</p>
+        <div class="mentee-left">
+          <img src="${mentee.img}" alt="${mentee.name}">
+          <div class="mentee-info">
+            <h3 class="name">${mentee.name}</h3>
+            <p class="role">${mentee.role}</p>
+          </div>
+        </div>
+        <div class="mentee-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
     `;
