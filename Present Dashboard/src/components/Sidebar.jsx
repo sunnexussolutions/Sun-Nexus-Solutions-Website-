@@ -12,7 +12,6 @@ const navItems = [
   { id: 'learning',   label: 'My Learning',          icon: BookOpen },
   { id: 'domains',    label: 'Domains',              icon: Layers },
   { id: 'projects',   label: 'Projects',             icon: FolderGit2 },
-  { id: 'coding',     label: 'Challenges',           icon: Code2 },
   { id: 'aptitude',   label: 'Aptitude',             icon: BrainCircuit },
   { id: 'council',    label: 'Council',              icon: Users },
   { id: 'profile',    label: 'Profile',              icon: UserCircle },

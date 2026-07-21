@@ -19,7 +19,8 @@ const setLocal = (key, data) => {
 };
 
 const getBaseUrl = () => {
-  return window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
+  const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
+  return isLocal ? 'http://localhost:3000' : '';
 };
 
 const fetchApi = async (endpoint, method = 'GET', body = null) => {
@@ -326,6 +327,9 @@ export const getHiringSubmissions = async () => {
     if (cloud && Array.isArray(cloud)) {
       const mapped = cloud.map(s => ({
         ...s,
+        mobile: s.mobile || s.mobile_number || s.phone || 'N/A',
+        prn: s.prn || s.prn_number || 'N/A',
+        division: s.division || s.div || 'N/A',
         academicYear: s.academic_year || s.academicYear || 'N/A',
         graduationYear: s.graduation_year || s.graduationYear || 'N/A',
         createdAt: s.created_at || s.createdAt || new Date().toISOString()

@@ -256,7 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Fetch from Backend API (if running)
         try {
-            const apiHost = window.location.port === '8080' || window.location.port === '' ? 'http://localhost:3000' : '';
+            const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
+            const apiHost = isLocal ? 'http://localhost:3000' : '';
             const res = await fetch(`${apiHost}/api/home-content`);
             if (res.ok) {
                 const data = await res.json();

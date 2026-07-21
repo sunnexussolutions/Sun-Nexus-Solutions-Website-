@@ -21,7 +21,7 @@ app.post('/api/contact', async (req, res) => {
     
     try {
         const { 
-            name, email, academic_year, graduation_year, branch, other_branch,
+            name, email, mobile, prn, division, academic_year, graduation_year, branch, other_branch,
             specialization, skills, domain, projects, github, linkedin, 
             codechef, hackerrank, languages 
         } = data;
@@ -49,6 +49,9 @@ app.post('/api/contact', async (req, res) => {
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 name TEXT NOT NULL,
                 email TEXT NOT NULL,
+                mobile TEXT,
+                prn TEXT,
+                division TEXT,
                 academic_year TEXT NOT NULL,
                 graduation_year TEXT NOT NULL,
                 branch TEXT NOT NULL,
@@ -64,13 +67,20 @@ app.post('/api/contact', async (req, res) => {
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             )
         `;
+        try {
+            await sql`ALTER TABLE contact_inquiries ADD COLUMN IF NOT EXISTS mobile TEXT`;
+            await sql`ALTER TABLE contact_inquiries ADD COLUMN IF NOT EXISTS prn TEXT`;
+            await sql`ALTER TABLE contact_inquiries ADD COLUMN IF NOT EXISTS division TEXT`;
+        } catch (colErr) {
+            // Ignore column check notices
+        }
 
         // Insert Submission
         await sql`
             INSERT INTO contact_inquiries 
-            (name, email, academic_year, graduation_year, branch, specialization, skills, domain, projects, github, linkedin, codechef, hackerrank, languages)
+            (name, email, mobile, prn, division, academic_year, graduation_year, branch, specialization, skills, domain, projects, github, linkedin, codechef, hackerrank, languages)
             VALUES (
-                ${name}, ${email}, ${academic_year}, ${graduation_year}, ${final_branch}, 
+                ${name}, ${email}, ${mobile || null}, ${prn || null}, ${division || null}, ${academic_year}, ${graduation_year}, ${final_branch}, 
                 ${specialization || null}, ${skills || null}, ${domain || null}, 
                 ${projects || null}, ${github || null}, ${linkedin || null}, 
                 ${codechef || null}, ${hackerrank || null}, ${languages || null}

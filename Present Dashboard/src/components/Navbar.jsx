@@ -113,31 +113,30 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
   };
 
   return (
-    <nav className="fixed top-0 right-0 nx-glass z-30 px-3 md:px-6 flex items-center justify-between h-16 md:h-20" style={{ left: '0', transition: 'var(--transition-base)' }}>
+    <nav className="nx-navbar z-30 px-4 md:px-6 flex items-center justify-between h-16 md:h-20" style={{ transition: 'var(--transition-base)' }}>
       {/* Search */}
       <div className="flex items-center gap-4 flex-1" style={{ maxWidth: '600px' }}>
         <button className="lg-hidden" style={{ color: 'var(--text-secondary)' }} onClick={toggleSidebar}>
           <Menu size={24} />
         </button>
         <div className="relative w-full lg-block hidden" ref={searchRef}>
-          <Search className="absolute" style={{ left: '1rem', top: '50%', transform: 'translateY(-50%)', color: isSearchFocused ? 'var(--accent-primary)' : 'var(--text-muted)', transition: 'color 0.3s' }} size={18} />
+          <Search className="absolute" style={{ left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: isSearchFocused ? '#00f2fe' : 'var(--text-muted)', transition: 'color 0.3s' }} size={18} />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsSearchFocused(true)}
             placeholder="Search for courses, projects..."
-            className="w-full"
+            className="w-full transition-all"
             style={{
-              backgroundColor: 'var(--bg-tertiary)',
-              border: isSearchFocused ? '1px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-full)',
-              padding: '0.65rem 1rem 0.65rem 3rem',
+              backgroundColor: isSearchFocused ? 'rgba(255, 255, 255, 0.08)' : 'var(--sidebar-icon-box-bg, rgba(15, 23, 42, 0.65))',
+              border: isSearchFocused ? '1px solid rgba(0, 242, 254, 0.5)' : '1px solid var(--sidebar-icon-box-border, rgba(255, 255, 255, 0.07))',
+              borderRadius: '16px',
+              padding: '0.7rem 1.25rem 0.7rem 3.25rem',
               fontSize: '0.875rem',
               outline: 'none',
               color: 'var(--text-primary)',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: isSearchFocused ? '0 0 20px rgba(99, 102, 241, 0.1)' : 'none'
+              boxShadow: isSearchFocused ? '0 0 20px rgba(0, 242, 254, 0.15)' : 'none'
             }}
           />
         </div>
@@ -180,35 +179,34 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
 
       {/* Actions */}
       <div className="flex items-center gap-2 md:gap-6">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={toggleTheme}
-            className="hidden md-flex group relative items-center p-1"
+            className="hidden md-flex group relative items-center p-1 transition-all"
             style={{
               width: '60px',
-              height: '30px',
-              borderRadius: '999px',
-              backgroundColor: theme === 'dark' ? '#050a18' : '#cbd5e1',
-              border: '2px solid white',
-              boxShadow: theme === 'dark' ? '0 0 15px rgba(0, 242, 254, 0.5)' : '0 4px 12px rgba(0,0,0,0.1)',
-              transition: 'all 0.3s ease'
+              height: '32px',
+              borderRadius: '16px',
+              backgroundColor: theme === 'dark' ? 'var(--sidebar-icon-box-bg, rgba(15, 23, 42, 0.65))' : '#cbd5e1',
+              border: theme === 'dark' ? '1px solid var(--sidebar-icon-box-border, rgba(255, 255, 255, 0.07))' : '1px solid rgba(0,0,0,0.1)',
+              boxShadow: theme === 'dark' ? '0 0 15px rgba(0, 242, 254, 0.25)' : '0 4px 12px rgba(0,0,0,0.1)',
             }}
           >
             <motion.div
-              animate={{ x: theme === 'dark' ? 0 : 28 }}
+              animate={{ x: theme === 'dark' ? 0 : 26 }}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
               className="flex items-center justify-center shadow-lg"
               style={{
-                width: '22px',
-                height: '22px',
-                borderRadius: '50%',
+                width: '24px',
+                height: '24px',
+                borderRadius: '12px',
                 backgroundColor: theme === 'dark' ? '#00f2fe' : '#f59e0b',
               }}
             >
               {theme === 'dark' ? (
-                <Moon size={12} fill="#f59e0b" stroke="none" />
+                <Moon size={13} fill="#f59e0b" stroke="none" />
               ) : (
-                <Sun size={12} fill="white" stroke="none" />
+                <Sun size={13} fill="white" stroke="none" />
               )}
             </motion.div>
           </button>
@@ -217,11 +215,18 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
           <div className="relative" ref={notifRef}>
             <button
               onClick={() => { setIsNotifOpen(v => !v); setIsProfileOpen(false); }}
-              className="relative flex items-center justify-center w-10 h-10 rounded-xl transition-all hover:bg-black/5 dark:hover:bg-white/5 text-secondary group"
+              className="relative flex items-center justify-center transition-all group"
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '12px',
+                background: isNotifOpen ? 'rgba(255, 255, 255, 0.18)' : 'var(--sidebar-icon-box-bg, rgba(15, 23, 42, 0.65))',
+                border: isNotifOpen ? '1px solid rgba(255, 255, 255, 0.25)' : '1px solid var(--sidebar-icon-box-border, rgba(255, 255, 255, 0.07))'
+              }}
             >
-              <Bell size={20} className="group-hover:rotate-12 transition-transform" />
+              <Bell size={18} style={{ color: isNotifOpen ? '#ffffff' : '#06b6d4', filter: isNotifOpen ? 'none' : 'drop-shadow(0 0 4px rgba(6, 182, 212, 0.45))' }} className="group-hover:rotate-12 transition-transform" />
               {unreadCount > 0 && (
-                <span className="absolute flex items-center justify-center" style={{ top: '6px', right: '6px', minWidth: '16px', height: '16px', backgroundColor: '#ef4444', borderRadius: '999px', border: '2px solid var(--bg-primary)', fontSize: '9px', fontWeight: 900, color: 'white', padding: '0 3px' }}>
+                <span className="absolute flex items-center justify-center" style={{ top: '-4px', right: '-4px', minWidth: '16px', height: '16px', backgroundColor: '#ef4444', borderRadius: '999px', border: '2px solid var(--sidebar-bg, #050a18)', fontSize: '9px', fontWeight: 900, color: 'white', padding: '0 3px' }}>
                   {unreadCount > 9 ? '9+' : unreadCount}
                   <span className="absolute inset-0 animate-ping bg-red-500 rounded-full opacity-60"></span>
                 </span>
@@ -304,26 +309,23 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
           </div>
         </div>
 
-        <div style={{ height: '2rem', width: '1px', backgroundColor: 'var(--border-subtle)' }} />
+        <div style={{ height: '2rem', width: '1px', backgroundColor: 'var(--sidebar-border, rgba(255, 255, 255, 0.07))' }} />
 
         {/* Profile Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => { setIsProfileOpen(v => !v); setIsNotifOpen(false); }}
-            className={`flex items-center gap-3 p-1.5 pr-4 rounded-2xl transition-all ${isProfileOpen ? 'bg-black/5 dark:bg-white/5' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
+            className="flex items-center gap-3 transition-all pr-3"
+            style={{
+              padding: '5px 12px 5px 5px',
+              borderRadius: '16px',
+              background: isProfileOpen ? 'rgba(255, 255, 255, 0.15)' : 'var(--sidebar-icon-box-bg, rgba(15, 23, 42, 0.65))',
+              border: isProfileOpen ? '1px solid rgba(255, 255, 255, 0.25)' : '1px solid var(--sidebar-icon-box-border, rgba(255, 255, 255, 0.07))'
+            }}
           >
-            <div className="flex flex-col items-end hidden lg-block">
-              <span className="text-sm font-bold leading-tight">
-                {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : (user?.username || 'Nexus Member')}
-              </span>
-              <div className="flex items-center gap-1">
-                <ShieldCheck size={10} className="text-accent-primary" />
-                <span className="uppercase font-bold" style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{user?.isAdmin ? 'Platform Admin' : (user?.headline || 'Pro Member')}</span>
-              </div>
-            </div>
             <div className="relative">
               <div className="flex items-center justify-center font-bold text-white shadow-lg overflow-hidden"
-                style={{ width: '40px', height: '40px', borderRadius: '14px', background: 'var(--accent-gradient)' }}>
+                style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'var(--accent-gradient)' }}>
                 {user?.avatar?.length > 5 ? (
                   <img src={user.avatar} alt="User" className="w-full h-full object-cover" />
                 ) : (
@@ -332,7 +334,16 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
               </div>
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900" />
             </div>
-            <ChevronDown size={14} style={{ color: 'var(--text-muted)', transform: isProfileOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }} />
+            <div className="flex flex-col items-start hidden lg-block">
+              <span className="text-sm font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
+                {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : (user?.username || 'Nexus Member')}
+              </span>
+              <div className="flex items-center gap-1 mt-0.5">
+                <ShieldCheck size={11} style={{ color: '#00f2fe' }} />
+                <span className="uppercase font-bold" style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{user?.isAdmin ? 'Platform Admin' : (user?.headline || 'Pro Member')}</span>
+              </div>
+            </div>
+            <ChevronDown size={14} style={{ color: 'var(--text-muted)', marginLeft: '2px', transform: isProfileOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }} />
           </button>
 
           <AnimatePresence mode="wait">
@@ -459,7 +470,7 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
       </div>
 
       <style>{`
-        @media (min-width: 1024px) { nav { left: var(--sidebar-width) !important; } }
+        @media (min-width: 1024px) { nav { left: var(--sidebar-width) !important; width: calc(100% - var(--sidebar-width)) !important; } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
