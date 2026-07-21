@@ -28,7 +28,7 @@ export default async (req, res) => {
 
         for (const col of columns) {
             try {
-                await sql.unsafe(`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS ${col.name} ${col.type}`);
+                await sql.query(`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS ${col.name} ${col.type}`);
                 console.log(`✅ COLUMN_VERIFIED: ${col.name}`);
             } catch (e) {
                 console.warn(`⚠️ COLUMN_NOTICE: ${col.name} - ${e.message}`);

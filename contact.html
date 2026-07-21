@@ -595,6 +595,30 @@
           </div>
 
           <div class="form-row-nexus">
+            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div>
+            <div class="field-input-col">
+              <label>Mobile Number</label>
+              <input type="tel" name="mobile" class="form-control-nexus" placeholder="+91 98765 43210" required>
+            </div>
+          </div>
+
+          <div class="form-row-nexus">
+            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg></div>
+            <div class="field-input-col">
+              <label>PRN Number</label>
+              <input type="text" name="prn" id="prn" class="form-control-nexus" placeholder="Enter your PRN Number" required>
+            </div>
+          </div>
+
+          <div class="form-row-nexus">
+            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+            <div class="field-input-col">
+              <label>Division</label>
+              <input type="text" name="division" id="division" class="form-control-nexus" placeholder="e.g. A, B, C or Div 1" required>
+            </div>
+          </div>
+
+          <div class="form-row-nexus">
             <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg></div>
             <div class="field-input-col">
               <label>Academic Year</label>
@@ -811,12 +835,28 @@
             const data = Object.fromEntries(formData.entries());
 
             try {
-              const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
+              const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
+              const baseUrl = isLocal ? 'http://localhost:3000' : '';
               const response = await fetch(`${baseUrl}/api/contact`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
               });
+
+              if (!response.ok) {
+                if (response.status === 405) {
+                  if (isLocal) {
+                    alert('❌ Static Server Detected (HTTP 405 Method Not Allowed):\n\nThe contact form attempted to submit to a local static web server instead of the Node backend.\n\nTo submit forms locally, please verify that your local Node server is running on port 3000 by executing:\nnode server.js');
+                    return;
+                  } else {
+                    alert('⚠️ Cloud Hub Error (HTTP 405 Method Not Allowed):\n\nThis hosting provider only serves static files and does not execute serverless backend API endpoints.');
+                    return;
+                  }
+                }
+                const errText = await response.text().catch(() => '');
+                alert(`❌ Server Error (${response.status} ${response.statusText}): ${errText || 'Please check server logs for details.'}`);
+                return;
+              }
 
               const text = await response.text();
               console.log('Raw Response:', text);
@@ -826,7 +866,7 @@
                 result = JSON.parse(text);
               } catch (e) {
                 console.error('JSON Parse Error:', e);
-                alert('❌ Protocol Mismatch: The server sent an invalid response. Check console for details.');
+                alert('❌ Protocol Mismatch: The server sent a non-JSON response. Ensure node server.js is running and returning valid JSON.');
                 return;
               }
 
@@ -841,10 +881,11 @@
               }
             } catch (err) {
               console.error("Submission Error:", err);
-              if (window.location.hostname !== 'localhost') {
+              const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
+              if (!isLocal) {
                  alert('Cloud Hub Error: ' + err.message + '\n\nProtocol Tip: Ensure your "api/" folder is deployed and Neon DB URL is set.');
               } else {
-                 alert('❌ Connection Protocol Failed. Please verify your local Node server is running on port 3000.');
+                 alert('❌ Connection Protocol Failed: Could not connect to local backend server at http://localhost:3000.\n\nPlease verify your local Node server is running on port 3000 by opening a terminal and running:\nnode server.js');
               }
             } finally {
               if (!btn.disabled) {

@@ -5,7 +5,7 @@ export default async (req, res) => {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
-    const { name, email, academic_year, graduation_year, branch, other_branch, specialization, skills, domain, projects, github, linkedin, codechef, hackerrank, languages } = req.body;
+    const { name, email, mobile, prn, division, academic_year, graduation_year, branch, other_branch, specialization, skills, domain, projects, github, linkedin, codechef, hackerrank, languages } = req.body;
     
     const sql = neon(process.env.VITE_NEON_URL || "postgresql://neondb_owner:npg_izrW7bvHTnO6@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require");
 
@@ -18,6 +18,9 @@ export default async (req, res) => {
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 name TEXT NOT NULL,
                 email TEXT NOT NULL,
+                mobile TEXT,
+                prn TEXT,
+                division TEXT,
                 academic_year TEXT NOT NULL,
                 graduation_year TEXT NOT NULL,
                 branch TEXT NOT NULL,
@@ -33,12 +36,19 @@ export default async (req, res) => {
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             )
         `;
+        try {
+            await sql`ALTER TABLE contact_inquiries ADD COLUMN IF NOT EXISTS mobile TEXT`;
+            await sql`ALTER TABLE contact_inquiries ADD COLUMN IF NOT EXISTS prn TEXT`;
+            await sql`ALTER TABLE contact_inquiries ADD COLUMN IF NOT EXISTS division TEXT`;
+        } catch (colErr) {
+            // Ignore column check notices
+        }
 
         await sql`
             INSERT INTO contact_inquiries 
-            (name, email, academic_year, graduation_year, branch, specialization, skills, domain, projects, github, linkedin, codechef, hackerrank, languages)
+            (name, email, mobile, prn, division, academic_year, graduation_year, branch, specialization, skills, domain, projects, github, linkedin, codechef, hackerrank, languages)
             VALUES (
-                ${name}, ${email}, ${academic_year}, ${graduation_year}, ${final_branch}, 
+                ${name}, ${email}, ${mobile || null}, ${prn || null}, ${division || null}, ${academic_year}, ${graduation_year}, ${final_branch}, 
                 ${specialization || null}, ${skills || null}, ${domain || null}, 
                 ${projects || null}, ${github || null}, ${linkedin || null}, 
                 ${codechef || null}, ${hackerrank || null}, ${languages || null}

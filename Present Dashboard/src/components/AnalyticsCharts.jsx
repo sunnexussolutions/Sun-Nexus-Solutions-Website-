@@ -30,7 +30,7 @@ export const UserPerformanceGraph = ({ data, height = 300, color = '#6366f1' }) 
               <stop offset="95%" stopColor={color} stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--chart-grid, rgba(255,255,255,0.05))" />
           <XAxis 
             dataKey="date" 
             axisLine={false} 

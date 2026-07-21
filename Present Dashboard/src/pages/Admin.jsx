@@ -1953,7 +1953,7 @@ const Admin = () => {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <span style={{ fontSize: '11px', fontWeight: 800, padding: '4px 12px', borderRadius: '8px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
-                      {s.academicYear} | {s.branch}
+                      {s.academicYear} | {s.branch}{s.division && s.division !== 'N/A' ? ` | Div ${s.division}` : ''}
                     </span>
                     <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Graduation: {s.graduationYear}</p>
                   </div>
@@ -1961,7 +1961,25 @@ const Admin = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl bg-black/20 border border-white/5 mb-4">
                   <div>
-                    <h5 style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Technical Profile</h5>
+                    <h5 style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Candidate & Technical Profile</h5>
+                    <p style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                      <strong>📱 Mobile:</strong>{' '}
+                      <span style={{ color: (s.mobile && s.mobile !== 'N/A') ? '#10b981' : 'var(--text-muted)', fontWeight: 700 }}>
+                        {s.mobile && s.mobile !== 'N/A' ? s.mobile : 'Not Provided'}
+                      </span>
+                    </p>
+                    <p style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                      <strong>🆔 PRN Number:</strong>{' '}
+                      <span style={{ color: (s.prn && s.prn !== 'N/A') ? '#38bdf8' : 'var(--text-muted)', fontWeight: 700 }}>
+                        {s.prn && s.prn !== 'N/A' ? s.prn : 'Not Provided'}
+                      </span>
+                    </p>
+                    <p style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                      <strong>🏫 Division:</strong>{' '}
+                      <span style={{ color: (s.division && s.division !== 'N/A') ? '#ec4899' : 'var(--text-muted)', fontWeight: 700 }}>
+                        {s.division && s.division !== 'N/A' ? s.division : 'Not Provided'}
+                      </span>
+                    </p>
                     <p style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>Domain:</strong> {s.domain}</p>
                     {s.specialization && <p style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>Specialization:</strong> {s.specialization}</p>}
                     {s.languages && <p style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>Stack:</strong> {s.languages}</p>}
