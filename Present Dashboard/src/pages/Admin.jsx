@@ -1510,49 +1510,51 @@ const Admin = () => {
             </div>
           )}
 
-          {assessments.map(a => (
-            <Card key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-              <div>
-                <p style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '4px' }}>{a.topic}</p>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  {[a.category, a.week, `${a.questions?.length || 0} Qs`, `${a.timeLimit} min`].map((tag, i) => (
-                    <span key={i} style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)' }}>{tag}</span>
-                  ))}
-                  <span style={{ fontSize: '10px', fontWeight: 900, padding: '2px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
-                    Updated: {new Date(a.updated_at || a.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                  {a.unlockTime && (
-                    <span style={{ fontSize: '10px', fontWeight: 900, padding: '2px 8px', borderRadius: '6px', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', textTransform: 'uppercase' }}>
-                      Schedule: {new Date(a.unlockTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            {assessments.map(a => (
+              <Card key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+                <div>
+                  <p style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>{a.topic}</p>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    {[a.category, a.week, `${a.questions?.length || 0} Qs`, `${a.timeLimit} min`].map((tag, i) => (
+                      <span key={i} style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)' }}>{tag}</span>
+                    ))}
+                    <span style={{ fontSize: '10px', fontWeight: 900, padding: '2px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
+                      Updated: {new Date(a.updated_at || a.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </span>
-                  )}
+                    {a.unlockTime && (
+                      <span style={{ fontSize: '10px', fontWeight: 900, padding: '2px 8px', borderRadius: '6px', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', textTransform: 'uppercase' }}>
+                        Schedule: {new Date(a.unlockTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <button onClick={() => { 
-                  setEditingAssessmentId(a.id);
-                  setAForm({ 
-                    category: a.category, 
-                    topic: a.topic, 
-                    week: a.week, 
-                    timeLimit: a.timeLimit, 
-                    unlockTime: formatDateForInput(a.unlockTime), 
-                    videoUrl: a.videoUrl || '' 
-                  });
-                  setAQuestions(a.questions || [emptyQuestion()]);
-                  setShowAssessmentForm(true);
-                  window.scrollTo({ top: 100, behavior: 'smooth' });
-                }}
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
-                  <FileText size={14} /> Edit
-                </button>
-                <button onClick={() => handleDeleteAssessment(a.id)}
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
-                  <Trash2 size={14} /> Delete
-                </button>
-              </div>
-            </Card>
-          ))}
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button onClick={() => { 
+                    setEditingAssessmentId(a.id);
+                    setAForm({ 
+                      category: a.category, 
+                      topic: a.topic, 
+                      week: a.week, 
+                      timeLimit: a.timeLimit, 
+                      unlockTime: formatDateForInput(a.unlockTime), 
+                      videoUrl: a.videoUrl || '' 
+                    });
+                    setAQuestions(a.questions || [emptyQuestion()]);
+                    setShowAssessmentForm(true);
+                    window.scrollTo({ top: 100, behavior: 'smooth' });
+                  }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                    <FileText size={14} /> Edit
+                  </button>
+                  <button onClick={() => handleDeleteAssessment(a.id)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                    <Trash2 size={14} /> Delete
+                  </button>
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
 
