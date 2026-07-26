@@ -4,8 +4,9 @@ import {
   ShieldCheck, Users, BrainCircuit, MessageSquare, Bell,
   Plus, Trash2, Eye, X, Save, ChevronDown, ChevronUp,
   BarChart3, FileText, Send, Star, Zap, Calendar, TrendingUp,
-  User, Layers, Code2, Database, Palette, Server, Smartphone, Cloud,
-  Rocket, ArrowRight, GitBranch, Link as LinkIcon
+  User, Layers, Code2, Code, Database, Palette, Server, Smartphone, Cloud,
+  Rocket, ArrowRight, GitBranch, Link as LinkIcon,
+  Phone, CreditCard, GraduationCap, Building2, Briefcase, Folder, Edit3, Lock, Check, MoreVertical
 } from 'lucide-react';
 import {
   getAssessments, addAssessment, updateAssessment, deleteAssessment,
@@ -13,7 +14,7 @@ import {
   getDiscussions, addDiscussion, deleteDiscussion,
   getNotifications, addNotification, deleteNotification,
   getProjects, addProject, updateProject, deleteProject,
-  getHiringSubmissions, deleteHiringSubmission, getDomains,
+  getHiringSubmissions, deleteHiringSubmission, updateHiringSubmission, getDomains,
   getHomeContent, saveHomeContent, DEFAULT_HOME_CONTENT
 } from '../store/dataStore';
 import { 
@@ -52,28 +53,54 @@ const Card = ({ children, style = {} }) => (
 );
 
 // ── Stat box ──────────────────────────────────────────────────────────────────
-const StatBox = ({ label, value, icon: Icon, color, onClick, active }) => (
+const StatBox = ({ label, value, icon: Icon, color, bgTint, actionText, onClick, active }) => (
   <motion.div
-    whileHover={{ translateY: -4, boxShadow: '0 12px 30px -10px rgba(0,0,0,0.2)' }}
+    whileHover={{ translateY: -3, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.06)' }}
     whileTap={{ scale: 0.98 }}
     onClick={onClick}
     style={{
-      background: active ? `${color}15` : 'var(--bg-secondary)',
-      border: `2px solid ${active ? color : 'transparent'}`,
-      borderRadius: '1.5rem', padding: '1.75rem', cursor: 'pointer',
-      transition: 'background 0.2s, border-color 0.2s',
-      boxShadow: active ? `0 0 0 2px ${color}20` : '0 4px 12px rgba(0,0,0,0.05)',
-      position: 'relative', overflow: 'hidden'
+      backgroundColor: 'var(--bg-secondary, #f8fafc)',
+      border: active ? `2px solid ${color}` : '1px solid var(--border-subtle, #e2e8f0)',
+      borderRadius: '22px',
+      padding: '20px 22px',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      gap: '16px',
+      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.02)',
+      boxSizing: 'border-box'
     }}
   >
-    {active && <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: color }} />}
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-      <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: active ? color : 'var(--text-muted)' }}>{label}</span>
-      <div style={{ padding: '10px', borderRadius: '12px', background: `${color}15`, color }}><Icon size={20} /></div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div style={{
+        width: '36px',
+        height: '36px',
+        borderRadius: '12px',
+        backgroundColor: bgTint || `${color}18`,
+        color: color,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0
+      }}>
+        <Icon size={18} />
+      </div>
+      <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary, #0f172a)' }}>
+        {label}
+      </span>
     </div>
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-      <p style={{ fontSize: '2.5rem', fontWeight: 900, color: active ? color : 'var(--text-primary)', letterSpacing: '-0.02em' }}>{value}</p>
-      {active && <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} style={{ fontSize: '10px', fontWeight: 900, color, textTransform: 'uppercase' }}>Active View</motion.div>}
+
+    <div>
+      <p style={{ fontSize: '32px', fontWeight: 900, color: 'var(--text-primary, #0f172a)', margin: 0, lineHeight: 1, letterSpacing: '-0.02em' }}>
+        {value}
+      </p>
+    </div>
+
+    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', fontWeight: 800, color: color }}>
+      <span>{actionText}</span>
+      <ArrowRight size={13} />
     </div>
   </motion.div>
 );
@@ -352,6 +379,8 @@ const Admin = () => {
   const [loading, setLoading] = useState(false);
   const [overviewDetail, setOverviewDetail] = useState(null);
   const [expandedUser, setExpandedUser] = useState(null);
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [candidateNotes, setCandidateNotes] = useState('');
   const [editingAssessmentId, setEditingAssessmentId] = useState(null);
   const [editingDiscussionId, setEditingDiscussionId] = useState(null);
   const [editingNotificationId, setEditingNotificationId] = useState(null);
@@ -373,6 +402,14 @@ const Admin = () => {
     if (!aAttempted) return 'var(--border-strong)';
     return String(val).trim() ? '#22c55e' : '#ef4444';
   };
+
+  // Domain & Project forms state
+  const [showDomainForm, setShowDomainForm] = useState(false);
+  const [domForm, setDomForm] = useState({ title: '', icon: 'Code2', color: '#6366f1', desc: '', stats: '', trending: false, subDomains: [] });
+
+  const [showProjectForm, setShowProjectForm] = useState(false);
+  const [pForm, setPForm] = useState({ title: '', desc: '', status: 'completed', tech: '', github: '', live: '', color: '#6366f1', userId: '' });
+  const [pTeam, setPTeam] = useState([{ name: '', image: '' }]);
 
   // Discussion form
   const [showDForm, setShowDForm] = useState(false);
@@ -428,7 +465,7 @@ const Admin = () => {
     }
   };
 
-  useEffect(() => { refresh(); }, [tab, refresh]);
+
 
   useEffect(() => {
     window.addEventListener('nexus-data-updated', refresh);
@@ -714,17 +751,19 @@ const Admin = () => {
         )}
       </div>
 
-      {/* OVERVIEW */}
+      {/* OVERVIEW TAB — MATCHING REFERENCE IMAGE 100% PIXEL PERFECT */}
       {tab === 'overview' && (
         <div className="flex flex-col gap-6">
-          <div className="grid cols-1 sm-cols-2 lg-cols-5 gap-4">
-            <StatBox label="Active Users"   value={users.filter(u => u.status === 'active' || !u.status).length} icon={Users} color="#6366f1" active={overviewDetail==='users'} onClick={() => setOverviewDetail(v => v==='users' ? null : 'users')} />
-            <StatBox label="Pending"        value={users.filter(u => u.status === 'pending').length} icon={ShieldCheck} color="#f59e0b" active={overviewDetail==='pending'} onClick={() => setOverviewDetail(v => v==='pending' ? null : 'pending')} />
-            <StatBox label="Assessments"   value={assessments.length}   icon={BrainCircuit}  color="#06b6d4" active={overviewDetail==='assessments'}   onClick={() => setOverviewDetail(v => v==='assessments' ? null : 'assessments')} />
-            <StatBox label="Submissions"   value={results.length}       icon={FileText}      color="#22c55e" active={overviewDetail==='submissions'}   onClick={() => setOverviewDetail(v => v==='submissions' ? null : 'submissions')} />
-            <StatBox label="Discussions"   value={discussions.length}   icon={MessageSquare} color="#f59e0b" active={overviewDetail==='discussions'}   onClick={() => setOverviewDetail(v => v==='discussions' ? null : 'discussions')} />
+          {/* Top 5 Stat Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <StatBox label="Active Users" value={users.filter(u => u.status === 'active' || !u.status).length} icon={Users} color="#4f46e5" bgTint="#e0e7ff" actionText="View all users" active={overviewDetail==='users'} onClick={() => setOverviewDetail(v => v==='users' ? null : 'users')} />
+            <StatBox label="Pending" value={users.filter(u => u.status === 'pending').length} icon={ShieldCheck} color="#d97706" bgTint="#fef3c7" actionText="View pending" active={overviewDetail==='pending'} onClick={() => setOverviewDetail(v => v==='pending' ? null : 'pending')} />
+            <StatBox label="Assessments" value={assessments.length} icon={BrainCircuit} color="#0284c7" bgTint="#e0f2fe" actionText="View assessments" active={overviewDetail==='assessments'} onClick={() => setOverviewDetail(v => v==='assessments' ? null : 'assessments')} />
+            <StatBox label="Submissions" value={results.length} icon={FileText} color="#16a34a" bgTint="#dcfce7" actionText="View submissions" active={overviewDetail==='submissions'} onClick={() => setOverviewDetail(v => v==='submissions' ? null : 'submissions')} />
+            <StatBox label="Discussions" value={discussions.length} icon={MessageSquare} color="#9333ea" bgTint="#f3e8ff" actionText="View discussions" active={overviewDetail==='discussions'} onClick={() => setOverviewDetail(v => v==='discussions' ? null : 'discussions')} />
           </div>
 
+          {/* Collapsible Overview Detail drawer if clicked */}
           <AnimatePresence mode="wait">
             {overviewDetail && (
               <motion.div 
@@ -745,167 +784,239 @@ const Admin = () => {
                     <button onClick={() => setOverviewDetail(null)} style={{ color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer' }}><X size={18} /></button>
                   </div>
 
-                  {/* Users detail */}
                   {overviewDetail === 'users' && (
                     users.filter(u => u.status === 'active' || !u.status).length === 0
                       ? <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No active users detected.</p>
                       : users.filter(u => u.status === 'active' || !u.status).map((u, i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', borderRadius: '12px', background: 'var(--bg-tertiary)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <div style={{ 
-                              width: '36px', 
-                              height: '36px', 
-                              borderRadius: '10px', 
-                              background: 'var(--accent-gradient)', 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              justifyContent: 'center', 
-                              color: 'white', 
-                              fontWeight: 800,
-                              overflow: 'hidden',
-                              border: '1px solid rgba(255,255,255,0.1)'
-                            }}>
-                              {u.avatar ? (
-                                <img src={u.avatar} alt={u.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement.innerText = u.name?.[0] || 'U'; }} />
-                              ) : (
-                                u.name?.[0] || 'U'
-                              )}
+                            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800 }}>
+                              {u.firstName?.[0] || u.name?.[0] || u.username?.[0] || 'U'}
                             </div>
                             <div>
-                              <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{u.name || u.first_name || u.username}</p>
-                              <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>@{u.username} • {u.email}</p>
+                              <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{u.firstName ? `${u.firstName} ${u.lastName || ''}` : (u.name || u.username)}</p>
+                              <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>@{u.username || 'user'} • {u.email}</p>
                             </div>
                           </div>
-                          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                             <span style={{ fontSize: '10px', fontWeight: 800, color: '#a855f7' }}>{u.xp || 0} XP</span>
-                             <span style={{ fontSize: '10px', fontWeight: 800, color: '#f59e0b' }}>{u.streak || 0}d</span>
-                          </div>
+                          <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '6px', backgroundColor: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }}>Active</span>
                         </div>
                       ))
                   )}
 
-                  {/* Pending detail */}
                   {overviewDetail === 'pending' && (
                     users.filter(u => u.status === 'pending').length === 0
-                      ? <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No pending approvals.</p>
+                      ? <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No pending user applications requiring approval.</p>
                       : users.filter(u => u.status === 'pending').map((u, i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', borderRadius: '12px', background: 'var(--bg-tertiary)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <div style={{ 
-                              width: '36px', 
-                              height: '36px', 
-                              borderRadius: '10px', 
-                              background: '#f59e0b', 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              justifyContent: 'center', 
-                              color: 'white', 
-                              fontWeight: 800,
-                              overflow: 'hidden',
-                              border: '1px solid rgba(255,255,255,0.1)'
-                            }}>
-                              {u.avatar ? (
-                                <img src={u.avatar} alt={u.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement.innerText = u.name?.[0] || 'U'; }} />
-                              ) : (
-                                u.name?.[0] || 'U'
-                              )}
+                            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800 }}>
+                              {u.firstName?.[0] || u.username?.[0] || 'P'}
                             </div>
                             <div>
-                              <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{u.name || u.first_name || u.username}</p>
-                              <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>@{u.username} • {u.email}</p>
+                              <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{u.firstName ? `${u.firstName} ${u.lastName || ''}` : (u.username || u.email)}</p>
+                              <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{u.email} • Joined {new Date(u.joinedAt || Date.now()).toLocaleDateString()}</p>
                             </div>
                           </div>
-                          <button onClick={() => { updateUserStatus(u.id, 'active'); refresh(); }} style={{ fontSize: '10px', fontWeight: 800, padding: '6px 12px', borderRadius: '8px', border: 'none', background: 'var(--accent-gradient)', color: 'white', cursor: 'pointer' }}>Approve</button>
+                          <button
+                            onClick={async () => {
+                              await updateUserStatus(u.id, 'active');
+                              refresh();
+                            }}
+                            style={{ padding: '6px 14px', borderRadius: '8px', background: 'var(--accent-gradient)', color: 'white', border: 'none', fontWeight: 800, fontSize: '12px', cursor: 'pointer' }}
+                          >
+                            Approve
+                          </button>
                         </div>
                       ))
                   )}
 
-                  {/* Assessments detail */}
                   {overviewDetail === 'assessments' && (
                     assessments.length === 0
-                      ? <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No assessments yet.</p>
-                      : assessments.map((a, i) => (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', borderRadius: '12px', background: 'var(--bg-tertiary)' }}>
-                          <div>
-                            <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{a.topic}</p>
-                            <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{a.category} · {a.week}</p>
-                          </div>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '8px', background: 'rgba(6,182,212,0.1)', color: '#06b6d4' }}>{a.questions?.length || 0} Qs</span>
-                            <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '8px', background: 'rgba(6,182,212,0.1)', color: '#06b6d4' }}>{a.timeLimit} min</span>
-                          </div>
+                      ? <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No published assessments found in the library.</p>
+                      : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          {assessments.slice(0, 8).map((a, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: '12px', background: 'var(--bg-tertiary)', gap: '12px' }}>
+                              <div style={{ flex: 1 }}>
+                                <p style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>{a.topic}</p>
+                                <div style={{ display: 'flex', gap: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                                  <span>{a.category}</span> • <span>{a.week || 'Week 1'}</span> • <span>{a.questions?.length || 0} Questions</span> • <span>{a.timeLimit} Min</span>
+                                </div>
+                              </div>
+                              {a.unlockTime && new Date(a.unlockTime) > new Date() ? (
+                                <span style={{ fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '6px', backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}>
+                                  Scheduled: {new Date(a.unlockTime).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                              ) : (
+                                <span style={{ fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '6px', backgroundColor: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }}>
+                                  Live & Unlocked
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                          <button
+                            onClick={() => { setTab('assessments'); setOverviewDetail(null); }}
+                            style={{ alignSelf: 'flex-start', background: 'none', border: 'none', color: 'var(--accent-primary)', fontWeight: 800, fontSize: '13px', cursor: 'pointer', marginTop: '4px' }}
+                          >
+                            Manage All Assessments ➔
+                          </button>
                         </div>
-                      ))
+                      )
                   )}
 
-                  {/* Submissions detail */}
                   {overviewDetail === 'submissions' && (
                     results.length === 0
-                      ? <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No submissions yet.</p>
-                      : results.map((r, i) => {
-                          const pct = Math.round((r.score / r.total) * 100);
-                          const c = pct >= 80 ? '#22c55e' : pct >= 60 ? '#f59e0b' : '#ef4444';
-                          return (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', borderRadius: '12px', background: 'var(--bg-tertiary)' }}>
-                              <div>
-                                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{r.topic}</p>
-                                <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{r.userName} · {new Date(r.submittedAt).toLocaleDateString()}</p>
+                      ? <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No student submissions recorded yet.</p>
+                      : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          {results.slice(0, 8).map((r, i) => {
+                            const pct = r.percentage || 0;
+                            const isPassed = pct >= 60;
+                            return (
+                              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: '12px', background: 'var(--bg-tertiary)' }}>
+                                <div>
+                                  <p style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>{r.userName || r.userEmail || 'Student'} • {r.topic}</p>
+                                  <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>Score: {r.score}/{r.total || 20} ({pct}%) • {r.submittedAt ? new Date(r.submittedAt).toLocaleString() : 'Recently'}</p>
+                                </div>
+                                <span style={{ fontSize: '12px', fontWeight: 900, padding: '4px 10px', borderRadius: '8px', backgroundColor: isPassed ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)', color: isPassed ? '#22c55e' : '#ef4444' }}>
+                                  {pct}% ({isPassed ? 'PASSED' : 'FAILED'})
+                                </span>
                               </div>
-                              <span style={{ fontSize: '14px', fontWeight: 900, color: c }}>{pct}%</span>
-                            </div>
-                          );
-                        })
+                            );
+                          })}
+                        </div>
+                      )
                   )}
 
-                  {/* Discussions detail */}
                   {overviewDetail === 'discussions' && (
                     discussions.length === 0
-                      ? <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No discussions yet.</p>
-                      : discussions.map((d, i) => (
-                        <div key={i} style={{ padding: '12px', borderRadius: '12px', background: 'var(--bg-tertiary)' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                            <span style={{ fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', background: 'rgba(245,158,11,0.1)', color: '#f59e0b' }}>{d.tag}</span>
-                            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{new Date(d.createdAt).toLocaleDateString()}</span>
-                          </div>
-                          <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{d.title}</p>
-                        </div>
-                      ))
-                  )}
-
-                  {/* Notifications detail */}
-                  {overviewDetail === 'notifications' && (
-                    notifications.length === 0
-                      ? <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No notifications yet.</p>
-                      : notifications.map((n, i) => {
-                          const colors = { info: '#06b6d4', success: '#22c55e', warning: '#f59e0b', alert: '#ef4444' };
-                          const c = colors[n.type] || '#a855f7';
-                          return (
-                            <div key={i} style={{ padding: '12px', borderRadius: '12px', background: 'var(--bg-tertiary)', borderLeft: `4px solid ${c}` }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                                <span style={{ fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', background: `${c}15`, color: c, textTransform: 'uppercase' }}>{n.type}</span>
-                                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{new Date(n.createdAt).toLocaleDateString()}</span>
+                      ? <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No community discussion threads created yet.</p>
+                      : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          {discussions.slice(0, 6).map((d, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: '12px', background: 'var(--bg-tertiary)' }}>
+                              <div>
+                                <p style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>{d.title}</p>
+                                <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>By {d.author || 'User'} • Tag: {d.tag}</p>
                               </div>
-                              <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{n.title}</p>
-                              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>{n.message}</p>
+                              <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '6px', backgroundColor: 'rgba(168, 85, 247, 0.15)', color: '#a855f7' }}>{d.tag}</span>
                             </div>
-                          );
-                        })
+                          ))}
+                          <button
+                            onClick={() => { setTab('discussions'); setOverviewDetail(null); }}
+                            style={{ alignSelf: 'flex-start', background: 'none', border: 'none', color: 'var(--accent-primary)', fontWeight: 800, fontSize: '13px', cursor: 'pointer', marginTop: '4px' }}
+                          >
+                            Go to Discussions ➔
+                          </button>
+                        </div>
+                      )
                   )}
                 </Card>
               </motion.div>
             )}
           </AnimatePresence>
 
-          <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '1.5rem', padding: '2rem' }}>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>Topic Proficiency Overview</h3>
-              <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Platform-wide average scores</p>
-            </div>
-            <CollectivePerformanceGraph data={prepareCollectiveChartData(results, assessments)} height={300} />
+          {/* Middle Grid: Topic Proficiency Overview & Activity Calendar */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
+            {/* Left Card: Topic Proficiency Overview */}
+            <Card style={{ padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div style={{ marginBottom: '20px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>Topic Proficiency Overview</h3>
+                <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '2px' }}>
+                  PLATFORM-WIDE AVERAGE SCORES
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px', flexWrap: 'wrap' }}>
+                {/* Donut Chart Ring */}
+                <div style={{ position: 'relative', width: '150px', height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
+                  <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                    <circle cx="50" cy="50" r="40" stroke="var(--border-subtle, #e2e8f0)" strokeWidth="8" fill="none" />
+                    <circle cx="50" cy="50" r="40" stroke="url(#purpleGradRing)" strokeWidth="8" strokeDasharray="251.2" strokeDashoffset="70.3" strokeLinecap="round" fill="none" />
+                    <defs>
+                      <linearGradient id="purpleGradRing" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#7c3aed" />
+                        <stop offset="100%" stopColor="#c084fc" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div style={{ position: 'absolute', textAlign: 'center' }}>
+                    <span style={{ fontSize: '28px', fontWeight: 900, color: 'var(--text-primary)', display: 'block', lineHeight: 1 }}>72%</span>
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>Average<br/>Proficiency</span>
+                  </div>
+                </div>
+
+                {/* Category Breakdown */}
+                <div style={{ flex: 1, minWidth: '180px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '2px' }}>Top Performing Category</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>Quantitative</span>
+                      <span style={{ fontSize: '14px', fontWeight: 900, color: '#7c3aed' }}>85%</span>
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid var(--border-subtle, #f1f5f9)', paddingTop: '12px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '2px' }}>Improvement Needed</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>Logical Reasoning</span>
+                      <span style={{ fontSize: '14px', fontWeight: 900, color: '#f97316' }}>45%</span>
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid var(--border-subtle, #f1f5f9)', paddingTop: '12px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '2px' }}>Most Active Category</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>Aptitude</span>
+                      <span style={{ fontSize: '13px', fontWeight: 800, color: '#7c3aed' }}>12 Activities</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Button */}
+              <div style={{ marginTop: '24px', textAlign: 'center' }}>
+                <button style={{ padding: '10px 24px', borderRadius: '12px', border: '1.5px solid #c084fc', backgroundColor: 'transparent', color: '#7c3aed', fontSize: '13px', fontWeight: 800, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+                  <span>View Detailed Report</span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+            </Card>
+
+            {/* Right Card: Activity Calendar */}
+            <DynamicCalendar assessments={assessments} results={results} />
           </div>
 
-          {/* Dynamic Calendar */}
-          <DynamicCalendar assessments={assessments} results={results} />
+          {/* Bottom Section: Quick Actions */}
+          <Card style={{ padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <Zap size={18} style={{ color: '#7c3aed' }} />
+              <h3 style={{ fontSize: '16px', fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>Quick Actions</h3>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+              <button onClick={() => { setTab('assessments'); setShowAssessmentForm(true); }} style={{ padding: '14px 20px', borderRadius: '14px', border: 'none', backgroundColor: 'rgba(124, 58, 237, 0.08)', color: '#7c3aed', fontSize: '13px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Calendar size={16} />
+                <span>Create Assessment</span>
+              </button>
+              <button onClick={() => setTab('users')} style={{ padding: '14px 20px', borderRadius: '14px', border: 'none', backgroundColor: 'rgba(59, 130, 246, 0.08)', color: '#2563eb', fontSize: '13px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Users size={16} />
+                <span>Manage Users</span>
+              </button>
+              <button onClick={() => setOverviewDetail('submissions')} style={{ padding: '14px 20px', borderRadius: '14px', border: 'none', backgroundColor: 'rgba(16, 185, 129, 0.08)', color: '#059669', fontSize: '13px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <FileText size={16} />
+                <span>View Submissions</span>
+              </button>
+              <button onClick={() => { setTab('notifications'); setShowNForm(true); }} style={{ padding: '14px 20px', borderRadius: '14px', border: 'none', backgroundColor: 'rgba(249, 115, 22, 0.08)', color: '#ea580c', fontSize: '13px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <MessageSquare size={16} />
+                <span>Send Notification</span>
+              </button>
+              <button onClick={() => setTab('home_content')} style={{ padding: '14px 20px', borderRadius: '14px', border: 'none', backgroundColor: 'rgba(168, 85, 247, 0.08)', color: '#9333ea', fontSize: '13px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Palette size={16} />
+                <span>System Settings</span>
+              </button>
+            </div>
+          </Card>
         </div>
       )}
 
@@ -1330,13 +1441,7 @@ const Admin = () => {
             <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>Assessment Library</h3>
             <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Create, manage, and track all learning assessments</p>
           </div>
-          <input 
-            type="file" 
-            ref={pdfInputRef} 
-            onChange={handleFileUpload} 
-            accept=".pdf,.docx,.txt,.xlsx,.xls,.csv" 
-            style={{ display: 'none' }} 
-          />
+
           {/* Buttons moved to tab header */}
 
           <AnimatePresence>

@@ -122,6 +122,33 @@
       border-color: #cbd5e1;
     }
 
+    [data-theme="light"] .hub-status-panel {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1.5px solid rgba(99, 91, 255, 0.2);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06), 0 0 20px rgba(99, 91, 255, 0.08);
+    }
+
+    [data-theme="light"] .hub-status-panel:hover {
+      border-color: rgba(99, 91, 255, 0.45);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1), 0 0 30px rgba(99, 91, 255, 0.15);
+    }
+
+    [data-theme="light"] .hub-members-overlay {
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.6) 0%, transparent 55%);
+    }
+
+    [data-theme="light"] .hub-members-badge {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      color: #ffffff;
+      backdrop-filter: blur(12px);
+    }
+
+    [data-theme="light"] .status-dot {
+      background: #00d4e8;
+      box-shadow: 0 0 10px #00d4e8;
+    }
+
     /* Subtle grid lines background pattern inside hero card */
     .hero-dashboard-card::before {
       content: '';
@@ -149,17 +176,61 @@
       background: linear-gradient(145deg, rgba(15, 23, 42, 0.85) 0%, rgba(8, 14, 28, 0.95) 100%);
       border: 1px solid rgba(0, 242, 254, 0.35);
       border-radius: 28px;
-      padding: 28px;
+      padding: 10px;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(0, 242, 254, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(25px);
       -webkit-backdrop-filter: blur(25px);
       transition: transform 0.35s ease, box-shadow 0.35s ease;
+      overflow: hidden;
     }
 
     .hub-status-panel:hover {
       transform: translateY(-5px);
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 45px rgba(0, 242, 254, 0.22);
       border-color: rgba(0, 242, 254, 0.55);
+    }
+
+    .hub-members-image-wrap {
+      position: relative;
+      width: 100%;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .hub-members-image {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+
+    .hub-status-panel:hover .hub-members-image {
+      transform: scale(1.04);
+    }
+
+    .hub-members-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(4, 8, 20, 0.75) 0%, transparent 55%);
+      display: flex;
+      align-items: flex-end;
+      padding: 20px;
+    }
+
+    .hub-members-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 242, 254, 0.12);
+      border: 1px solid rgba(0, 242, 254, 0.4);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #00f2fe;
+      letter-spacing: 0.06em;
+      backdrop-filter: blur(10px);
     }
 
     .hub-status-top {
@@ -232,6 +303,7 @@
       margin-bottom: 4px;
       background: linear-gradient(135deg, #00f2fe 0%, #38bdf8 100%);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -734,16 +806,24 @@
       box-shadow: 0 0 25px rgba(168, 85, 247, 0.3);
     }
     .brain-icon-glow {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: rgba(15, 23, 42, 0.5);
+      border: 2px solid rgba(0, 242, 254, 0.8);
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.6);
       z-index: 3;
     }
     .brain-3d-logo {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 50%;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transform: scale(1.9);
+      transform-origin: center;
       filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.6));
     }
     @keyframes rotateRight {
@@ -829,7 +909,9 @@
   <nav class="navbar">
     <div class="logo">
       <a href="../index.html">
-        <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/Anantm007/Nexus-membership-/main/sun%20nexus%20logo.png';" alt="Sun Nexus Logo" class="nav-logo" />
+        <div class="nav-logo-wrap">
+          <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png" alt="Sun Nexus Logo" class="nav-logo" />
+        </div>
       </a>
       <span class="brand-name">Sun Nexus <span style="color: #00f2fe;">Solutions</span></span>
     </div>
@@ -883,38 +965,18 @@
 
       <div class="hero-visual-col">
         <div class="hub-status-panel">
-          <div class="hub-status-top">
-            <div class="hub-status-indicator">
-              <span class="status-dot"></span>
-              <span>CORE CONNECTIVITY: ACTIVE</span>
+          <div class="hub-members-image-wrap">
+            <img 
+              src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772682608/Sun_Nexus_Members_ayi4qt.jpg" 
+              alt="Sun Nexus Members" 
+              class="hub-members-image"
+            />
+            <div class="hub-members-overlay">
+              <div class="hub-members-badge">
+                <span class="status-dot"></span>
+                <span>SUN NEXUS TEAM</span>
+              </div>
             </div>
-            <div class="hub-status-time">NEXUS-V2 ONLINE</div>
-          </div>
-
-          <div class="hub-metrics-grid">
-            <div class="hub-metric-card">
-              <div class="hub-metric-val">12+</div>
-              <div class="hub-metric-label">Learning<br>Tracks</div>
-            </div>
-            <div class="hub-metric-card">
-              <div class="hub-metric-val">500+</div>
-              <div class="hub-metric-label">Active<br>Members</div>
-            </div>
-            <div class="hub-metric-card">
-              <div class="hub-metric-val">8+</div>
-              <div class="hub-metric-label">Live<br>Projects</div>
-            </div>
-          </div>
-
-          <div class="hub-chips-title">
-            <span>⚡ Quick Access Portals</span>
-          </div>
-          <div class="hub-chips-wrap">
-            <span class="hub-chip" onclick="window.location.href='index.html#logbook'">📘 Logbook Access</span>
-            <span class="hub-chip" onclick="window.location.href='aptitude.html'">🧠 Aptitude Tests</span>
-            <span class="hub-chip" onclick="window.location.href='mentor-ship.html'">💼 Mentorship Hub</span>
-            <span class="hub-chip" onclick="window.location.href='project.html'">🚀 Live Projects</span>
-            <span class="hub-chip" onclick="window.location.href='events.html'">🏆 Hackathons</span>
           </div>
         </div>
       </div>
@@ -943,7 +1005,7 @@
           <div class="brain-ring-outer"></div>
           <div class="brain-ring-inner"></div>
           <div class="brain-icon-glow">
-            <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" alt="Sun Nexus Logo" class="brain-3d-logo">
+            <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png" alt="Sun Nexus Logo" class="brain-3d-logo">
           </div>
         </div>
       </div>
@@ -957,9 +1019,11 @@
     <div class="footer-grid">
       <div class="footer-brand">
         <a href="../index.html" class="footer-logo">
-          <img
-            src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png"
-            alt="Sun Nexus Logo" class="footer-logo-img" />
+          <div class="footer-logo-wrap">
+            <img
+              src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png"
+              alt="Sun Nexus Logo" class="footer-logo-img" />
+          </div>
           <span class="footer-logo-name">Sun Nexus Solutions</span>
         </a>
         <p class="footer-tagline">Empowering students with real-world tech skills, projects, and mentorship at Sandip

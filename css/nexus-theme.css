@@ -6,37 +6,41 @@
 
 /* ── Design Tokens ── */
 :root {
-  --bg-primary:          #050a18;
-  --bg-secondary:        #0a0e1c;
-  --bg-card:             rgba(16, 20, 36, 0.7);
-  --bg-card-hover:       rgba(20, 25, 45, 0.85);
-  --bg-glass:            rgba(10, 14, 28, 0.65);
+  --bg-primary:          #1D1D1D;
+  --bg-secondary:        #161616;
+  --bg-card:             rgba(29, 29, 29, 0.9);
+  --bg-card-hover:       rgba(45, 45, 45, 0.95);
+  --bg-glass:            rgba(29, 29, 29, 0.8);
 
-  --color-primary:       #00f2fe;
-  --color-primary-glow:  rgba(0, 242, 254, 0.4);
-  --color-primary-light: #00d4e8;
-  --color-accent:        #4facfe;
+  --color-theme-hex:     #1D1D1D;
+  --color-theme-rgb:     29, 29, 29;
+  --color-theme-cmyk:    0, 0, 0, 89;
+
+  --color-primary:       #38bdf8;
+  --color-primary-glow:  rgba(56, 189, 248, 0.35);
+  --color-primary-light: #7dd3fc;
+  --color-accent:        #00f2fe;
   --color-success:       #34d399;
   --color-danger:        #f87171;
   --color-warning:       #fbbf24;
-  --color-secondary:     #4facfe;
+  --color-secondary:     #38bdf8;
 
-  --text-primary:        #f8fafc;
-  --text-secondary:      #cbd5e1;
-  --text-muted:          #94a3b8;
+  --text-primary:        #ffffff;
+  --text-secondary:      #d4d4d4;
+  --text-muted:          #a3a3a3;
 
-  --border-color:        rgba(0, 242, 254, 0.18);
-  --border-subtle:       rgba(255, 255, 255, 0.08);
+  --border-color:        rgba(255, 255, 255, 0.18);
+  --border-subtle:       rgba(255, 255, 255, 0.12);
 
-  --gradient-primary:    linear-gradient(135deg, #4facfe, #00f2fe);
-  --gradient-hero:       linear-gradient(135deg, #050a18 0%, #0a0e1c 100%);
-  --gradient-indigo:     linear-gradient(90deg, #4facfe, #00f2fe, #4facfe);
+  --gradient-primary:    linear-gradient(135deg, #00f2fe, #38bdf8);
+  --gradient-hero:       linear-gradient(135deg, #1D1D1D 0%, #121212 100%);
+  --gradient-indigo:     linear-gradient(90deg, #00f2fe, #38bdf8, #00f2fe);
   --gradient-success:    linear-gradient(90deg, #059669, #34d399);
 
-  --shadow-sm:           0 1px 3px rgba(0,0,0,0.5);
-  --shadow-md:           0 4px 20px rgba(0,0,0,0.6);
-  --shadow-lg:           0 8px 40px rgba(0, 242, 254, 0.25);
-  --shadow-glow:         0 0 24px rgba(0, 242, 254, 0.35);
+  --shadow-sm:           0 1px 3px rgba(0,0,0,0.6);
+  --shadow-md:           0 4px 20px rgba(0,0,0,0.7);
+  --shadow-lg:           0 8px 40px rgba(0, 0, 0, 0.8);
+  --shadow-glow:         0 0 24px rgba(56, 189, 248, 0.3);
 
   --radius-sm:           8px;
   --radius-md:           14px;
@@ -263,23 +267,38 @@ body.light-mode .nav-actions::before {
   gap: 16px;
 }
 
-.nav-logo {
-  width: 4.8rem;
-  height: 4.8rem;
-  object-fit: contain;
+/* Logo wrapper — the visible circular box */
+.nav-logo-wrap {
+  width: 4.4rem;
+  height: 4.4rem;
   border-radius: 50%;
-  padding: 5px;
-  background: linear-gradient(135deg, rgba(0, 242, 254, 0.25), rgba(79, 172, 254, 0.3));
-  border: 1.5px solid rgba(0, 242, 254, 0.6);
-  box-shadow: 0 0 18px rgba(0, 242, 254, 0.45);
-  transition: transform var(--transition-base), box-shadow 0.3s, border-color 0.3s;
-  display: block;
+  overflow: hidden;
   flex-shrink: 0;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1.5px solid rgba(0, 242, 254, 0.4);
+  box-shadow: 0 0 14px rgba(0, 242, 254, 0.25);
+  transition: box-shadow 0.3s, border-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.nav-logo:hover {
-  transform: scale(1.15) rotate(-3deg);
+.nav-logo-wrap:hover {
   box-shadow: 0 0 28px rgba(0, 242, 254, 0.8);
   border-color: #00f2fe;
+}
+
+/* Logo image — fits inside the clipped wrapper */
+.nav-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(1.9);
+  transform-origin: center;
+  transition: transform var(--transition-base);
+  display: block;
+}
+.nav-logo-wrap:hover .nav-logo {
+  transform: scale(2.0);
 }
 
 .brand-name {
@@ -432,10 +451,9 @@ body.light-mode .nav-links a.active {
   .logo {
     gap: 8px !important;
   }
-  .nav-logo {
+  .nav-logo-wrap {
     width: 3.6rem !important;
     height: 3.6rem !important;
-    padding: 3px !important;
   }
   .brand-name {
     font-size: 1.6rem !important;
@@ -487,7 +505,7 @@ body.light-mode .nav-links a.active {
     padding: 6px 12px !important;
     height: 58px !important;
   }
-  .nav-logo {
+  .nav-logo-wrap {
     width: 3.2rem !important;
     height: 3.2rem !important;
   }
@@ -550,27 +568,39 @@ body.light-mode .nav-links a.active {
 .footer-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 20px;
   text-decoration: none;
 }
-.footer-logo-img {
-  width: 44px;
-  height: 44px;
-  object-fit: contain;
+.footer-logo-wrap {
+  width: 4.4rem;
+  height: 4.4rem;
   border-radius: 50%;
-  padding: 4px;
-  background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(99, 102, 241, 0.25));
-  border: 1.5px solid rgba(0, 242, 254, 0.5);
-  box-shadow: 0 0 14px rgba(0, 242, 254, 0.35);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  display: block;
+  overflow: hidden;
   flex-shrink: 0;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1.5px solid rgba(0, 242, 254, 0.4);
+  box-shadow: 0 0 14px rgba(0, 242, 254, 0.25);
+  transition: box-shadow 0.3s, border-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.footer-logo:hover .footer-logo-wrap {
+  box-shadow: 0 0 28px rgba(0, 242, 254, 0.8);
+  border-color: #00f2fe;
+}
+.footer-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(1.9);
+  transform-origin: center;
+  transition: transform var(--transition-base);
+  display: block;
 }
 .footer-logo:hover .footer-logo-img {
-  transform: scale(1.12);
-  box-shadow: 0 0 22px rgba(0, 242, 254, 0.7);
-  border-color: #00f2fe;
+  transform: scale(2.0);
 }
 .footer-logo-name {
   font-size: 2.2rem;
@@ -1356,17 +1386,25 @@ body.light-mode .nav-links a.active {
 }
 
 .brain-icon-glow {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(15, 23, 42, 0.5);
+  border: 2px solid rgba(0, 242, 254, 0.8);
+  box-shadow: 0 0 25px rgba(0, 242, 254, 0.6);
   z-index: 3;
 }
 
 .brain-3d-logo {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(1.9);
+  transform-origin: center;
   filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.6)) drop-shadow(0 0 25px rgba(79, 172, 254, 0.6));
   animation: ctaBrainPulse 3s infinite ease-in-out;
 }
@@ -1382,8 +1420,8 @@ body.light-mode .nav-links a.active {
 }
 
 @keyframes ctaBrainPulse {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.6)) drop-shadow(0 0 25px rgba(79, 172, 254, 0.6)); }
-  50% { transform: scale(1.08); filter: drop-shadow(0 0 25px rgba(0, 242, 254, 0.9)) drop-shadow(0 0 40px rgba(79, 172, 254, 0.9)); }
+  0%, 100% { transform: scale(1.9); filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.6)) drop-shadow(0 0 25px rgba(79, 172, 254, 0.6)); }
+  50% { transform: scale(2.05); filter: drop-shadow(0 0 25px rgba(0, 242, 254, 0.9)) drop-shadow(0 0 40px rgba(79, 172, 254, 0.9)); }
 }
 
 @media (max-width: 1024px) {

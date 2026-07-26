@@ -169,12 +169,12 @@ const Community = () => {
             <div className="flex gap-6 relative z-10">
               <div className="flex flex-col items-center gap-4">
                 <div 
-                  className="w-12 h-12 rounded-xl flex items-center justify-center bg-[#050a18] border border-white/5 relative z-10 transition-transform group-focus-within:border-accent-primary/30 shadow-2xl"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-900/60 border border-white/10 overflow-hidden relative z-10 p-0 shadow-lg"
                 >
                   <img 
-                    src="https://raw.githubusercontent.com/Anantm007/Nexus-membership-/main/sun%20nexus%20logo.png" 
+                    src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png" 
                     alt="Nexus" 
-                    className="w-7 h-7 object-contain"
+                    className="w-full h-full object-contain scale-[2.15]"
                   />
                 </div>
                 <div className="w-[1px] flex-1 bg-gradient-to-b from-white/10 via-white/5 to-transparent" />

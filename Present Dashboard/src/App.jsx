@@ -25,22 +25,27 @@ function App() {
   if (!isAuthenticated) return <Auth />;
 
   const knownPages = ['dashboard', 'learning', 'domains', 'aptitude', 'council', 'projects', 'profile', 'admin'];
+  const isDashboard = activePage === 'dashboard';
 
   return (
     <div className="min-h-screen">
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} activePage={activePage} setActivePage={setActivePage} />
       <div className="flex flex-col lg-ml-280 min-h-screen">
         <Navbar toggleSidebar={toggleSidebar} setActivePage={setActivePage} />
-        <main className="flex-1 flex flex-col p-6 md:p-10 lg:p-12" style={{ marginTop: '5rem' }}>
-          {activePage === 'dashboard'  && <Dashboard />}
-          {activePage === 'learning'   && <Learning />}
-          {activePage === 'domains'    && <Domains />}
-          {activePage === 'aptitude'   && <Aptitude />}
-          {activePage === 'projects'   && <Projects />}
-          {activePage === 'council'    && <UnderProgress page="Council" />}
-          {activePage === 'profile'    && <Profile />}
-          {activePage === 'admin'      && (user?.isAdmin ? <Admin /> : <UnderProgress page="Admin" />)}
-          {!knownPages.includes(activePage) && <UnderProgress page={activePage.charAt(0).toUpperCase() + activePage.slice(1)} />}
+        {/* Sidebar theme applied to all pages except Dashboard */}
+        <main
+          className={`flex-1 flex flex-col p-6 md:p-10 lg:p-12${!isDashboard ? ' sidebar-theme-page' : ''}`}
+          style={{ marginTop: '5rem' }}
+        >
+          {activePage === 'dashboard' && <Dashboard />}
+          {activePage === 'learning' && <Learning />}
+          {activePage === 'domains' && <UnderProgress page="Domains" onReturn={() => setActivePage('dashboard')} />}
+          {activePage === 'aptitude' && <Aptitude />}
+          {activePage === 'projects' && <UnderProgress page="Projects" onReturn={() => setActivePage('dashboard')} />}
+          {activePage === 'council' && <UnderProgress page="Council" onReturn={() => setActivePage('dashboard')} />}
+          {activePage === 'profile' && <Profile />}
+          {activePage === 'admin' && (user?.isAdmin ? <Admin /> : <UnderProgress page="Admin" onReturn={() => setActivePage('dashboard')} />)}
+          {!knownPages.includes(activePage) && <UnderProgress page={activePage.charAt(0).toUpperCase() + activePage.slice(1)} onReturn={() => setActivePage('dashboard')} />}
         </main>
       </div>
       <AIChatbot />

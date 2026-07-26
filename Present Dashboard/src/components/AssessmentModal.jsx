@@ -1,33 +1,128 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Timer, CheckCircle, XCircle, Trophy, ChevronRight, RotateCcw, BookOpen, BarChart2 } from 'lucide-react';
+import { X, Timer, CheckCircle, XCircle, ChevronRight, BookOpen, BarChart2, ArrowRight, FileText } from 'lucide-react';
 import { saveResult } from '../store/dataStore';
 import { useAuth } from '../contexts/AuthContext';
 
+/** Golden 3D Trophy with particles graphic matching the reference image */
+const TrophyGraphic = () => (
+  <div style={{ position: 'relative', width: '110px', height: '76px', margin: '0 auto 4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <svg viewBox="0 0 160 120" style={{ width: '100%', height: '100%' }}>
+      <defs>
+        <linearGradient id="goldCupGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#fbbf24" />
+          <stop offset="50%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#d97706" />
+        </linearGradient>
+        <linearGradient id="goldStemGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#b45309" />
+        </linearGradient>
+        <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#fef3c7" />
+        </linearGradient>
+      </defs>
+
+      {/* Floating Particles around Trophy */}
+      <circle cx="25" cy="40" r="2.5" fill="#38bdf8" />
+      <rect x="50" y="20" width="4" height="4" rx="1" fill="#f59e0b" transform="rotate(25 50 20)" />
+      <circle cx="55" cy="55" r="3" fill="#a855f7" />
+      <circle cx="100" cy="22" r="3" fill="#fb923c" />
+      <circle cx="140" cy="40" r="2.5" fill="#a855f7" />
+      <rect x="135" y="70" width="4" height="4" rx="1" fill="#818cf8" transform="rotate(45 135 70)" />
+      <circle cx="125" cy="90" r="2" fill="#38bdf8" opacity="0.8" />
+      <circle cx="35" cy="85" r="3" fill="#c084fc" opacity="0.8" />
+
+      {/* Base */}
+      <rect x="52" y="98" width="56" height="12" rx="4" fill="url(#goldStemGrad)" />
+      <path d="M 68 82 L 92 82 L 88 98 L 72 98 Z" fill="url(#goldStemGrad)" />
+
+      {/* Cup Handles */}
+      <path d="M 45 42 C 30 42, 30 70, 52 72 L 52 64 C 40 64, 40 48, 48 48 Z" fill="#d97706" />
+      <path d="M 115 42 C 130 42, 130 70, 108 72 L 108 64 C 120 64, 120 48, 112 48 Z" fill="#d97706" />
+
+      {/* Main Cup */}
+      <path d="M 46 36 L 114 36 Q 112 78 80 80 Q 48 78 46 36 Z" fill="url(#goldCupGrad)" />
+      <ellipse cx="80" cy="36" rx="34" ry="6" fill="#fef3c7" opacity="0.6" />
+
+      {/* White Star on Cup */}
+      <polygon
+        points="80,48 83,56 92,56 85,61 87,70 80,64 73,70 75,61 68,56 77,56"
+        fill="url(#starGrad)"
+      />
+    </svg>
+  </div>
+);
+
 const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
   const { user } = useAuth();
-  const [phase, setPhase] = useState(previousResult ? 'result' : 'quiz'); // 'quiz' | 'result'
-  const [resultTab, setResultTab] = useState(previousResult ? 'review' : 'summary'); // 'summary' | 'review'
+  const [phase, setPhase] = useState(previousResult ? 'result' : 'quiz');
+  const [resultTab, setResultTab] = useState('summary');
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState(previousResult?.answers || {});
   const [selected, setSelected] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(assessment.timeLimit * 60);
+
+  const initialSeconds = (assessment?.timeLimit && typeof assessment.timeLimit === 'number' && assessment.timeLimit > 0)
+    ? assessment.timeLimit * 60
+    : 20 * 60;
+
+  const [timeLeft, setTimeLeft] = useState(initialSeconds);
   const [submitted, setSubmitted] = useState(!!previousResult);
 
-  const questions = assessment.questions || [];
-  const total = questions.length;
+  const questions = assessment?.questions || [];
+  const total = questions.length || 20;
 
-  // Timer
+  const handleSubmit = useCallback((finalAnswers) => {
+    if (submitted) return;
+    setSubmitted(true);
+    const ans = finalAnswers || { ...answers, ...(selected !== null ? { [current]: selected } : {}) };
+    const score = questions.reduce((acc, q, i) => acc + (ans[i] === q.answer ? 1 : 0), 0);
+    const result = {
+      assessmentId: assessment.id,
+      topic: assessment.topic || assessment.title,
+      category: assessment.category,
+      score,
+      total,
+      percentage: Math.round((score / total) * 100),
+      answers: ans,
+      userEmail: user?.email || 'guest',
+      userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.username || 'Guest',
+      userId: user?.id,
+    };
+    saveResult(result);
+    setAnswers(ans);
+    setPhase('result');
+  }, [submitted, answers, selected, current, questions, assessment, user, total]);
+
   useEffect(() => {
     if (phase !== 'quiz' || submitted) return;
-    if (timeLeft <= 0) { handleSubmit(); return; }
-    const t = setTimeout(() => setTimeLeft(s => s - 1), 1000);
-    return () => clearTimeout(t);
-  }, [timeLeft, phase, submitted]);
+    if (timeLeft <= 0) {
+      handleSubmit();
+      return;
+    }
+    const timerId = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timerId);
+          handleSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timerId);
+  }, [phase, submitted, timeLeft, handleSubmit]);
 
-  const formatTime = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-  const timerColor = timeLeft < 60 ? '#ef4444' : timeLeft < 180 ? '#f59e0b' : '#22d3ee';
+  const formatTime = (seconds) => {
+    if (isNaN(seconds) || seconds < 0) return '00:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  };
+
+  const timerColor = timeLeft < 60 ? '#ef4444' : timeLeft < 300 ? '#f59e0b' : '#6366f1';
 
   const handleSelect = (optIdx) => {
     if (submitted) return;
@@ -42,32 +137,14 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
     else handleSubmit({ ...answers, [current]: selected });
   };
 
-  const handleSubmit = useCallback((finalAnswers) => {
-    if (submitted) return;
-    setSubmitted(true);
-    const ans = finalAnswers || { ...answers, ...(selected !== null ? { [current]: selected } : {}) };
-    const score = questions.reduce((acc, q, i) => acc + (ans[i] === q.answer ? 1 : 0), 0);
-    const result = {
-      assessmentId: assessment.id,
-      topic: assessment.topic,
-      category: assessment.category,
-      score,
-      total,
-      percentage: Math.round((score / total) * 100),
-      answers: ans,
-      userEmail: user?.email || 'guest',
-      userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.username || 'Guest',
-      userId: user?.id,
-    };
-    saveResult(result);
-    setAnswers(ans);
-    setPhase('result');
-  }, [answers, selected, current, questions, assessment, user, submitted, total]);
-
   const q = questions[current];
-  const finalScore = questions.reduce((acc, q, i) => acc + (answers[i] === q.answer ? 1 : 0), 0);
-  const pct = Math.round((finalScore / total) * 100);
-  const grade = pct >= 80 ? { label: 'Excellent!', color: '#22c55e' } : pct >= 60 ? { label: 'Good Job!', color: '#f59e0b' } : { label: 'Keep Practicing', color: '#ef4444' };
+
+  // Calculated Metrics
+  const finalScore = previousResult ? previousResult.score : questions.reduce((acc, q, i) => acc + (answers[i] === q.answer ? 1 : 0), 0);
+  const pct = previousResult ? previousResult.percentage : Math.round((finalScore / (total || 1)) * 100);
+  const wrongCount = Math.max(0, total - finalScore);
+
+  const gradeText = pct >= 80 ? 'Excellent Work!' : pct >= 60 ? 'Good Job!' : 'Keep Practicing!';
 
   return createPortal(
     <AnimatePresence>
@@ -76,93 +153,68 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        onClick={phase === 'result' ? onClose : undefined}
-        style={{ position: 'fixed', inset: 0, zIndex: 9998, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(14px)' }}
+        onClick={onClose}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9998,
+          background: 'rgba(15, 23, 42, 0.75)',
+          backdropFilter: 'blur(8px)',
+        }}
       />
-      <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', pointerEvents: 'none' }}>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', pointerEvents: 'none' }}>
         <motion.div
           key="modal"
-          initial={{ opacity: 0, scale: 0.93, y: 24 }}
+          initial={{ opacity: 0, scale: 0.94, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.93, y: 24 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+          exit={{ opacity: 0, scale: 0.94, y: 16 }}
+          transition={{ type: 'spring', stiffness: 320, damping: 28 }}
           style={{
-            pointerEvents: 'auto', width: '100%', maxWidth: '560px',
-            background: 'var(--bg-secondary)', border: '1px solid var(--border-strong)',
-            borderRadius: '2rem', overflow: 'hidden', boxShadow: '0 40px 100px rgba(0,0,0,0.7)',
+            pointerEvents: 'auto',
+            width: '100%',
+            maxWidth: '440px',
+            backgroundColor: '#ffffff',
+            borderRadius: '24px',
+            overflow: 'hidden',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+            color: '#0f172a',
+            fontFamily: "'Inter', sans-serif",
           }}
         >
-          {/* Top accent */}
-          <div style={{ height: '4px', background: 'var(--accent-gradient)' }} />
-
           {phase === 'quiz' && q && (
-            <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {/* Header */}
+            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
-                  <p style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--text-muted)', marginBottom: '4px' }}>
-                    {assessment.category} · {assessment.topic}
+                  <p style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#64748b', marginBottom: '2px' }}>
+                    {assessment.category} · {assessment.topic || assessment.title}
                   </p>
-                  <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>
                     Question {current + 1} of {total}
                   </p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '999px', background: `${timerColor}15`, border: `1px solid ${timerColor}40` }}>
-                    <Timer size={14} style={{ color: timerColor }} />
-                    <span style={{ fontSize: '14px', fontWeight: 800, color: timerColor, fontVariantNumeric: 'tabular-nums' }}>{formatTime(timeLeft)}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '999px', background: `${timerColor}15`, border: `1px solid ${timerColor}40` }}>
+                    <Timer size={13} style={{ color: timerColor }} />
+                    <span style={{ fontSize: '13px', fontWeight: 800, color: timerColor }}>{formatTime(timeLeft)}</span>
                   </div>
-                  <button 
-                    onClick={() => {
-                      if (phase === 'quiz' && !submitted) {
-                        if (confirm('Exit Assessment? Progress will not be saved.')) onClose();
-                      } else {
-                        onClose();
-                      }
-                    }}
-                    style={{ 
-                      padding: '8px 16px', 
-                      borderRadius: '12px', 
-                      color: '#ef4444', 
-                      background: 'rgba(239,68,68,0.1)', 
-                      border: '1px solid rgba(239,68,68,0.2)',
-                      fontWeight: 800,
-                      fontSize: '12px',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = '#ef4444';
-                      e.currentTarget.style.color = 'white';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = 'rgba(239,68,68,0.1)';
-                      e.currentTarget.style.color = '#ef4444';
-                    }}
+                  <button
+                    onClick={onClose}
+                    style={{ padding: '6px 10px', borderRadius: '10px', color: '#ef4444', background: '#fee2e2', border: 'none', fontWeight: 800, fontSize: '12px', cursor: 'pointer' }}
                   >
-                    <span>Exit</span>
-                    <X size={14} />
+                    <X size={13} />
                   </button>
                 </div>
               </div>
 
-              {/* Progress bar */}
-              <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '999px', overflow: 'hidden' }}>
-                <motion.div animate={{ width: `${((current + 1) / total) * 100}%` }} style={{ height: '100%', background: 'var(--accent-gradient)', borderRadius: '999px' }} />
+              <div style={{ height: '5px', background: '#f1f5f9', borderRadius: '999px', overflow: 'hidden' }}>
+                <motion.div animate={{ width: `${((current + 1) / total) * 100}%` }} style={{ height: '100%', background: '#6366f1', borderRadius: '999px' }} />
               </div>
 
-              {/* Question */}
-              <div style={{ padding: '1.25rem', background: 'rgba(255,255,255,0.03)', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <p style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.6 }}>{q.text}</p>
+              <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '0.875rem', border: '1px solid #e2e8f0' }}>
+                <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', lineHeight: 1.5 }}>{q.question || q.text}</p>
               </div>
 
-              {/* Options */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {q.options.map((opt, i) => {
                   const isSelected = selected === i;
                   return (
@@ -171,15 +223,14 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleSelect(i)}
                       style={{
-                        width: '100%', padding: '14px 18px', borderRadius: '14px', textAlign: 'left',
-                        fontWeight: 600, fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s',
-                        background: isSelected ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.03)',
-                        border: isSelected ? '1.5px solid #6366f1' : '1.5px solid rgba(255,255,255,0.07)',
-                        color: isSelected ? '#a5b4fc' : 'var(--text-secondary)',
-                        boxShadow: isSelected ? '0 0 20px rgba(99,102,241,0.15)' : 'none',
+                        width: '100%', padding: '12px 14px', borderRadius: '12px', textAlign: 'left',
+                        fontWeight: 600, fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s',
+                        background: isSelected ? '#eeeffe' : '#ffffff',
+                        border: isSelected ? '2px solid #5b46e0' : '1.5px solid #e2e8f0',
+                        color: isSelected ? '#5b46e0' : '#334155',
                       }}
                     >
-                      <span style={{ marginRight: '12px', fontWeight: 800, color: isSelected ? '#6366f1' : 'var(--text-muted)' }}>
+                      <span style={{ marginRight: '10px', fontWeight: 800, color: isSelected ? '#5b46e0' : '#94a3b8' }}>
                         {String.fromCharCode(65 + i)}.
                       </span>
                       {opt}
@@ -188,234 +239,333 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                 })}
               </div>
 
-              {/* Next / Submit */}
               <motion.button
-                whileHover={{ scale: selected !== null ? 1.02 : 1 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleNext}
                 disabled={selected === null}
                 style={{
-                  width: '100%', padding: '14px', borderRadius: '14px', fontWeight: 800,
-                  fontSize: '14px', color: 'white', border: 'none', cursor: selected !== null ? 'pointer' : 'not-allowed',
-                  background: selected !== null ? 'var(--accent-gradient)' : 'rgba(255,255,255,0.06)',
-                  opacity: selected !== null ? 1 : 0.5,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  transition: 'all 0.2s',
+                  width: '100%', padding: '12px', borderRadius: '12px', fontWeight: 800,
+                  fontSize: '13px', color: 'white', border: 'none', cursor: selected !== null ? 'pointer' : 'not-allowed',
+                  background: selected !== null ? '#5b46e0' : '#cbd5e1',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                 }}
               >
                 {current < total - 1 ? 'Next Question' : 'Submit Assessment'}
-                <ChevronRight size={16} />
+                <ChevronRight size={15} />
               </motion.button>
             </div>
           )}
 
           {phase === 'result' && (
-            <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
-              {/* Result tabs */}
-              <div style={{ display: 'flex', borderBottom: '1px solid var(--border-subtle)', padding: '0 2rem' }}>
-                {[{ id: 'summary', label: 'Summary', icon: BarChart2 }, { id: 'review', label: 'Review Mistakes', icon: BookOpen }].map(t => (
-                  <button key={t.id} onClick={() => setResultTab(t.id)}
-                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '14px 16px', fontSize: '13px', fontWeight: 700, border: 'none', background: 'none', cursor: 'pointer', borderBottom: `2px solid ${resultTab === t.id ? 'var(--accent-primary)' : 'transparent'}`, color: resultTab === t.id ? 'var(--accent-primary)' : 'var(--text-muted)', transition: 'all 0.2s' }}>
-                    <t.icon size={14} /> {t.label}
-                    {t.id === 'review' && (total - finalScore) > 0 && (
-                      <span style={{ fontSize: '10px', fontWeight: 800, padding: '1px 6px', borderRadius: '999px', background: '#ef444420', color: '#ef4444' }}>{total - finalScore}</span>
-                    )}
-                  </button>
-                ))}
+            <div style={{ display: 'flex', flexDirection: 'column', padding: '18px 22px 22px' }}>
+              {/* ── TOP NAV TABS ── */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px', marginBottom: '18px' }}>
+                <button
+                  onClick={() => setResultTab('summary')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    border: 'none',
+                    background: 'none',
+                    cursor: 'pointer',
+                    color: resultTab === 'summary' ? '#5b46e0' : '#64748b',
+                    position: 'relative',
+                    paddingBottom: '6px',
+                  }}
+                >
+                  <BarChart2 size={16} style={{ color: resultTab === 'summary' ? '#5b46e0' : '#64748b' }} />
+                  <span>Summary</span>
+                  {resultTab === 'summary' && (
+                    <motion.div
+                      layoutId="tabUnderline"
+                      style={{
+                        position: 'absolute',
+                        bottom: '-11px',
+                        left: 0,
+                        right: 0,
+                        height: '3px',
+                        backgroundColor: '#5b46e0',
+                        borderRadius: '3px 3px 0 0',
+                      }}
+                    />
+                  )}
+                </button>
+
+                <button
+                  onClick={() => setResultTab('review')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    border: 'none',
+                    background: 'none',
+                    cursor: 'pointer',
+                    color: resultTab === 'review' ? '#5b46e0' : '#64748b',
+                    position: 'relative',
+                    paddingBottom: '6px',
+                  }}
+                >
+                  <BookOpen size={16} style={{ color: resultTab === 'review' ? '#5b46e0' : '#64748b' }} />
+                  <span>Review Mistakes</span>
+                  {wrongCount > 0 && (
+                    <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 7px', borderRadius: '999px', backgroundColor: '#fee2e2', color: '#ef4444' }}>
+                      {wrongCount}
+                    </span>
+                  )}
+                  {resultTab === 'review' && (
+                    <motion.div
+                      layoutId="tabUnderline"
+                      style={{
+                        position: 'absolute',
+                        bottom: '-11px',
+                        left: 0,
+                        right: 0,
+                        height: '3px',
+                        backgroundColor: '#5b46e0',
+                        borderRadius: '3px 3px 0 0',
+                      }}
+                    />
+                  )}
+                </button>
               </div>
 
-              <div style={{ overflowY: 'auto', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: resultTab === 'summary' ? 'center' : 'stretch', textAlign: resultTab === 'summary' ? 'center' : 'left' }}>
+              {/* ── SUMMARY TAB CONTENT (Proportional & Compact) ── */}
+              {resultTab === 'summary' && (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+                  {/* Hero Trophy Illustration */}
+                  <TrophyGraphic />
 
-                {/* ── SUMMARY TAB ── */}
-                {resultTab === 'summary' && (
-                  <>
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.1 }}>
-                      <Trophy size={56} style={{ color: grade.color }} />
-                    </motion.div>
-                    <div>
-                      <h2 style={{ fontSize: '2rem', fontWeight: 900, color: grade.color, marginBottom: '6px' }}>{grade.label}</h2>
-                      <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>{assessment.topic} · {assessment.category}</p>
-                    </div>
+                  {/* Heading & Subtitle */}
+                  <div style={{ textAlign: 'center' }}>
+                    <h2 style={{ fontSize: '22px', fontWeight: 900, color: '#3b0764', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>
+                      {gradeText}
+                    </h2>
+                    <p style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', margin: 0 }}>
+                      {assessment?.topic || assessment?.title || 'Puzzles (Mixed Logic)'} · {assessment?.category || 'Logical Reasoning'}
+                    </p>
+                  </div>
 
-                    {/* Score ring */}
-                    <div style={{ position: 'relative', width: '120px', height: '120px' }}>
-                      <svg width="120" height="120" style={{ transform: 'rotate(-90deg)' }}>
-                        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
-                        <motion.circle cx="60" cy="60" r="50" fill="none" stroke={grade.color} strokeWidth="10"
-                          strokeLinecap="round" strokeDasharray={`${2 * Math.PI * 50}`}
-                          initial={{ strokeDashoffset: 2 * Math.PI * 50 }}
-                          animate={{ strokeDashoffset: 2 * Math.PI * 50 * (1 - pct / 100) }}
-                          transition={{ duration: 1.2, ease: 'easeOut', delay: 0.3 }}
-                        />
-                      </svg>
-                      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--text-primary)' }}>{pct}%</span>
-                        <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Score</span>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', width: '100%' }}>
-                      {[
-                        { label: 'Correct', value: finalScore,         icon: CheckCircle, color: '#22c55e' },
-                        { label: 'Wrong',   value: total - finalScore, icon: XCircle,     color: '#ef4444' },
-                      ].map((s, i) => (
-                        <div key={i} style={{ padding: '16px', borderRadius: '14px', background: `${s.color}10`, border: `1px solid ${s.color}25`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                          <s.icon size={20} style={{ color: s.color }} />
-                          <span style={{ fontSize: '1.5rem', fontWeight: 900, color: s.color }}>{s.value}</span>
-                          <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)' }}>{s.label}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <button onClick={() => setResultTab('review')}
-                      className="relative overflow-hidden w-100 py-4 font-black text-[10px] uppercase tracking-ultra outline-none duration-300 group active:opacity-75"
-                      style={{ 
-                        background: '#10b98115', 
-                        color: '#10b981', 
-                        border: '1px solid #10b98140',
-                        borderBottom: '4px solid #10b981',
-                        borderRadius: '9999px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        cursor: 'pointer',
-                        justifyContent: 'center',
-                        width: '100%'
-                      }}
-                      onMouseEnter={e => {
-                        e.currentTarget.style.filter = 'brightness(1.5)';
-                        e.currentTarget.style.borderTopWidth = '4px';
-                        e.currentTarget.style.borderBottomWidth = '1px';
-                      }}
-                      onMouseLeave={e => {
-                        e.currentTarget.style.filter = 'none';
-                        e.currentTarget.style.borderTopWidth = '1px';
-                        e.currentTarget.style.borderBottomWidth = '4px';
-                      }}
-                    >
-                      <span 
-                        className="absolute -top-[150%] left-0 inline-flex w-[400px] h-[5px] opacity-50 duration-500 group-hover:top-[150%]"
-                        style={{ 
-                          background: '#10b981', 
-                          boxShadow: '0 0 10px 10px #10b98140',
-                          borderRadius: '999px'
-                        }}
+                  {/* Circular Donut Score Chart (Scaled to 110px) */}
+                  <div style={{ position: 'relative', width: '110px', height: '110px', margin: '2px 0' }}>
+                    <svg width="110" height="110" style={{ transform: 'rotate(-90deg)' }}>
+                      <circle cx="55" cy="55" r="44" fill="none" stroke="#f3e8ff" strokeWidth="9" />
+                      <motion.circle
+                        cx="55"
+                        cy="55"
+                        r="44"
+                        fill="none"
+                        stroke="#5b46e0"
+                        strokeWidth="9"
+                        strokeLinecap="round"
+                        strokeDasharray={`${2 * Math.PI * 44}`}
+                        initial={{ strokeDashoffset: 2 * Math.PI * 44 }}
+                        animate={{ strokeDashoffset: 2 * Math.PI * 44 * (1 - pct / 100) }}
+                        transition={{ duration: 1.2, ease: 'easeOut', delay: 0.2 }}
                       />
-                      {/* <BookOpen size={15} className="transition-transform" />  */}
-                      {finalScore === total ? 'Review All Questions & Explanations' : `Review ${total - finalScore} Mistake${total - finalScore > 1 ? 's' : ''} & Explanations`}
-                    </button>
-
-                    <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
-                      <button onClick={onClose} style={{ flex: 1, padding: '13px', borderRadius: '14px', fontWeight: 700, fontSize: '14px', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.08)', background: 'transparent', cursor: 'pointer' }}>
-                        Close
-                      </button>
-                      <button onClick={() => { setPhase('result'); setResultTab('review'); }}
-                        className="relative overflow-hidden flex-1 py-3.5 font-black text-[10px] uppercase tracking-ultra outline-none duration-300 group active:opacity-75"
-                        style={{ 
-                          background: '#10b98115', 
-                          color: '#10b981', 
-                          border: '1px solid #10b98140',
-                          borderBottom: '4px solid #10b981',
-                          borderRadius: '9999px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          cursor: 'pointer',
-                          justifyContent: 'center'
-                        }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.filter = 'brightness(1.5)';
-                          e.currentTarget.style.borderTopWidth = '4px';
-                          e.currentTarget.style.borderBottomWidth = '1px';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.filter = 'none';
-                          e.currentTarget.style.borderTopWidth = '1px';
-                          e.currentTarget.style.borderBottomWidth = '4px';
-                        }}
-                      >
-                        <span 
-                          className="absolute -top-[150%] left-0 inline-flex w-[400px] h-[5px] opacity-50 duration-500 group-hover:top-[150%]"
-                          style={{ 
-                            background: '#10b981', 
-                            boxShadow: '0 0 10px 10px #10b98140',
-                            borderRadius: '999px'
-                          }}
-                        />
-                        Review Answers
-                      </button>
-                    </div>
-                  </>
-                )}
-
-                {/* ── REVIEW TAB ── */}
-                {resultTab === 'review' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      {questions.map((q, i) => {
-                        const userAns = answers[i];
-                        const correct = userAns === q.answer;
-                        return (
-                          <motion.div key={i}
-                            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                            style={{ borderRadius: '16px', overflow: 'hidden', border: `1px solid ${correct ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.25)'}` }}
-                          >
-                            {/* Question header */}
-                            <div style={{ padding: '14px 16px', background: correct ? 'rgba(34,197,94,0.06)' : 'rgba(239,68,68,0.06)', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                              {correct
-                                ? <CheckCircle size={16} style={{ color: '#22c55e', flexShrink: 0, marginTop: '2px' }} />
-                                : <XCircle size={16} style={{ color: '#ef4444', flexShrink: 0, marginTop: '2px' }} />}
-                              <div style={{ flex: 1 }}>
-                                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-                                  <span style={{ fontSize: '10px', fontWeight: 800, color: correct ? '#22c55e' : '#ef4444', textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: '8px' }}>Q{i + 1}</span>
-                                  {q.text}
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* Options */}
-                            <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '6px', background: 'var(--bg-tertiary)' }}>
-                              {q.options.map((opt, oi) => {
-                                const isCorrect = oi === q.answer;
-                                const isUserWrong = oi === userAns && !correct;
-                                const bg = isCorrect ? 'rgba(34,197,94,0.12)' : isUserWrong ? 'rgba(239,68,68,0.1)' : 'transparent';
-                                const border = isCorrect ? '1px solid rgba(34,197,94,0.35)' : isUserWrong ? '1px solid rgba(239,68,68,0.3)' : '1px solid transparent';
-                                const color = isCorrect ? '#22c55e' : isUserWrong ? '#ef4444' : 'var(--text-secondary)';
-                                return (
-                                  <div key={oi} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '10px', background: bg, border, transition: 'all 0.15s' }}>
-                                    <span style={{ fontSize: '11px', fontWeight: 800, color, minWidth: '18px' }}>{String.fromCharCode(65 + oi)}.</span>
-                                    <span style={{ fontSize: '13px', fontWeight: isCorrect || isUserWrong ? 700 : 500, color }}>{opt}</span>
-                                    {isCorrect && <CheckCircle size={13} style={{ color: '#22c55e', marginLeft: 'auto', flexShrink: 0 }} />}
-                                    {isUserWrong && <XCircle size={13} style={{ color: '#ef4444', marginLeft: 'auto', flexShrink: 0 }} />}
-                                  </div>
-                                );
-                              })}
-                            </div>
-
-                            {/* Explanation — always shown */}
-                            {q.explanation && (
-                              <div style={{ padding: '12px 16px', background: 'rgba(99,102,241,0.06)', borderTop: '1px solid rgba(99,102,241,0.12)', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                                <BookOpen size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0, marginTop: '2px' }} />
-                                <p style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                                  <span style={{ fontWeight: 800, color: 'var(--accent-primary)' }}>Explanation: </span>
-                                  {q.explanation}
-                                </p>
-                              </div>
-                            )}
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                      <button onClick={() => setResultTab('summary')}
-                        style={{ width: '100%', padding: '13px', borderRadius: '14px', fontWeight: 800, fontSize: '14px', color: 'white', background: 'var(--accent-gradient)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                        <Trophy size={14} /> Back to Summary
-                      </button>
+                    </svg>
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', lineHeight: 1 }}>{pct}%</span>
+                      <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '2px' }}>SCORE</span>
                     </div>
                   </div>
-                )}
-              </div>
+
+                  {/* 2 Metric Cards Grid (Correct vs Wrong) */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', width: '100%' }}>
+                    {/* Correct Card */}
+                    <div style={{ padding: '14px 10px', borderRadius: '16px', backgroundColor: '#f0fdf4', border: '1.5px solid #dcfce7', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#d1fae5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
+                        <CheckCircle size={16} />
+                      </div>
+                      <span style={{ fontSize: '24px', fontWeight: 900, color: '#059669', lineHeight: 1, marginBottom: '4px' }}>
+                        {finalScore}
+                      </span>
+                      <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#475569', marginBottom: '2px' }}>
+                        CORRECT
+                      </span>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 500 }}>
+                        Good job! Keep it up.
+                      </span>
+                    </div>
+
+                    {/* Wrong Card */}
+                    <div style={{ padding: '14px 10px', borderRadius: '16px', backgroundColor: '#fef2f2', border: '1.5px solid #fee2e2', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#fee2e2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
+                        <XCircle size={16} />
+                      </div>
+                      <span style={{ fontSize: '24px', fontWeight: 900, color: '#dc2626', lineHeight: 1, marginBottom: '4px' }}>
+                        {wrongCount}
+                      </span>
+                      <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#475569', marginBottom: '2px' }}>
+                        WRONG
+                      </span>
+                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 500 }}>
+                        Review to improve score.
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Middle Review Mistakes Banner */}
+                  <button
+                    onClick={() => setResultTab('review')}
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      borderRadius: '14px',
+                      backgroundColor: '#f3e8ff',
+                      border: '1px solid #e9d5ff',
+                      color: '#5b46e0',
+                      fontWeight: 800,
+                      fontSize: '11px',
+                      letterSpacing: '0.04em',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    <BookOpen size={15} />
+                    <span>REVIEW {wrongCount} MISTAKES & EXPLANATIONS</span>
+                    <ArrowRight size={14} />
+                  </button>
+
+                  {/* Bottom Action Bar (Close & Review Answers) */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', marginTop: '2px' }}>
+                    <button
+                      onClick={onClose}
+                      style={{
+                        flex: 1,
+                        padding: '11px',
+                        borderRadius: '12px',
+                        border: '1.5px solid #e2e8f0',
+                        backgroundColor: '#ffffff',
+                        color: '#334155',
+                        fontWeight: 800,
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'background 0.2s',
+                      }}
+                    >
+                      Close
+                    </button>
+                    <button
+                      onClick={() => setResultTab('review')}
+                      style={{
+                        flex: 1.2,
+                        padding: '11px',
+                        borderRadius: '12px',
+                        border: 'none',
+                        backgroundColor: '#5b46e0',
+                        color: '#ffffff',
+                        fontWeight: 800,
+                        fontSize: '12px',
+                        letterSpacing: '0.04em',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 14px rgba(91, 70, 224, 0.3)',
+                      }}
+                    >
+                      <FileText size={14} />
+                      <span>REVIEW ANSWERS</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* ── REVIEW TAB CONTENT ── */}
+              {resultTab === 'review' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxHeight: '65vh', overflowY: 'auto', paddingRight: '4px' }}>
+                  {questions.map((q, i) => {
+                    const userAns = answers[i];
+                    const correct = userAns === q.answer;
+                    return (
+                      <div
+                        key={i}
+                        style={{
+                          borderRadius: '16px',
+                          overflow: 'hidden',
+                          border: `1.5px solid ${correct ? '#bbf7d0' : '#fecaca'}`,
+                          backgroundColor: '#ffffff',
+                        }}
+                      >
+                        <div style={{ padding: '14px 16px', background: correct ? '#f0fdf4' : '#fef2f2', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                          {correct
+                            ? <CheckCircle size={18} style={{ color: '#059669', flexShrink: 0, marginTop: '2px' }} />
+                            : <XCircle size={18} style={{ color: '#dc2626', flexShrink: 0, marginTop: '2px' }} />}
+                          <div style={{ flex: 1 }}>
+                            <p style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', lineHeight: 1.5, margin: 0 }}>
+                              <span style={{ fontSize: '11px', fontWeight: 800, color: correct ? '#059669' : '#dc2626', textTransform: 'uppercase', letterSpacing: '0.08em', marginRight: '8px' }}>Q{i + 1}</span>
+                              {q.question || q.text}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '6px', background: '#f8fafc' }}>
+                          {q.options.map((opt, oi) => {
+                            const isCorrect = oi === q.answer;
+                            const isUserWrong = oi === userAns && !correct;
+                            const bg = isCorrect ? '#dcfce7' : isUserWrong ? '#fee2e2' : '#ffffff';
+                            const border = isCorrect ? '1px solid #86efac' : isUserWrong ? '1px solid #fca5a5' : '1px solid #e2e8f0';
+                            const color = isCorrect ? '#15803d' : isUserWrong ? '#b91c1c' : '#334155';
+
+                            return (
+                              <div key={oi} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '10px', background: bg, border, transition: 'all 0.15s' }}>
+                                <span style={{ fontSize: '12px', fontWeight: 800, color, minWidth: '20px' }}>{String.fromCharCode(65 + oi)}.</span>
+                                <span style={{ fontSize: '13px', fontWeight: isCorrect || isUserWrong ? 700 : 500, color }}>{opt}</span>
+                                {isCorrect && <CheckCircle size={14} style={{ color: '#16a34a', marginLeft: 'auto', flexShrink: 0 }} />}
+                                {isUserWrong && <XCircle size={14} style={{ color: '#dc2626', marginLeft: 'auto', flexShrink: 0 }} />}
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {q.explanation && (
+                          <div style={{ padding: '12px 16px', background: '#f5f3ff', borderTop: '1px solid #ddd6fe', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                            <BookOpen size={16} style={{ color: '#5b46e0', flexShrink: 0, marginTop: '2px' }} />
+                            <p style={{ fontSize: '12px', fontWeight: 500, color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                              <span style={{ fontWeight: 800, color: '#5b46e0' }}>Explanation: </span>
+                              {q.explanation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                    <button
+                      onClick={() => setResultTab('summary')}
+                      style={{
+                        width: '100%',
+                        padding: '14px',
+                        borderRadius: '14px',
+                        fontWeight: 800,
+                        fontSize: '14px',
+                        color: '#ffffff',
+                        background: '#5b46e0',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      <BarChart2 size={16} /> Back to Summary
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </motion.div>
