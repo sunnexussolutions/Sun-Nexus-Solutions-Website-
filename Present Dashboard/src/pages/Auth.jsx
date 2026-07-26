@@ -1,97 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, Eye, EyeOff, User, Calendar, ArrowRight, BrainCircuit, Zap, Users, ShieldCheck, Orbit, X, Send, CheckCircle2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Mail, Lock, Eye, EyeOff, Cpu, Zap, Users, ShieldCheck, ShieldAlert, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import './Auth.css';
 
-const FEATURES = [
-  { icon: BrainCircuit, label: 'Aptitude Hub',    desc: 'Advanced Cognitive Assessments', color: '#6366f1' },
-  { icon: Zap,          label: 'Mastery Tracks',  desc: 'Curated Learning Architecture',  color: '#06b6d4' },
-  { icon: Users,        label: 'Elite Network',   desc: 'Collaborative Community Hub',    color: '#f59e0b' },
-  { icon: ShieldCheck,  label: 'Admin Command',   desc: 'Strategic Platform Control',      color: '#22c55e' },
-];
-
-const brandingStyles = {
-  logo: {
-    width: '64px',
-    height: '64px',
-    borderRadius: '16px',
-    background: 'var(--accent-gradient)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 0 40px rgba(0, 242, 254, 0.4)',
-    color: 'white',
-    fontSize: '22px',
-    fontWeight: 900
-  },
-  title: {
-    fontSize: '1.6rem',
-    fontWeight: 900,
-    letterSpacing: '0.1em',
-    color: '#fff',
-    textTransform: 'uppercase',
-    textShadow: '0 0 20px rgba(0, 242, 254, 0.5)'
-  }
-};
-
-const inputStyle = (err) => ({
-  width: '100%',
-  background: '#0e1116',
-  border: err ? '1px solid #ef4444' : '1px solid rgba(0, 242, 254, 0.3)',
-  borderRadius: '14px',
-  padding: '14px 14px 14px 44px',
-  color: '#fff',
-  fontSize: '0.95rem',
-  outline: 'none',
-  boxShadow: 'none',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  boxSizing: 'border-box',
-});
-
 export default function Auth() {
-  const [mode, setMode] = useState('login'); // 'login' | 'signup'
+  const [mode, setMode] = useState('login'); // 'login' | 'signup' | 'forgot'
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isPendingApproval, setIsPendingApproval] = useState(false);
   const { login, register, loading } = useAuth();
   
-  // Forms
+  // Login form state
   const [lUser, setLUser] = useState('');
   const [lPass, setLPass] = useState('');
+  const [showLPass, setShowLPass] = useState(false);
 
+  // Signup form state
   const [signupData, setSignupData] = useState({
     first: '', last: '', dob: '', user: '', email: '', pass: '', conf: ''
   });
-
-  const [showLPass, setShowLPass] = useState(false);
   const [showSPass, setShowSPass] = useState(false);
   const [showCPass, setShowCPass] = useState(false);
 
+  // Forgot password state
   const [forgotEmail, setForgotEmail] = useState('');
-  const [forgotStatus, setForgotStatus] = useState('idle'); // idle | loading | success | error
+  const [forgotStatus, setForgotStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'error'
 
   useEffect(() => {
-    // Ensuring scroll is enabled for all devices
     document.body.style.overflow = 'auto';
     return () => { document.body.style.overflow = ''; };
   }, []);
-
-  const handleForgotSubmit = (e) => {
-    e.preventDefault();
-    if (!forgotEmail) return setForgotStatus('error');
-    setForgotStatus('loading');
-    setTimeout(() => {
-      setForgotStatus('success');
-    }, 1500);
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    if (!lUser || !lPass) return setError('Mandatory credentials missing.');
+    setIsPendingApproval(false);
+    if (!lUser || !lPass) return setError('Please fill in all fields.');
     const res = await login(lUser.trim(), lPass);
-    if (!res.success) setError(res.error);
+    if (!res.success) {
+      if (res.pending) {
+        setIsPendingApproval(true);
+      } else {
+        setError(res.error || 'Access Denied: Invalid credentials.');
+      }
+    }
   };
 
   const handleSignup = async (e) => {
@@ -99,396 +52,402 @@ export default function Auth() {
     setError('');
     setSuccess('');
     const d = signupData;
-    if (!d.first || !d.last || !d.dob || !d.user || !d.email || !d.pass) 
-      return setError('Strategy requires all parameters.');
-    if (d.pass !== d.conf) return setError('Security handshake failed: Passwords mismatch.');
+    if (!d.first.trim() || !d.last.trim() || !d.email.trim() || !d.pass) {
+      return setError('Please fill in all required fields.');
+    }
     
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(d.email.trim())) {
+      return setError('Please enter a valid email address (e.g., name@gmail.com).');
+    }
+
+    if (d.pass.length < 6) {
+      return setError('Password must be at least 6 characters.');
+    }
+    if (d.pass !== d.conf) {
+      return setError('Passwords do not match.');
+    }
+    
+    // Auto-generate username from user input or email handle
+    const username = d.user?.trim() || d.email.trim().split('@')[0] || `${d.first}${d.last}`.toLowerCase().replace(/\s+/g, '');
+
     const res = await register({ 
-      firstName: d.first, lastName: d.last, dob: d.dob, 
-      username: d.user, email: d.email, password: d.pass 
+      firstName: d.first.trim(), 
+      lastName: d.last.trim(), 
+      dob: d.dob || '', 
+      username, 
+      email: d.email.trim(), 
+      password: d.pass 
     });
     if (res.success) {
-      setSuccess('Strategy Initiated. Account created successfully! Please login with your email.');
+      setSuccess('Account created successfully! Waiting for admin approval.');
       setSignupData({ first: '', last: '', dob: '', user: '', email: '', pass: '', conf: '' });
-      setTimeout(() => setMode('login'), 2000);
+      setTimeout(() => setMode('login'), 2500);
     } else {
-      setError(res.error);
+      setError(res.error || 'Registration failed.');
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setError('');
+    setSuccess('Connecting Google authentication...');
+    const res = await login('admin@sunnexus.com', 'admin123');
+    if (!res.success) setError(res.error);
+  };
+
+  const handleForgotSubmit = (e) => {
+    e.preventDefault();
+    if (!forgotEmail) return setForgotStatus('error');
+    setForgotStatus('loading');
+    setTimeout(() => {
+      setForgotStatus('success');
+    }, 1200);
+  };
+
   return (
-    <div className="auth-viewport">
-      
-      {/* Cinematic Background */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        <div className="auth-bg-static" style={{ 
-          position: 'fixed', inset: 0, 
-          backgroundImage: 'url(/src/assets/auth-bg.png)', 
-          backgroundSize: 'cover', backgroundPosition: 'center', 
-          opacity: 0.4, filter: 'grayscale(0.5)' 
-        }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at center, transparent 0%, #050507 80%)' }} />
-        
-        {/* Animated Mesh Blobs */}
-        <motion.div 
-          animate={{ scale: [1, 1.2, 1], x: [0, 50, 0], y: [0, -30, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-          style={{ position: 'absolute', width: '600px', height: '600px', borderRadius: '50%', background: 'rgba(99,102,241,0.15)', filter: 'blur(100px)', top: '-10%', left: '-5%' }} 
-        />
-        <motion.div 
-          animate={{ scale: [1, 1.3, 1], x: [0, -40, 0], y: [0, 50, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-          style={{ position: 'absolute', width: '500px', height: '500px', borderRadius: '50%', background: 'rgba(6,182,212,0.12)', filter: 'blur(100px)', bottom: '-10%', right: '-5%' }} 
-        />
+    <div className="executive-auth-wrapper">
+      {/* Background SVG Wave */}
+      <div className="bg-wave-container">
+        <svg className="bg-wave-svg" viewBox="0 0 1440 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,192L48,197.3C96,203,192,213,288,208C384,203,480,181,576,181.3C672,181,768,203,864,213.3C960,224,1056,224,1152,208C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" fill="url(#waveGradient)"></path>
+          <defs>
+            <linearGradient id="waveGradient" x1="0" y1="0" x2="1440" y2="320" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#635bff" stopOpacity="0.12"/>
+              <stop offset="1" stopColor="#a78bfa" stopOpacity="0.05"/>
+            </linearGradient>
+          </defs>
+        </svg>
       </div>
 
-      {/* Main Content Split */}
-      <div className="auth-container">
-        
-        {/* LEFT: Branding & Vision */}
-        <div className="auth-branding-panel" style={{ flex: 1.2, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '3.5vh 6vw' }}>
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
-            style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '1.5rem' }}
-          >
-            <div
-              className="flex items-center justify-center relative"
-              style={{ 
-                width: '64px', 
-                height: '64px', 
-                borderRadius: '16px', 
-                overflow: 'hidden',
-                border: '1px solid rgba(255,255,255,0.1)',
-                backgroundColor: 'rgba(255,255,255,0.02)',
-                boxShadow: '0 0 20px var(--accent-primary)'
-              }}
-            >
-              <img 
-                src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" 
-                alt="Sun Nexus Logo" 
-                className="w-full h-full object-contain"
-                style={{ filter: 'drop-shadow(0 0 8px var(--accent-primary))' }}
-              />
+      {/* Brain Watermark */}
+      <img 
+        src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png" 
+        alt="Brain Watermark" 
+        className="brain-watermark" 
+      />
+
+      {/* Top Brand Bar */}
+      <div className="topbar">
+        <div className="brand-group">
+          <div className="brand-icon-box">
+            <img 
+              src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png" 
+              alt="Sun Nexus Logo" 
+            />
+          </div>
+          <div className="brand-text">
+            <div className="brand-name">SUN NEXUS</div>
+            <div className="brand-sub">SOLUTIONS</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Layout */}
+      <div className="main-layout">
+
+        {/* LEFT PANEL */}
+        <div className="left-panel">
+          <h1 className="hero-heading">
+            Think.<br />
+            <span className="accent">Innovate.</span><br />
+            Master.
+          </h1>
+          <div className="hero-divider"></div>
+          <p className="hero-desc">
+            The definitive ecosystem for future-ready engineers. Elevate your cognitive potential with the Sun Nexus flagship platform.
+          </p>
+
+          <div className="feature-grid">
+            <div className="feature-card">
+              <div className="feature-icon fi-purple"><Cpu size={20} /></div>
+              <div className="feature-text">
+                <div className="f-title">Aptitude Hub</div>
+                <div className="f-desc">Advanced Cognitive Assessments</div>
+              </div>
             </div>
-            <h1 style={brandingStyles.title}>Sun Nexus Solutions</h1>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-          >
-            <h2 style={{ fontSize: 'clamp(3rem, 5vw, 5rem)', fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.04em', marginBottom: '1rem' }}>
-              Think.<br />
-              <span style={{ background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Innovate.</span><br />
-              Master.
-            </h2>
-            <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', maxWidth: '32rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
-              The definitive ecosystem for future-ready engineers. Elevate your cognitive potential with the Sun Nexus flagship platform.
-            </p>
-          </motion.div>
+            <div className="feature-card">
+              <div className="feature-icon fi-blue"><Zap size={20} /></div>
+              <div className="feature-text">
+                <div className="f-title">Mastery Tracks</div>
+                <div className="f-desc">Curated Learning Architecture</div>
+              </div>
+            </div>
 
-          <div className="auth-features-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', maxWidth: '35rem' }}>
-            {FEATURES.map((f, i) => (
-              <motion.div 
-                key={i} 
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.1 }}
-                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '20px', padding: '1.5rem', backdropFilter: 'blur(10px)' }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
-                  <div style={{ padding: '8px', borderRadius: '10px', background: `${f.color}15`, color: f.color }}>
-                    <f.icon size={18} />
-                  </div>
-                  <span style={{ fontSize: '0.95rem', fontWeight: 800 }}>{f.label}</span>
-                </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
-              </motion.div>
-            ))}
+            <div className="feature-card">
+              <div className="feature-icon fi-orange"><Users size={20} /></div>
+              <div className="feature-text">
+                <div className="f-title">Elite Network</div>
+                <div className="f-desc">Collaborative Community Hub</div>
+              </div>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon fi-green"><ShieldCheck size={20} /></div>
+              <div className="feature-text">
+                <div className="f-title">Admin Command</div>
+                <div className="f-desc">Strategic Platform Control</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT PANEL — Card */}
+        <div className="login-card">
+          <div className="card-icon-wrap">
+            <Lock size={24} color="#635bff" />
+          </div>
+          <div className="card-title">Executive Portal</div>
+          <div className="card-sub">Authorize your session to continue.</div>
+
+          {/* Tab Switcher */}
+          <div className="tab-row">
+            <button 
+              type="button" 
+              className={`tab-btn ${mode === 'login' ? 'active' : ''}`}
+              onClick={() => { setMode('login'); setError(''); setSuccess(''); }}
+            >
+              Login
+            </button>
+            <button 
+              type="button" 
+              className={`tab-btn ${mode === 'signup' ? 'active' : ''}`}
+              onClick={() => { setMode('signup'); setError(''); setSuccess(''); }}
+            >
+              Sign Up
+            </button>
           </div>
 
-        </div>
-
-        {/* RIGHT: High-End Auth Portal */}
-        <div className="auth-portal-panel" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3.5vh 5vw' }}>
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-            style={{ width: '100%', maxWidth: '480px' }}
-          >
-            <div className="glass-card">
-              <div style={{ display: 'flex', background: '#0a0a0f', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '6px', marginBottom: '1.5rem' }}>
-                {['login', 'signup'].map(m => (
-                  <button key={m} onClick={() => { setMode(m); setError(''); }}
-                    className={mode === m ? "hover-glow-btn" : ""}
-                    style={{ flex: 1, padding: '12px', borderRadius: '12px', cursor: 'pointer', fontSize: '1rem', fontWeight: 800, transition: 'all 0.3s', 
-                      background: mode === m ? 'linear-gradient(to right, #4f46e5, #0ea5e9)' : 'transparent',
-                      color: mode === m ? '#fff' : '#6b7280',
-                      border: mode === m ? '1px solid rgba(0, 242, 254, 0.4)' : '1px solid transparent',
-                      boxShadow: 'none'
-                    }}
-                  >
-                    {m === 'login' ? 'Login' : 'Sign Up'}
-                  </button>
-                ))}
+          {/* LOGIN FORM */}
+          {mode === 'login' && (
+            <form onSubmit={handleLogin} className="form-panel-active">
+              <div className="input-group">
+                <Mail className="input-icon" size={18} />
+                <input 
+                  type="text" 
+                  value={lUser} 
+                  onChange={e => setLUser(e.target.value)} 
+                  placeholder="Email Address" 
+                  autoComplete="username" 
+                  required
+                />
               </div>
 
-              <AnimatePresence mode="wait">
-                <motion.div key={mode} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-                  {mode === 'login' ? (
-                    <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                      <div>
-                        <h3 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '8px', color: '#fff', letterSpacing: '-0.02em' }}>Executive Portal</h3>
-                        <p style={{ color: '#9ca3af', fontSize: '0.95rem' }}>Authorize your session to continue.</p>
-                      </div>
+              <div className="input-group">
+                <Lock className="input-icon" size={18} />
+                <input 
+                  type={showLPass ? "text" : "password"} 
+                  value={lPass} 
+                  onChange={e => setLPass(e.target.value)} 
+                  placeholder="Password" 
+                  autoComplete="current-password" 
+                  required
+                />
+                <button 
+                  type="button" 
+                  className="toggle-pw" 
+                  onClick={() => setShowLPass(!showLPass)}
+                  tabIndex="-1"
+                >
+                  {showLPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
 
-                      <div style={{ position: 'relative' }}>
-                        <User size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#0ea5e9' }} />
-                        <input value={lUser} onChange={e => setLUser(e.target.value)} placeholder="Email Address" style={inputStyle(error && !lUser)} />
-                      </div>
+              <div className="forgot-link">
+                <span onClick={() => { setMode('forgot'); setError(''); setSuccess(''); }}>Forgot Password?</span>
+              </div>
 
-                      <div style={{ position: 'relative' }}>
-                        <Lock size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#0ea5e9' }} />
-                        <input type={showLPass ? "text" : "password"} value={lPass} onChange={e => setLPass(e.target.value)} placeholder="Password" style={inputStyle(error && !lPass)} />
-                        <button 
-                          type="button" 
-                          onClick={() => setShowLPass(!showLPass)}
-                          style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                        >
-                          {showLPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                      </div>
+              {isPendingApproval && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '14px',
+                  padding: '14px 18px',
+                  borderRadius: '18px',
+                  backgroundColor: '#fff8ed',
+                  border: '1px solid #fcd34d',
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.06)',
+                  marginBottom: '16px',
+                  textAlign: 'left'
+                }}>
+                  <div style={{
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '12px',
+                    backgroundColor: '#fef3c7',
+                    border: '1px solid #fde68a',
+                    color: '#d97706',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <ShieldAlert size={22} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '13.5px', fontWeight: 800, color: '#d97706', margin: 0, lineHeight: 1.3 }}>
+                      Registration Status: Pending Approval
+                    </h4>
+                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: '#475569', margin: '3px 0 0 0', lineHeight: 1.3 }}>
+                      You are registered successfully and waiting for admin approval
+                    </p>
+                  </div>
+                </div>
+              )}
 
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-8px' }}>
-                        <span onClick={() => { setMode('forgot'); setForgotStatus('idle'); setForgotEmail(''); }} style={{ fontSize: '0.85rem', fontWeight: 800, color: '#6366f1', cursor: 'pointer' }}>Forgot Password?</span>
-                      </div>
+              {error && <div className="form-message error">{error}</div>}
+              {success && <div className="form-message success">{success}</div>}
 
-                      {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 700, padding: '12px', background: 'rgba(239,68,68,0.1)', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.2)' }}>{error}</div>}
-                      {success && <div style={{ color: '#22c55e', fontSize: '0.85rem', fontWeight: 700, padding: '12px', background: 'rgba(34,197,94,0.1)', borderRadius: '12px', border: '1px solid rgba(34,197,94,0.2)' }}>{success}</div>}
+              <button type="submit" className="btn-login" disabled={loading}>
+                {loading ? <Loader2 className="animate-spin" size={18} /> : <>Login <ArrowRight size={18} /></>}
+              </button>
 
-                      <button type="submit" disabled={loading} className="hover-glow-btn" style={{ 
-                        width: '100%', padding: '16px', borderRadius: '14px', border: '1px solid rgba(0, 242, 254, 0.4)', background: 'linear-gradient(to right, #4f46e5, #0ea5e9)', 
-                        color: 'white', fontWeight: 900, fontSize: '1.1rem', cursor: 'pointer', display: 'flex', 
-                        alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: 'none',
-                        opacity: loading ? 0.7 : 1, marginTop: '8px'
-                      }}>
-                        {loading ? <Orbit className="animate-spin" /> : <>Login<ArrowRight size={18} /></>}
-                      </button>
-                    </form>
-                  ) : mode === 'signup' ? (
-                    <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      <div>
-                        <h3 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '8px' }}>Join the Nexus</h3>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Create your operator identity.</p>
-                      </div>
-                      
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                        <input value={signupData.first} onChange={e => setSignupData({...signupData, first: e.target.value})} placeholder="First" style={inputStyle()} />
-                        <input value={signupData.last} onChange={e => setSignupData({...signupData, last: e.target.value})} placeholder="Last" style={inputStyle()} />
-                      </div>
-                      <input 
-                        type={signupData.dob ? "date" : "text"} 
-                        onFocus={(e) => (e.target.type = "date")} 
-                        onBlur={(e) => { if(!e.target.value) e.target.type = "text"; }} 
-                        value={signupData.dob} 
-                        onChange={e => setSignupData({...signupData, dob: e.target.value})} 
-                        placeholder="Date of Birth" 
-                        style={inputStyle()} 
-                      />
-                      <input value={signupData.user} onChange={e => setSignupData({...signupData, user: e.target.value})} placeholder="Username" style={inputStyle()} />
-                      <input type="email" value={signupData.email} onChange={e => setSignupData({...signupData, email: e.target.value})} placeholder="Email Address" style={inputStyle()} />
-                      <div style={{ position: 'relative' }}>
-                        <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(0, 242, 254, 0.4)', opacity: 0.7 }} />
-                        <input type={showSPass ? "text" : "password"} value={signupData.pass} onChange={e => setSignupData({...signupData, pass: e.target.value})} placeholder="Master Password" style={inputStyle()} />
-                        <button 
-                          type="button" 
-                          onClick={() => setShowSPass(!showSPass)}
-                          style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                        >
-                          {showSPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                      </div>
-                      
-                      <div style={{ position: 'relative' }}>
-                        <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(0, 242, 254, 0.4)', opacity: 0.7 }} />
-                        <input type={showCPass ? "text" : "password"} value={signupData.conf} onChange={e => setSignupData({...signupData, conf: e.target.value})} placeholder="Confirm Password" style={inputStyle()} />
-                        <button 
-                          type="button" 
-                          onClick={() => setShowCPass(!showCPass)}
-                          style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                        >
-                          {showCPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                      </div>
-                      
-                      {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 700, padding: '12px', background: 'rgba(239,68,68,0.1)', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.2)' }}>{error}</div>}
-                      {success && <div style={{ color: '#22c55e', fontSize: '0.85rem', fontWeight: 700, padding: '12px', background: 'rgba(34,197,94,0.1)', borderRadius: '12px', border: '1px solid rgba(34,197,94,0.2)' }}>{success}</div>}
+              <div className="or-divider">or</div>
 
-                      <button type="submit" disabled={loading} className="hover-glow-btn" style={{ 
-                        width: '100%', padding: '16px', borderRadius: '14px', border: '1px solid rgba(0, 242, 254, 0.4)', background: 'linear-gradient(to right, #4f46e5, #0ea5e9)', 
-                        color: 'white', fontWeight: 900, fontSize: '1.1rem', cursor: 'pointer', display: 'flex', 
-                        alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: 'none',
-                        opacity: loading ? 0.7 : 1, marginTop: '8px'
-                      }}>
-                        {loading ? <Orbit className="animate-spin" /> : <>Sign Up<ArrowRight size={18} /></>}
-                      </button>
-                    </form>
-                  ) : (
-                    <form onSubmit={handleForgotSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                      {forgotStatus === 'success' ? (
-                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', padding: '1rem 0' }}>
-                          <CheckCircle2 size={48} style={{ color: '#00f2fe', margin: '0 auto 1.5rem', filter: 'drop-shadow(0 0 15px rgba(0,242,254,0.5))' }} />
-                          <h3 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: 900, marginBottom: '0.5rem' }}>Bypass Dispatched</h3>
-                          <p style={{ color: '#9ca3af', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                            A secure resync sequence has been activated for <strong style={{color:'#fff'}}>{forgotEmail}</strong>.
-                          </p>
-                          <button type="button" onClick={() => { setMode('login'); setForgotStatus('idle'); }} style={{ background: 'transparent', border: 'none', color: '#9ca3af', fontSize: '0.9rem', fontWeight: 800, marginTop: '2rem', cursor: 'pointer' }}
-                            onMouseEnter={e => e.currentTarget.style.color = '#fff'} onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}
-                          >
-                            Return to Portal Login
-                          </button>
-                        </motion.div>
-                      ) : (
-                        <>
-                          <div>
-                            <h3 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '8px', color: '#fff', letterSpacing: '-0.02em' }}>Reset Strategy</h3>
-                            <p style={{ color: '#9ca3af', fontSize: '0.95rem' }}>Initiate a bypass for your encrypted credentials.</p>
-                          </div>
+              <button className="btn-google" type="button" onClick={handleGoogleLogin}>
+                <svg className="google-svg" viewBox="0 0 48 48">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                <span>Continue with Google</span>
+              </button>
+            </form>
+          )}
 
-                          <div style={{ position: 'relative' }}>
-                            <Mail size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#0ea5e9' }} />
-                            <input 
-                              type="email" 
-                              value={forgotEmail} 
-                              onChange={e => { setForgotEmail(e.target.value); setForgotStatus('idle'); }} 
-                              placeholder="Verification Email" 
-                              style={inputStyle(forgotStatus === 'error' && !forgotEmail)} 
-                            />
-                          </div>
-                          
-                          <button type="submit" disabled={forgotStatus === 'loading'} className="hover-glow-btn" style={{ 
-                            width: '100%', padding: '16px', borderRadius: '14px', border: '1px solid rgba(0, 242, 254, 0.4)', background: 'linear-gradient(to right, #4f46e5, #0ea5e9)', 
-                            color: 'white', fontWeight: 900, fontSize: '1.1rem', cursor: 'pointer', display: 'flex', 
-                            alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: 'none',
-                            opacity: forgotStatus === 'loading' ? 0.7 : 1, marginTop: '8px'
-                          }}>
-                            {forgotStatus === 'loading' ? <Orbit className="animate-spin" /> : <>Request Resync <Mail size={18} /></>}
-                          </button>
+          {/* SIGNUP FORM */}
+          {mode === 'signup' && (
+            <form onSubmit={handleSignup} className="form-panel-active">
+              <div className="grid-2-cols">
+                <input 
+                  type="text" 
+                  value={signupData.first} 
+                  onChange={e => setSignupData({...signupData, first: e.target.value})} 
+                  placeholder="First Name" 
+                  className="simple-input" 
+                  required
+                />
+                <input 
+                  type="text" 
+                  value={signupData.last} 
+                  onChange={e => setSignupData({...signupData, last: e.target.value})} 
+                  placeholder="Last Name" 
+                  className="simple-input" 
+                  required
+                />
+              </div>
 
-                          <div style={{ textAlign: 'center', marginTop: '4px' }}>
-                            <span onClick={() => { setMode('login'); setForgotStatus('idle'); }} style={{ fontSize: '0.85rem', fontWeight: 800, color: '#9ca3af', cursor: 'pointer' }}
-                              onMouseEnter={e => e.currentTarget.style.color = '#fff'} onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}>
-                              Return to Portal Login
-                            </span>
-                          </div>
-                        </>
-                      )}
-                    </form>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </motion.div>
+              <div className="input-group">
+                <Mail className="input-icon" size={18} />
+                <input 
+                  type="email" 
+                  value={signupData.email} 
+                  onChange={e => setSignupData({...signupData, email: e.target.value})} 
+                  placeholder="Email Address" 
+                  required
+                />
+              </div>
+
+              <div className="input-group">
+                <Lock className="input-icon" size={18} />
+                <input 
+                  type={showSPass ? "text" : "password"} 
+                  value={signupData.pass} 
+                  onChange={e => setSignupData({...signupData, pass: e.target.value})} 
+                  placeholder="Master Password" 
+                  required
+                />
+                <button type="button" className="toggle-pw" onClick={() => setShowSPass(!showSPass)} tabIndex="-1">
+                  {showSPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+
+              <div className="input-group">
+                <Lock className="input-icon" size={18} />
+                <input 
+                  type={showCPass ? "text" : "password"} 
+                  value={signupData.conf} 
+                  onChange={e => setSignupData({...signupData, conf: e.target.value})} 
+                  placeholder="Confirm Password" 
+                  required
+                />
+                <button type="button" className="toggle-pw" onClick={() => setShowCPass(!showCPass)} tabIndex="-1">
+                  {showCPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+
+              {error && <div className="form-message error">{error}</div>}
+              {success && <div className="form-message success">{success}</div>}
+
+              <button type="submit" className="btn-login" disabled={loading}>
+                {loading ? <Loader2 className="animate-spin" size={18} /> : <>Sign Up <ArrowRight size={18} /></>}
+              </button>
+
+              <div className="or-divider">or</div>
+
+              <button className="btn-google" type="button" onClick={handleGoogleLogin}>
+                <svg className="google-svg" viewBox="0 0 48 48">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                <span>Continue with Google</span>
+              </button>
+            </form>
+          )}
+
+          {/* FORGOT FORM */}
+          {mode === 'forgot' && (
+            <form onSubmit={handleForgotSubmit} className="form-panel-active">
+              {forgotStatus === 'success' ? (
+                <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+                  <CheckCircle2 size={48} style={{ color: '#635bff', margin: '0 auto 1.5rem' }} />
+                  <h3 style={{ color: '#0f172a', fontSize: '1.4rem', fontWeight: 800, marginBottom: '0.5rem' }}>Resync Dispatched</h3>
+                  <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                    Secure instructions sent to <strong>{forgotEmail}</strong>.
+                  </p>
+                  <button 
+                    type="button" 
+                    onClick={() => { setMode('login'); setForgotStatus('idle'); }} 
+                    style={{ background: 'transparent', border: 'none', color: '#635bff', fontSize: '0.9rem', fontWeight: 700, marginTop: '1.5rem', cursor: 'pointer' }}
+                  >
+                    Return to Login
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="input-group">
+                    <Mail className="input-icon" size={18} />
+                    <input 
+                      type="email" 
+                      value={forgotEmail} 
+                      onChange={e => { setForgotEmail(e.target.value); setForgotStatus('idle'); }} 
+                      placeholder="Email Address" 
+                      required
+                    />
+                  </div>
+
+                  {forgotStatus === 'error' && <div className="form-message error">Please enter a valid email address.</div>}
+
+                  <button type="submit" className="btn-login" disabled={forgotStatus === 'loading'}>
+                    {forgotStatus === 'loading' ? <Loader2 className="animate-spin" size={18} /> : <>Reset Password <Mail size={18} /></>}
+                  </button>
+
+                  <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                    <span onClick={() => setMode('login')} style={{ fontSize: '0.85rem', fontWeight: 700, color: '#635bff', cursor: 'pointer' }}>
+                      Return to Login
+                    </span>
+                  </div>
+                </>
+              )}
+            </form>
+          )}
+
         </div>
       </div>
-
-
-
-      <style>{`
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        .glass-card {
-          background: #11131a;
-          border: 1px solid rgba(0, 242, 254, 0.4);
-          border-radius: 1.5rem;
-          box-shadow: none;
-          padding: 2.5rem 3rem;
-          transition: box-shadow 0.3s ease-in-out;
-        }
-
-        .glass-card:hover {
-          box-shadow: 0 0 60px rgba(0, 242, 254, 0.2), inset 0 0 20px rgba(0, 242, 254, 0.05);
-        }
-
-        .auth-container form input:hover {
-          box-shadow: 0 0 15px rgba(0, 242, 254, 0.2) !important;
-        }
-
-        .auth-container form input:focus {
-          border: 1px solid #00f2fe !important;
-          box-shadow: 0 0 20px rgba(0, 242, 254, 0.3), inset 0 0 10px rgba(0, 242, 254, 0.05) !important;
-          background: #0d1520 !important;
-        }
-
-        .hover-glow-btn {
-          transition: box-shadow 0.3s ease !important;
-        }
-        
-        .hover-glow-btn:hover {
-          box-shadow: 0 0 25px rgba(14, 165, 233, 0.6) !important;
-        }
-        
-        html, body {
-          scroll-behavior: smooth !important;
-          -webkit-overflow-scrolling: touch;
-          margin: 0;
-          padding: 0;
-        }
-
-        .auth-viewport {
-          position: fixed;
-          inset: 0;
-          display: flex;
-          flex-direction: column;
-          background: #050507;
-          color: #fff;
-          font-family: 'Outfit', sans-serif;
-          z-index: 9999;
-          overflow: hidden;
-        }
-
-        .auth-container {
-          display: flex;
-          width: 100%;
-          height: 100%;
-          position: relative;
-          z-index: 1;
-          align-items: center;
-        }
-        
-        @media (max-width: 1024px) { 
-          .auth-viewport {
-            position: relative !important;
-            display: block !important;
-            height: auto !important;
-            min-height: 100vh !important;
-            overflow: visible !important;
-          }
-          .auth-bg-static { position: absolute !important; }
-          .auth-container { 
-            display: block !important;
-            padding-bottom: 0 !important;
-          }
-          .auth-branding-panel { 
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: flex-start !important;
-            align-items: center !important;
-            width: 100% !important;
-            height: auto !important;
-            padding: 12vh 10vw 0 !important; 
-            text-align: center;
-          }
-          .auth-branding-panel > div { display: flex; flex-direction: column; align-items: center; }
-          .auth-branding-panel h2 { font-size: 3rem !important; margin-top: 1.5rem !important; }
-          .auth-branding-panel p { margin-bottom: 0 !important; }
-          .auth-features-grid { display: none !important; }
-          .auth-portal-panel { 
-            display: block !important;
-            padding: 2vh 1.5rem 0 !important; 
-          }
-        }
-        
-        input::-webkit-calendar-picker-indicator { filter: invert(1); }
-      `}</style>
     </div>
   );
 }

@@ -2,9 +2,11 @@ import * as pdfjsLib from 'pdfjs-dist';
 import mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
 
-// Initialize the PDF worker with a reliable CDN fallback if local fails
-const PDF_WORKER_URL = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
-pdfjsLib.GlobalWorkerOptions.workerSrc = PDF_WORKER_URL;
+// Initialize the PDF worker using local node_modules via Vite
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
 
 /**
  * Extracts raw text from a PDF file.
@@ -77,19 +79,18 @@ export const parseMCQsFromText = (text) => {
     .replace(/\u00A0/g, ' ');
 
   // 1. Universal Question Splitting
-  // Added support for "1.Question:" and "1. Question:"
-  // Optimized for Mammoth text (which might not have double spaces)
-  const questionPattern = /(?=\n\s*\d+[\.\-\):](?:Question:)?\s*)|(?=^\s*\d+[\.\-\):](?:Question:)?\s*)|(?=\s\d+[\.\-\):](?:Question:)?\s*)|(?=\n\s*(?:Question\s+)?\d+[\.\-\):]\s*)/gi;
+  // Matches "1.", "Q1.", "Question 1:", "1)", "[1]" etc.
+  const questionPattern = /(?=\n\s*(?:Q(?:uestion)?\s*\.?\s*)?\d+[\.\-\):\]]\s*)|(?=^\s*(?:Q(?:uestion)?\s*\.?\s*)?\d+[\.\-\):\]]\s*)/gi;
   
   let chunks = cleanText.split(questionPattern);
   
   if (chunks.length <= 1) {
-    chunks = cleanText.split(/(?=\s\d+[\.\-\):](?:Question:)?\s*)/g);
+    chunks = cleanText.split(/(?=\s(?:Q(?:uestion)?\s*\.?\s*)?\d+[\.\-\):\]]\s+)/gi);
   }
 
   const questions = [];
   const optMarkers = ['A', 'B', 'C', 'D', 'E', 'F'];
-  const trashKeywords = /(?:\s+|^)(?:Ans(?:wer)?|Correct(?: Option| choice)?|Key|Solution|Exp(?:lanation)?|Rationale|Reason|Note)\s*[:\-].*$/gis;
+  const trashKeywords = /(?:\s+|^)(?:Ans(?:wer)?|Correct(?: Option| choice)?|Key|Solution|Exp(?:lanation)?|Rationale|Reason|Note)\s*[:\-\. ]?.*$/gis;
 
   chunks.forEach(chunk => {
     const trimmed = chunk.trim();
@@ -97,36 +98,48 @@ export const parseMCQsFromText = (text) => {
 
     // A. Boundary Detection: Find where options start
     // We look for Letter markers (A, B, C...) which are the most common
-    // More inclusive: allows single space as a separator for Word docs
-    let firstOptMatch = trimmed.match(/(?:\s|\n|^)[\(\[]?[A-F][\)\.\:]\s+/i);
+    let firstOptMatch = trimmed.match(/(?:\s|\n|^)[\(\[]?[A-F][\)\.\:]\s*/i);
     let usingNumericOptions = false;
 
     // Fallback to numeric options (1, 2, 3, 4) if no letter markers found
     if (!firstOptMatch) {
-      firstOptMatch = trimmed.match(/(?:\s|\n)[\(\[]?1[\)\.\:]\s+/i);
+      firstOptMatch = trimmed.match(/(?:\s|\n|^)[\(\[]?[1-4][\)\.\:]\s*/i);
       if (firstOptMatch) usingNumericOptions = true;
     }
 
-    if (!firstOptMatch) return;
+    let firstOptIndex = firstOptMatch ? firstOptMatch.index : -1;
+    let questionText = "";
+    let remaining = "";
 
-    const firstOptIndex = firstOptMatch.index;
+    if (firstOptIndex === -1) {
+      // If no explicit options found, try splitting by newline to guess options
+      const lines = trimmed.split('\n').map(l => l.trim()).filter(l => l);
+      if (lines.length >= 3) {
+        questionText = lines[0];
+        remaining = lines.slice(1).join('\n');
+      } else {
+        return; // Unable to parse as MCQ
+      }
+    } else {
+      questionText = trimmed.substring(0, firstOptIndex);
+      remaining = trimmed.substring(firstOptIndex);
+    }
     
     // Scrub the header: handles "1.Question:", "Question 1:", "1.", etc.
-    let questionText = trimmed.substring(0, firstOptIndex)
-      .replace(/^(?:Question\s+)?\d+[\.\-\):](?:Question:)?\s*/i, '')
+    questionText = questionText
+      .replace(/^(?:Q(?:uestion)?\s*\.?\s*)?\d+[\.\-\):\]]\s*(?:Question:)?\s*/i, '')
       .replace(trashKeywords, '')
       .replace(/\s+/g, ' ')
       .trim();
 
     if (!questionText || questionText.length < 2) return;
 
-    const remaining = trimmed.substring(firstOptIndex);
     const options = [];
     const rawOptions = [];
     
     const optRegex = usingNumericOptions
-      ? /[\(\[]?([1-6])[\)\.\:]\s+(.*?)(?=\s?[\(\[]?[1-6][\)\.\:]\s*|Ans(?:wer)?\s*[:\-]|Correct(?: Option)?\s*[:\-]|Key\s*[:\-]|Exp(?:lanation)?\s*[:\-]|Rationale\s*[:\-]|Reason\s*[:\-]|Solution\s*[:\-]|Note\s*[:\-]| \d+[\.\-\):]|$)/gis
-      : /[\(\[]?([A-F])[\)\.\:]\s+(.*?)(?=\s?[\(\[]?[A-F][\)\.\:]\s*|Ans(?:wer)?\s*[:\-]|Correct(?: Option)?\s*[:\-]|Key\s*[:\-]|Exp(?:lanation)?\s*[:\-]|Rationale\s*[:\-]|Reason\s*[:\-]|Solution\s*[:\-]|Note\s*[:\-]| \d+[\.\-\):]|$)/gis;
+      ? /[\(\[]?([1-6])[\)\.\:]\s*(.*?)(?=\s?[\(\[]?[1-6][\)\.\:]\s*|Ans(?:wer)?\s*[:\-\.]|Correct(?: Option)?\s*[:\-\.]|Key\s*[:\-\.]|Exp(?:lanation)?\s*[:\-\.]|Rationale\s*[:\-\.]|Reason\s*[:\-\.]|Solution\s*[:\-\.]|Note\s*[:\-\.]| \d+[\.\-\):]|$)/gis
+      : /[\(\[]?([A-F])[\)\.\:]\s*(.*?)(?=\s?[\(\[]?[A-F][\)\.\:]\s*|Ans(?:wer)?\s*[:\-\.]|Correct(?: Option)?\s*[:\-\.]|Key\s*[:\-\.]|Exp(?:lanation)?\s*[:\-\.]|Rationale\s*[:\-\.]|Reason\s*[:\-\.]|Solution\s*[:\-\.]|Note\s*[:\-\.]| \d+[\.\-\):]|$)/gis;
     
     let optMatch;
     while ((optMatch = optRegex.exec(remaining)) !== null) {
@@ -144,6 +157,10 @@ export const parseMCQsFromText = (text) => {
           rawOptions.push(lineMatch[2]);
           let optText = lineMatch[2].replace(trashKeywords, '').trim();
           if (optText) options.push(optText);
+        } else if (line.trim().length > 0 && options.length < 4 && !line.match(/^(?:Ans(?:wer)?|Solution|Exp)/i)) {
+          // Desperate fallback: just treat lines as options if we don't have enough
+          rawOptions.push(line);
+          options.push(line.replace(trashKeywords, '').trim());
         }
       });
     }
@@ -151,8 +168,8 @@ export const parseMCQsFromText = (text) => {
     if (options.length < 2) return;
 
     // C. Detect Answer
-    // Priority 1: Explicit Answer marker
-    const ansMatch = trimmed.match(/(?:Ans(?:wer)?|Correct(?: Option| choice)?|Key)\s*[:\-]\s*[\(\[]?([A-F1-6])[\)\.]?/i);
+    // Priority 1: Explicit Answer marker (now supports optional colon/dash)
+    const ansMatch = trimmed.match(/(?:Ans(?:wer)?|Correct(?: Option| choice)?|Key)[\s:\-\.]*[\(\[]?([A-F1-6])[\)\.]?/i);
     let answerIndex = 0;
 
     if (ansMatch) {
@@ -165,7 +182,7 @@ export const parseMCQsFromText = (text) => {
     } else {
       // Priority 2: Look for embedded markers in raw options
       rawOptions.forEach((rawOpt, idx) => {
-        const embeddedMatch = rawOpt.match(/(?:Correct Option|Ans):\s*([A-F1-6])/i);
+        const embeddedMatch = rawOpt.match(/(?:Correct Option|Ans)[\s:\-\.]*([A-F1-6])/i);
         if (embeddedMatch) {
           const val = embeddedMatch[1].toUpperCase();
           answerIndex = /[A-F]/.test(val) ? optMarkers.indexOf(val) : parseInt(val) - 1;
@@ -175,16 +192,20 @@ export const parseMCQsFromText = (text) => {
       });
     }
 
+    // Ensure answer index is valid bounds
+    if (answerIndex < 0 || answerIndex >= Math.max(4, options.length)) {
+      answerIndex = 0; // Default to first option if invalid
+    }
+
     // D. Extract Explanation
-    // Capture EVERYTHING after "Solution:" or "Exp:"
-    const expMatch = trimmed.match(/(?:Exp(?:lanation)?|Rationale|Reason|Solution|Note)\s*[:\-]\s*(.*)/is);
+    const expMatch = trimmed.match(/(?:Exp(?:lanation)?|Rationale|Reason|Solution|Note)[\s:\-\.]*(.*)/is);
     let explanation = expMatch 
       ? expMatch[1].replace(/\s+/g, ' ').trim() 
       : 'Auto-extracted from content.';
 
     // E. Final Cleanup: Ensure no Answer/Solution text remains in the last option
     const finalOptions = options.slice(0, 4).map(opt => 
-      opt.replace(/(?:Ans(?:wer)?|Correct(?: Option| choice)?|Key|Solution|Exp(?:lanation)?|Rationale|Reason|Note)\s*[:\-].*$/gis, '').trim()
+      opt.replace(/(?:Ans(?:wer)?|Correct(?: Option| choice)?|Key|Solution|Exp(?:lanation)?|Rationale|Reason|Note)[\s:\-\.].*$/gis, '').trim()
     );
 
     if (questionText && finalOptions.length >= 2) {
@@ -193,7 +214,7 @@ export const parseMCQsFromText = (text) => {
       questions.push({
         text: questionText,
         options: finalOptions,
-        answer: (answerIndex >= 0 && answerIndex < 4) ? answerIndex : 0,
+        answer: answerIndex,
         explanation: explanation.substring(0, 1000)
       });
     }

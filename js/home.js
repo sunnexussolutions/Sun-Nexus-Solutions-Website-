@@ -244,8 +244,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const loadHomeContent = async () => {
-        // 1. Instant check from localStorage
-        const localData = localStorage.getItem('nexus_home_content');
+        // 1. Instant check from localStorage (checking multiple possible keys)
+        const localData = localStorage.getItem('nexus_home_content') || localStorage.getItem('nexus_home_data');
         if (localData) {
             try {
                 applyHomeContent(JSON.parse(localData));
@@ -274,12 +274,18 @@ document.addEventListener('DOMContentLoaded', () => {
     loadHomeContent();
     initHeroCarousel();
 
-    // Listen for live updates across browser tabs
-    window.addEventListener('storage', (e) => {
-        if (e.key === 'nexus_home_content' && e.newValue) {
-            try {
-                applyHomeContent(JSON.parse(e.newValue));
-            } catch (err) {}
+    // Listen for live updates across browser tabs & same tab
+    const handleSyncEvent = (e) => {
+        if (!e || e.key === 'nexus_home_content' || e.key === 'nexus_home_data' || !e.key) {
+            const raw = localStorage.getItem('nexus_home_content') || localStorage.getItem('nexus_home_data');
+            if (raw) {
+                try {
+                    applyHomeContent(JSON.parse(raw));
+                } catch (err) {}
+            }
         }
-    });
+    };
+
+    window.addEventListener('storage', handleSyncEvent);
+    window.addEventListener('nexus-data-updated', handleSyncEvent);
 });

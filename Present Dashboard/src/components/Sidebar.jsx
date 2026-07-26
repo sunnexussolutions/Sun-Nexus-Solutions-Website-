@@ -1,204 +1,323 @@
 import React from 'react';
 import {
-  BrainCircuit, Users, UserCircle, X, ChevronRight, LogOut,
-  ShieldCheck, LifeBuoy, LayoutDashboard, BookOpen, Layers,
-  FolderGit2, Code2
+  LayoutGrid, GraduationCap, Layers, Folder,
+  Target, Users, User, ShieldCheck, LogOut,
+  Sun, Moon, X
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
-const navItems = [
-  { id: 'dashboard',  label: 'Dashboard',           icon: LayoutDashboard },
-  { id: 'learning',   label: 'My Learning',          icon: BookOpen },
-  { id: 'domains',    label: 'Domains',              icon: Layers },
-  { id: 'projects',   label: 'Projects',             icon: FolderGit2 },
-  { id: 'aptitude',   label: 'Aptitude',             icon: BrainCircuit },
-  { id: 'council',    label: 'Council',              icon: Users },
-  { id: 'profile',    label: 'Profile',              icon: UserCircle },
+const NAV_ITEMS = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
+  { id: 'learning', label: 'My Learning', icon: GraduationCap },
+  { id: 'domains', label: 'Domains', icon: Layers },
+  { id: 'projects', label: 'Projects', icon: Folder },
+  { id: 'aptitude', label: 'Aptitude', icon: Target },
+  { id: 'council', label: 'Council', icon: Users },
+  { id: 'profile', label: 'Profile', icon: User },
 ];
 
-const adminItem = { id: 'admin', label: 'Admin Panel', icon: ShieldCheck };
+const ADMIN_ITEM = { id: 'admin', label: 'Admin Panel', icon: ShieldCheck };
 
 const Sidebar = ({ isOpen, toggleSidebar, activePage, setActivePage }) => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
   const isAdmin = user?.isAdmin;
 
-  const allItems = isAdmin ? [...navItems, adminItem] : navItems;
+  const allItems = isAdmin ? [...NAV_ITEMS, ADMIN_ITEM] : NAV_ITEMS;
 
   return (
-    <>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 lg-hidden"
-          style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', zIndex: 40 }}
-          onClick={toggleSidebar}
-        />
-      )}
+    <aside
+      className="sidebar-aside"
+      style={{
+        width: '260px',
+        minWidth: '260px',
+        maxWidth: '260px',
+        height: '100vh',
+        backgroundColor: isDark ? '#0d0f1a' : '#ffffff',
+        borderRight: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        zIndex: 50,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '1.25rem 1rem',
+        boxSizing: 'border-box',
+        transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease',
+        transform: isOpen
+          ? 'translateX(0)'
+          : typeof window !== 'undefined' && window.innerWidth >= 1024
+          ? 'translateX(0)'
+          : 'translateX(-100%)',
+      }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', overflowY: 'auto', alignItems: 'stretch' }}>
+        {/* Brand Logo Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', padding: '0 4px', width: '100%', boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '42px',
+                height: '42px',
+                minWidth: '42px',
+                minHeight: '42px',
+                borderRadius: '12px',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(123, 92, 255, 0.25)',
+                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.6)' : 'rgba(248, 250, 252, 0.9)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                boxSizing: 'border-box',
+                padding: '0px',
+                flexShrink: 0
+              }}
+            >
+              <img
+                src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png"
+                alt="Sun Nexus Logo"
+                style={{ width: '100%', height: '100%', objectFit: 'contain', maxWidth: '100%', maxHeight: '100%', transform: 'scale(2.35)' }}
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <span style={{ fontSize: '17px', fontWeight: 900, letterSpacing: '-0.02em', color: isDark ? '#f8fafc' : '#0f172a', lineHeight: 1.1 }}>
+                Sun Nexus
+              </span>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#7b5cff', letterSpacing: '0.01em', lineHeight: 1.1 }}>
+                Solutions
+              </span>
+            </div>
+          </div>
 
-      <aside
-        className="fixed top-0 left-0 h-full w-280"
-        style={{
-          backgroundColor: 'var(--bg-secondary)',
-          borderRight: '1px solid var(--border-subtle)',
-          zIndex: 50,
-          transition: 'transform var(--transition-base)',
-          transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
-        }}
-      >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-8 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className="flex items-center justify-center relative"
-                style={{ 
-                  width: '48px', 
-                  height: '48px', 
-                  borderRadius: 'var(--radius-md)', 
-                  overflow: 'hidden',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  backgroundColor: 'rgba(255,255,255,0.02)',
-                  boxShadow: '0 0 15px var(--accent-primary)'
+          <button
+            className="lg-hidden"
+            style={{ background: 'none', border: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer', padding: '4px' }}
+            onClick={toggleSidebar}
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Navigation Stack */}
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, width: '100%', alignSelf: 'stretch', boxSizing: 'border-box' }}>
+          {allItems.map((item) => {
+            const IconComp = item.icon;
+            const isActive = activePage === item.id;
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActivePage(item.id);
+                  if (typeof window !== 'undefined' && window.innerWidth < 1024) toggleSidebar();
+                }}
+                className={`sidebar-nav-item-row ${isActive ? 'active-item' : ''}`}
+                style={{
+                  width: '100%',
+                  minWidth: '100%',
+                  maxWidth: '100%',
+                  alignSelf: 'stretch',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '11px 16px',
+                  minHeight: '48px',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  fontWeight: isActive ? 700 : 500,
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxSizing: 'border-box',
+                  transition: 'all 0.2s ease',
+                  whiteSpace: 'nowrap',
+                  background: isActive
+                    ? 'linear-gradient(135deg, #7b5cff 0%, #a78bfa 100%)'
+                    : 'transparent',
+                  color: isActive
+                    ? '#ffffff'
+                    : (isDark ? '#cbd5e1' : '#1e293b'),
+                  boxShadow: isActive
+                    ? '0 4px 16px rgba(123, 92, 255, 0.35)'
+                    : 'none',
                 }}
               >
-                <img 
-                  src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" 
-                  alt="Sun Nexus Logo" 
-                  className="w-full h-full object-contain"
-                  style={{ filter: 'drop-shadow(0 0 8px var(--accent-primary))' }}
-                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                  <div style={{ width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <IconComp
+                      size={20}
+                      style={{
+                        color: isActive
+                          ? '#ffffff'
+                          : (isDark ? '#94a3b8' : '#475569'),
+                        flexShrink: 0,
+                        transition: 'color 0.2s ease',
+                      }}
+                    />
+                  </div>
+                  <span
+                    className="nav-label"
+                    style={{ fontSize: '14px', fontWeight: isActive ? 700 : 500, color: isActive ? '#ffffff' : (isDark ? '#f8fafc' : '#0f172a'), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}
+                  >
+                    {item.label}
+                  </span>
+                </div>
+
+                {item.badge && (
+                  <span
+                    style={{
+                      padding: '2px 8px',
+                      borderRadius: '9999px',
+                      backgroundColor: '#f59e0b',
+                      color: '#ffffff',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      flexShrink: 0,
+                      marginLeft: '8px'
+                    }}
+                  >
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Sidebar Bottom Footer Section */}
+        <div style={{ paddingTop: '1rem', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', alignSelf: 'stretch', boxSizing: 'border-box' }}>
+          {/* User Profile Badge Card */}
+          <div
+            onClick={() => {
+              setActivePage('profile');
+              if (typeof window !== 'undefined' && window.innerWidth < 1024) toggleSidebar();
+            }}
+            style={{
+              padding: '10px 12px',
+              borderRadius: '14px',
+              border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
+              backgroundColor: isDark ? '#121625' : '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              width: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  backgroundColor: '#7b5cff',
+                  color: '#ffffff',
+                  fontWeight: 800,
+                  fontSize: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  boxShadow: '0 2px 8px rgba(123, 92, 255, 0.3)',
+                }}
+              >
+                {user?.firstName?.[0] || user?.username?.[0] || 'N'}
               </div>
-              <div className="flex flex-col leading-none">
-                <span className="text-xl font-extrabold tracking-tight" style={{ color: 'var(--text-primary)' }}>
-                  Sun Nexus
+              <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left', minWidth: 0, flex: 1 }}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : (user?.username || 'Nexus Admin')}
                 </span>
-                <span className="text-base font-extrabold tracking-wide" style={{ background: 'linear-gradient(90deg, #38bdf8 0%, #6366f1 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  Solutions
+                <span style={{ fontSize: '9.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: isDark ? '#a78bfa' : '#7b5cff' }}>
+                  {isAdmin ? 'PLATFORM ADMIN' : 'VERIFIED MEMBER'}
                 </span>
               </div>
             </div>
-            <button className="lg-hidden" style={{ color: 'var(--text-secondary)' }} onClick={toggleSidebar}>
-              <X size={24} />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (logout) logout();
+              }}
+              title="Log Out"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                border: 'none',
+                backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2',
+                color: '#ef4444',
+                cursor: 'pointer',
+                flexShrink: 0,
+                marginLeft: '6px',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <LogOut size={16} />
             </button>
           </div>
 
-          <div style={{ padding: '0 1.5rem 0.5rem' }}>
-            <div style={{ height: '1px', backgroundColor: 'var(--border-subtle)', width: '100%' }} />
-          </div>
-
-          {/* Nav */}
-          <nav className="flex-1 px-4 py-6 flex flex-col gap-1.5" style={{ overflowY: 'auto' }}>
-            {allItems.map((item) => {
-              const isActive = activePage === item.id;
-              const isAdminBtn = item.id === 'admin';
-              return (
-                <motion.button
-                  key={item.id}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => { setActivePage(item.id); if (window.innerWidth < 1024) toggleSidebar(); }}
-                  className={`sidebar-btn ${isActive ? 'active' : ''}`}
-                  style={isAdminBtn && !isActive ? { borderTop: '1px solid var(--border-subtle)', marginTop: '8px', paddingTop: '16px', color: '#f59e0b' } : {}}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="icon-bg" style={isAdminBtn && !isActive ? { color: '#f59e0b' } : {}}>
-                      <item.icon size={18} />
-                    </div>
-                    <span className="text-sm font-semibold">{item.label}</span>
-                    {isAdminBtn && !isActive && (
-                      <span style={{ fontSize: '9px', fontWeight: 800, background: 'rgba(245,158,11,0.15)', color: '#f59e0b', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                        Admin
-                      </span>
-                    )}
-                  </div>
-                  {isActive
-                    ? <motion.div layoutId="activeIndicator" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}><ChevronRight size={16} style={{ opacity: 0.7 }} /></motion.div>
-                    : <ChevronRight size={16} className="chevron" style={{ opacity: 0, transition: 'var(--transition-fast)' }} />
-                  }
-                </motion.button>
-              );
-            })}
-          </nav>
-
-          {/* User & Session Control */}
-          <div className="p-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-            <div className="flex items-center gap-2">
-              {/* Identity Badge */}
-              <button 
-                onClick={() => { setActivePage('profile'); if (window.innerWidth < 1024) toggleSidebar(); }}
-                className="flex flex-1 items-center gap-3 p-2 rounded-xl transition-all hover:bg-white/5 group border border-transparent hover:border-white/10"
-                style={{ backgroundColor: 'var(--bg-tertiary)', minWidth: 0 }}
-              >
-                <div className="relative flex-shrink-0">
-                  <svg width="0" height="0" className="absolute">
-                    <defs>
-                      <clipPath id="sidebarSquircle" clipPathUnits="objectBoundingBox">
-                        <path d="M .5,0 C .1,0 0,.1 0,.5 0,.9 .1,1 .5,1 .9,1 1,.9 1,.5 1,.1 .9,0 .5,0 Z" />
-                      </clipPath>
-                    </defs>
-                  </svg>
-                  <div 
-                    className="flex items-center justify-center font-bold shadow-md transition-transform group-hover:scale-105 overflow-hidden" 
-                    style={{ 
-                      width: '36px', height: '36px', 
-                      clipPath: 'url(#sidebarSquircle)',
-                      background: isAdmin ? 'linear-gradient(135deg,#f59e0b,#ef4444)' : 'var(--accent-gradient)', 
-                      color: 'white', fontSize: '14px' 
-                    }}
-                  >
-                    {user?.avatar?.length > 5 ? (
-                      <img 
-                        src={user.avatar} 
-                        alt="User" 
-                        className="w-full h-full object-cover" 
-                      />
-                    ) : (
-                      (user?.firstName?.[0] || user?.username?.[0] || 'U')
-                    )}
-                  </div>
-                  <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-[var(--bg-tertiary)]" />
-                </div>
-                <div className="flex flex-col items-start overflow-hidden">
-                  <span className="text-[13px] font-bold truncate w-full text-left" style={{ color: 'var(--text-primary)' }}>
-                    {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : (user?.username || 'Nexus Member')}
-                  </span>
-                  <span style={{ fontSize: '8px', color: isAdmin ? '#f59e0b' : 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {user?.headline || (isAdmin ? 'Nexus Administrator' : 'Identity Verified')}
-                  </span>
-                </div>
-              </button>
-
-              {/* Nexus Pro Logout Action */}
-              <motion.button 
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={logout}
-                className="flex-shrink-0 flex items-center justify-center"
-                style={{ 
-                  width: '38px', height: '38px',
-                  background: 'linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%)',
-                  borderRadius: '12px',
-                  border: '2px solid rgba(255,255,255,0.2)',
-                  boxShadow: '0 4px 12px rgba(58, 123, 213, 0.3)',
-                  position: 'relative',
-                  cursor: 'pointer'
-                }}
-                title="Logout"
-              >
-                <div style={{ position: 'absolute', top: '4px', left: '6px', width: '3px', height: '3px', background: 'rgba(255,255,255,0.4)', borderRadius: '50%' }} />
-                <LogOut size={16} color="white" strokeWidth={3} />
-              </motion.button>
-            </div>
+          {/* Light / Dark Segmented Switcher */}
+          <div style={{ display: 'flex', alignItems: 'center', padding: '3px', borderRadius: '12px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', gap: '3px', width: '100%', boxSizing: 'border-box' }}>
+            <button
+              onClick={() => {
+                if (isDark) toggleTheme();
+              }}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '9px',
+                fontSize: '12px',
+                fontWeight: 600,
+                backgroundColor: !isDark ? '#ffffff' : 'transparent',
+                color: !isDark ? '#7b5cff' : '#64748b',
+                border: !isDark ? '1px solid #e2e8f0' : 'none',
+                boxShadow: !isDark ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Sun size={14} style={{ color: !isDark ? '#7b5cff' : '#64748b' }} />
+              <span>Light</span>
+            </button>
+            <button
+              onClick={() => {
+                if (!isDark) toggleTheme();
+              }}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '9px',
+                fontSize: '12px',
+                fontWeight: 600,
+                backgroundColor: isDark ? '#1e293b' : 'transparent',
+                color: isDark ? '#a78bfa' : '#64748b',
+                border: isDark ? '1px solid #334155' : 'none',
+                boxShadow: isDark ? '0 1px 4px rgba(0,0,0,0.2)' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Moon size={14} style={{ color: isDark ? '#a78bfa' : '#64748b' }} />
+              <span>Dark</span>
+            </button>
           </div>
         </div>
-      </aside>
-
-      <style>{`
-        @media (min-width: 1024px) { aside { transform: translateX(0) !important; } }
-        .sidebar-btn:hover .chevron { opacity: 0.5 !important; transform: translateX(2px); }
-      `}</style>
-    </>
+      </div>
+    </aside>
   );
 };
 

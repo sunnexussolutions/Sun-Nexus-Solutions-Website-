@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   Trophy, Flame, Target, Zap, TrendingUp, 
   ArrowUpRight, Award, Clock, Calendar, Star, BrainCircuit,
-  BarChart3, MessageSquare, ChevronDown, ArrowRight
+  BarChart3, MessageSquare, ChevronDown, ArrowRight, CheckCircle, ShieldAlert, Sparkles
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getResults } from '../store/dataStore';
@@ -81,7 +81,14 @@ const clampNumber = (min, max) => `clamp(${min}px, 2vw + ${min}px, ${max}px)`;
 const Dashboard = () => {
   const { user } = useAuth();
   const [results, setResults] = React.useState([]);
-  
+  const [userStatus, setUserStatus] = React.useState(() => {
+    // Read fresh status from localStorage to pick up admin changes immediately
+    try {
+      const s = JSON.parse(localStorage.getItem('nexus_user') || '{}');
+      return s.status || user?.status || 'active';
+    } catch { return user?.status || 'active'; }
+  });
+
   const [currentTime, setCurrentTime] = React.useState(new Date());
   const [lastSyncTime, setLastSyncTime] = React.useState(new Date());
 
@@ -90,6 +97,11 @@ const Dashboard = () => {
     const all = await getResults();
     setResults(all.filter(r => r.userId === user.id));
     setLastSyncTime(new Date());
+    // Re-read fresh status on every update (e.g. admin just approved)
+    try {
+      const s = JSON.parse(localStorage.getItem('nexus_user') || '{}');
+      if (s.status) setUserStatus(s.status);
+    } catch {}
   }, [user]);
 
   React.useEffect(() => {
@@ -116,6 +128,67 @@ const Dashboard = () => {
         padding: 'clamp(1.5rem, 3vw, 2.75rem) clamp(1.5rem, 4vw, 3.5rem) 4rem clamp(1.5rem, 4vw, 3.5rem)'
       }}
     >
+      {/* STATUS CARDS: PENDING APPROVAL OR APPROVED WELCOME TO TEAM NEXUS */}
+      {userStatus === 'pending' ? (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            padding: '1.25rem 1.75rem',
+            borderRadius: '20px',
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(217, 119, 6, 0.06) 100%)',
+            border: '1.5px solid rgba(245, 158, 11, 0.45)',
+            boxShadow: '0 8px 30px rgba(245, 158, 11, 0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px'
+          }}
+        >
+          <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'rgba(245, 158, 11, 0.2)', border: '1px solid rgba(245, 158, 11, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <ShieldAlert size={22} color="#f59e0b" strokeWidth={2.5} />
+          </div>
+          <div>
+            <h4 style={{ fontSize: '15px', fontWeight: 900, color: '#f59e0b', margin: 0 }}>Registration Status: Pending Approval</h4>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '2px' }}>
+              You are registered successfully and waiting for admin approval
+            </p>
+          </div>
+        </motion.div>
+      ) : (!user?.isAdmin) && userStatus === 'active' && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            padding: '1.25rem 1.75rem',
+            borderRadius: '20px',
+            background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.14) 0%, rgba(16, 185, 129, 0.06) 100%)',
+            border: '1.5px solid rgba(34, 197, 94, 0.45)',
+            boxShadow: '0 8px 30px rgba(34, 197, 94, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '16px',
+            flexWrap: 'wrap'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <CheckCircle size={22} color="#22c55e" strokeWidth={2.5} />
+            </div>
+            <div>
+              <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#22c55e', display: 'block' }}>ACCOUNT APPROVED</span>
+              <h4 style={{ fontSize: '18px', fontWeight: 900, color: '#22c55e', margin: '2px 0 0 0' }}>
+                Welcome to team Nexus
+              </h4>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '12px', background: 'rgba(34, 197, 94, 0.15)', border: '1px solid rgba(34, 197, 94, 0.3)', color: '#22c55e', fontSize: '12px', fontWeight: 800 }}>
+            <Sparkles size={14} />
+            <span>Official Operator Access</span>
+          </div>
+        </motion.div>
+      )}
+
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>

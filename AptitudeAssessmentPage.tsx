@@ -1,487 +1,705 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useTheme } from "next-themes";
-import {
-  Search,
-  Bell,
-  Sun,
-  Moon,
-  ChevronRight,
-  TrendingUp,
-  X,
-  LayoutGrid,
-  BookOpen,
-  Layers,
-  FolderGit2,
-  Code2,
-  Users,
-  User,
-  Shield,
-  LogOut,
-  Target,
-  Brain,
-  MessageSquare,
-  ArrowRight,
-  Menu,
-} from "lucide-react";
+import { motion } from "framer-motion";
+import * as LucideIcons from "lucide-react";
+
+const icons: any = LucideIcons;
+
+const Search: any = icons.Search;
+const Bell: any = icons.Bell;
+const Sun: any = icons.Sun;
+const Moon: any = icons.Moon;
+const ChevronDown: any = icons.ChevronDown;
+const LayoutGrid: any = icons.LayoutGrid;
+const Home: any = icons.Home;
+const CheckSquare: any = icons.CheckSquare;
+const Layers: any = icons.Layers;
+const FolderGit2: any = icons.FolderGit2;
+const Users: any = icons.Users;
+const MessageSquare: any = icons.MessageSquare;
+const Briefcase: any = icons.Briefcase;
+const Clock: any = icons.Clock;
+const HelpCircle: any = icons.HelpCircle;
+const Lock: any = icons.Lock;
+const ArrowLeft: any = icons.ArrowLeft;
+const LogOut: any = icons.LogOut;
+const Zap: any = icons.Zap;
+const Menu: any = icons.Menu;
+const X: any = icons.X;
 
 /* ============================================================================
- * INTERFACES & TYPES
+ * 3D ISOMETRIC PUZZLE ILLUSTRATIONS (Matching Reference Image 100%)
  * ============================================================================ */
-interface AssessmentCategory {
-  id: string;
-  title: string;
-  code: string;
-  icon: React.ElementType;
-  topicCount: number;
-  themeColor: string;
-  badgeBg: string;
-  borderClass: string;
-  hoverBorderClass: string;
-  shadowClass: string;
-  iconBgClass: string;
-  buttonBgClass: string;
-}
 
-const CATEGORIES: AssessmentCategory[] = [
-  {
-    id: "quantitative",
-    title: "Quantitative",
-    code: "Q A",
-    icon: Target,
-    topicCount: 0,
-    themeColor: "#a855f7",
-    badgeBg: "bg-purple-950/70 border-purple-500/40 text-purple-400",
-    borderClass: "border-purple-500/40",
-    hoverBorderClass: "hover:border-purple-500/80",
-    shadowClass: "shadow-[0_0_30px_rgba(147,51,234,0.15)]",
-    iconBgClass: "bg-purple-950/60 border-purple-500/40 text-purple-400",
-    buttonBgClass:
-      "border-purple-500/40 bg-purple-950/40 hover:bg-purple-900/60 text-purple-300",
-  },
-  {
-    id: "logical",
-    title: "Logical Reasoning",
-    code: "L R",
-    icon: Brain,
-    topicCount: 0,
-    themeColor: "#06b6d4",
-    badgeBg: "bg-cyan-950/70 border-cyan-500/40 text-cyan-400",
-    borderClass: "border-cyan-500/40",
-    hoverBorderClass: "hover:border-cyan-500/80",
-    shadowClass: "shadow-[0_0_30px_rgba(6,182,212,0.15)]",
-    iconBgClass: "bg-cyan-950/60 border-cyan-500/40 text-cyan-400",
-    buttonBgClass:
-      "border-cyan-500/40 bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-300",
-  },
-  {
-    id: "verbal",
-    title: "Verbal Ability",
-    code: "V A",
-    icon: MessageSquare,
-    topicCount: 0,
-    themeColor: "#f59e0b",
-    badgeBg: "bg-amber-950/70 border-amber-500/40 text-amber-400",
-    borderClass: "border-amber-500/40",
-    hoverBorderClass: "hover:border-amber-500/80",
-    shadowClass: "shadow-[0_0_30px_rgba(245,158,11,0.15)]",
-    iconBgClass: "bg-amber-950/60 border-amber-500/40 text-amber-400",
-    buttonBgClass:
-      "border-amber-500/40 bg-amber-950/40 hover:bg-amber-900/60 text-amber-300",
-  },
-];
+/** 3D Puzzle Illustration for Purple Card */
+const Purple3DPuzzleSvg = () => (
+  <div className="relative w-44 h-44 flex items-center justify-center flex-shrink-0 pointer-events-none">
+    <svg viewBox="0 0 200 180" className="w-full h-full drop-shadow-md overflow-visible">
+      <defs>
+        <linearGradient id="purpleTopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#f5f3ff" />
+          <stop offset="100%" stopColor="#e9d5ff" />
+        </linearGradient>
+        <linearGradient id="purpleSideGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#d8b4fe" />
+          <stop offset="100%" stopColor="#c084fc" />
+        </linearGradient>
+        <linearGradient id="purpleFrontGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#e9d5ff" />
+          <stop offset="100%" stopColor="#d8b4fe" />
+        </linearGradient>
+        <filter id="shadowPurp" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#7c3aed" floodOpacity="0.12" />
+        </filter>
+      </defs>
+      
+      <g filter="url(#shadowPurp)" transform="translate(10, 10)">
+        <path d="M 110 110 L 160 85 L 175 110 L 125 135 Z" fill="url(#purpleTopGrad)" stroke="#d8b4fe" strokeWidth="1" />
+        <path d="M 125 135 L 175 110 L 175 125 L 125 150 Z" fill="url(#purpleSideGrad)" />
+        <path d="M 110 110 L 125 135 L 125 150 L 110 125 Z" fill="url(#purpleFrontGrad)" />
+
+        <path d="M 75 70 L 125 45 L 140 70 L 90 95 Z" fill="url(#purpleTopGrad)" stroke="#f5f3ff" strokeWidth="1" />
+        <path d="M 90 95 L 140 70 L 140 85 L 90 110 Z" fill="url(#purpleSideGrad)" />
+        <path d="M 75 70 L 90 95 L 90 110 L 75 85 Z" fill="url(#purpleFrontGrad)" />
+        <ellipse cx="108" cy="58" rx="10" ry="6" fill="url(#purpleTopGrad)" stroke="#d8b4fe" strokeWidth="1" />
+
+        <path d="M 40 110 L 90 85 L 105 110 L 55 135 Z" fill="url(#purpleTopGrad)" stroke="#e9d5ff" strokeWidth="1" />
+        <path d="M 55 135 L 105 110 L 105 125 L 55 150 Z" fill="url(#purpleSideGrad)" />
+        <path d="M 40 110 L 55 135 L 55 150 L 40 125 Z" fill="url(#purpleFrontGrad)" />
+        <ellipse cx="72" cy="98" rx="10" ry="6" fill="url(#purpleTopGrad)" stroke="#d8b4fe" strokeWidth="1" />
+      </g>
+    </svg>
+  </div>
+);
+
+/** 3D Puzzle Illustration for Green Card */
+const Green3DPuzzleSvg = () => (
+  <div className="relative w-44 h-44 flex items-center justify-center flex-shrink-0 pointer-events-none">
+    <svg viewBox="0 0 200 180" className="w-full h-full drop-shadow-md overflow-visible">
+      <defs>
+        <linearGradient id="greenTopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#f0fdf4" />
+          <stop offset="100%" stopColor="#d1fae5" />
+        </linearGradient>
+        <linearGradient id="greenSideGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#a7f3d0" />
+          <stop offset="100%" stopColor="#6ee7b7" />
+        </linearGradient>
+        <linearGradient id="greenFrontGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#d1fae5" />
+          <stop offset="100%" stopColor="#a7f3d0" />
+        </linearGradient>
+        <filter id="shadowGreen" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#10b981" floodOpacity="0.12" />
+        </filter>
+      </defs>
+      
+      <g filter="url(#shadowGreen)" transform="translate(10, 10)">
+        <path d="M 110 110 L 160 85 L 175 110 L 125 135 Z" fill="url(#greenTopGrad)" stroke="#a7f3d0" strokeWidth="1" />
+        <path d="M 125 135 L 175 110 L 175 125 L 125 150 Z" fill="url(#greenSideGrad)" />
+        <path d="M 110 110 L 125 135 L 125 150 L 110 125 Z" fill="url(#greenFrontGrad)" />
+
+        <path d="M 75 70 L 125 45 L 140 70 L 90 95 Z" fill="url(#greenTopGrad)" stroke="#f0fdf4" strokeWidth="1" />
+        <path d="M 90 95 L 140 70 L 140 85 L 90 110 Z" fill="url(#greenSideGrad)" />
+        <path d="M 75 70 L 90 95 L 90 110 L 75 85 Z" fill="url(#greenFrontGrad)" />
+        <ellipse cx="108" cy="58" rx="10" ry="6" fill="url(#greenTopGrad)" stroke="#a7f3d0" strokeWidth="1" />
+
+        <path d="M 40 110 L 90 85 L 105 110 L 55 135 Z" fill="url(#greenTopGrad)" stroke="#d1fae5" strokeWidth="1" />
+        <path d="M 55 135 L 105 110 L 105 125 L 55 150 Z" fill="url(#greenSideGrad)" />
+        <path d="M 40 110 L 55 135 L 55 150 L 40 125 Z" fill="url(#greenFrontGrad)" />
+        <ellipse cx="72" cy="98" rx="10" ry="6" fill="url(#greenTopGrad)" stroke="#a7f3d0" strokeWidth="1" />
+      </g>
+    </svg>
+  </div>
+);
+
+/** Golden 3D Trophy Graphic matching Reference Image */
+const GoldenTrophyGraphic = () => (
+  <div className="relative w-36 h-28 mx-auto mb-2 flex items-center justify-center pointer-events-none">
+    <svg viewBox="0 0 160 120" className="w-full h-full overflow-visible">
+      <defs>
+        <linearGradient id="goldCupGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#fbbf24" />
+          <stop offset="50%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#d97706" />
+        </linearGradient>
+        <linearGradient id="goldStemGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#b45309" />
+        </linearGradient>
+        <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#fef3c7" />
+        </linearGradient>
+      </defs>
+
+      {/* Floating Particles */}
+      <circle cx="25" cy="40" r="2.5" fill="#38bdf8" />
+      <rect x="50" y="20" width="4" height="4" rx="1" fill="#f59e0b" transform="rotate(25 50 20)" />
+      <circle cx="55" cy="55" r="3" fill="#a855f7" />
+      <circle cx="100" cy="22" r="3" fill="#fb923c" />
+      <circle cx="140" cy="40" r="2.5" fill="#a855f7" />
+      <rect x="135" y="70" width="4" height="4" rx="1" fill="#818cf8" transform="rotate(45 135 70)" />
+      <circle cx="125" cy="90" r="2" fill="#38bdf8" opacity="0.8" />
+      <circle cx="35" cy="85" r="3" fill="#c084fc" opacity="0.8" />
+
+      {/* Base */}
+      <rect x="52" y="98" width="56" height="12" rx="4" fill="url(#goldStemGrad)" />
+      <path d="M 68 82 L 92 82 L 88 98 L 72 98 Z" fill="url(#goldStemGrad)" />
+
+      {/* Cup Handles */}
+      <path d="M 45 42 C 30 42, 30 70, 52 72 L 52 64 C 40 64, 40 48, 48 48 Z" fill="#d97706" />
+      <path d="M 115 42 C 130 42, 130 70, 108 72 L 108 64 C 120 64, 120 48, 112 48 Z" fill="#d97706" />
+
+      {/* Main Cup */}
+      <path d="M 46 36 L 114 36 Q 112 78 80 80 Q 48 78 46 36 Z" fill="url(#goldCupGrad)" />
+      <ellipse cx="80" cy="36" rx="34" ry="6" fill="#fef3c7" opacity="0.6" />
+
+      {/* White Star on Cup */}
+      <polygon
+        points="80,48 83,56 92,56 85,61 87,70 80,64 73,70 75,61 68,56 77,56"
+        fill="url(#starGrad)"
+      />
+    </svg>
+  </div>
+);
 
 /* ============================================================================
- * MAIN COMPONENT
+ * MAIN APTITUDE ASSESSMENT PAGE COMPONENT
  * ============================================================================ */
-export default function AptitudeAssessmentPage() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeModalCategory, setActiveModalCategory] =
-    useState<AssessmentCategory | null>(null);
+export default function AptitudeAssessmentPage(): any {
+  const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>("aptitude");
+  const [showResultsModal, setShowResultsModal] = useState<boolean>(true);
+  const [modalTab, setModalTab] = useState<"summary" | "review">("summary");
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (themeMode === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [themeMode]);
 
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-100 flex antialiased overflow-x-hidden selection:bg-blue-500/30">
-      {/* Background Cyber Glow Orbs */}
-      <div className="fixed top-24 right-1/4 w-[500px] h-[400px] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="fixed bottom-10 left-1/3 w-[600px] h-[500px] bg-cyan-600/10 rounded-full blur-[160px] pointer-events-none z-0" />
-
-      {/* ================= LEFT SIDEBAR NAVIGATION ================= */}
+    <div className={`min-h-screen font-sans transition-colors duration-300 ${themeMode === "dark" ? "bg-slate-950 text-slate-100" : "bg-[#f8fafc] text-slate-800"}`}>
+      {/* SIDEBAR NAVIGATION */}
       <aside
-        className={`w-[260px] flex-shrink-0 bg-[#040914]/95 backdrop-blur-2xl border-r border-slate-800/60 flex flex-col justify-between z-40 fixed lg:relative inset-y-0 left-0 transition-transform duration-300 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed top-0 left-0 h-full w-64 z-50 transition-transform duration-300 flex flex-col border-r ${
+          themeMode === "dark" ? "bg-slate-900 border-slate-800 text-slate-200" : "bg-white border-slate-200/80 text-slate-700"
+        } ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
-        <div className="p-5 flex flex-col h-full">
-          {/* Brand Logo Header */}
-          <div className="flex items-center gap-3.5 px-2 py-1">
-            <div className="w-11 h-11 rounded-xl bg-slate-900 border border-blue-500/40 flex items-center justify-center p-1.5 shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+        {/* Brand Header */}
+        <div className="p-6 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-0 flex items-center justify-center overflow-hidden">
               <img
-                src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png"
+                src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png"
                 alt="Sun Nexus Logo"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain scale-[2.15]"
               />
             </div>
             <div className="flex flex-col leading-none">
-              <span className="font-extrabold text-[19px] tracking-tight text-white">
-                Sun Nexus
-              </span>
-              <span className="font-extrabold text-[15px] tracking-wide text-cyan-400">
-                Solutions
-              </span>
+              <span className="font-black text-lg tracking-tight text-slate-900 dark:text-white">Sun Nexus</span>
+              <span className="font-extrabold text-sm tracking-wide text-amber-500">Solutions</span>
             </div>
           </div>
+          <button className="lg:hidden text-slate-400 hover:text-slate-600" onClick={() => setSidebarOpen(false)}>
+            {X ? <X className="w-5 h-5" /> : null}
+          </button>
+        </div>
 
-          <div className="h-px w-full bg-slate-800/80 my-4" />
+        {/* Sidebar Nav Links */}
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {[
+            { id: "overview", label: "Overview", icon: LayoutGrid },
+            { id: "homepage", label: "Home Page", icon: Home },
+            { id: "aptitude", label: "Assessments", icon: CheckSquare },
+            { id: "domains", label: "Domains", icon: Layers },
+            { id: "projects", label: "Projects", icon: FolderGit2 },
+            { id: "users", label: "Users", icon: Users },
+            { id: "discussions", label: "Discussions", icon: MessageSquare },
+            { id: "notifications", label: "Notifications", icon: Bell, badge: 12 },
+            { id: "hiring", label: "Hiring", icon: Briefcase },
+          ].map((item) => {
+            const IconComponent = item.icon;
+            const isActive = activeTab === item.id;
 
-          {/* Navigation Items */}
-          <nav className="space-y-1.5 flex-1 overflow-y-auto pr-1">
-            <a
-              href="/dashboard"
-              className="flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900/60 transition-all font-medium text-sm"
-            >
-              <LayoutGrid className="w-5 h-5 text-slate-400" />
-              <span>Dashboard</span>
-            </a>
-
-            <a
-              href="/learning"
-              className="flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900/60 transition-all font-medium text-sm"
-            >
-              <BookOpen className="w-5 h-5 text-slate-400" />
-              <span>My Learning</span>
-            </a>
-
-            <a
-              href="/domains"
-              className="flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900/60 transition-all font-medium text-sm"
-            >
-              <Layers className="w-5 h-5 text-slate-400" />
-              <span>Domains</span>
-            </a>
-
-            <a
-              href="/projects"
-              className="flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900/60 transition-all font-medium text-sm"
-            >
-              <FolderGit2 className="w-5 h-5 text-slate-400" />
-              <span>Projects</span>
-            </a>
-
-            <a
-              href="/challenges"
-              className="flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900/60 transition-all font-medium text-sm"
-            >
-              <Code2 className="w-5 h-5 text-slate-400" />
-              <span>Challenges</span>
-            </a>
-
-            {/* ACTIVE: Aptitude */}
-            <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-semibold text-sm shadow-[0_4px_20px_rgba(79,70,229,0.35)] cursor-pointer">
-              <div className="flex items-center gap-3.5">
-                <Brain className="w-5 h-5 text-white" />
-                <span>Aptitude</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/80" />
-            </div>
-
-            <a
-              href="/council"
-              className="flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900/60 transition-all font-medium text-sm"
-            >
-              <Users className="w-5 h-5 text-slate-400" />
-              <span>Council</span>
-            </a>
-
-            <a
-              href="/profile"
-              className="flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900/60 transition-all font-medium text-sm"
-            >
-              <User className="w-5 h-5 text-slate-400" />
-              <span>Profile</span>
-            </a>
-          </nav>
-
-          {/* Sidebar Footer Section */}
-          <div className="pt-4 space-y-4">
-            <a
-              href="/admin"
-              className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-900/60 border border-slate-800/80 hover:border-amber-500/40 text-amber-500 hover:text-amber-400 font-semibold text-sm transition-all group"
-            >
-              <div className="flex items-center gap-3">
-                <Shield className="w-4 h-4 text-amber-500" />
-                <span>Admin Panel</span>
-              </div>
-              <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-[10px] font-bold text-amber-400 tracking-wider">
-                ADMIN
-              </span>
-            </a>
-
-            <div className="h-px w-full bg-slate-800/80" />
-
-            {/* User Profile Footer Card */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900/40 border border-slate-800/60">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-indigo-600 font-bold text-white flex items-center justify-center text-sm shadow-[0_0_12px_rgba(79,70,229,0.4)]">
-                  N
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-white leading-tight">
-                    Nexus Admin
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">
-                    NEXUS ADMIN
-                  </span>
-                </div>
-              </div>
+            return (
               <button
-                title="Logout"
-                className="p-2 rounded-lg border border-slate-700/60 hover:bg-slate-800 text-slate-300 hover:text-white transition-all"
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
+                  isActive
+                    ? "bg-slate-100 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 shadow-xs"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                }`}
               >
-                <LogOut className="w-4 h-4" />
+                <div className="flex items-center gap-3.5">
+                  {IconComponent ? (
+                    <IconComponent
+                      className={`w-4 h-4 ${
+                        isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400"
+                      }`}
+                    />
+                  ) : null}
+                  <span>{item.label}</span>
+                </div>
+
+                {item.badge && (
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[11px] font-bold shadow-xs">
+                    {item.badge}
+                  </span>
+                )}
               </button>
+            );
+          })}
+        </nav>
+
+        {/* Sidebar Footer Controls */}
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800/60 space-y-3">
+          {/* Admin User Badge */}
+          <div className="p-2.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-purple-600 text-white font-black text-sm flex items-center justify-center shadow-md">
+                N
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-bold text-slate-900 dark:text-white leading-tight">Nexus Admin</span>
+                <span className="text-[9px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+                  PLATFORM ADMIN
+                </span>
+              </div>
             </div>
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined') window.location.href = '/login';
+              }}
+              title="Log Out"
+              className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center hover:bg-red-200 dark:hover:bg-red-900/60 transition-colors flex-shrink-0"
+            >
+              {LogOut ? <LogOut className="w-4 h-4" /> : null}
+            </button>
+          </div>
+
+          {/* Theme Switcher Widget */}
+          <div className="p-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 flex items-center gap-1">
+            <button
+              onClick={() => setThemeMode("light")}
+              className={`flex-1 flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${
+                themeMode === "light"
+                  ? "bg-white text-purple-600 shadow-xs border border-slate-200/60"
+                  : "text-slate-500 hover:text-slate-800 dark:text-slate-400"
+              }`}
+            >
+              {Sun ? <Sun className="w-3.5 h-3.5 text-purple-600" /> : null}
+              <span>Light</span>
+            </button>
+            <button
+              onClick={() => setThemeMode("dark")}
+              className={`flex-1 flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${
+                themeMode === "dark"
+                  ? "bg-slate-800 text-purple-400 shadow-xs border border-slate-700"
+                  : "text-slate-500 hover:text-slate-800 dark:text-slate-400"
+              }`}
+            >
+              {Moon ? <Moon className="w-3.5 h-3.5" /> : null}
+              <span>Dark</span>
+            </button>
           </div>
         </div>
       </aside>
 
-      {/* ================= RIGHT WRAPPER (HEADER + CONTENT) ================= */}
-      <div className="flex-1 flex flex-col min-h-screen relative z-10 overflow-hidden">
-        {/* HEADER BAR */}
-        <header className="h-[72px] px-6 md:px-10 flex items-center justify-between border-b border-slate-800/60 bg-[#030712]/80 backdrop-blur-xl relative z-20">
-          {/* Mobile Sidebar Toggle Button */}
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden p-2.5 rounded-xl border border-slate-700/60 bg-slate-900/80 text-slate-300 hover:text-white"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-
-          {/* Search Input Box */}
-          <div className="relative w-full max-w-[360px] hidden sm:block">
-            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for courses, projects..."
-              className="w-full bg-[#070e1e]/80 border border-slate-700/70 rounded-full pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:border-blue-500/70 focus:ring-1 focus:ring-blue-500/50 transition-all"
-            />
-          </div>
-
-          {/* Right Header Actions */}
-          <div className="flex items-center gap-4 ml-auto">
-            {/* Theme Switcher Pill */}
-            <div className="flex items-center p-1 rounded-full bg-slate-800/80 border border-slate-700/70">
-              <button
-                onClick={() =>
-                  setTheme(theme === "dark" ? "light" : "dark")
-                }
-                aria-label="Toggle Theme"
-                className="p-1.5 rounded-full bg-amber-500 text-white shadow-md transition-all"
-              >
-                {mounted && theme === "light" ? (
-                  <Moon className="w-4 h-4" />
-                ) : (
-                  <Sun className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-
-            {/* Notification Bell */}
-            <button className="w-9 h-9 rounded-full border border-slate-700/60 bg-slate-900/60 flex items-center justify-center text-slate-300 hover:text-white transition-colors relative">
-              <Bell className="w-4 h-4" />
+      {/* MAIN CONTENT AREA */}
+      <div className="lg:ml-64 min-h-screen flex flex-col">
+        {/* Top Header Bar */}
+        <header
+          className={`h-16 px-4 lg:px-8 flex items-center justify-between border-b sticky top-0 z-40 backdrop-blur-md ${
+            themeMode === "dark" ? "bg-slate-950/80 border-slate-800/80" : "bg-white/80 border-slate-200/80"
+          }`}
+        >
+          <div className="flex items-center gap-4">
+            <button className="lg:hidden text-slate-500" onClick={() => setSidebarOpen(true)}>
+              {Menu ? <Menu className="w-6 h-6" /> : null}
             </button>
 
-            {/* Profile Dropdown Trigger */}
-            <div className="flex items-center gap-3 pl-2 border-l border-slate-800/80">
-              <div className="text-right hidden md:block">
-                <div className="text-sm font-semibold text-white leading-tight">
-                  Nexus Admin
-                </div>
-                <div className="text-[10px] font-bold text-blue-400 tracking-wider">
-                  PLATFORM ADMIN
-                </div>
-              </div>
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-[0_0_12px_rgba(37,99,235,0.4)]">
+            {/* Global Search Bar */}
+            <div className="relative w-64 md:w-96">
+              {Search ? <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" /> : null}
+              <input
+                type="text"
+                placeholder="Search for courses, projects..."
+                className={`w-full pl-10 pr-4 py-2 rounded-xl text-xs font-medium border outline-none transition-all ${
+                  themeMode === "dark"
+                    ? "bg-slate-900 border-slate-800 text-slate-200 placeholder-slate-500 focus:border-purple-500"
+                    : "bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400 focus:border-purple-500"
+                }`}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {/* Notification Bell */}
+            <button
+              className={`p-2 rounded-xl border relative transition-colors ${
+                themeMode === "dark"
+                  ? "bg-slate-900 border-slate-800 text-slate-300 hover:text-white"
+                  : "bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              {Bell ? <Bell className="w-4 h-4" /> : null}
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full ring-2 ring-white dark:ring-slate-950" />
+            </button>
+
+            {/* User Profile Pill */}
+            <div className="flex items-center gap-2.5 pl-2 border-l border-slate-200 dark:border-slate-800">
+              <div className="w-8 h-8 rounded-full bg-purple-600 text-white font-bold text-xs flex items-center justify-center">
                 N
               </div>
+              <div className="hidden md:flex flex-col text-left">
+                <span className="text-xs font-bold text-slate-900 dark:text-white leading-tight">Nexus Admin</span>
+                <span className="text-[9px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
+                  PLATFORM ADMIN
+                </span>
+              </div>
+              {ChevronDown ? <ChevronDown className="w-3.5 h-3.5 text-slate-400" /> : null}
             </div>
           </div>
         </header>
 
-        {/* MAIN CONTENT AREA */}
-        <main className="flex-1 px-6 md:px-12 lg:px-16 py-10 max-w-7xl w-full mx-auto relative z-10 flex flex-col justify-center">
-          {/* Decorative Flowing Neon Mesh Waves Background matching reference image */}
-          <div className="absolute right-0 top-2 w-[650px] h-[360px] pointer-events-none opacity-90 hidden lg:block z-0">
-            <svg viewBox="0 0 700 400" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-              <defs>
-                <linearGradient id="waveGrad1" x1="0" y1="0" x2="700" y2="400" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#38bdf8" stopOpacity="0" />
-                  <stop offset="40%" stopColor="#818cf8" stopOpacity="0.85" />
-                  <stop offset="80%" stopColor="#c084fc" stopOpacity="0.95" />
-                  <stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
-                </linearGradient>
-                <linearGradient id="waveGrad2" x1="100" y1="0" x2="600" y2="350" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#06b6d4" stopOpacity="0" />
-                  <stop offset="50%" stopColor="#a855f7" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#ec4899" stopOpacity="0.15" />
-                </linearGradient>
-              </defs>
-              <path d="M0 250 C 150 150, 250 320, 420 180 C 550 70, 600 200, 700 120" stroke="url(#waveGrad1)" strokeWidth={1.5} fill="none" />
-              <path d="M20 270 C 170 170, 270 340, 440 200 C 570 90, 620 220, 700 140" stroke="url(#waveGrad1)" strokeWidth={1} strokeDasharray="4 4" fill="none" />
-              <path d="M40 290 C 190 190, 290 360, 460 220 C 590 110, 640 240, 700 160" stroke="url(#waveGrad2)" strokeWidth={2} fill="none" />
-              <path d="M60 310 C 210 210, 310 380, 480 240 C 610 130, 660 260, 700 180" stroke="url(#waveGrad2)" strokeWidth={1} fill="none" />
-              <path d="M80 330 C 230 230, 330 400, 500 260 C 630 150, 680 280, 700 200" stroke="url(#waveGrad1)" strokeWidth={1.5} fill="none" />
-              <path d="M100 350 C 250 250, 350 420, 520 280 C 650 170, 690 300, 700 220" stroke="url(#waveGrad2)" strokeWidth={1} fill="none" />
-              <circle cx={430} cy={160} r={2.5} fill="#a855f7" />
-              <circle cx={510} cy={110} r={2} fill="#38bdf8" />
-              <circle cx={580} cy={190} r={3} fill="#ec4899" />
-              <circle cx={640} cy={140} r={2} fill="#c084fc" />
-              <circle cx={370} cy={230} r={2} fill="#06b6d4" />
-            </svg>
+        {/* PAGE CONTENT CONTAINER — MATCHING REFERENCE IMAGE 100% */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-10 max-w-7xl w-full mx-auto space-y-6">
+          {/* Breadcrumb Back Link */}
+          <div>
+            <button className="inline-flex items-center gap-2 text-sm font-bold text-purple-600 dark:text-purple-400 hover:underline">
+              {ArrowLeft ? <ArrowLeft className="w-4 h-4" /> : null}
+              <span>Back to Categories</span>
+            </button>
           </div>
 
-          {/* Skill Assessment Pill Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-5 relative z-10"
-          >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-950/80 border border-indigo-500/30 text-indigo-400 font-bold text-xs tracking-wider shadow-[0_0_20px_rgba(37,99,235,0.4)]">
-              <TrendingUp className="w-3.5 h-3.5 text-indigo-400" />
-              <span>SKILL ASSESSMENT</span>
-            </div>
-          </motion.div>
-
-          {/* Headline & Subtitle */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mb-10 space-y-3 relative z-10"
-          >
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.08]">
-              <span className="text-white">Aptitude & </span>
-              <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
-                Reasoning
-              </span>
+          {/* Header Section */}
+          <div className="space-y-1">
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+              Logical Reasoning Topics
             </h1>
-            <p className="text-base sm:text-lg text-slate-300 font-normal">
-              Master the logic behind every challenge.
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+              Select a module to sharpen your skills.
             </p>
-          </motion.div>
+          </div>
 
-          {/* ================= 3 ASSESSMENT CATEGORY CARDS GRID ================= */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-            {CATEGORIES.map((category, idx) => {
-              const IconComp = category.icon;
-              return (
-                <motion.div
-                  key={category.id}
-                  initial={{ opacity: 0, y: 25 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 + idx * 0.1 }}
-                  whileHover={{ y: -6 }}
-                  className={`border ${category.borderClass} ${category.hoverBorderClass} ${category.shadowClass} rounded-2xl bg-slate-900/65 backdrop-blur-xl p-7 flex flex-col justify-between min-h-[360px] group transition-all duration-300`}
-                >
-                  {/* Top Row: Icon Box & Tag Badge */}
-                  <div className="flex items-start justify-between">
-                    <div
-                      className={`w-14 h-14 rounded-2xl ${category.iconBgClass} border flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform`}
-                    >
-                      <IconComp className="w-7 h-7" />
+          {/* TWO MAIN TOPIC CARDS GRID (Side-by-Side) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 pt-4">
+            {/* CARD 1: PURPLE MODULE CARD */}
+            <div
+              className={`rounded-[28px] border p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:shadow-xl ${
+                themeMode === "dark"
+                  ? "bg-slate-900/90 border-purple-900/50 shadow-purple-950/20"
+                  : "bg-[#f0ebff] border-[#d8cefe] shadow-[0_8px_30px_rgba(124,58,237,0.05)]"
+              }`}
+            >
+              {/* Top Badges Row */}
+              <div className="flex items-center justify-between gap-2 mb-6">
+                <span className="px-3.5 py-1.5 rounded-full bg-[#e4dcff] text-[#6d28d9] font-bold text-xs tracking-wide">
+                  WEEK 1
+                </span>
+
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#ddd3fe] text-[#6d28d9] font-bold text-xs">
+                  {Lock ? <Lock className="w-3.5 h-3.5" /> : null}
+                  <span>UNLOCKS: 23 JUL, 11:23 AM</span>
+                </div>
+              </div>
+
+              {/* Main Content & 3D Puzzle Illustration Row */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-6 my-2">
+                {/* Left Side Info */}
+                <div className="flex-1 space-y-4 text-left">
+                  {/* Stat Indicators */}
+                  <div className="flex items-center gap-4 text-xs font-bold text-[#6d28d9]">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-6 h-6 rounded-full bg-white/80 flex items-center justify-center text-[#6d28d9]">
+                        {HelpCircle ? <HelpCircle className="w-3.5 h-3.5" /> : null}
+                      </div>
+                      <span className="text-slate-800 dark:text-slate-200">20 QNS</span>
                     </div>
-                    <span className="px-2.5 py-1 rounded-md bg-slate-800/80 border border-slate-700/60 text-xs font-bold text-slate-200 tracking-wider">
-                      {category.code}
-                    </span>
+
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-6 h-6 rounded-full bg-white/80 flex items-center justify-center text-[#6d28d9]">
+                        {Clock ? <Clock className="w-3.5 h-3.5" /> : null}
+                      </div>
+                      <span className="text-slate-800 dark:text-slate-200">20 MIN</span>
+                    </div>
                   </div>
 
-                  {/* Middle Section: Title & Topic Count */}
-                  <div className="mt-6">
-                    <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
-                      {category.title}
+                  {/* Title & Description */}
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                      Puzzles(Mixed Logic)
                     </h3>
-                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
-                      {category.topicCount} TOPICS
+                    <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400 mt-2 leading-relaxed max-w-[280px]">
+                      Focused practice module covering core concepts for puzzles(mixed logic).
                     </p>
-                    <div className="h-px w-full bg-slate-800/80 my-6" />
                   </div>
 
-                  {/* Bottom Explore Topics Button */}
-                  <button
-                    onClick={() => setActiveModalCategory(category)}
-                    className={`w-full py-3.5 px-6 rounded-full border ${category.buttonBgClass} hover:text-white font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 transition-all`}
-                  >
-                    <span>EXPLORE TOPICS</span>
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </button>
-                </motion.div>
-              );
-            })}
+                  {/* Action Button */}
+                  <div className="pt-2">
+                    <button
+                      onClick={() => setShowResultsModal(true)}
+                      className="px-6 py-2.5 rounded-xl border-2 border-[#a78bfa] bg-white/60 hover:bg-white text-[#6d28d9] font-extrabold text-xs tracking-wider uppercase inline-flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+                    >
+                      <span>REVIEW</span>
+                      {Lock ? <Lock className="w-3.5 h-3.5" /> : null}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* CARD 2: MINT/GREEN MODULE CARD */}
+            <div
+              className={`rounded-[28px] border p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:shadow-xl ${
+                themeMode === "dark"
+                  ? "bg-slate-900/90 border-emerald-900/50 shadow-emerald-950/20"
+                  : "bg-[#e6f4f1] border-[#b2e5d9] shadow-[0_8px_30px_rgba(16,185,129,0.05)]"
+              }`}
+            >
+              {/* Top Badges Row */}
+              <div className="flex items-center justify-between gap-2 mb-6">
+                <span className="px-3.5 py-1.5 rounded-full bg-[#d1f2e9] text-[#047857] font-bold text-xs tracking-wide">
+                  WEEK 1
+                </span>
+
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#c2eee1] text-[#047857] font-bold text-xs">
+                  {Lock ? <Lock className="w-3.5 h-3.5" /> : null}
+                  <span>UNLOCKS: 23 JUL, 11:30 AM</span>
+                </div>
+              </div>
+
+              {/* Main Content Row */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-6 my-2">
+                {/* Left Side Info */}
+                <div className="flex-1 space-y-4 text-left">
+                  {/* Stat Indicators */}
+                  <div className="flex items-center gap-4 text-xs font-bold text-[#059669]">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-6 h-6 rounded-full bg-white/80 flex items-center justify-center text-[#059669]">
+                        {HelpCircle ? <HelpCircle className="w-3.5 h-3.5" /> : null}
+                      </div>
+                      <span className="text-slate-800 dark:text-slate-200">20 QNS</span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-6 h-6 rounded-full bg-white/80 flex items-center justify-center text-[#059669]">
+                        {Clock ? <Clock className="w-3.5 h-3.5" /> : null}
+                      </div>
+                      <span className="text-slate-800 dark:text-slate-200">20 MIN</span>
+                    </div>
+                  </div>
+
+                  {/* Title & Description */}
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                      Puzzles(Mixed Logic)
+                    </h3>
+                    <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400 mt-2 leading-relaxed max-w-[280px]">
+                      Focused practice module covering core concepts for puzzles(mixed logic).
+                    </p>
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="pt-2">
+                    <button
+                      onClick={() => setShowResultsModal(true)}
+                      className="px-6 py-2.5 rounded-xl border-2 border-[#34d399] bg-white/60 hover:bg-white text-[#059669] font-extrabold text-xs tracking-wider uppercase inline-flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+                    >
+                      <span>START</span>
+                      {Zap ? <Zap className="w-3.5 h-3.5" /> : null}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </main>
       </div>
 
-      {/* FLOATING CHAT BUTTON (Bottom Right) */}
-      <button
-        aria-label="Support Chat"
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_25px_rgba(37,99,235,0.55)] flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
-      >
-        <MessageSquare className="w-6 h-6" />
-      </button>
-
-      {/* EXPLORE TOPICS MODAL */}
-      <AnimatePresence>
-        {activeModalCategory && (
+      {/* ============================================================================
+       * ASSESSMENT RESULTS MODAL OVERLAY (100% PIXEL PERFECT TO REFERENCE IMAGE)
+       * ============================================================================ */}
+      {showResultsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+            initial={{ opacity: 0, scale: 0.94, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94, y: 16 }}
+            className="w-full max-w-[440px] bg-white rounded-[24px] p-5 sm:p-6 shadow-2xl text-slate-900 overflow-hidden relative"
           >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl relative"
-            >
+            {/* Top Navigation Tabs Bar */}
+            <div className="flex items-center gap-5 border-b border-slate-100 pb-2.5 mb-4">
               <button
-                onClick={() => setActiveModalCategory(null)}
-                className="absolute top-5 right-5 p-2 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-white"
+                onClick={() => setModalTab("summary")}
+                className={`flex items-center gap-1.5 text-sm font-extrabold pb-2 relative transition-colors ${
+                  modalTab === "summary" ? "text-[#5b46e0]" : "text-slate-400 hover:text-slate-600"
+                }`}
               >
-                <X className="w-5 h-5" />
+                <span>📊 Summary</span>
+                {modalTab === "summary" && (
+                  <motion.div
+                    layoutId="modalTabUnderline"
+                    className="absolute bottom-[-11px] left-0 right-0 h-[3px] bg-[#5b46e0] rounded-t-full"
+                  />
+                )}
               </button>
 
-              <div className="flex items-center gap-3 mb-2">
-                <span className="px-2.5 py-1 rounded-md bg-purple-500/20 text-purple-400 text-xs font-bold">
-                  {activeModalCategory.code}
+              <button
+                onClick={() => setModalTab("review")}
+                className={`flex items-center gap-1.5 text-sm font-extrabold pb-2 relative transition-colors ${
+                  modalTab === "review" ? "text-[#5b46e0]" : "text-slate-400 hover:text-slate-600"
+                }`}
+              >
+                <span>📖 Review Mistakes</span>
+                <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-600 font-black text-[10px]">
+                  14
                 </span>
-                <span className="text-xs font-bold uppercase tracking-widest text-slate-400">
-                  SKILL MODULES
-                </span>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-black text-white mb-6">
-                {activeModalCategory.title} Topics
-              </h3>
+                {modalTab === "review" && (
+                  <motion.div
+                    layoutId="modalTabUnderline"
+                    className="absolute bottom-[-11px] left-0 right-0 h-[3px] bg-[#5b46e0] rounded-t-full"
+                  />
+                )}
+              </button>
+            </div>
 
-              <div className="p-8 text-center rounded-2xl bg-slate-950/60 border border-slate-800/80">
-                <p className="text-slate-400 font-medium">
-                  Curated skill modules will be available soon for this section.
-                </p>
+            {/* TAB CONTENT */}
+            {modalTab === "summary" ? (
+              <div className="flex flex-col items-center text-center space-y-3.5">
+                {/* Hero Golden Trophy Graphic */}
+                <GoldenTrophyGraphic />
+
+                {/* Heading & Subtitle */}
+                <div className="space-y-0.5">
+                  <h2 className="text-2xl font-black text-[#2e1065] tracking-tight">
+                    Keep Practicing!
+                  </h2>
+                  <p className="text-xs font-semibold text-slate-500">
+                    Puzzles (Mixed Logic) • Logical Reasoning
+                  </p>
+                </div>
+
+                {/* Circular Donut Progress Ring */}
+                <div className="relative w-28 h-28 flex items-center justify-center my-0.5">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle cx="56" cy="56" r="42" fill="none" stroke="#f3e8ff" strokeWidth="9" />
+                    <motion.circle
+                      cx="56"
+                      cy="56"
+                      r="42"
+                      fill="none"
+                      stroke="#5b46e0"
+                      strokeWidth="9"
+                      strokeLinecap="round"
+                      strokeDasharray={`${2 * Math.PI * 42}`}
+                      initial={{ strokeDashoffset: 2 * Math.PI * 42 }}
+                      animate={{ strokeDashoffset: 2 * Math.PI * 42 * (1 - 0.3) }}
+                      transition={{ duration: 1.2, ease: "easeOut" }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-2xl font-black text-slate-900 leading-none">30%</span>
+                    <span className="text-[9px] font-extrabold text-slate-400 tracking-widest uppercase mt-0.5">
+                      SCORE
+                    </span>
+                  </div>
+                </div>
+
+                {/* 2 Metric Cards Grid (Correct vs Wrong) */}
+                <div className="grid grid-cols-2 gap-3 w-full">
+                  {/* Correct Metric Card */}
+                  <div className="p-3.5 rounded-xl bg-[#f0fdf4] border border-[#dcfce7] flex flex-col items-center text-center">
+                    <div className="w-7 h-7 rounded-full bg-[#d1fae5] text-emerald-600 flex items-center justify-center mb-1.5">
+                      <span className="font-black text-base">✓</span>
+                    </div>
+                    <span className="text-2xl font-black text-emerald-600 leading-none mb-1">
+                      6
+                    </span>
+                    <span className="text-[10px] font-extrabold text-slate-600 tracking-wider uppercase mb-0.5">
+                      CORRECT
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-500">
+                      Good job! Keep it up.
+                    </span>
+                  </div>
+
+                  {/* Wrong Metric Card */}
+                  <div className="p-3.5 rounded-xl bg-[#fef2f2] border border-[#fee2e2] flex flex-col items-center text-center">
+                    <div className="w-7 h-7 rounded-full bg-[#fee2e2] text-red-600 flex items-center justify-center mb-1.5">
+                      <span className="font-black text-base">✕</span>
+                    </div>
+                    <span className="text-2xl font-black text-red-600 leading-none mb-1">
+                      14
+                    </span>
+                    <span className="text-[10px] font-extrabold text-slate-600 tracking-wider uppercase mb-0.5">
+                      WRONG
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-500">
+                      Review to improve score.
+                    </span>
+                  </div>
+                </div>
+
+                {/* Middle Action Banner */}
+                <button
+                  onClick={() => setModalTab("review")}
+                  className="w-full py-3 px-4 rounded-xl bg-[#f3e8ff] border border-[#e9d5ff] text-[#5b46e0] font-extrabold text-[11px] tracking-wider uppercase flex items-center justify-center gap-2 hover:bg-[#ede9fe] transition-all cursor-pointer"
+                >
+                  <span>📖 REVIEW 14 MISTAKES & EXPLANATIONS</span>
+                  <span>➔</span>
+                </button>
+
+                {/* Bottom Action Bar */}
+                <div className="grid grid-cols-2 gap-3 w-full pt-0.5">
+                  <button
+                    onClick={() => setShowResultsModal(false)}
+                    className="py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-extrabold text-xs hover:bg-slate-50 transition-all cursor-pointer"
+                  >
+                    Close
+                  </button>
+
+                  <button
+                    onClick={() => setModalTab("review")}
+                    className="py-2.5 px-3 rounded-xl bg-[#5b46e0] text-white font-extrabold text-[11px] tracking-wider uppercase flex items-center justify-center gap-1.5 hover:bg-[#4c38ce] transition-all shadow-md shadow-indigo-500/20 cursor-pointer"
+                  >
+                    <span>📑 REVIEW ANSWERS</span>
+                  </button>
+                </div>
               </div>
-            </motion.div>
+            ) : (
+              <div className="space-y-4 text-left">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <h3 className="font-bold text-sm text-slate-900 mb-1">Question 1 Review</h3>
+                  <p className="text-xs text-slate-600">
+                    Five people A, B, C, D, and E are sitting in a row facing North...
+                  </p>
+                  <div className="mt-2 text-xs font-bold text-red-600">
+                    Your Answer: Person A (Incorrect)
+                  </div>
+                  <div className="mt-0.5 text-xs font-bold text-emerald-600">
+                    Correct Answer: Person B
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setModalTab("summary")}
+                  className="w-full py-3 rounded-xl bg-[#5b46e0] text-white font-bold text-sm"
+                >
+                  Back to Summary
+                </button>
+              </div>
+            )}
           </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 }

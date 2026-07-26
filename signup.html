@@ -142,7 +142,7 @@
         <div class="flex items-center gap-3.5">
           <div class="w-11 h-11 rounded-xl bg-slate-900/90 dark:bg-slate-900/90 border border-cyan-400/30 flex items-center justify-center shadow-[0_0_20px_rgba(0,242,254,0.25)] p-1">
             <img 
-              src="https://res.cloudinary.com/dseg9nty3/image/upload/v1772331731/file_0000000032f07208a59ae376aacc1d36_fra0s4.png" 
+              src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png" 
               alt="Sun Nexus Solutions Logo" 
               class="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(0,242,254,0.6)]" 
             />
@@ -598,13 +598,51 @@
 
     function handleSignupSubmit(e) {
       e.preventDefault();
-      const p1 = document.getElementById('signup-pass-1').value;
-      const p2 = document.getElementById('signup-pass-2').value;
-      if (p1 !== p2) {
+      const p1 = document.getElementById('signup-pass-1')?.value || '';
+      const p2 = document.getElementById('signup-pass-2')?.value || '';
+      if (!p1 || p1 !== p2) {
         showToast('Passwords do not match. Please verify.', 'error');
         return;
       }
-      showToast('Operator identity created successfully! Welcome to Sun Nexus.');
+
+      const email = (document.getElementById('signup-email')?.value || '').trim().toLowerCase();
+      const name = (document.getElementById('signup-name')?.value || '').trim();
+      const username = (document.getElementById('signup-user')?.value || email.split('@')[0] || 'user').trim().toLowerCase();
+
+      if (!email || !name) {
+        showToast('Please fill out all required fields.', 'error');
+        return;
+      }
+
+      const newUser = {
+        id: `user_${Date.now()}`,
+        email: email,
+        username: username,
+        name: name,
+        firstName: name.split(' ')[0] || name,
+        lastName: name.split(' ').slice(1).join(' ') || '',
+        password: p1,
+        isAdmin: false,
+        status: 'active',
+        joinedAt: new Date().toISOString(),
+        xp: 0,
+        streak: 1
+      };
+
+      const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+      const existing = localUsers.find(u => u.email === email || u.username === username);
+      if (existing) {
+        showToast('An account with this email or username already exists.', 'error');
+        return;
+      }
+
+      localStorage.setItem('nexus_users', JSON.stringify([...localUsers, newUser]));
+      localStorage.setItem('nexus_user', JSON.stringify(newUser));
+      window.dispatchEvent(new Event('nexus-data-updated'));
+      showToast('Operator identity created successfully! Logging you in...');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
     }
 
     /* =================== 3D CYBER WAVE BACKGROUND CANVAS =================== */
