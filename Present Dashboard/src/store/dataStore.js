@@ -205,10 +205,11 @@ export const DEFAULT_ASSESSMENTS = [
 export const getAssessments = async () => {
   const local = getLocal('assessments');
   try {
-    const cloud = await fetchApi('/api/assessments');
+    const cloud = await query('SELECT * FROM assessments ORDER BY created_at DESC');
     if (cloud && cloud.length > 0) {
       const mapped = cloud.map(a => ({
         ...a,
+        questions: typeof a.questions === 'string' ? JSON.parse(a.questions) : (a.questions || []),
         timeLimit: a.time_limit,
         videoUrl: a.video_url,
         unlockTime: a.unlock_time,
@@ -275,10 +276,11 @@ export const deleteAssessment = async (id) => {
 export const getResults = async (userId) => {
   const local = getLocal('results');
   try {
-    const cloud = await fetchApi('/api/results');
+    const sql = userId ? 'SELECT * FROM results WHERE user_id = $1 ORDER BY submitted_at DESC' : 'SELECT * FROM results ORDER BY submitted_at DESC';
+    const params = userId ? [userId] : [];
+    const cloud = await query(sql, params);
     if (cloud) {
-      const filtered = userId ? cloud.filter(r => r.user_id === userId) : cloud;
-      const mapped = filtered.map(r => ({
+      const mapped = cloud.map(r => ({
         ...r,
         userId: r.user_id,
         userEmail: r.user_email,
