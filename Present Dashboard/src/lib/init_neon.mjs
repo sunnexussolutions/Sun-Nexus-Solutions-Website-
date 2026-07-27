@@ -36,6 +36,38 @@ async function initDB() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `;
+
+    console.log("Creating assessments table...");
+    await sql`
+      CREATE TABLE IF NOT EXISTS assessments (
+        id VARCHAR(255) PRIMARY KEY,
+        category VARCHAR(255),
+        topic VARCHAR(255),
+        week VARCHAR(100),
+        time_limit INTEGER,
+        questions JSONB,
+        video_url TEXT,
+        unlock_time TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    console.log("Creating results table...");
+    await sql`
+      CREATE TABLE IF NOT EXISTS results (
+        id VARCHAR(255) PRIMARY KEY,
+        user_id VARCHAR(255),
+        assessment_id VARCHAR(255),
+        topic VARCHAR(255),
+        score INTEGER,
+        total INTEGER,
+        percentage INTEGER,
+        category VARCHAR(255),
+        user_name VARCHAR(255),
+        user_email VARCHAR(255),
+        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
     console.log("✅ Additional Tables created successfully in Neon DB.");
   } catch (error) {
     console.error("❌ Failed to create tables:", error);
