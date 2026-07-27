@@ -65,9 +65,11 @@ async function initDB() {
         category VARCHAR(255),
         user_name VARCHAR(255),
         user_email VARCHAR(255),
+        answers JSONB,
         submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `;
+    await sql`ALTER TABLE results ADD COLUMN IF NOT EXISTS answers JSONB;`;
     console.log("✅ Additional Tables created successfully in Neon DB.");
   } catch (error) {
     console.error("❌ Failed to create tables:", error);

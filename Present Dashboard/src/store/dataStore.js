@@ -285,7 +285,8 @@ export const getResults = async (userId) => {
         userId: r.user_id,
         userEmail: r.user_email,
         assessmentId: r.assessment_id,
-        submittedAt: r.submitted_at
+        submittedAt: r.submitted_at,
+        answers: typeof r.answers === 'string' ? JSON.parse(r.answers) : (r.answers || {})
       }));
       setLocal('results', mapped, true);
       return mapped;
@@ -302,9 +303,9 @@ export const saveResult = async (res) => {
   setLocal('results', [...getLocal('results'), newRes]);
 
   await query(`
-    INSERT INTO results (id, user_id, assessment_id, topic, score, total, percentage, category, user_name, user_email)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-  `, [id, res.userId, res.assessmentId, res.topic, res.score, res.total, res.percentage, res.category, res.userName || 'Anonymous', res.userEmail]);
+    INSERT INTO results (id, user_id, assessment_id, topic, score, total, percentage, category, user_name, user_email, answers)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+  `, [id, res.userId, res.assessmentId, res.topic, res.score, res.total, res.percentage, res.category, res.userName || 'Anonymous', res.userEmail, JSON.stringify(res.answers || {})]);
   return newRes;
 };
 
