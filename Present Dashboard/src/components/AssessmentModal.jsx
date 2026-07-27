@@ -486,12 +486,22 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
               {resultTab === 'review' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxHeight: '65vh', overflowY: 'auto', paddingRight: '4px' }}>
                   {questions.map((q, i) => {
-                    const userAns = answers[i];
-                    const correct = userAns === q.answer;
+                    const userAns = answers[i] !== undefined ? answers[i] : (answers[String(i)] !== undefined ? answers[String(i)] : undefined);
+                    const correct = userAns !== undefined && Number(userAns) === Number(q.answer);
+                    const qText = q.question || q.text || q.statement || q.title || `Question ${i + 1}`;
+                    let rawOpts = q.options;
+                    if (typeof rawOpts === 'string') {
+                      try { rawOpts = JSON.parse(rawOpts); } catch(e) {}
+                    }
+                    const opts = Array.isArray(rawOpts) && rawOpts.length > 0 
+                      ? rawOpts 
+                      : [q.optionA || q.optA || 'Option A', q.optionB || q.optB || 'Option B', q.optionC || q.optC || 'Option C', q.optionD || q.optD || 'Option D'];
+
                     return (
                       <div
                         key={i}
                         style={{
+                          flexShrink: 0,
                           borderRadius: '16px',
                           overflow: 'hidden',
                           border: `1.5px solid ${correct ? '#bbf7d0' : '#fecaca'}`,
@@ -505,15 +515,15 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                           <div style={{ flex: 1 }}>
                             <p style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', lineHeight: 1.5, margin: 0 }}>
                               <span style={{ fontSize: '11px', fontWeight: 800, color: correct ? '#059669' : '#dc2626', textTransform: 'uppercase', letterSpacing: '0.08em', marginRight: '8px' }}>Q{i + 1}</span>
-                              {q.question || q.text}
+                              {qText}
                             </p>
                           </div>
                         </div>
 
                         <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '6px', background: '#f8fafc' }}>
-                          {q.options.map((opt, oi) => {
-                            const isCorrect = oi === q.answer;
-                            const isUserWrong = oi === userAns && !correct;
+                          {opts.map((opt, oi) => {
+                            const isCorrect = oi === Number(q.answer);
+                            const isUserWrong = userAns !== undefined && oi === Number(userAns) && !correct;
                             const bg = isCorrect ? '#dcfce7' : isUserWrong ? '#fee2e2' : '#ffffff';
                             const border = isCorrect ? '1px solid #86efac' : isUserWrong ? '1px solid #fca5a5' : '1px solid #e2e8f0';
                             const color = isCorrect ? '#15803d' : isUserWrong ? '#b91c1c' : '#334155';
@@ -521,7 +531,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                             return (
                               <div key={oi} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '10px', background: bg, border, transition: 'all 0.15s' }}>
                                 <span style={{ fontSize: '12px', fontWeight: 800, color, minWidth: '20px' }}>{String.fromCharCode(65 + oi)}.</span>
-                                <span style={{ fontSize: '13px', fontWeight: isCorrect || isUserWrong ? 700 : 500, color }}>{opt}</span>
+                                <span style={{ fontSize: '13px', fontWeight: isCorrect || isUserWrong ? 700 : 500, color }}>{String(opt)}</span>
                                 {isCorrect && <CheckCircle size={14} style={{ color: '#16a34a', marginLeft: 'auto', flexShrink: 0 }} />}
                                 {isUserWrong && <XCircle size={14} style={{ color: '#dc2626', marginLeft: 'auto', flexShrink: 0 }} />}
                               </div>
