@@ -70,33 +70,7 @@ export const AuthProvider = ({ children }) => {
         return { success: true };
       }
 
-      // 2. Check local users first for instant local login
-      const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
-      const localMatch = localUsers.find(u => 
-        (u.email && u.email.toLowerCase() === cleanId) || 
-        (u.username && u.username.toLowerCase() === cleanId)
-      );
-
-      if (localMatch && (localMatch.password === password || password === 'admin123')) {
-        if (localMatch.status === 'pending') {
-          setLoading(false);
-          return { success: false, pending: true, error: 'Registration Status: Pending Approval' };
-        }
-        const loggedUser = {
-          ...localMatch,
-          firstName: localMatch.firstName || localMatch.first_name || localMatch.name?.split(' ')[0] || 'User',
-          lastName: localMatch.lastName || localMatch.last_name || '',
-          isAdmin: !!localMatch.isAdmin,
-          status: localMatch.status || 'active'
-        };
-        setUser(loggedUser);
-        setIsAuthenticated(true);
-        localStorage.setItem('nexus_user', JSON.stringify(loggedUser));
-        setLoading(false);
-        return { success: true };
-      }
-
-      // 3. Try Cloud Hub Database (Neon PostgreSQL)
+      // 2. Try Cloud Hub Database (Neon PostgreSQL)
       try {
         const cloud = await query('SELECT * FROM profiles WHERE LOWER(email) = $1 OR LOWER(username) = $2', [cleanId, cleanId]);
         if (cloud && cloud.length > 0) {
@@ -122,7 +96,7 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } catch (cloudErr) {
-        console.warn("Cloud login check bypassed:", cloudErr.message);
+        console.warn("Cloud login check failed:", cloudErr.message);
       }
 
       setLoading(false);
@@ -156,31 +130,27 @@ export const AuthProvider = ({ children }) => {
       streak: 1
     };
 
-    // 1. Check if user already exists in local storage
-    const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
-    const existing = localUsers.find(u => 
-      (u.email && u.email.toLowerCase() === cleanEmail) || 
-      (u.username && u.username.toLowerCase() === cleanUsername)
-    );
-
-    if (existing) {
-      setLoading(false);
-      return { success: false, error: 'An account with this email or username already exists.' };
+    // 1. Check if user already exists in cloud
+    try {
+      const existing = await query('SELECT id FROM profiles WHERE LOWER(email) = $1 OR LOWER(username) = $2', [cleanEmail, cleanUsername]);
+      if (existing && existing.length > 0) {
+        setLoading(false);
+        return { success: false, error: 'An account with this email or username already exists.' };
+      }
+    } catch (err) {
+      console.warn("Cloud check failed during registration:", err.message);
     }
 
-    // 2. Save locally first (Ensures signup ALWAYS succeeds even offline)
-    const updatedUsers = [...localUsers, newUser];
-    localStorage.setItem('nexus_users', JSON.stringify(updatedUsers));
-    window.dispatchEvent(new Event('nexus-data-updated'));
-
-    // 3. Attempt cloud database sync asynchronously
+    // 2. Insert into cloud database directly
     try {
       await query(`
         INSERT INTO profiles (id, email, first_name, last_name, name, username, password, is_admin, status, joined_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       `, [id, cleanEmail, userData.firstName, userData.lastName, fullName, cleanUsername, userData.password, false, 'active', newUser.joinedAt]);
     } catch (cloudErr) {
-      console.warn("Cloud signup sync warning (saved locally):", cloudErr.message);
+      console.error("Cloud signup failed:", cloudErr.message);
+      setLoading(false);
+      return { success: false, error: 'Failed to connect to the database. Please try again.' };
     }
 
     setLoading(false);
