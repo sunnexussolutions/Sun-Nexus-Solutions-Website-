@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
+import { query } from '../lib/neon';
 
 /* ─── UI Constancy Factory ─── */
 const makeCompose = () => ({
@@ -34,6 +35,30 @@ const Community = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await query('SELECT * FROM community_posts ORDER BY created_at DESC');
+        if (res && res.length > 0) {
+          const mapped = res.map(p => ({
+            ...p,
+            mediaPreview: p.media_preview,
+            resourceUrl: p.resource_url,
+            user: p.user_name,
+            userReactions: typeof p.user_reactions === 'string' ? JSON.parse(p.user_reactions) : (p.user_reactions || []),
+            reactions: typeof p.reactions === 'string' ? JSON.parse(p.reactions) : (p.reactions || { zap: 0, fire: 0, check: 0, idea: 0 }),
+            comments: typeof p.comments === 'string' ? JSON.parse(p.comments) : (p.comments || [])
+          }));
+          setPosts(mapped);
+          localStorage.setItem('nexus-community-posts', JSON.stringify(mapped));
+        }
+      } catch (err) {
+        console.warn("Cloud failed, using local posts", err.message);
+      }
+    };
+    fetchPosts();
+  }, []);
+
   const [compose, setCompose] = useState(makeCompose());
   const [modalCompose, setModalCompose] = useState(makeCompose());
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,6 +67,7 @@ const Community = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
   const fileRef = useRef(null);
+
 
   useEffect(() => {
     localStorage.setItem('nexus-community-posts', JSON.stringify(posts));
@@ -54,10 +80,10 @@ const Community = () => {
     reader.readAsDataURL(file);
   };
 
-  const submitPost = (c, resetFn) => {
+  const submitPost = async (c, resetFn) => {
     if (!c.text.trim() && !c.mediaPreview) return;
     const newPost = {
-      id: Date.now(),
+      id: Date.now().toString(),
       user: currentUserName,
       role: user?.headline || 'Nexus Peer',
       avatar: user?.avatar || currentUserInitial,
@@ -73,6 +99,15 @@ const Community = () => {
     setPosts(prev => [newPost, ...prev]);
     resetFn(makeCompose());
     setIsModalOpen(false);
+
+    try {
+      await query(`
+        INSERT INTO community_posts (id, user_name, role, avatar, content, media_preview, resource_url, reactions, user_reactions, verified, comments)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      `, [newPost.id, newPost.user, newPost.role, newPost.avatar, newPost.content, newPost.mediaPreview, newPost.resourceUrl, JSON.stringify(newPost.reactions), JSON.stringify(newPost.userReactions), newPost.verified, JSON.stringify(newPost.comments)]);
+    } catch (err) {
+      console.warn("Cloud sync failed:", err.message);
+    }
   };
 
   const addReaction = (postId, type) => {

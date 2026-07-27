@@ -309,7 +309,7 @@ export const saveResult = async (res) => {
 // ── Users ─────────────────────────────────────────────────────────────────────
 export const getUsers = async () => {
   try {
-    const cloud = await fetchApi('/api/users');
+    const cloud = await query('SELECT * FROM profiles ORDER BY joined_at DESC');
     if (cloud) {
       const mapped = cloud.map(u => ({
         ...u,
@@ -363,12 +363,13 @@ export const updateUserStatus = async (id, status) => {
 export const getDomains = async () => {
   const local = getLocal('domains');
   try {
-    const cloud = await fetchApi('/api/domains');
+    const cloud = await query('SELECT * FROM domains ORDER BY created_at DESC');
     if (cloud) {
       const mapped = cloud.map(d => ({
         ...d,
         desc: d.description,
-        subDomains: d.sub_domains,
+        subDomains: typeof d.sub_domains === 'string' ? JSON.parse(d.sub_domains) : (d.sub_domains || []),
+        topics: typeof d.topics === 'string' ? JSON.parse(d.topics) : (d.topics || []),
         createdAt: d.created_at
       }));
       setLocal('domains', mapped, true);
