@@ -593,6 +593,20 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                           })}
                         </div>
 
+                        {/* Hint Section in Review Mistakes */}
+                        {(() => {
+                          const hintContent = q.hint && String(q.hint).trim() ? String(q.hint).trim() : '';
+                          return (
+                            <div style={{ padding: '10px 16px', background: hintContent ? '#fffbeb' : '#f8fafc', borderTop: '1px solid #fde68a', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                              <Lightbulb size={16} style={{ color: hintContent ? '#d97706' : '#94a3b8', flexShrink: 0, marginTop: '2px' }} />
+                              <p style={{ fontSize: '12px', fontWeight: 500, color: hintContent ? '#78350f' : '#64748b', lineHeight: 1.5, margin: 0 }}>
+                                <span style={{ fontWeight: 800, color: hintContent ? '#d97706' : '#64748b' }}>Hint: </span>
+                                {hintContent ? hintContent : 'No hint provided for this question.'}
+                              </p>
+                            </div>
+                          );
+                        })()}
+
                         {q.explanation && (
                           <div style={{ padding: '12px 16px', background: '#f5f3ff', borderTop: '1px solid #ddd6fe', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
                             <BookOpen size={16} style={{ color: '#5b46e0', flexShrink: 0, marginTop: '2px' }} />
