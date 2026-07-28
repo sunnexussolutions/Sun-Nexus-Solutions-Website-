@@ -70,7 +70,7 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
     ]},
     { label: "Support & Help", items: [
       { label: "Mentor Support", desc: "Chat with expert guides",       icon: LifeBuoy,    color: "#10b981" },
-      { label: "Council",        desc: "Sovereign community hub",       icon: MessageSquare, color: "#06b6d4", page: "council" },
+      // { label: "Council",        desc: "Sovereign community hub",       icon: MessageSquare, color: "#06b6d4", page: "council" },
       { label: "Product Tour",   desc: "Explore new platform features", icon: Compass,     color: "#a855f7" },
     ]},
   ];
