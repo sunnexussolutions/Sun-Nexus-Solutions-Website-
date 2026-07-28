@@ -24,6 +24,20 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  // Re-sync user state when admin approves on same browser session
+  useEffect(() => {
+    const onUpdate = () => {
+      const raw = localStorage.getItem('nexus_user');
+      if (!raw) return;
+      try {
+        const u = JSON.parse(raw);
+        setUser(u);
+      } catch {}
+    };
+    window.addEventListener('nexus-data-updated', onUpdate);
+    return () => window.removeEventListener('nexus-data-updated', onUpdate);
+  }, []);
+
   const refreshProfile = async (id) => {
     try {
       const cloud = await query('SELECT * FROM profiles WHERE id = $1', [id]);
@@ -34,6 +48,7 @@ export const AuthProvider = ({ children }) => {
           firstName: u.first_name, 
           lastName: u.last_name, 
           isAdmin: u.is_admin,
+          status: u.status || 'active',
           joinedAt: u.joined_at
         };
         setUser(updated);
@@ -42,6 +57,33 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.warn("Profile refresh failed or offline:", err.message);
     }
+  };
+
+  // Called by PendingApproval to check if admin approved without a full re-login
+  const checkApprovalStatus = async () => {
+    if (!user?.id) return false;
+    try {
+      const rows = await query('SELECT status FROM profiles WHERE id = $1', [user.id]);
+      if (rows?.[0]?.status === 'active') {
+        const updated = { ...user, status: 'active' };
+        setUser(updated);
+        localStorage.setItem('nexus_user', JSON.stringify(updated));
+        return true;
+      }
+    } catch {
+      // fallback: check localStorage nexus_users list
+      try {
+        const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+        const found = localUsers.find(u => u.id === user.id || u.email === user.email);
+        if (found?.status === 'active') {
+          const updated = { ...user, status: 'active' };
+          setUser(updated);
+          localStorage.setItem('nexus_user', JSON.stringify(updated));
+          return true;
+        }
+      } catch {}
+    }
+    return false;
   };
 
   const login = async (identifier, password) => {
@@ -71,32 +113,64 @@ export const AuthProvider = ({ children }) => {
       }
 
       // 2. Try Cloud Hub Database (Neon PostgreSQL)
+      let found = null;
       try {
         const cloud = await query('SELECT * FROM profiles WHERE LOWER(email) = $1 OR LOWER(username) = $2', [cleanId, cleanId]);
         if (cloud && cloud.length > 0) {
-          const found = cloud[0];
-          if (found.password === password || password === 'admin123') {
-            if (found.status === 'pending') {
-              setLoading(false);
-              return { success: false, pending: true, error: 'Registration Status: Pending Approval' };
-            }
-            const u = { 
-              ...found, 
-              firstName: found.first_name || found.name?.split(' ')[0], 
-              lastName: found.last_name, 
-              isAdmin: !!found.is_admin,
-              status: found.status || 'active',
-              joinedAt: found.joined_at
-            };
-            setUser(u);
-            setIsAuthenticated(true);
-            localStorage.setItem('nexus_user', JSON.stringify(u));
-            setLoading(false);
-            return { success: true };
-          }
+          found = cloud[0];
         }
       } catch (cloudErr) {
         console.warn("Cloud login check failed:", cloudErr.message);
+      }
+
+      // Local storage fallback for local users
+      if (!found) {
+        try {
+          const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+          found = localUsers.find(u => 
+            (u.email && u.email.toLowerCase() === cleanId) || 
+            (u.username && u.username.toLowerCase() === cleanId)
+          );
+        } catch (e) {}
+      }
+
+      if (found) {
+        // Pending check MUST happen FIRST before password check
+        if (found.status === 'pending') {
+          // Store minimal session so PendingApproval page can poll for approval
+          const pendingUser = {
+            ...found,
+            firstName: found.first_name || found.firstName || found.name?.split(' ')[0],
+            lastName: found.last_name || found.lastName,
+            isAdmin: false,
+            status: 'pending'
+          };
+          setUser(pendingUser);
+          setIsAuthenticated(true);
+          localStorage.setItem('nexus_user', JSON.stringify(pendingUser));
+          setLoading(false);
+          return { success: false, pending: true, error: 'You are registered and waiting for Admin approval...' };
+        }
+
+        if (found.password === password || password === 'admin123') {
+          if (found.status === 'suspended' || found.status === 'banned') {
+            setLoading(false);
+            return { success: false, error: 'Account has been suspended. Please contact support.' };
+          }
+          const u = { 
+            ...found, 
+            firstName: found.first_name || found.firstName || found.name?.split(' ')[0], 
+            lastName: found.last_name || found.lastName, 
+            isAdmin: !!(found.is_admin || found.isAdmin),
+            status: found.status || 'active',
+            joinedAt: found.joined_at || found.joinedAt
+          };
+          setUser(u);
+          setIsAuthenticated(true);
+          localStorage.setItem('nexus_user', JSON.stringify(u));
+          setLoading(false);
+          return { success: true };
+        }
       }
 
       setLoading(false);
@@ -130,6 +204,13 @@ export const AuthProvider = ({ children }) => {
       streak: 1
     };
 
+    // Save to local storage users list as well for fallback
+    try {
+      const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+      const updatedLocal = [...localUsers.filter(u => u.email !== cleanEmail && u.username !== cleanUsername), newUser];
+      localStorage.setItem('nexus_users', JSON.stringify(updatedLocal));
+    } catch (e) {}
+
     // 1. Check if user already exists in cloud
     try {
       const existing = await query('SELECT id FROM profiles WHERE LOWER(email) = $1 OR LOWER(username) = $2', [cleanEmail, cleanUsername]);
@@ -146,15 +227,20 @@ export const AuthProvider = ({ children }) => {
       await query(`
         INSERT INTO profiles (id, email, first_name, last_name, name, username, password, is_admin, status, joined_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-      `, [id, cleanEmail, userData.firstName, userData.lastName, fullName, cleanUsername, userData.password, false, 'active', newUser.joinedAt]);
+      `, [id, cleanEmail, userData.firstName, userData.lastName, fullName, cleanUsername, userData.password, false, 'pending', newUser.joinedAt]);
+
+      // Add registration pending notification for the user
+      await query(`
+        INSERT INTO notifications (id, user_id, title, message, type)
+        VALUES ($1, $2, $3, $4, $5)
+      `, [crypto.randomUUID(), id, 'Registration Pending', 'You are registered and waiting for Admin approval...', 'info']);
     } catch (cloudErr) {
-      console.error("Cloud signup failed:", cloudErr.message);
-      setLoading(false);
-      return { success: false, error: 'Failed to connect to the database. Please try again.' };
+      console.warn("Cloud signup sync error (saved locally):", cloudErr.message);
     }
 
+    // Do NOT set session — user must wait for admin approval before logging in
     setLoading(false);
-    return { success: true, user: newUser };
+    return { success: true, pending: true };
   };
 
   const updateProfile = async (updates) => {
@@ -205,7 +291,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, logout, register, updateProfile }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, logout, register, updateProfile, checkApprovalStatus }}>
       {children}
     </AuthContext.Provider>
   );

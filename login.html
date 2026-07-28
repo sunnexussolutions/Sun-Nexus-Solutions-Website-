@@ -662,27 +662,134 @@
       document.getElementById('loginPassword').value = 'admin123';
     }
 
-    function handleLoginSubmit(e) {
+    const NEON_URL = 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech';
+    const NEON_DB  = 'neondb';
+    const NEON_KEY = 'npg_izrW7bvHTnO6';
+
+    async function neonQuery(sql, params = []) {
+      const res = await fetch(`${NEON_URL}/sql`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Neon-Connection-String': `postgresql://neondb_owner:${NEON_KEY}@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/${NEON_DB}?sslmode=require`
+        },
+        body: JSON.stringify({ query: sql, params })
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      return data.rows || [];
+    }
+
+    async function handleLoginSubmit(e) {
       e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim();
+      const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
       const password = document.getElementById('loginPassword').value;
+      const btn      = document.getElementById('loginBtn');
 
       if (!email || !password) {
         showMsg('loginMessage', 'error', 'Please fill in all fields.');
         return;
       }
 
-      showMsg('loginMessage', 'success', 'Session authorized. Redirecting to Dashboard...');
-      localStorage.setItem(SESSION_KEY, JSON.stringify({ name: 'Executive Admin', email }));
-      setTimeout(() => {
-        window.location.href = 'Nexus Dashboard Anti/dashboard.html';
-      }, 1000);
+      btn.disabled = true;
+      btn.innerHTML = 'Checking... <i class="bi bi-hourglass-split"></i>';
+
+      try {
+        const rows = await neonQuery(
+          'SELECT * FROM profiles WHERE LOWER(email) = $1 OR LOWER(username) = $1',
+          [email]
+        );
+
+        if (rows.length > 0 && rows[0].password === password) {
+          if (rows[0].status === 'pending') {
+            showMsg('loginMessage', 'success', 'You are registered and waiting for Admin approval...');
+            btn.disabled = false;
+            btn.innerHTML = 'Login <i class="bi bi-arrow-right"></i>';
+            return;
+          }
+          showMsg('loginMessage', 'success', 'Session authorized. Redirecting...');
+          localStorage.setItem(SESSION_KEY, JSON.stringify({ name: rows[0].name, email: rows[0].email }));
+          setTimeout(() => { window.location.href = 'Nexus Dashboard Anti/dashboard.html'; }, 1000);
+          return;
+        }
+
+        // Fallback: localStorage
+        const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+        const local = localUsers.find(u => (u.email === email || u.username === email) && u.password === password);
+        if (local) {
+          if (local.status === 'pending') {
+            showMsg('loginMessage', 'success', 'You are registered and waiting for Admin approval...');
+            btn.disabled = false;
+            btn.innerHTML = 'Login <i class="bi bi-arrow-right"></i>';
+            return;
+          }
+          showMsg('loginMessage', 'success', 'Session authorized. Redirecting...');
+          localStorage.setItem(SESSION_KEY, JSON.stringify({ name: local.name, email: local.email }));
+          setTimeout(() => { window.location.href = 'Nexus Dashboard Anti/dashboard.html'; }, 1000);
+          return;
+        }
+
+        showMsg('loginMessage', 'error', 'Invalid email or password.');
+      } catch (err) {
+        console.warn('Neon login failed, using local fallback:', err.message);
+        const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+        const local = localUsers.find(u => (u.email === email || u.username === email) && u.password === password);
+        if (local && local.status === 'pending') {
+          showMsg('loginMessage', 'success', 'You are registered and waiting for Admin approval...');
+        } else if (local) {
+          showMsg('loginMessage', 'success', 'Session authorized. Redirecting...');
+          localStorage.setItem(SESSION_KEY, JSON.stringify({ name: local.name, email: local.email }));
+          setTimeout(() => { window.location.href = 'Nexus Dashboard Anti/dashboard.html'; }, 1000);
+        } else {
+          showMsg('loginMessage', 'error', 'Invalid email or password.');
+        }
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = 'Login <i class="bi bi-arrow-right"></i>';
     }
 
-    function handleSignupSubmit(e) {
+    async function handleSignupSubmit(e) {
       e.preventDefault();
-      showMsg('signupMessage', 'success', 'Account registered successfully! Please login.');
-      setTimeout(() => switchTab('login'), 1200);
+      const name     = document.getElementById('signupName').value.trim();
+      const email    = document.getElementById('signupEmail').value.trim().toLowerCase();
+      const password = document.getElementById('signupPassword').value;
+
+      if (!name || !email || !password) {
+        showMsg('signupMessage', 'error', 'Please fill in all fields.');
+        return;
+      }
+
+      const id       = 'user_' + Date.now();
+      const username = email.split('@')[0];
+      const now      = new Date().toISOString();
+
+      try {
+        const existing = await neonQuery(
+          'SELECT id FROM profiles WHERE LOWER(email) = $1',
+          [email]
+        );
+        if (existing.length > 0) {
+          showMsg('signupMessage', 'error', 'An account with this email already exists.');
+          return;
+        }
+
+        await neonQuery(
+          `INSERT INTO profiles (id, email, first_name, last_name, name, username, password, is_admin, status, joined_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [id, email, name.split(' ')[0], name.split(' ').slice(1).join(' ') || '', name, username, password, false, 'pending', now]
+        );
+      } catch (err) {
+        console.warn('Neon signup failed, saving locally:', err.message);
+        const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+        if (localUsers.find(u => u.email === email)) {
+          showMsg('signupMessage', 'error', 'An account with this email already exists.');
+          return;
+        }
+        localStorage.setItem('nexus_users', JSON.stringify([...localUsers, { id, email, name, username, password, status: 'pending', joinedAt: now }]));
+      }
+
+      showMsg('signupMessage', 'success', 'You are registered and waiting for Admin approval...');
     }
 
     function handleGoogleLogin() {

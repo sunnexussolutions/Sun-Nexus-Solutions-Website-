@@ -326,6 +326,7 @@
                   </svg>
                 </button>
               </div>
+              <div id="login-msg"></div>
             </form>
           </div>
 
@@ -479,6 +480,7 @@
                   </svg>
                 </button>
               </div>
+              <div id="signup-msg"></div>
             </form>
           </div>
 
@@ -591,58 +593,135 @@
       }, 3500);
     }
 
-    function handleLoginSubmit(e) {
-      e.preventDefault();
-      showToast('Session authorized successfully. Welcome to Executive Portal!');
+    const NEON_URL = 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech';
+    const NEON_DB  = 'neondb';
+    const NEON_KEY = 'npg_izrW7bvHTnO6';
+
+    async function neonQuery(sql, params = []) {
+      const res = await fetch(`${NEON_URL}/sql`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Neon-Connection-String': `postgresql://neondb_owner:${NEON_KEY}@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/${NEON_DB}?sslmode=require`
+        },
+        body: JSON.stringify({ query: sql, params })
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      return data.rows || [];
     }
 
-    function handleSignupSubmit(e) {
+    function showPendingMsg(containerId) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      el.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:rgba(0,242,254,0.07);border:1px solid rgba(0,242,254,0.3);margin-top:12px">
+          <svg style="width:18px;height:18px;color:#00f2fe;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>
+          <span style="font-size:13px;font-weight:700;color:#00f2fe;line-height:1.4">You are registered and waiting for Admin approval...</span>
+        </div>
+      `;
+    }
+
+    async function handleLoginSubmit(e) {
       e.preventDefault();
-      const p1 = document.getElementById('signup-pass-1')?.value || '';
-      const p2 = document.getElementById('signup-pass-2')?.value || '';
-      if (!p1 || p1 !== p2) {
-        showToast('Passwords do not match. Please verify.', 'error');
+      const email    = document.getElementById('login-email').value.trim().toLowerCase();
+      const password = document.getElementById('login-password').value;
+      const msgEl    = document.getElementById('login-msg');
+
+      if (!email || !password) {
+        showToast('Please fill in all fields.', 'error');
         return;
       }
 
-      const email = (document.getElementById('signup-email')?.value || '').trim().toLowerCase();
-      const name = (document.getElementById('signup-name')?.value || '').trim();
-      const username = (document.getElementById('signup-user')?.value || email.split('@')[0] || 'user').trim().toLowerCase();
+      try {
+        const rows = await neonQuery(
+          'SELECT * FROM profiles WHERE LOWER(email) = $1 OR LOWER(username) = $1',
+          [email]
+        );
 
-      if (!email || !name) {
+        if (rows.length > 0 && rows[0].password === password) {
+          if (rows[0].status === 'pending') {
+            showPendingMsg('login-msg');
+            return;
+          }
+          showToast('Session authorized. Redirecting...');
+          setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+          return;
+        }
+
+        // Fallback: localStorage
+        const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+        const local = localUsers.find(u => (u.email === email || u.username === email) && u.password === password);
+        if (local) {
+          if (local.status === 'pending') { showPendingMsg('login-msg'); return; }
+          showToast('Session authorized. Redirecting...');
+          setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+          return;
+        }
+
+        showToast('Invalid email or password.', 'error');
+      } catch (err) {
+        console.warn('Neon login failed:', err.message);
+        const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+        const local = localUsers.find(u => (u.email === email || u.username === email) && u.password === password);
+        if (local && local.status === 'pending') { showPendingMsg('login-msg'); }
+        else if (local) { showToast('Session authorized. Redirecting...'); setTimeout(() => { window.location.href = 'index.html'; }, 1000); }
+        else showToast('Invalid email or password.', 'error');
+      }
+    }
+
+    async function handleSignupSubmit(e) {
+      e.preventDefault();
+      const p1       = document.getElementById('signup-pass-1')?.value || '';
+      const p2       = document.getElementById('signup-pass-2')?.value || '';
+      const firstName = (document.querySelectorAll('#form-signup input[type=text]')[0]?.value || '').trim();
+      const lastName  = (document.querySelectorAll('#form-signup input[type=text]')[1]?.value || '').trim();
+      const username  = (document.querySelectorAll('#form-signup input[type=text]')[2]?.value || '').trim();
+      const email     = (document.querySelector('#form-signup input[type=email]')?.value || '').trim().toLowerCase();
+
+      if (!firstName || !email || !p1) {
         showToast('Please fill out all required fields.', 'error');
         return;
       }
-
-      const newUser = {
-        id: `user_${Date.now()}`,
-        email: email,
-        username: username,
-        name: name,
-        firstName: name.split(' ')[0] || name,
-        lastName: name.split(' ').slice(1).join(' ') || '',
-        password: p1,
-        isAdmin: false,
-        status: 'active',
-        joinedAt: new Date().toISOString(),
-        xp: 0,
-        streak: 1
-      };
-
-      const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
-      const existing = localUsers.find(u => u.email === email || u.username === username);
-      if (existing) {
-        showToast('An account with this email or username already exists.', 'error');
+      if (p1 !== p2) {
+        showToast('Passwords do not match.', 'error');
         return;
       }
 
-      localStorage.setItem('nexus_users', JSON.stringify([...localUsers, newUser]));
-      localStorage.setItem('nexus_user', JSON.stringify(newUser));
-      window.dispatchEvent(new Event('nexus-data-updated'));
-      showToast('Operator identity created successfully! Logging you in...');
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 1500);
+      const id       = `user_${Date.now()}`;
+      const uname    = username || email.split('@')[0];
+      const fullName = `${firstName} ${lastName}`.trim();
+      const now      = new Date().toISOString();
+
+      try {
+        const existing = await neonQuery(
+          'SELECT id FROM profiles WHERE LOWER(email) = $1 OR LOWER(username) = $2',
+          [email, uname]
+        );
+        if (existing.length > 0) {
+          showToast('An account with this email or username already exists.', 'error');
+          return;
+        }
+        await neonQuery(
+          `INSERT INTO profiles (id, email, first_name, last_name, name, username, password, is_admin, status, joined_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [id, email, firstName, lastName, fullName, uname, p1, false, 'pending', now]
+        );
+      } catch (err) {
+        console.warn('Neon signup failed, saving locally:', err.message);
+        const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+        if (localUsers.find(u => u.email === email)) {
+          showToast('An account with this email already exists.', 'error');
+          return;
+        }
+        localStorage.setItem('nexus_users', JSON.stringify([...localUsers,
+          { id, email, name: fullName, username: uname, password: p1, status: 'pending', joinedAt: now }
+        ]));
+      }
+
+      showPendingMsg('signup-msg');
     }
 
     /* =================== 3D CYBER WAVE BACKGROUND CANVAS =================== */
