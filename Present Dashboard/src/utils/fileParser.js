@@ -197,15 +197,20 @@ export const parseMCQsFromText = (text) => {
       answerIndex = 0; // Default to first option if invalid
     }
 
-    // D. Extract Explanation
+    // D. Extract Explanation & Hint
     const expMatch = trimmed.match(/(?:Exp(?:lanation)?|Rationale|Reason|Solution|Note)[\s:\-\.]*(.*)/is);
     let explanation = expMatch 
       ? expMatch[1].replace(/\s+/g, ' ').trim() 
       : 'Auto-extracted from content.';
 
+    const hintMatch = trimmed.match(/(?:Hint|Clue|Tip|Guide)[\s:\-\.]*(.*)/i);
+    let hint = hintMatch 
+      ? hintMatch[1].replace(trashKeywords, '').replace(/\s+/g, ' ').trim() 
+      : '';
+
     // E. Final Cleanup: Ensure no Answer/Solution text remains in the last option
     const finalOptions = options.slice(0, 4).map(opt => 
-      opt.replace(/(?:Ans(?:wer)?|Correct(?: Option| choice)?|Key|Solution|Exp(?:lanation)?|Rationale|Reason|Note)[\s:\-\.].*$/gis, '').trim()
+      opt.replace(/(?:Ans(?:wer)?|Correct(?: Option| choice)?|Key|Solution|Exp(?:lanation)?|Rationale|Reason|Note|Hint|Clue)[\s:\-\.].*$/gis, '').trim()
     );
 
     if (questionText && finalOptions.length >= 2) {
@@ -215,7 +220,8 @@ export const parseMCQsFromText = (text) => {
         text: questionText,
         options: finalOptions,
         answer: answerIndex,
-        explanation: explanation.substring(0, 1000)
+        explanation: explanation.substring(0, 1000),
+        hint: hint
       });
     }
   });
@@ -248,7 +254,8 @@ export const extractQuestionsFromExcel = async (file) => {
       const optC   = findCol(row, ['option c', 'opt c', 'c', '3', 'choice 3']) || Object.keys(row)[3];
       const optD   = findCol(row, ['option d', 'opt d', 'd', '4', 'choice 4']) || Object.keys(row)[4];
       const ansCol = findCol(row, ['answer', 'ans', 'correct', 'key', 'solution']) || Object.keys(row)[5];
-      const expCol = findCol(row, ['explanation', 'exp', 'rationale', 'reason', 'note']);
+      const expCol  = findCol(row, ['explanation', 'exp', 'rationale', 'reason', 'note']);
+      const hintCol = findCol(row, ['hint', 'clue', 'tip', 'guide']);
 
       const options = [
         String(row[optA] || ''),
@@ -268,7 +275,8 @@ export const extractQuestionsFromExcel = async (file) => {
         text: String(row[qCol] || 'Untitled Question'),
         options,
         answer: ansIndex,
-        explanation: row[expCol] || 'Auto-extracted from spreadsheet.'
+        explanation: row[expCol] || 'Auto-extracted from spreadsheet.',
+        hint: hintCol ? String(row[hintCol] || '').trim() : ''
       };
     });
   } catch (error) {

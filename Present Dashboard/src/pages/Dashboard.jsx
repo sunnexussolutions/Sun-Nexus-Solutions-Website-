@@ -440,20 +440,27 @@ const Dashboard = () => {
                     </span>
                   </div>
 
-                  <div 
-                    style={{ 
-                      position: 'relative', 
-                      width: '85%', 
-                      height: '3px', 
-                      borderRadius: '99px', 
-                      backgroundColor: 'rgba(249, 115, 22, 0.18)', 
-                      display: 'flex', 
-                      alignItems: 'center' 
-                    }}
-                  >
-                    <div style={{ width: '45%', height: '100%', borderRadius: '99px', background: 'linear-gradient(90deg, #f97316 0%, #fb923c 100%)' }} />
-                    <div style={{ width: '9px', height: '9px', borderRadius: '50%', backgroundColor: '#fb923c', boxShadow: '0 0 10px #fb923c', marginLeft: '-4px' }} />
-                  </div>
+                  {(() => {
+                    const currentStreak = user?.streak || 1;
+                    const weekCycleDay = (currentStreak % 7) || 7;
+                    const streakProgressPct = Math.min(100, Math.max(14, Math.round((weekCycleDay / 7) * 100)));
+                    return (
+                      <div 
+                        style={{ 
+                          position: 'relative', 
+                          width: '100%', 
+                          height: '4px', 
+                          borderRadius: '99px', 
+                          backgroundColor: 'rgba(249, 115, 22, 0.18)', 
+                          display: 'flex', 
+                          alignItems: 'center' 
+                        }}
+                      >
+                        <div style={{ width: `${streakProgressPct}%`, height: '100%', borderRadius: '99px', background: 'linear-gradient(90deg, #f97316 0%, #fb923c 100%)', transition: 'width 0.5s ease' }} />
+                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#fb923c', boxShadow: '0 0 10px #fb923c', marginLeft: '-5px' }} />
+                      </div>
+                    );
+                  })()}
                 </motion.div>
               </>
             );
