@@ -15,13 +15,16 @@ export const AuthProvider = ({ children }) => {
         const u = JSON.parse(savedUser);
         setUser(u);
         setIsAuthenticated(true);
-        refreshProfile(u.id);
+        // Refresh from DB before releasing loading — prevents stale pending status
+        refreshProfile(u.id).finally(() => setLoading(false));
       } catch (err) {
         console.error("Failed to parse nexus_user from localStorage:", err);
         localStorage.removeItem('nexus_user');
+        setLoading(false);
       }
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   // Re-sync user state when admin approves on same browser session
@@ -70,8 +73,17 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('nexus_user', JSON.stringify(updated));
         return true;
       }
+      // Also check by email in case id format differs
+      if (user.email) {
+        const byEmail = await query('SELECT status FROM profiles WHERE LOWER(email) = $1', [user.email.toLowerCase()]);
+        if (byEmail?.[0]?.status === 'active') {
+          const updated = { ...user, status: 'active' };
+          setUser(updated);
+          localStorage.setItem('nexus_user', JSON.stringify(updated));
+          return true;
+        }
+      }
     } catch {
-      // fallback: check localStorage nexus_users list
       try {
         const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
         const found = localUsers.find(u => u.id === user.id || u.email === user.email);
@@ -135,9 +147,10 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (found) {
-        // Pending check MUST happen FIRST before password check
-        if (found.status === 'pending') {
-          // Store minimal session so PendingApproval page can poll for approval
+        // Always use the DB status (most up-to-date), fall back to found.status
+        const currentStatus = found.status || 'active';
+
+        if (currentStatus === 'pending') {
           const pendingUser = {
             ...found,
             firstName: found.first_name || found.firstName || found.name?.split(' ')[0],
@@ -152,17 +165,17 @@ export const AuthProvider = ({ children }) => {
           return { success: false, pending: true, error: 'You are registered and waiting for Admin approval...' };
         }
 
-        if (found.password === password || password === 'admin123') {
-          if (found.status === 'suspended' || found.status === 'banned') {
+        if (found.password === password) {
+          if (currentStatus === 'suspended' || currentStatus === 'banned') {
             setLoading(false);
             return { success: false, error: 'Account has been suspended. Please contact support.' };
           }
-          const u = { 
-            ...found, 
-            firstName: found.first_name || found.firstName || found.name?.split(' ')[0], 
-            lastName: found.last_name || found.lastName, 
+          const u = {
+            ...found,
+            firstName: found.first_name || found.firstName || found.name?.split(' ')[0],
+            lastName: found.last_name || found.lastName,
             isAdmin: !!(found.is_admin || found.isAdmin),
-            status: found.status || 'active',
+            status: 'active',
             joinedAt: found.joined_at || found.joinedAt
           };
           setUser(u);
