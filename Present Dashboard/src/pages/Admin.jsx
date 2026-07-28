@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import {
   getAssessments, addAssessment, updateAssessment, deleteAssessment,
-  getUsers, getResults, deleteUser, updateUserStatus,
+  getUsers, getResults, deleteResult, deleteUser, updateUserStatus,
   getDiscussions, addDiscussion, deleteDiscussion,
   getNotifications, addNotification, deleteNotification,
   getProjects, addProject, updateProject, deleteProject,
@@ -30,6 +30,7 @@ const TABS = [
   { id: 'overview',      label: 'Overview',      icon: BarChart3 },
   { id: 'home_content',  label: 'Home Page',     icon: Palette },
   { id: 'assessments',   label: 'Assessments',   icon: BrainCircuit },
+  { id: 'submissions',   label: 'Submissions',   icon: FileText },
   { id: 'domains',       label: 'Domains',       icon: Layers },
   { id: 'projects',      label: 'Projects',      icon: Rocket },
   { id: 'users',         label: 'Users',         icon: Users },
@@ -106,7 +107,7 @@ const StatBox = ({ label, value, icon: Icon, color, bgTint, actionText, onClick,
 );
 
 // ── Question builder ──────────────────────────────────────────────────────────
-const emptyQuestion = () => ({ text: '', options: ['', '', '', ''], answer: 0, explanation: '' });
+const emptyQuestion = () => ({ text: '', options: ['', '', '', ''], answer: 0, explanation: '', hint: '' });
 
 const QuestionBuilder = ({ questions, setQuestions, attempted = false }) => {
   const add = () => setQuestions(q => [...q, emptyQuestion()]);
@@ -218,26 +219,58 @@ const SubDomainBuilder = ({ subs, setSubs, inputStyle }) => {
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAY_NAMES   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-const DynamicCalendar = ({ assessments = [], results = [] }) => {
+const DynamicCalendar = ({ assessments = [], results = [], setTab }) => {
   const today = new Date();
   const [viewDate, setViewDate] = React.useState({ year: today.getFullYear(), month: today.getMonth() });
   const [selectedDay, setSelectedDay] = React.useState(null);
+  const [activeTypeFilter, setActiveTypeFilter] = React.useState('ALL'); // ALL, assessment, unlock, submission
 
-  // Build event map: { 'YYYY-MM-DD': [{label, color, type}] }
+  // Build event map: { 'YYYY-MM-DD': [{id, label, time, color, type, raw}] }
   const eventMap = React.useMemo(() => {
     const map = {};
-    const push = (date, event) => {
-      const key = date.toISOString().slice(0, 10);
+    const push = (dateObj, event) => {
+      if (!dateObj || isNaN(new Date(dateObj).getTime())) return;
+      const key = new Date(dateObj).toISOString().slice(0, 10);
       if (!map[key]) map[key] = [];
       map[key].push(event);
     };
+
     assessments.forEach(a => {
-      if (a.createdAt) push(new Date(a.createdAt), { label: `📘 ${a.topic} (Published)`, color: '#6366f1', type: 'assessment' });
-      if (a.unlockTime) push(new Date(a.unlockTime), { label: `🔓 ${a.topic} (Unlocks)`, color: '#06b6d4', type: 'unlock' });
+      if (a.createdAt || a.created_at) {
+        push(a.createdAt || a.created_at, { 
+          id: a.id, 
+          label: `📘 ${a.topic || 'Assessment'} (Published)`, 
+          time: new Date(a.createdAt || a.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          color: '#6366f1', 
+          type: 'assessment',
+          raw: a 
+        });
+      }
+      if (a.unlockTime || a.unlock_time) {
+        push(a.unlockTime || a.unlock_time, { 
+          id: a.id, 
+          label: `🔓 ${a.topic || 'Assessment'} (Unlocks)`, 
+          time: new Date(a.unlockTime || a.unlock_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          color: '#06b6d4', 
+          type: 'unlock',
+          raw: a 
+        });
+      }
     });
+
     results.forEach(r => {
-      if (r.submittedAt) push(new Date(r.submittedAt), { label: `✅ Submission by ${r.userEmail || r.userName || 'User'}`, color: '#22c55e', type: 'submission' });
+      if (r.submittedAt || r.submitted_at) {
+        push(r.submittedAt || r.submitted_at, { 
+          id: r.id, 
+          label: `✅ Submission by ${r.userName || r.userEmail || 'User'} (${r.percentage || 0}%)`, 
+          time: new Date(r.submittedAt || r.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          color: '#22c55e', 
+          type: 'submission',
+          raw: r 
+        });
+      }
     });
+
     return map;
   }, [assessments, results]);
 
@@ -250,15 +283,34 @@ const DynamicCalendar = ({ assessments = [], results = [] }) => {
 
   const prevMonth = () => setViewDate(v => v.month === 0 ? { year: v.year - 1, month: 11 } : { year: v.year, month: v.month - 1 });
   const nextMonth = () => setViewDate(v => v.month === 11 ? { year: v.year + 1, month: 0 } : { year: v.year, month: v.month + 1 });
+  const jumpToday = () => {
+    setViewDate({ year: today.getFullYear(), month: today.getMonth() });
+    setSelectedDay(today.toISOString().slice(0, 10));
+  };
+
   const getKey = (d) => `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
   const isToday = (d) => today.getDate() === d && today.getMonth() === month && today.getFullYear() === year;
   const isSelected = (d) => selectedDay === getKey(d);
-  const selectedEvents = selectedDay ? (eventMap[selectedDay] || []) : [];
+
+  // Month summary stats
+  const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+  const monthEvents = Object.entries(eventMap)
+    .filter(([key]) => key.startsWith(monthPrefix))
+    .flatMap(([, evs]) => evs);
+
+  const monthPublishedCount  = monthEvents.filter(e => e.type === 'assessment').length;
+  const monthUnlocksCount    = monthEvents.filter(e => e.type === 'unlock').length;
+  const monthSubmissionsCount = monthEvents.filter(e => e.type === 'submission').length;
+
+  const rawSelectedEvents = selectedDay ? (eventMap[selectedDay] || []) : [];
+  const selectedEvents = activeTypeFilter === 'ALL' 
+    ? rawSelectedEvents 
+    : rawSelectedEvents.filter(e => e.type === activeTypeFilter);
 
   return (
     <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '1.5rem', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(99,102,241,0.12)', color: '#6366f1' }}><Calendar size={18} /></div>
           <div>
@@ -266,28 +318,51 @@ const DynamicCalendar = ({ assessments = [], results = [] }) => {
             <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Live from platform data</p>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button 
+            onClick={jumpToday}
+            style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '8px', padding: '5px 12px', cursor: 'pointer', color: 'var(--accent-primary)', fontWeight: 800, fontSize: '12px' }}
+          >
+            Today
+          </button>
           <button onClick={prevMonth} style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '6px 10px', cursor: 'pointer', color: 'var(--text-primary)', fontWeight: 700, fontSize: '14px', lineHeight: 1 }}>‹</button>
-          <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', minWidth: '130px', textAlign: 'center' }}>{MONTH_NAMES[month]} {year}</span>
+          <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', minWidth: '120px', textAlign: 'center' }}>{MONTH_NAMES[month]} {year}</span>
           <button onClick={nextMonth} style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '6px 10px', cursor: 'pointer', color: 'var(--text-primary)', fontWeight: 700, fontSize: '14px', lineHeight: 1 }}>›</button>
         </div>
       </div>
 
-      {/* Legend */}
-      <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+      {/* Interactive Legend Filters */}
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
         {[
-          { color: '#6366f1', label: 'Assessment Published' },
-          { color: '#06b6d4', label: 'Assessment Unlocks' },
-          { color: '#22c55e', label: 'Quiz Submission' },
-        ].map(l => (
-          <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: l.color, flexShrink: 0 }} />
-            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>{l.label}</span>
-          </div>
-        ))}
+          { id: 'ALL', color: 'var(--accent-primary)', label: 'All Events' },
+          { id: 'assessment', color: '#6366f1', label: 'Assessment Published' },
+          { id: 'unlock', color: '#06b6d4', label: 'Assessment Unlocks' },
+          { id: 'submission', color: '#22c55e', label: 'Quiz Submissions' },
+        ].map(l => {
+          const isSel = activeTypeFilter === l.id;
+          return (
+            <button
+              key={l.id}
+              onClick={() => setActiveTypeFilter(l.id)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '4px 10px', borderRadius: '20px',
+                background: isSel ? `${l.color}20` : 'transparent',
+                border: `1.5px solid ${isSel ? l.color : 'var(--border-subtle)'}`,
+                color: isSel ? l.color : 'var(--text-muted)',
+                fontSize: '11px', fontWeight: 700, cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: l.color, flexShrink: 0 }} />
+              <span>{l.label}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Grid */}
+      {/* Days Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
         {DAY_NAMES.map(d => (
           <div key={d} style={{ textAlign: 'center', fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '6px 0' }}>{d}</div>
@@ -295,10 +370,13 @@ const DynamicCalendar = ({ assessments = [], results = [] }) => {
         {cells.map((d, i) => {
           if (!d) return <div key={`empty-${i}`} />;
           const key = getKey(d);
-          const events = eventMap[key] || [];
-          const uniqueColors = [...new Set(events.map(e => e.color))];
+          const allEvs = eventMap[key] || [];
+          const filteredEvs = activeTypeFilter === 'ALL' ? allEvs : allEvs.filter(e => e.type === activeTypeFilter);
+          const uniqueColors = [...new Set(filteredEvs.map(e => e.color))];
           const today_ = isToday(d);
           const sel = isSelected(d);
+          const hasEvents = filteredEvs.length > 0;
+
           return (
             <button
               key={key}
@@ -307,15 +385,15 @@ const DynamicCalendar = ({ assessments = [], results = [] }) => {
                 position: 'relative',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 padding: '6px 2px', borderRadius: '10px', border: 'none', cursor: 'pointer',
-                background: sel ? 'rgba(99,102,241,0.15)' : today_ ? 'rgba(99,102,241,0.08)' : 'transparent',
-                outline: sel ? '2px solid #6366f1' : today_ ? '2px solid rgba(99,102,241,0.4)' : 'none',
+                background: sel ? 'rgba(99,102,241,0.18)' : today_ ? 'rgba(99,102,241,0.08)' : 'transparent',
+                outline: sel ? '2px solid #6366f1' : today_ ? '2px solid rgba(99,102,241,0.4)' : hasEvents ? '1px dashed rgba(99,102,241,0.3)' : 'none',
                 transition: 'all 0.15s',
                 minHeight: '44px',
               }}
               onMouseEnter={e => { if (!sel) e.currentTarget.style.background = 'var(--bg-tertiary)'; }}
               onMouseLeave={e => { if (!sel) e.currentTarget.style.background = today_ ? 'rgba(99,102,241,0.08)' : 'transparent'; }}
             >
-              <span style={{ fontSize: '13px', fontWeight: today_ || sel ? 900 : 600, color: sel ? '#6366f1' : today_ ? 'var(--accent-primary)' : 'var(--text-primary)' }}>{d}</span>
+              <span style={{ fontSize: '13px', fontWeight: today_ || sel || hasEvents ? 900 : 600, color: sel ? '#6366f1' : today_ ? 'var(--accent-primary)' : 'var(--text-primary)' }}>{d}</span>
               {uniqueColors.length > 0 && (
                 <div style={{ display: 'flex', gap: '2px', marginTop: '3px' }}>
                   {uniqueColors.slice(0, 3).map((c, ci) => (
@@ -328,7 +406,7 @@ const DynamicCalendar = ({ assessments = [], results = [] }) => {
         })}
       </div>
 
-      {/* Selected Day Events */}
+      {/* Selected Day Events & Action Panel */}
       {selectedDay && (
         <motion.div
           key={selectedDay}
@@ -337,23 +415,53 @@ const DynamicCalendar = ({ assessments = [], results = [] }) => {
           exit={{ opacity: 0, y: -8 }}
           style={{ background: 'var(--bg-tertiary)', borderRadius: '12px', padding: '14px 16px', border: '1px solid var(--border-subtle)' }}
         >
-          <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
-            {new Date(selectedDay + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+            <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>
+              {new Date(selectedDay + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+            </p>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--accent-primary)' }}>
+              {selectedEvents.length} Event{selectedEvents.length === 1 ? '' : 's'}
+            </span>
+          </div>
+
           {selectedEvents.length === 0 ? (
-            <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No events on this day.</p>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0 }}>No matching events on this date.</p>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {selectedEvents.map((ev, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', borderRadius: '8px', background: `${ev.color}10`, border: `1px solid ${ev.color}25` }}>
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: ev.color, flexShrink: 0 }} />
-                  <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{ev.label}</span>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '10px 14px', borderRadius: '10px', background: 'var(--bg-secondary)', border: `1px solid ${ev.color}30` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: ev.color, flexShrink: 0 }} />
+                    <div>
+                      <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 700, display: 'block' }}>{ev.label}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500 }}>Time: {ev.time}</span>
+                    </div>
+                  </div>
+
+                  {setTab && (
+                    <button
+                      onClick={() => setTab(ev.type === 'submission' ? 'submissions' : 'assessments')}
+                      style={{ padding: '4px 10px', borderRadius: '6px', background: `${ev.color}15`, color: ev.color, border: 'none', fontSize: '11px', fontWeight: 800, cursor: 'pointer' }}
+                    >
+                      {ev.type === 'submission' ? 'View Submission ➔' : 'Manage ➔'}
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
           )}
         </motion.div>
       )}
+
+      {/* Monthly Summary Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-subtle)', paddingTop: '12px', fontSize: '12px', color: 'var(--text-muted)', flexWrap: 'wrap', gap: '8px' }}>
+        <span><strong>{monthEvents.length} Total Events</strong> in {MONTH_NAMES[month]}</span>
+        <div style={{ display: 'flex', gap: '12px', fontSize: '11px', fontWeight: 700 }}>
+          <span style={{ color: '#6366f1' }}>{monthPublishedCount} Published</span>
+          <span style={{ color: '#06b6d4' }}>{monthUnlocksCount} Unlocks</span>
+          <span style={{ color: '#22c55e' }}>{monthSubmissionsCount} Submissions</span>
+        </div>
+      </div>
     </div>
   );
 };
@@ -386,6 +494,57 @@ const Admin = () => {
   const [editingNotificationId, setEditingNotificationId] = useState(null);
   const [editingDomainId, setEditingDomainId] = useState(null);
   const [editingProjectId, setEditingProjectId] = useState(null);
+
+  // Submissions management state
+  const [subSearch, setSubSearch] = useState('');
+  const [subCatFilter, setSubCatFilter] = useState('ALL');
+  const [subStatusFilter, setSubStatusFilter] = useState('ALL');
+  const [selectedSubDetail, setSelectedSubDetail] = useState(null);
+
+  // Dynamic Topic Proficiency Stats calculated from results
+  const topicProficiencyStats = React.useMemo(() => {
+    if (!results || results.length === 0) {
+      return {
+        overallAvg: 0,
+        topCategory: { name: 'Quantitative', score: 0 },
+        lowestCategory: { name: 'Logical Reasoning', score: 0 },
+        mostActive: { name: 'Aptitude', count: 0 }
+      };
+    }
+
+    const categoryMap = {};
+    let totalPctSum = 0;
+
+    results.forEach(r => {
+      const cat = r.category || 'Quantitative';
+      const pct = r.percentage || 0;
+      totalPctSum += pct;
+
+      if (!categoryMap[cat]) {
+        categoryMap[cat] = { name: cat, sum: 0, count: 0 };
+      }
+      categoryMap[cat].sum += pct;
+      categoryMap[cat].count += 1;
+    });
+
+    const overallAvg = Math.round(totalPctSum / results.length);
+
+    const categories = Object.values(categoryMap).map(c => ({
+      name: c.name,
+      score: Math.round(c.sum / c.count),
+      count: c.count
+    }));
+
+    const sortedByScore = [...categories].sort((a, b) => b.score - a.score);
+    const sortedByCount = [...categories].sort((a, b) => b.count - a.count);
+
+    return {
+      overallAvg,
+      topCategory: sortedByScore[0] || { name: 'Quantitative', score: 0 },
+      lowestCategory: sortedByScore[sortedByScore.length - 1] || { name: 'Logical Reasoning', score: 0 },
+      mostActive: sortedByCount[0] || { name: 'Aptitude', count: 0 }
+    };
+  }, [results]);
 
   // Assessment form
   const [showAssessmentForm, setShowAssessmentForm] = useState(false);
@@ -932,7 +1091,16 @@ const Admin = () => {
                 <div style={{ position: 'relative', width: '150px', height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
                   <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
                     <circle cx="50" cy="50" r="40" stroke="var(--border-subtle, #e2e8f0)" strokeWidth="8" fill="none" />
-                    <circle cx="50" cy="50" r="40" stroke="url(#purpleGradRing)" strokeWidth="8" strokeDasharray="251.2" strokeDashoffset="70.3" strokeLinecap="round" fill="none" />
+                    <circle 
+                      cx="50" cy="50" r="40" 
+                      stroke="url(#purpleGradRing)" 
+                      strokeWidth="8" 
+                      strokeDasharray="251.2" 
+                      strokeDashoffset={251.2 - (251.2 * (topicProficiencyStats.overallAvg / 100))} 
+                      strokeLinecap="round" 
+                      fill="none" 
+                      style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+                    />
                     <defs>
                       <linearGradient id="purpleGradRing" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stopColor="#7c3aed" />
@@ -941,7 +1109,9 @@ const Admin = () => {
                     </defs>
                   </svg>
                   <div style={{ position: 'absolute', textAlign: 'center' }}>
-                    <span style={{ fontSize: '28px', fontWeight: 900, color: 'var(--text-primary)', display: 'block', lineHeight: 1 }}>72%</span>
+                    <span style={{ fontSize: '28px', fontWeight: 900, color: 'var(--text-primary)', display: 'block', lineHeight: 1 }}>
+                      {topicProficiencyStats.overallAvg}%
+                    </span>
                     <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>Average<br/>Proficiency</span>
                   </div>
                 </div>
@@ -951,24 +1121,24 @@ const Admin = () => {
                   <div>
                     <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '2px' }}>Top Performing Category</div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>Quantitative</span>
-                      <span style={{ fontSize: '14px', fontWeight: 900, color: '#7c3aed' }}>85%</span>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>{topicProficiencyStats.topCategory.name}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 900, color: '#7c3aed' }}>{topicProficiencyStats.topCategory.score}%</span>
                     </div>
                   </div>
 
                   <div style={{ borderTop: '1px solid var(--border-subtle, #f1f5f9)', paddingTop: '12px' }}>
                     <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '2px' }}>Improvement Needed</div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>Logical Reasoning</span>
-                      <span style={{ fontSize: '14px', fontWeight: 900, color: '#f97316' }}>45%</span>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>{topicProficiencyStats.lowestCategory.name}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 900, color: '#f97316' }}>{topicProficiencyStats.lowestCategory.score}%</span>
                     </div>
                   </div>
 
                   <div style={{ borderTop: '1px solid var(--border-subtle, #f1f5f9)', paddingTop: '12px' }}>
                     <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '2px' }}>Most Active Category</div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>Aptitude</span>
-                      <span style={{ fontSize: '13px', fontWeight: 800, color: '#7c3aed' }}>12 Activities</span>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>{topicProficiencyStats.mostActive.name}</span>
+                      <span style={{ fontSize: '13px', fontWeight: 800, color: '#7c3aed' }}>{topicProficiencyStats.mostActive.count} Activities</span>
                     </div>
                   </div>
                 </div>
@@ -976,7 +1146,10 @@ const Admin = () => {
 
               {/* Bottom Button */}
               <div style={{ marginTop: '24px', textAlign: 'center' }}>
-                <button style={{ padding: '10px 24px', borderRadius: '12px', border: '1.5px solid #c084fc', backgroundColor: 'transparent', color: '#7c3aed', fontSize: '13px', fontWeight: 800, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+                <button 
+                  onClick={() => setTab('submissions')}
+                  style={{ padding: '10px 24px', borderRadius: '12px', border: '1.5px solid #c084fc', backgroundColor: 'transparent', color: '#7c3aed', fontSize: '13px', fontWeight: 800, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}
+                >
                   <span>View Detailed Report</span>
                   <ArrowRight size={14} />
                 </button>
@@ -984,7 +1157,7 @@ const Admin = () => {
             </Card>
 
             {/* Right Card: Activity Calendar */}
-            <DynamicCalendar assessments={assessments} results={results} />
+            <DynamicCalendar assessments={assessments} results={results} setTab={setTab} />
           </div>
 
           {/* Bottom Section: Quick Actions */}
@@ -2033,6 +2206,217 @@ const Admin = () => {
         </div>
       </div>
     )}
+
+    {/* ── SUBMISSIONS CONTROL CENTER ── */}
+    {tab === 'submissions' && (() => {
+      const filteredResults = results.filter(r => {
+        const queryStr = (subSearch || '').toLowerCase();
+        const matchesSearch = !queryStr || 
+          (r.userName || '').toLowerCase().includes(queryStr) || 
+          (r.userEmail || '').toLowerCase().includes(queryStr) || 
+          (r.topic || '').toLowerCase().includes(queryStr) ||
+          (r.category || '').toLowerCase().includes(queryStr);
+        
+        const matchesCategory = subCatFilter === 'ALL' || (r.category && r.category.toLowerCase() === subCatFilter.toLowerCase());
+        const pct = r.percentage || 0;
+        const matchesStatus = subStatusFilter === 'ALL' || (subStatusFilter === 'PASS' ? pct >= 60 : pct < 60);
+
+        return matchesSearch && matchesCategory && matchesStatus;
+      });
+
+      const totalSubs = results.length;
+      const passedSubs = results.filter(r => (r.percentage || 0) >= 60).length;
+      const failedSubs = results.filter(r => (r.percentage || 0) < 60).length;
+      const avgScore = totalSubs > 0 ? Math.round(results.reduce((acc, r) => acc + (r.percentage || 0), 0) / totalSubs) : 0;
+
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Top Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>Submissions Control Center</h3>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Monitor, inspect, and manage student assessment results across the platform</p>
+            </div>
+            <button onClick={refresh} style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+              Sync Submissions
+            </button>
+          </div>
+
+          {/* Quick Metrics Bar */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+            <Card style={{ padding: '16px 20px', background: 'var(--bg-secondary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total Submissions</p>
+                  <h4 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--text-primary)', margin: '4px 0 0 0' }}>{totalSubs}</h4>
+                </div>
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(99,102,241,0.12)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <FileText size={20} />
+                </div>
+              </div>
+            </Card>
+
+            <Card style={{ padding: '16px 20px', background: 'var(--bg-secondary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Passed (≥60%)</p>
+                  <h4 style={{ fontSize: '24px', fontWeight: 900, color: '#22c55e', margin: '4px 0 0 0' }}>{passedSubs}</h4>
+                </div>
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(34,197,94,0.12)', color: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Check size={20} />
+                </div>
+              </div>
+            </Card>
+
+            <Card style={{ padding: '16px 20px', background: 'var(--bg-secondary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Failed (&lt;60%)</p>
+                  <h4 style={{ fontSize: '24px', fontWeight: 900, color: '#ef4444', margin: '4px 0 0 0' }}>{failedSubs}</h4>
+                </div>
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(239,68,68,0.12)', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <X size={20} />
+                </div>
+              </div>
+            </Card>
+
+            <Card style={{ padding: '16px 20px', background: 'var(--bg-secondary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Platform Avg Score</p>
+                  <h4 style={{ fontSize: '24px', fontWeight: 900, color: '#a855f7', margin: '4px 0 0 0' }}>{avgScore}%</h4>
+                </div>
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(168,85,247,0.12)', color: '#a855f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <TrendingUp size={20} />
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Search & Filters */}
+          <Card style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <input 
+              type="text" 
+              placeholder="Search by student name, email, or topic..." 
+              value={subSearch} 
+              onChange={e => setSubSearch(e.target.value)} 
+              style={{ flex: 1, minWidth: '240px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-strong)', borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none' }}
+            />
+            <select 
+              value={subCatFilter} 
+              onChange={e => setSubCatFilter(e.target.value)}
+              style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-strong)', borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', cursor: 'pointer' }}
+            >
+              <option value="ALL">All Categories</option>
+              <option value="Quantitative">Quantitative</option>
+              <option value="Logical Reasoning">Logical Reasoning</option>
+              <option value="Verbal Ability">Verbal Ability</option>
+            </select>
+            <select 
+              value={subStatusFilter} 
+              onChange={e => setSubStatusFilter(e.target.value)}
+              style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-strong)', borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', cursor: 'pointer' }}
+            >
+              <option value="ALL">All Statuses</option>
+              <option value="PASS">Passed Only (≥60%)</option>
+              <option value="FAIL">Failed Only (&lt;60%)</option>
+            </select>
+          </Card>
+
+          {/* Submissions List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {filteredResults.length === 0 ? (
+              <Card><p style={{ textAlign: 'center', color: 'var(--text-muted)', margin: '1rem 0' }}>No assessment submissions match your filters.</p></Card>
+            ) : (
+              filteredResults.map((r, i) => {
+                const pct = r.percentage || 0;
+                const isPassed = pct >= 60;
+                return (
+                  <Card key={r.id || i} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                        <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: isPassed ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', border: `1px solid ${isPassed ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <BrainCircuit size={20} color={isPassed ? '#22c55e' : '#ef4444'} />
+                        </div>
+                        <div>
+                          <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>{r.userName || r.userEmail || 'Student'}</h4>
+                          <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>{r.userEmail || 'No Email'} • <span style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>{r.topic}</span> ({r.category || 'General'})</p>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                        <div style={{ textAlign: 'right' }}>
+                          <span style={{ fontSize: '12px', fontWeight: 900, padding: '4px 12px', borderRadius: '8px', backgroundColor: isPassed ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)', color: isPassed ? '#22c55e' : '#ef4444' }}>
+                            {pct}% ({isPassed ? 'PASSED' : 'FAILED'})
+                          </span>
+                          <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>Score: {r.score}/{r.total || 20}</p>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          {r.answers && Object.keys(r.answers).length > 0 && (
+                            <button 
+                              onClick={() => setSelectedSubDetail(r)}
+                              style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                            >
+                              <Eye size={14} /> Inspect Answers
+                            </button>
+                          )}
+                          <button 
+                            onClick={async () => {
+                              if (confirm(`Revoke and delete submission for "${r.userName || r.userEmail}" on topic "${r.topic}"? This allows the student to re-take the assessment.`)) {
+                                await deleteResult(r.id);
+                                await refresh();
+                              }
+                            }}
+                            style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                          >
+                            <Trash2 size={14} /> Revoke / Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)', fontSize: '11px', color: 'var(--text-muted)' }}>
+                      <span>Submission ID: <code style={{ fontSize: '10px' }}>{r.id}</code></span>
+                      <span>Submitted: {r.submittedAt ? new Date(r.submittedAt).toLocaleString() : 'Recently'}</span>
+                    </div>
+                  </Card>
+                );
+              })
+            )}
+          </div>
+
+          {/* Inspect Answers Modal */}
+          {selectedSubDetail && (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+              <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-strong)', borderRadius: '24px', width: '100%', maxWidth: '650px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.3)' }}>
+                <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-tertiary)' }}>
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>Submission Detail Inspection</h3>
+                    <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>{selectedSubDetail.userName} • {selectedSubDetail.topic} ({selectedSubDetail.percentage}%)</p>
+                  </div>
+                  <button onClick={() => setSelectedSubDetail(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}>
+                    <X size={22} />
+                  </button>
+                </div>
+                <div style={{ padding: '20px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {Object.entries(selectedSubDetail.answers || {}).map(([qIdx, ansVal], idx) => (
+                    <div key={idx} style={{ padding: '12px 16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)' }}>
+                      <p style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 6px 0' }}>Question #{Number(qIdx) + 1}</p>
+                      <p style={{ fontSize: '12px', color: 'var(--accent-primary)', fontWeight: 700, margin: 0 }}>Student Choice / Input: <span style={{ color: 'var(--text-primary)' }}>{String(ansVal)}</span></p>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-tertiary)', textAlign: 'right' }}>
+                  <button onClick={() => setSelectedSubDetail(null)} style={{ padding: '8px 20px', borderRadius: '10px', background: 'var(--accent-primary)', color: 'white', border: 'none', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                    Close Inspection
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    })()}
 
     {/* ── HIRING SUBMISSIONS ── */}
     {tab === 'hiring' && (

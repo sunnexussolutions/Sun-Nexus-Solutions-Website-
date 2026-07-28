@@ -302,11 +302,63 @@ export const saveResult = async (res) => {
   const newRes = { ...res, id, submittedAt: new Date().toISOString() };
   setLocal('results', [...getLocal('results'), newRes]);
 
-  await query(`
-    INSERT INTO results (id, user_id, assessment_id, topic, score, total, percentage, category, user_name, user_email, answers)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-  `, [id, res.userId, res.assessmentId, res.topic, res.score, res.total, res.percentage, res.category, res.userName || 'Anonymous', res.userEmail, JSON.stringify(res.answers || {})]);
+  try {
+    await query(`
+      INSERT INTO results (id, user_id, assessment_id, topic, score, total, percentage, category, user_name, user_email, answers)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    `, [id, res.userId, res.assessmentId, res.topic, res.score, res.total, res.percentage, res.category, res.userName || 'Anonymous', res.userEmail, JSON.stringify(res.answers || {})]);
+  } catch (err) {
+    console.warn("Cloud save result fallback:", err.message);
+  }
+
+  // Increment user streak count by +1 when taking an aptitude test
+  try {
+    const rawUser = localStorage.getItem('nexus_user');
+    if (rawUser) {
+      const u = JSON.parse(rawUser);
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const newStreak = (Number(u.streak) || 0) + 1;
+
+      const updatedUser = {
+        ...u,
+        streak: newStreak,
+        lastActiveDate: todayStr,
+        last_active_date: todayStr
+      };
+
+      localStorage.setItem('nexus_user', JSON.stringify(updatedUser));
+
+      // Update in local users array
+      const localUsers = getLocal('users');
+      const updatedLocalUsers = localUsers.map(usr => 
+        (usr.id === u.id || usr.email === u.email) 
+          ? { ...usr, streak: newStreak, lastActiveDate: todayStr } 
+          : usr
+      );
+      setLocal('users', updatedLocalUsers, true);
+
+      // Async cloud sync
+      if (u.id || u.email) {
+        query(`
+          UPDATE profiles 
+          SET streak = COALESCE(streak, 0) + 1, last_active_date = $1 
+          WHERE id = $2 OR LOWER(email) = $3
+        `, [todayStr, u.id || '', (u.email || '').toLowerCase()]).catch(e => console.warn("Cloud streak increment fallback:", e.message));
+      }
+
+      window.dispatchEvent(new Event('nexus-data-updated'));
+    }
+  } catch (err) {
+    console.warn("Streak increment on test submission error:", err);
+  }
+
   return newRes;
+};
+
+export const deleteResult = async (id) => {
+  setLocal('results', getLocal('results').filter(r => r.id !== id));
+  await query('DELETE FROM results WHERE id = $1', [id]);
 };
 
 // ── Users ─────────────────────────────────────────────────────────────────────

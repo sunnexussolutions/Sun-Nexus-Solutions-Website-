@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Timer, CheckCircle, XCircle, ChevronRight, BookOpen, BarChart2, ArrowRight, FileText } from 'lucide-react';
+import { X, Timer, CheckCircle, XCircle, ChevronRight, BookOpen, BarChart2, ArrowRight, FileText, Lightbulb } from 'lucide-react';
 import { saveResult } from '../store/dataStore';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -63,6 +63,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState(previousResult?.answers || {});
   const [selected, setSelected] = useState(null);
+  const [showHint, setShowHint] = useState(false);
 
   const initialSeconds = (assessment?.timeLimit && typeof assessment.timeLimit === 'number' && assessment.timeLimit > 0)
     ? assessment.timeLimit * 60
@@ -133,6 +134,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
     if (selected === null) return;
     setAnswers(prev => ({ ...prev, [current]: selected }));
     setSelected(null);
+    setShowHint(false);
     if (current < total - 1) setCurrent(c => c + 1);
     else handleSubmit({ ...answers, [current]: selected });
   };
@@ -210,9 +212,61 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                 <motion.div animate={{ width: `${((current + 1) / total) * 100}%` }} style={{ height: '100%', background: '#6366f1', borderRadius: '999px' }} />
               </div>
 
-              <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '0.875rem', border: '1px solid #e2e8f0' }}>
-                <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', lineHeight: 1.5 }}>{q.question || q.text}</p>
+              <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '0.875rem', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Question Statement</span>
+                  <button
+                    onClick={() => setShowHint(prev => !prev)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '5px',
+                      padding: '4px 10px', borderRadius: '20px',
+                      background: showHint ? '#fef3c7' : '#ffffff',
+                      border: showHint ? '1px solid #f59e0b' : '1px solid #cbd5e1',
+                      color: showHint ? '#d97706' : '#475569',
+                      fontSize: '12px', fontWeight: 700, cursor: 'pointer',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <Lightbulb size={13} style={{ color: showHint ? '#d97706' : '#64748b' }} />
+                    <span>{showHint ? 'Hide Hint' : 'Hint'}</span>
+                  </button>
+                </div>
+                <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', lineHeight: 1.5, margin: 0 }}>{q.question || q.text}</p>
               </div>
+
+              {/* Hint Box Container */}
+              {showHint && (() => {
+                const hintContent = q.hint && String(q.hint).trim() ? String(q.hint).trim() : '';
+                const hasHint = Boolean(hintContent);
+
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    style={{
+                      padding: '12px 14px',
+                      borderRadius: '12px',
+                      background: hasHint ? 'rgba(254, 243, 199, 0.7)' : 'rgba(241, 245, 249, 0.9)',
+                      border: hasHint ? '1px solid #fcd34d' : '1px solid #cbd5e1',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '10px',
+                    }}
+                  >
+                    <Lightbulb size={16} style={{ color: hasHint ? '#b45309' : '#64748b', flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <p style={{ fontSize: '11px', fontWeight: 800, color: hasHint ? '#92400e' : '#475569', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 2px 0' }}>
+                        {hasHint ? 'Helpful Hint' : 'Notice'}
+                      </p>
+                      <p style={{ fontSize: '12px', fontWeight: 600, color: hasHint ? '#78350f' : '#64748b', margin: 0, lineHeight: 1.4 }}>
+                        {hasHint ? hintContent : 'There is no hint provided for this question.'}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })()}
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {q.options.map((opt, i) => {

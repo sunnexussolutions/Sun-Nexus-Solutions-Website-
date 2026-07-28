@@ -3,20 +3,101 @@ import { query } from '../lib/neon';
 
 const AuthContext = createContext();
 
+// ── Proper Dynamic Streak Calculation Utility ─────────────────────────
+export const processUserStreak = (u) => {
+  if (!u || u.status === 'pending') return { updatedUser: u, streakIncreased: false, freezeUsed: false, newStreak: u?.streak || 0 };
+
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+
+  const lastActive = u.lastActiveDate || u.last_active_date || null;
+  let currentStreak = Number(u.streak ?? 1);
+  let streakFreezeActive = !!(u.streakFreezeActive || u.streak_freeze_active);
+  let newStreak = currentStreak;
+  let streakIncreased = false;
+  let freezeUsed = false;
+
+  if (!lastActive) {
+    newStreak = 1;
+    streakIncreased = false;
+  } else if (lastActive === todayStr) {
+    newStreak = currentStreak > 0 ? currentStreak : 1;
+    streakIncreased = false;
+  } else if (lastActive === yesterdayStr) {
+    newStreak = (currentStreak > 0 ? currentStreak : 0) + 1;
+    streakIncreased = true;
+  } else {
+    if (streakFreezeActive) {
+      freezeUsed = true;
+      streakFreezeActive = false;
+      newStreak = currentStreak > 0 ? currentStreak : 1;
+    } else {
+      newStreak = 1;
+    }
+  }
+
+  const updatedUser = {
+    ...u,
+    streak: newStreak,
+    lastActiveDate: todayStr,
+    last_active_date: todayStr,
+    streakFreezeActive,
+    streak_freeze_active: streakFreezeActive
+  };
+
+  return { updatedUser, streakIncreased, freezeUsed, newStreak };
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Helper to persist streak changes
+  const applyStreakToUser = async (rawUser) => {
+    if (!rawUser || rawUser.status === 'pending') return rawUser;
+
+    const { updatedUser, streakIncreased, freezeUsed, newStreak } = processUserStreak(rawUser);
+
+    localStorage.setItem('nexus_user', JSON.stringify(updatedUser));
+
+    // Update local users array
+    try {
+      const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+      const idx = localUsers.findIndex(usr => usr.id === updatedUser.id || usr.email === updatedUser.email);
+      if (idx !== -1) {
+        localUsers[idx] = { ...localUsers[idx], ...updatedUser };
+        localStorage.setItem('nexus_users', JSON.stringify(localUsers));
+      }
+    } catch {}
+
+    // Async cloud sync to Neon DB
+    try {
+      await query(
+        'UPDATE profiles SET streak = $1, last_active_date = $2 WHERE id = $3',
+        [newStreak, updatedUser.lastActiveDate, updatedUser.id]
+      );
+    } catch (e) {
+      console.warn("Streak cloud update fallback:", e.message);
+    }
+
+    return updatedUser;
+  };
 
   useEffect(() => {
     const savedUser = localStorage.getItem('nexus_user');
     if (savedUser && savedUser !== 'undefined' && savedUser !== 'null') {
       try {
         const u = JSON.parse(savedUser);
-        setUser(u);
-        setIsAuthenticated(true);
-        // Refresh from DB before releasing loading — prevents stale pending status
-        refreshProfile(u.id).finally(() => setLoading(false));
+        applyStreakToUser(u).then(processed => {
+          setUser(processed);
+          setIsAuthenticated(true);
+          refreshProfile(processed.id).finally(() => setLoading(false));
+        });
       } catch (err) {
         console.error("Failed to parse nexus_user from localStorage:", err);
         localStorage.removeItem('nexus_user');
@@ -178,9 +259,11 @@ export const AuthProvider = ({ children }) => {
             status: 'active',
             joinedAt: found.joined_at || found.joinedAt
           };
-          setUser(u);
+
+          const processed = await applyStreakToUser(u);
+          setUser(processed);
           setIsAuthenticated(true);
-          localStorage.setItem('nexus_user', JSON.stringify(u));
+          localStorage.setItem('nexus_user', JSON.stringify(processed));
           setLoading(false);
           return { success: true };
         }
