@@ -38,13 +38,10 @@ export default function Auth() {
     setIsPendingApproval(false);
     if (!lUser || !lPass) return setError('Please fill in all fields.');
     const res = await login(lUser.trim(), lPass);
-    if (!res.success) {
-      if (res.pending) {
-        setIsPendingApproval(true);
-      } else {
-        setError(res.error || 'Access Denied: Invalid credentials.');
-      }
+    if (!res.success && !res.pending) {
+      setError(res.error || 'Access Denied: Invalid credentials.');
     }
+    // If res.pending === true, App.jsx will route to PendingApproval automatically
   };
 
   const handleSignup = async (e) => {
@@ -56,12 +53,10 @@ export default function Auth() {
       return setError('Please fill in all required fields.');
     }
     
-    // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(d.email.trim())) {
       return setError('Please enter a valid email address (e.g., name@gmail.com).');
     }
-
     if (d.pass.length < 6) {
       return setError('Password must be at least 6 characters.');
     }
@@ -69,7 +64,6 @@ export default function Auth() {
       return setError('Passwords do not match.');
     }
     
-    // Auto-generate username from user input or email handle
     const username = d.user?.trim() || d.email.trim().split('@')[0] || `${d.first}${d.last}`.toLowerCase().replace(/\s+/g, '');
 
     const res = await register({ 
@@ -81,9 +75,9 @@ export default function Auth() {
       password: d.pass 
     });
     if (res.success) {
-      setSuccess('Account created successfully! Waiting for admin approval.');
+      setSuccess('You are registered and waiting for Admin approval...');
       setSignupData({ first: '', last: '', dob: '', user: '', email: '', pass: '', conf: '' });
-      setTimeout(() => setMode('login'), 2500);
+      // Do NOT redirect — user must wait for admin approval
     } else {
       setError(res.error || 'Registration failed.');
     }
@@ -206,14 +200,14 @@ export default function Auth() {
             <button 
               type="button" 
               className={`tab-btn ${mode === 'login' ? 'active' : ''}`}
-              onClick={() => { setMode('login'); setError(''); setSuccess(''); }}
+              onClick={() => { setMode('login'); setError(''); setSuccess(''); setIsPendingApproval(false); }}
             >
               Login
             </button>
             <button 
               type="button" 
               className={`tab-btn ${mode === 'signup' ? 'active' : ''}`}
-              onClick={() => { setMode('signup'); setError(''); setSuccess(''); }}
+              onClick={() => { setMode('signup'); setError(''); setSuccess(''); setIsPendingApproval(false); }}
             >
               Sign Up
             </button>
@@ -258,46 +252,7 @@ export default function Auth() {
                 <span onClick={() => { setMode('forgot'); setError(''); setSuccess(''); }}>Forgot Password?</span>
               </div>
 
-              {isPendingApproval && (
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '14px',
-                  padding: '14px 18px',
-                  borderRadius: '18px',
-                  backgroundColor: '#fff8ed',
-                  border: '1px solid #fcd34d',
-                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.06)',
-                  marginBottom: '16px',
-                  textAlign: 'left'
-                }}>
-                  <div style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '12px',
-                    backgroundColor: '#fef3c7',
-                    border: '1px solid #fde68a',
-                    color: '#d97706',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
-                    <ShieldAlert size={22} />
-                  </div>
-                  <div>
-                    <h4 style={{ fontSize: '13.5px', fontWeight: 800, color: '#d97706', margin: 0, lineHeight: 1.3 }}>
-                      Registration Status: Pending Approval
-                    </h4>
-                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: '#475569', margin: '3px 0 0 0', lineHeight: 1.3 }}>
-                      You are registered successfully and waiting for admin approval
-                    </p>
-                  </div>
-                </div>
-              )}
-
               {error && <div className="form-message error">{error}</div>}
-              {success && <div className="form-message success">{success}</div>}
 
               <button type="submit" className="btn-login" disabled={loading}>
                 {loading ? <Loader2 className="animate-spin" size={18} /> : <>Login <ArrowRight size={18} /></>}
@@ -379,11 +334,29 @@ export default function Auth() {
               </div>
 
               {error && <div className="form-message error">{error}</div>}
-              {success && <div className="form-message success">{success}</div>}
 
               <button type="submit" className="btn-login" disabled={loading}>
                 {loading ? <Loader2 className="animate-spin" size={18} /> : <>Sign Up <ArrowRight size={18} /></>}
               </button>
+
+              {success && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '12px 14px',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(245,158,11,0.08)',
+                  border: '1px solid rgba(245,158,11,0.35)',
+                  marginTop: '12px',
+                  textAlign: 'left'
+                }}>
+                  <ShieldAlert size={18} style={{ color: '#f59e0b', flexShrink: 0 }} />
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: '#f59e0b', lineHeight: 1.4 }}>
+                    You are registered and waiting for Admin approval...
+                  </span>
+                </div>
+              )}
 
               <div className="or-divider">or</div>
 

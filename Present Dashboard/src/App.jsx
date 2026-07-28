@@ -11,6 +11,7 @@ import Learning from './pages/Learning';
 import Domains from './pages/Domains';
 import Auth from './pages/Auth';
 import Admin from './pages/Admin';
+import PendingApproval from './pages/PendingApproval';
 import UnderProgress from './components/UnderProgress';
 import { useAuth } from './contexts/AuthContext';
 
@@ -23,6 +24,7 @@ function App() {
 
   if (loading) return null;
   if (!isAuthenticated) return <Auth />;
+  if (user?.status === 'pending') return <PendingApproval />;
 
   const knownPages = ['dashboard', 'learning', 'domains', 'aptitude', 'council', 'projects', 'profile', 'admin'];
   const isDashboard = activePage === 'dashboard';

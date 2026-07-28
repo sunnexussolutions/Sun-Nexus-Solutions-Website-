@@ -337,11 +337,16 @@ export const deleteUser = async (id) => {
 };
 
 export const updateUserStatus = async (id, status) => {
-  // Update in nexus_users list
-  const updated = getLocal('users').map(u => u.id === id ? { ...u, status } : u);
-  setLocal('users', updated);
+  // Update nexus_users (admin list)
+  setLocal('users', getLocal('users').map(u => u.id === id ? { ...u, status } : u));
 
-  // Also update nexus_user session if it's the same user (so Dashboard reacts immediately)
+  // Update nexus_users fallback list used by PendingApproval
+  try {
+    const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+    localStorage.setItem('nexus_users', JSON.stringify(localUsers.map(u => u.id === id ? { ...u, status } : u)));
+  } catch (e) {}
+
+  // Update active session so App.jsx re-renders immediately
   try {
     const sessionRaw = localStorage.getItem('nexus_user');
     if (sessionRaw) {
@@ -352,12 +357,18 @@ export const updateUserStatus = async (id, status) => {
     }
   } catch (e) {}
 
-  // Notify all listeners
   window.dispatchEvent(new Event('nexus-data-updated'));
 
-  // Sync to cloud
   try {
     await query('UPDATE profiles SET status = $1 WHERE id = $2', [status, id]);
+    if (status === 'active') {
+      await addNotification({
+        user_id: id,
+        title: 'Account Approved',
+        message: 'Admin approved member. Welcome to Nexus hub',
+        type: 'success'
+      });
+    }
   } catch (e) {
     console.warn('Cloud status sync failed, saved locally:', e.message);
   }

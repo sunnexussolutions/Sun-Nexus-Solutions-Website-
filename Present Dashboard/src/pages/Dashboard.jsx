@@ -178,7 +178,7 @@ const Dashboard = () => {
             <div>
               <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#22c55e', display: 'block' }}>ACCOUNT APPROVED</span>
               <h4 style={{ fontSize: '18px', fontWeight: 900, color: '#22c55e', margin: '2px 0 0 0' }}>
-                Welcome to team Nexus
+                Admin approved member. Welcome to Nexus hub
               </h4>
             </div>
           </div>
