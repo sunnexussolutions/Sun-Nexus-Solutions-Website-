@@ -9,11 +9,11 @@ import { useTheme } from '../contexts/ThemeContext';
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
-  { id: 'learning', label: 'My Learning', icon: GraduationCap },
-  { id: 'domains', label: 'Domains', icon: Layers },
-  { id: 'projects', label: 'Projects', icon: Folder },
+  // { id: 'learning', label: 'My Learning', icon: GraduationCap },
+  // { id: 'domains', label: 'Domains', icon: Layers },
+  // { id: 'projects', label: 'Projects', icon: Folder },
   { id: 'aptitude', label: 'Aptitude', icon: Target },
-  { id: 'council', label: 'Council', icon: Users },
+  // { id: 'council', label: 'Council', icon: Users },
   { id: 'profile', label: 'Profile', icon: User },
 ];
 
