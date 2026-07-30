@@ -15,13 +15,8 @@ import {
   getNotifications, addNotification, deleteNotification,
   getProjects, addProject, updateProject, deleteProject,
   getHiringSubmissions, deleteHiringSubmission, updateHiringSubmission, getDomains,
-  getHomeContent, saveHomeContent, DEFAULT_HOME_CONTENT,
-  getDSATopics, getDSAProblems,
-  addDSATopic, updateDSATopic, deleteDSATopic,
-  addDSAProblem, updateDSAProblem, deleteDSAProblem,
-  getDSASolutions, updateDSASolutionStatus, deleteDSASolution,
+  getHomeContent, saveHomeContent, DEFAULT_HOME_CONTENT
 } from '../store/dataStore';
-import AdminDSATab from './AdminDSATab';
 import { 
   extractTextFromPDF, extractTextFromWord, extractQuestionsFromExcel, parseMCQsFromText,
   extractProjectsFromExcel
@@ -35,7 +30,6 @@ const TABS = [
   { id: 'overview',      label: 'Overview',      icon: BarChart3 },
   { id: 'home_content',  label: 'Home Page',     icon: Palette },
   { id: 'assessments',   label: 'Assessments',   icon: BrainCircuit },
-  { id: 'dsa',           label: 'DSA',           icon: Code2 },
   { id: 'submissions',   label: 'Submissions',   icon: FileText },
   { id: 'domains',       label: 'Domains',       icon: Layers },
   { id: 'projects',      label: 'Projects',      icon: Rocket },
@@ -501,27 +495,11 @@ const Admin = () => {
   const [editingDomainId, setEditingDomainId] = useState(null);
   const [editingProjectId, setEditingProjectId] = useState(null);
 
-  // DSA state
-  const [dsaTopics, setDsaTopics] = useState([]);
-  const [dsaProblems, setDsaProblems] = useState([]);
-  const [dsaSelectedTopic, setDsaSelectedTopic] = useState(null);
-  const [showDsaTopicForm, setShowDsaTopicForm] = useState(false);
-  const [showDsaProblemForm, setShowDsaProblemForm] = useState(false);
-  const [editingDsaTopicId, setEditingDsaTopicId] = useState(null);
-  const [editingDsaProblemId, setEditingDsaProblemId] = useState(null);
-  const [dsaTopicForm, setDsaTopicForm] = useState({ name: '', color: '#7b5cff', icon: 'Layers' });
-  const [dsaProblemForm, setDsaProblemForm] = useState({
-    topicId: '', title: '', number: '', difficulty: 'Easy', tags: '',
-    description: '', examples: '', constraints: '', hints: '',
-    timeComplexity: '', spaceComplexity: '', tutorial: '', videoUrl: ''
-  });
-
   // Submissions management state
   const [subSearch, setSubSearch] = useState('');
   const [subCatFilter, setSubCatFilter] = useState('ALL');
   const [subStatusFilter, setSubStatusFilter] = useState('ALL');
   const [selectedSubDetail, setSelectedSubDetail] = useState(null);
-  const [dsaSolutions, setDsaSolutions] = useState([]);
 
   // Dynamic Topic Proficiency Stats calculated from results
   const topicProficiencyStats = React.useMemo(() => {
@@ -603,17 +581,14 @@ const Admin = () => {
   const refresh = React.useCallback(async () => {
     setLoading(true);
     try {
-      const [a, u, r, d, n, s, p, doms, hc, dt, dp] = await Promise.all([
-        getAssessments(), getUsers(), getResults(),
+      const [a, u, r, d, n, s, p, doms, hc] = await Promise.all([
+        getAssessments(), getUsers(), getResults(), 
         getDiscussions(), getNotifications(), getHiringSubmissions(),
-        getProjects(), getDomains(), getHomeContent(),
-        getDSATopics(), getDSAProblems()
+        getProjects(), getDomains(), getHomeContent()
       ]);
-      setAssessments(a); setUsers(u); setResults(r);
+      setAssessments(a); setUsers(u); setResults(r); 
       setDiscussions(d); setNotifications(n); setSubmissions(s);
       setProjects(p); setDomains(doms); setHomeContent(hc);
-      setDsaTopics(dt || []); setDsaProblems(dp || []);
-      setDsaSolutions(getDSASolutions());
     } catch (err) {
       console.error("Refresh error:", err);
     }
@@ -1632,352 +1607,6 @@ const Admin = () => {
         </div>
       )}
 
-      {/* DSA MANAGEMENT TAB */}
-      {tab === 'dsa' && (
-        <AdminDSATab
-          dsaTopics={dsaTopics}
-          setDsaTopics={setDsaTopics}
-          dsaProblems={dsaProblems}
-          setDsaProblems={setDsaProblems}
-        />
-      )}
-
-      {/* ── SUBMISSIONS TAB — DSA + APTITUDE ── */}
-      {tab === 'submissions' && (() => {
-        const subType = subCatFilter || 'dsa'; // reuse subCatFilter as sub-tab selector
-
-        /* ── DSA filtered list ── */
-        const STATUS_COLORS = {
-          pending:  { bg: 'rgba(245,158,11,0.12)',  text: '#f59e0b',  border: 'rgba(245,158,11,0.3)'  },
-          reviewed: { bg: 'rgba(99,102,241,0.12)',  text: '#6366f1',  border: 'rgba(99,102,241,0.3)'  },
-          approved: { bg: 'rgba(34,197,94,0.12)',   text: '#22c55e',  border: 'rgba(34,197,94,0.3)'   },
-          rejected: { bg: 'rgba(239,68,68,0.12)',   text: '#ef4444',  border: 'rgba(239,68,68,0.3)'   },
-        };
-        const filteredDSA = dsaSolutions.filter(s => {
-          const matchSearch = !subSearch ||
-            s.memberName?.toLowerCase().includes(subSearch.toLowerCase()) ||
-            s.memberEmail?.toLowerCase().includes(subSearch.toLowerCase()) ||
-            s.problemTitle?.toLowerCase().includes(subSearch.toLowerCase());
-          const matchStatus = subStatusFilter === 'ALL' || s.status === subStatusFilter;
-          return matchSearch && matchStatus;
-        });
-
-        /* ── Aptitude filtered list ── */
-        const filteredApt = results.filter(r => {
-          const q = subSearch.toLowerCase();
-          const matchSearch = !q ||
-            (r.userName || '').toLowerCase().includes(q) ||
-            (r.userEmail || '').toLowerCase().includes(q) ||
-            (r.topic || '').toLowerCase().includes(q) ||
-            (r.category || '').toLowerCase().includes(q);
-          const pct = r.percentage || 0;
-          const matchStatus = subStatusFilter === 'ALL' ||
-            (subStatusFilter === 'PASS' ? pct >= 60 : pct < 60);
-          return matchSearch && matchStatus;
-        });
-        const totalApt = results.length;
-        const passedApt = results.filter(r => (r.percentage || 0) >= 60).length;
-        const failedApt = results.filter(r => (r.percentage || 0) < 60).length;
-        const avgApt = totalApt > 0 ? Math.round(results.reduce((a, r) => a + (r.percentage || 0), 0) / totalApt) : 0;
-
-        return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-            {/* ── Page Header ── */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-              <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>Submissions</h3>
-                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Review DSA solution uploads and Aptitude quiz results</p>
-              </div>
-              <button onClick={() => { setDsaSolutions(getDSASolutions()); refresh(); }}
-                style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>
-                ↻ Refresh
-              </button>
-            </div>
-
-            {/* ── Sub-Tab Switcher ── */}
-            <div style={{ display: 'flex', gap: '6px', borderBottom: '2px solid var(--border-subtle)', paddingBottom: '0' }}>
-              {[
-                { id: 'dsa',      label: '🧠 DSA Solutions',    count: dsaSolutions.length },
-                { id: 'aptitude', label: '⚡ Aptitude Results', count: results.length },
-              ].map(t => (
-                <button key={t.id} onClick={() => setSubCatFilter(t.id)}
-                  style={{
-                    padding: '10px 20px', border: 'none', cursor: 'pointer', fontWeight: 800, fontSize: '13px',
-                    background: 'transparent', borderBottom: subType === t.id ? '2px solid var(--accent-primary)' : '2px solid transparent',
-                    color: subType === t.id ? 'var(--accent-primary)' : 'var(--text-muted)',
-                    marginBottom: '-2px', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: '8px'
-                  }}>
-                  {t.label}
-                  <span style={{ fontSize: '11px', fontWeight: 900, padding: '2px 8px', borderRadius: '8px',
-                    background: subType === t.id ? 'rgba(99,102,241,0.15)' : 'var(--bg-tertiary)',
-                    color: subType === t.id ? 'var(--accent-primary)' : 'var(--text-muted)' }}>
-                    {t.count}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            {/* ── Shared Search + Status Filter ── */}
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-              <input value={subSearch} onChange={e => setSubSearch(e.target.value)}
-                placeholder={subType === 'dsa' ? 'Search by member or problem…' : 'Search by student, topic, category…'}
-                style={{ flex: 1, minWidth: '220px', padding: '9px 14px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '13px', outline: 'none' }} />
-              {subType === 'dsa'
-                ? ['ALL', 'pending', 'reviewed', 'approved', 'rejected'].map(s => (
-                    <button key={s} onClick={() => setSubStatusFilter(s)}
-                      style={{ padding: '8px 14px', borderRadius: '10px', fontWeight: 700, fontSize: '12px', cursor: 'pointer', border: 'none',
-                        background: subStatusFilter === s ? 'var(--accent-gradient)' : 'var(--bg-secondary)',
-                        color: subStatusFilter === s ? '#fff' : 'var(--text-muted)', textTransform: 'capitalize' }}>
-                      {s}
-                    </button>
-                  ))
-                : (
-                  <select value={subStatusFilter} onChange={e => setSubStatusFilter(e.target.value)}
-                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '10px', padding: '9px 14px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', cursor: 'pointer' }}>
-                    <option value="ALL">All Statuses</option>
-                    <option value="PASS">Passed (≥60%)</option>
-                    <option value="FAIL">Failed (&lt;60%)</option>
-                  </select>
-                )
-              }
-            </div>
-
-            {/* ════════════════════════════════ DSA PANEL ════════════════════════════════ */}
-            {subType === 'dsa' && (
-              <>
-                {filteredDSA.length === 0 ? (
-                  <Card>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '3rem', textAlign: 'center', gap: '12px' }}>
-                      <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <FileText size={28} />
-                      </div>
-                      <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>No DSA Submissions Yet</h4>
-                      <p style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '340px' }}>When members upload and submit their handwritten/typed DSA solutions, they will appear here.</p>
-                    </div>
-                  </Card>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                    {filteredDSA.map(sol => {
-                      const sc = STATUS_COLORS[sol.status] || STATUS_COLORS.pending;
-                      const isExp = selectedSubDetail === sol.id;
-                      return (
-                        <Card key={sol.id} style={{ border: `1px solid ${isExp ? 'var(--accent-primary)' : 'var(--border-subtle)'}`, transition: 'border-color 0.2s' }}>
-                          <div onClick={() => setSelectedSubDetail(isExp ? null : sol.id)}
-                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', cursor: 'pointer', flexWrap: 'wrap' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'var(--accent-gradient)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '16px', flexShrink: 0 }}>
-                                {(sol.memberName || '?').charAt(0).toUpperCase()}
-                              </div>
-                              <div>
-                                <p style={{ fontWeight: 800, fontSize: '14px', color: 'var(--text-primary)', margin: 0 }}>{sol.memberName || 'Unknown'}</p>
-                                <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>{sol.memberEmail}</p>
-                              </div>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>{sol.problemTitle}</span>
-                              <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '8px',
-                                backgroundColor: sol.difficulty === 'Easy' ? 'rgba(34,197,94,0.12)' : sol.difficulty === 'Hard' ? 'rgba(239,68,68,0.12)' : 'rgba(245,158,11,0.12)',
-                                color: sol.difficulty === 'Easy' ? '#22c55e' : sol.difficulty === 'Hard' ? '#ef4444' : '#f59e0b' }}>{sol.difficulty}</span>
-                              <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '8px', backgroundColor: sc.bg, color: sc.text, border: `1px solid ${sc.border}`, textTransform: 'capitalize' }}>{sol.status}</span>
-                              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                                {new Date(sol.submittedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                              </span>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (confirm(`Delete submission by ${sol.memberName || 'this student'} permanently?`)) {
-                                    deleteDSASolution(sol.id);
-                                    setDsaSolutions(getDSASolutions());
-                                    if (selectedSubDetail === sol.id) setSelectedSubDetail(null);
-                                  }
-                                }}
-                                title="Delete submission"
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  width: '28px',
-                                  height: '28px',
-                                  borderRadius: '8px',
-                                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                  color: '#ef4444',
-                                  border: '1px solid rgba(239, 68, 68, 0.2)',
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                <Trash2 size={13} />
-                              </button>
-                            </div>
-                          </div>
-                          {isExp && (
-                            <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                              {sol.imageData && (
-                                <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-tertiary)' }}>
-                                  <img src={sol.imageData} alt="Submitted Solution" style={{ width: '100%', maxHeight: '420px', objectFit: 'contain', display: 'block' }} />
-                                </div>
-                              )}
-                              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                                {[['Topic', sol.topicName], ['Problem', sol.problemTitle], ['Difficulty', sol.difficulty], ['Submitted', new Date(sol.submittedAt).toLocaleString()]].map(([label, val]) => (
-                                  <div key={label} style={{ padding: '8px 14px', borderRadius: '10px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)' }}>
-                                    <p style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 2px 0' }}>{label}</p>
-                                    <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{val || '—'}</p>
-                                  </div>
-                                ))}
-                              </div>
-                              {(sol.notes || sol.solutionNotes || sol.description) && (
-                                <div style={{ padding: '12px 16px', borderRadius: '12px', background: 'rgba(123,92,255,0.06)', border: '1px solid rgba(123,92,255,0.2)' }}>
-                                  <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 4px 0' }}>
-                                    📝 Member Solution Description / Notes
-                                  </p>
-                                  <p style={{ fontSize: '13px', color: 'var(--text-primary)', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                                    {sol.notes || sol.solutionNotes || sol.description}
-                                  </p>
-                                </div>
-                              )}
-                              {sol.adminNote && (
-                                <div style={{ padding: '12px 16px', borderRadius: '12px', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)' }}>
-                                  <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 4px 0' }}>Admin Note</p>
-                                  <p style={{ fontSize: '13px', color: 'var(--text-primary)', margin: 0 }}>{sol.adminNote}</p>
-                                </div>
-                              )}
-                              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', paddingTop: '8px' }}>
-                                <button onClick={() => { updateDSASolutionStatus(sol.id, 'approved'); setDsaSolutions(getDSASolutions()); }}
-                                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', background: 'rgba(34,197,94,0.1)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.25)', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
-                                  <Check size={14} /> Approve
-                                </button>
-                                <button onClick={() => { updateDSASolutionStatus(sol.id, 'rejected'); setDsaSolutions(getDSASolutions()); }}
-                                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.25)', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
-                                  <X size={14} /> Reject
-                                </button>
-                                <button onClick={() => { updateDSASolutionStatus(sol.id, 'reviewed'); setDsaSolutions(getDSASolutions()); }}
-                                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
-                                  <Eye size={14} /> Mark Reviewed
-                                </button>
-                                <button onClick={() => { if (confirm('Delete this submission permanently?')) { deleteDSASolution(sol.id); setDsaSolutions(getDSASolutions()); setSelectedSubDetail(null); } }}
-                                  style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', background: 'rgba(239,68,68,0.06)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.15)', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>
-                                  <Trash2 size={13} /> Delete
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </Card>
-                      );
-                    })}
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* ════════════════════════════════ APTITUDE PANEL ════════════════════════════════ */}
-            {subType === 'aptitude' && (
-              <>
-                {/* Stats Bar */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px' }}>
-                  {[
-                    { label: 'Total Submissions', val: totalApt, color: '#6366f1', bg: 'rgba(99,102,241,0.12)', Icon: FileText },
-                    { label: 'Passed (≥60%)',     val: passedApt, color: '#22c55e', bg: 'rgba(34,197,94,0.12)',  Icon: Check },
-                    { label: 'Failed (<60%)',      val: failedApt, color: '#ef4444', bg: 'rgba(239,68,68,0.12)',  Icon: X },
-                    { label: 'Platform Avg',       val: `${avgApt}%`, color: '#a855f7', bg: 'rgba(168,85,247,0.12)', Icon: TrendingUp },
-                  ].map(({ label, val, color, bg, Icon }) => (
-                    <Card key={label} style={{ padding: '16px 20px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div>
-                          <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>{label}</p>
-                          <h4 style={{ fontSize: '24px', fontWeight: 900, color, margin: '4px 0 0 0' }}>{val}</h4>
-                        </div>
-                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Icon size={20} />
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-
-                {/* Results List */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {filteredApt.length === 0 ? (
-                    <Card><p style={{ textAlign: 'center', color: 'var(--text-muted)', margin: '1.5rem 0' }}>No aptitude submissions match your filters.</p></Card>
-                  ) : (
-                    filteredApt.map((r, i) => {
-                      const pct = r.percentage || 0;
-                      const isPassed = pct >= 60;
-                      return (
-                        <Card key={r.id || i} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: isPassed ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', border: `1px solid ${isPassed ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <BrainCircuit size={20} color={isPassed ? '#22c55e' : '#ef4444'} />
-                              </div>
-                              <div>
-                                <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>{r.userName || r.userEmail || 'Student'}</h4>
-                                <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>{r.userEmail} · <span style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>{r.topic}</span> ({r.category || 'General'})</p>
-                              </div>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                              <div style={{ textAlign: 'right' }}>
-                                <span style={{ fontSize: '12px', fontWeight: 900, padding: '4px 12px', borderRadius: '8px', backgroundColor: isPassed ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: isPassed ? '#22c55e' : '#ef4444' }}>
-                                  {pct}% ({isPassed ? 'PASSED' : 'FAILED'})
-                                </span>
-                                <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>Score: {r.score}/{r.total || 20}</p>
-                              </div>
-                              <div style={{ display: 'flex', gap: '8px' }}>
-                                {r.answers && Object.keys(r.answers).length > 0 && (
-                                  <button onClick={() => setSelectedSubDetail(r)}
-                                    style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                    <Eye size={14} /> Inspect
-                                  </button>
-                                )}
-                                <button onClick={async () => { if (confirm(`Revoke submission for "${r.userName || r.userEmail}" on "${r.topic}"?`)) { await deleteResult(r.id); await refresh(); } }}
-                                  style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <Trash2 size={14} /> Revoke
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)', fontSize: '11px', color: 'var(--text-muted)' }}>
-                            <span>ID: <code style={{ fontSize: '10px' }}>{r.id}</code></span>
-                            <span>Submitted: {r.submittedAt ? new Date(r.submittedAt).toLocaleString() : 'Recently'}</span>
-                          </div>
-                        </Card>
-                      );
-                    })
-                  )}
-                </div>
-
-                {/* Inspect Answers Modal */}
-                {selectedSubDetail && typeof selectedSubDetail === 'object' && selectedSubDetail.answers && (
-                  <div style={{ position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-                    <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-strong)', borderRadius: '24px', width: '100%', maxWidth: '650px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.3)' }}>
-                      <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-tertiary)' }}>
-                        <div>
-                          <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>Answer Inspection</h3>
-                          <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>{selectedSubDetail.userName} · {selectedSubDetail.topic} ({selectedSubDetail.percentage}%)</p>
-                        </div>
-                        <button onClick={() => setSelectedSubDetail(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}>
-                          <X size={22} />
-                        </button>
-                      </div>
-                      <div style={{ padding: '20px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                        {Object.entries(selectedSubDetail.answers || {}).map(([qIdx, ansVal], idx) => (
-                          <div key={idx} style={{ padding: '12px 16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)' }}>
-                            <p style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 6px 0' }}>Question #{Number(qIdx) + 1}</p>
-                            <p style={{ fontSize: '12px', color: 'var(--accent-primary)', fontWeight: 700, margin: 0 }}>Answer: <span style={{ color: 'var(--text-primary)' }}>{String(ansVal)}</span></p>
-                          </div>
-                        ))}
-                      </div>
-                      <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-tertiary)', textAlign: 'right' }}>
-                        <button onClick={() => setSelectedSubDetail(null)} style={{ padding: '10px 24px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>Close</button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        );
-      })()}
-
       {/* ASSESSMENTS (existing code continues...) */}
       {tab === 'assessments' && (
         <div className="flex flex-col gap-5">
@@ -2321,7 +1950,7 @@ const Admin = () => {
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
                           {[
                             { label: 'Total XP',     value: `${u.xp ?? 0} pts`,      color: '#a855f7', icon: Star },
-                            { label: 'Current Streak', value: `${u.streak ?? 0} weeks`, color: '#f59e0b', icon: Zap },
+                            { label: 'Current Streak', value: `${u.streak ?? 0} days`, color: '#f59e0b', icon: Zap },
                             { label: 'Last Login',   value: u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Never', color: '#6366f1', icon: Calendar },
                             { label: 'Avg Accuracy', value: userResults.length ? Math.round(userResults.reduce((a, r) => a + (r.percentage || 0), 0) / userResults.length) + '%' : 'N/A', color: '#22c55e', icon: TrendingUp },
                           ].map((stat, si) => (
@@ -2578,8 +2207,8 @@ const Admin = () => {
       </div>
     )}
 
-    {/* ── HIRING CONTROL CENTER ── */}
-    {tab === 'hiring' && (() => {
+    {/* ── SUBMISSIONS CONTROL CENTER ── */}
+    {tab === 'submissions' && (() => {
       const filteredResults = results.filter(r => {
         const queryStr = (subSearch || '').toLowerCase();
         const matchesSearch = !queryStr || 
