@@ -538,20 +538,17 @@
       const iconLight = document.getElementById('theme-icon-light');
       const themeText = document.getElementById('theme-text');
 
-      let isDark = false;
-      if (savedTheme === 'dark') {
-        isDark = true;
-        doc.classList.add('dark');
-        doc.classList.remove('light');
-        iconDark.classList.remove('hidden');
-        iconLight.classList.add('hidden');
-        themeText.textContent = 'Dark Mode';
-      } else {
+      let isDark = true;
+      if (savedTheme === 'light') {
+        isDark = false;
         doc.classList.remove('dark');
         doc.classList.add('light');
         iconDark.classList.add('hidden');
         iconLight.classList.remove('hidden');
         themeText.textContent = 'Light Mode';
+      } else {
+        doc.classList.add('dark');
+        doc.classList.remove('light');
       }
 
       themeToggle.addEventListener('click', () => {
