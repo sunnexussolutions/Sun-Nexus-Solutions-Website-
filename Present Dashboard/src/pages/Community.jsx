@@ -204,12 +204,16 @@ const Community = () => {
             <div className="flex gap-6 relative z-10">
               <div className="flex flex-col items-center gap-4">
                 <div 
-                  className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-900/60 border border-white/10 overflow-hidden relative z-10 p-0 shadow-lg"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center bg-white overflow-hidden relative z-10 p-1 shadow-lg"
+                  style={{
+                    border: '1px solid rgba(123, 92, 255, 0.35)',
+                    boxShadow: '0 0 16px rgba(123, 92, 255, 0.3)'
+                  }}
                 >
                   <img 
-                    src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png" 
+                    src="/logo_mark.png" 
                     alt="Nexus" 
-                    className="w-full h-full object-contain scale-[2.15]"
+                    className="w-full h-full object-contain object-center"
                   />
                 </div>
                 <div className="w-[1px] flex-1 bg-gradient-to-b from-white/10 via-white/5 to-transparent" />

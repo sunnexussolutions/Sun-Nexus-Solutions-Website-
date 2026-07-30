@@ -709,7 +709,7 @@
           }
           showMsg('loginMessage', 'success', 'Session authorized. Redirecting...');
           localStorage.setItem(SESSION_KEY, JSON.stringify({ name: rows[0].name, email: rows[0].email }));
-          setTimeout(() => { window.location.href = 'Nexus Dashboard Anti/dashboard.html'; }, 1000);
+          setTimeout(() => { window.location.href = 'https://sun-nexus-solutions-website-urs3.vercel.app/'; }, 1000);
           return;
         }
 
@@ -725,7 +725,7 @@
           }
           showMsg('loginMessage', 'success', 'Session authorized. Redirecting...');
           localStorage.setItem(SESSION_KEY, JSON.stringify({ name: local.name, email: local.email }));
-          setTimeout(() => { window.location.href = 'Nexus Dashboard Anti/dashboard.html'; }, 1000);
+          setTimeout(() => { window.location.href = 'https://sun-nexus-solutions-website-urs3.vercel.app/'; }, 1000);
           return;
         }
 
@@ -739,7 +739,7 @@
         } else if (local) {
           showMsg('loginMessage', 'success', 'Session authorized. Redirecting...');
           localStorage.setItem(SESSION_KEY, JSON.stringify({ name: local.name, email: local.email }));
-          setTimeout(() => { window.location.href = 'Nexus Dashboard Anti/dashboard.html'; }, 1000);
+          setTimeout(() => { window.location.href = 'https://sun-nexus-solutions-website-urs3.vercel.app/'; }, 1000);
         } else {
           showMsg('loginMessage', 'error', 'Invalid email or password.');
         }
@@ -796,7 +796,7 @@
       showMsg('loginMessage', 'success', 'Connecting Google authentication...');
       setTimeout(() => {
         localStorage.setItem(SESSION_KEY, JSON.stringify({ name: 'Google User', email: 'user@gmail.com' }));
-        window.location.href = 'Nexus Dashboard Anti/dashboard.html';
+        window.location.href = 'https://sun-nexus-solutions-website-urs3.vercel.app/';
       }, 1000);
     }
   </script>

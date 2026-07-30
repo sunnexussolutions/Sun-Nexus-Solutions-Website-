@@ -1,4 +1,5 @@
 import { query } from '../lib/neon';
+import { getYearWeek, getWeekDiff } from '../contexts/AuthContext';
 
 // Helper for local management
 const getLocal = (key, fallback = []) => {
@@ -311,20 +312,41 @@ export const saveResult = async (res) => {
     console.warn("Cloud save result fallback:", err.message);
   }
 
-  // Increment user streak count by +1 when taking an aptitude test
+  // Weekly streak update when taking an aptitude test: +1 per week, -1 per missed week
   try {
     const rawUser = localStorage.getItem('nexus_user');
     if (rawUser) {
       const u = JSON.parse(rawUser);
       const now = new Date();
       const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-      const newStreak = (Number(u.streak) || 0) + 1;
+      const currentWeek = getYearWeek(now);
+      const lastActiveWeek = u.lastActiveWeek || u.last_active_week || (u.lastActiveDate ? getYearWeek(new Date(u.lastActiveDate)) : null);
+
+      let currentStreak = Number(u.streak) || 0;
+      let newStreak = currentStreak;
+
+      if (!lastActiveWeek) {
+        newStreak = 1;
+      } else {
+        const diff = getWeekDiff(lastActiveWeek, currentWeek);
+        if (diff === 0) {
+          newStreak = currentStreak > 0 ? currentStreak : 1;
+        } else if (diff === 1) {
+          newStreak = (currentStreak > 0 ? currentStreak : 0) + 1;
+        } else if (diff > 1) {
+          const missedWeeks = diff - 1;
+          const streakAfterLoss = Math.max(0, currentStreak - missedWeeks);
+          newStreak = streakAfterLoss + 1;
+        }
+      }
 
       const updatedUser = {
         ...u,
         streak: newStreak,
         lastActiveDate: todayStr,
-        last_active_date: todayStr
+        last_active_date: todayStr,
+        lastActiveWeek: currentWeek,
+        last_active_week: currentWeek
       };
 
       localStorage.setItem('nexus_user', JSON.stringify(updatedUser));
@@ -333,7 +355,7 @@ export const saveResult = async (res) => {
       const localUsers = getLocal('users');
       const updatedLocalUsers = localUsers.map(usr => 
         (usr.id === u.id || usr.email === u.email) 
-          ? { ...usr, streak: newStreak, lastActiveDate: todayStr } 
+          ? { ...usr, streak: newStreak, lastActiveDate: todayStr, lastActiveWeek: currentWeek } 
           : usr
       );
       setLocal('users', updatedLocalUsers, true);
@@ -342,15 +364,15 @@ export const saveResult = async (res) => {
       if (u.id || u.email) {
         query(`
           UPDATE profiles 
-          SET streak = COALESCE(streak, 0) + 1, last_active_date = $1 
-          WHERE id = $2 OR LOWER(email) = $3
-        `, [todayStr, u.id || '', (u.email || '').toLowerCase()]).catch(e => console.warn("Cloud streak increment fallback:", e.message));
+          SET streak = $1, last_active_date = $2, last_active_week = $3
+          WHERE id = $4 OR LOWER(email) = $5
+        `, [newStreak, todayStr, currentWeek, u.id || '', (u.email || '').toLowerCase()]).catch(e => console.warn("Cloud streak update fallback:", e.message));
       }
 
       window.dispatchEvent(new Event('nexus-data-updated'));
     }
   } catch (err) {
-    console.warn("Streak increment on test submission error:", err);
+    console.warn("Weekly streak update on test submission error:", err);
   }
 
   return newRes;
@@ -665,3 +687,175 @@ export const saveHomeContent = async (content) => {
     console.error("Failed to save home content to cloud:", err);
   }
 };
+
+// ── DSA Topics & Problems ─────────────────────────────────────────────────────
+
+// ── DSA Topics & Problems ─────────────────────────────────────────────────────
+
+export const DEFAULT_DSA_TOPICS = [];
+
+export const DEFAULT_DSA_PROBLEMS = [];
+
+
+export const getDSATopics = async () => {
+  const local = getLocal('dsa_topics', null);
+  try {
+    const cloud = await query('SELECT * FROM dsa_topics ORDER BY "order" ASC');
+    if (cloud && cloud.length > 0) {
+      const mapped = cloud.map(t => ({ ...t, createdAt: t.created_at }));
+      setLocal('dsa_topics', mapped, true);
+      return mapped;
+    }
+  } catch (err) { console.warn('Using local DSA topics fallback'); }
+  return local || DEFAULT_DSA_TOPICS;
+};
+
+export const addDSATopic = async (t) => {
+  const id = t.id || crypto.randomUUID();
+  const existing = getLocal('dsa_topics', []);
+  const maxOrder = existing.length > 0 ? Math.max(...existing.map(x => x.order || 0)) : 0;
+  const newT = { ...t, id, order: t.order || maxOrder + 1 };
+  setLocal('dsa_topics', [...existing, newT]);
+  try {
+    await query(
+      'INSERT INTO dsa_topics (id, name, color, icon, "order") VALUES ($1,$2,$3,$4,$5) ON CONFLICT (id) DO UPDATE SET name=$2,color=$3,icon=$4,"order"=$5',
+      [id, t.name, t.color, t.icon, newT.order]
+    );
+  } catch (err) { console.warn('Cloud DSA topic add fallback:', err.message); }
+  return newT;
+};
+
+export const updateDSATopic = async (t) => {
+  setLocal('dsa_topics', getLocal('dsa_topics', []).map(item => item.id === t.id ? { ...item, ...t } : item));
+  try {
+    await query('UPDATE dsa_topics SET name=$1,color=$2,icon=$3,"order"=$4 WHERE id=$5', [t.name, t.color, t.icon, t.order, t.id]);
+  } catch (err) { console.warn('Cloud DSA topic update fallback:', err.message); }
+};
+
+export const deleteDSATopic = async (id) => {
+  setLocal('dsa_topics', getLocal('dsa_topics', []).filter(t => t.id !== id));
+  setLocal('dsa_problems', getLocal('dsa_problems', []).filter(p => p.topicId !== id));
+  try {
+    await query('DELETE FROM dsa_problems WHERE topic_id=$1', [id]);
+    await query('DELETE FROM dsa_topics WHERE id=$1', [id]);
+  } catch (err) { console.warn('Cloud DSA topic delete fallback:', err.message); }
+};
+
+export const getDSAProblems = async (topicId) => {
+  const local = getLocal('dsa_problems', null);
+  try {
+    const sql = topicId
+      ? 'SELECT * FROM dsa_problems WHERE topic_id=$1 ORDER BY "order" ASC'
+      : 'SELECT * FROM dsa_problems ORDER BY "order" ASC';
+    const cloud = await query(sql, topicId ? [topicId] : []);
+    if (cloud && cloud.length > 0) {
+      const mapped = cloud.map(p => ({
+        ...p,
+        topicId:       p.topic_id,
+        examples:      typeof p.examples    === 'string' ? JSON.parse(p.examples)    : (p.examples    || []),
+        constraints:   typeof p.constraints === 'string' ? JSON.parse(p.constraints) : (p.constraints || []),
+        hints:         typeof p.hints       === 'string' ? JSON.parse(p.hints)       : (p.hints       || []),
+        tags:          typeof p.tags        === 'string' ? JSON.parse(p.tags)        : (p.tags        || []),
+        timeComplexity:  p.time_complexity,
+        spaceComplexity: p.space_complexity,
+        videoUrl:        p.video_url,
+        createdAt:       p.created_at,
+      }));
+      if (!topicId) setLocal('dsa_problems', mapped, true);
+      return mapped;
+    }
+  } catch (err) { console.warn('Using local DSA problems fallback'); }
+  const all = local || DEFAULT_DSA_PROBLEMS;
+  return topicId ? all.filter(p => p.topicId === topicId) : all;
+};
+
+export const addDSAProblem = async (p) => {
+  const id = crypto.randomUUID();
+  const existing = getLocal('dsa_problems', []);
+  const topicProbs = existing.filter(x => x.topicId === p.topicId);
+  const maxOrder = topicProbs.length > 0 ? Math.max(...topicProbs.map(x => x.order || 0)) : 0;
+  const newP = { ...p, id, order: p.order || maxOrder + 1 };
+  setLocal('dsa_problems', [...existing, newP]);
+  try {
+    await query(
+      `INSERT INTO dsa_problems (id,topic_id,title,number,difficulty,tags,description,examples,constraints,hints,time_complexity,space_complexity,tutorial,video_url,"order")
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
+      [id, p.topicId, p.title, p.number, p.difficulty,
+       JSON.stringify(p.tags||[]), p.description,
+       JSON.stringify(p.examples||[]), JSON.stringify(p.constraints||[]),
+       JSON.stringify(p.hints||[]), p.timeComplexity, p.spaceComplexity,
+       p.tutorial, p.videoUrl||null, newP.order]
+    );
+  } catch (err) { console.warn('Cloud DSA problem add fallback:', err.message); }
+  return newP;
+};
+
+export const updateDSAProblem = async (p) => {
+  setLocal('dsa_problems', getLocal('dsa_problems', []).map(item => item.id === p.id ? { ...item, ...p } : item));
+  try {
+    await query(
+      `UPDATE dsa_problems SET topic_id=$1,title=$2,number=$3,difficulty=$4,tags=$5,description=$6,examples=$7,constraints=$8,hints=$9,time_complexity=$10,space_complexity=$11,tutorial=$12,video_url=$13,"order"=$14 WHERE id=$15`,
+      [p.topicId, p.title, p.number, p.difficulty,
+       JSON.stringify(p.tags||[]), p.description,
+       JSON.stringify(p.examples||[]), JSON.stringify(p.constraints||[]),
+       JSON.stringify(p.hints||[]), p.timeComplexity, p.spaceComplexity,
+       p.tutorial, p.videoUrl||null, p.order, p.id]
+    );
+  } catch (err) { console.warn('Cloud DSA problem update fallback:', err.message); }
+};
+
+export const deleteDSAProblem = async (id) => {
+  setLocal('dsa_problems', getLocal('dsa_problems', []).filter(p => p.id !== id));
+  try { await query('DELETE FROM dsa_problems WHERE id=$1', [id]); }
+  catch (err) { console.warn('Cloud DSA problem delete fallback:', err.message); }
+};
+
+// ── DSA Solution Submissions (Member → Admin) ────────────────────────────────
+export const getDSASolutions = () => {
+  return getLocal('dsa_solutions', []);
+};
+
+export const addDSASolution = (submission) => {
+  const id = crypto.randomUUID();
+  const newEntry = {
+    id,
+    ...submission,
+    status: 'pending',   // 'pending' | 'reviewed' | 'approved' | 'rejected'
+    submittedAt: new Date().toISOString(),
+  };
+  const existing = getLocal('dsa_solutions', []);
+  setLocal('dsa_solutions', [newEntry, ...existing]);
+  return newEntry;
+};
+
+export const updateDSASolutionStatus = (id, status, adminNote = '') => {
+  const updated = getLocal('dsa_solutions', []).map(s =>
+    s.id === id ? { ...s, status, adminNote, reviewedAt: new Date().toISOString() } : s
+  );
+  setLocal('dsa_solutions', updated);
+};
+
+export const updateDSASolution = (id, updates) => {
+  const updated = getLocal('dsa_solutions', []).map(s =>
+    s.id === id ? { ...s, ...updates, updatedAt: new Date().toISOString() } : s
+  );
+  setLocal('dsa_solutions', updated);
+  return updated.find(s => s.id === id);
+};
+
+export const deleteDSASolution = (id) => {
+  const all = getLocal('dsa_solutions', []);
+  const target = all.find(s => s.id === id);
+  if (target) {
+    const keys = [target.memberId, target.memberEmail].filter(Boolean);
+    keys.forEach(k => {
+      try {
+        const penKey = `nexus_dsa_deleted_penalty_${k}`;
+        const currentPen = Number(localStorage.getItem(penKey) || 0);
+        localStorage.setItem(penKey, String(currentPen + 1));
+      } catch (e) {}
+    });
+  }
+  setLocal('dsa_solutions', all.filter(s => s.id !== id));
+};
+
