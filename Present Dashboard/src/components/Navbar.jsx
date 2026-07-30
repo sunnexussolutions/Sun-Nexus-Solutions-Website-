@@ -10,7 +10,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { getNotifications, markNotificationRead, addNotification } from "../store/dataStore";
 
-const Navbar = ({ toggleSidebar, setActivePage }) => {
+const Navbar = ({ toggleSidebar, setActivePage, isDesktop }) => {
   const { theme } = useTheme();
   const { user, logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -38,9 +38,8 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
 
   const mockSearchResults = [
     { title: "Advanced React Architecture", category: "Course", icon: Zap },
-    { title: "AI Portfolio Builder", category: "Project", icon: Layout },
-    { title: "Quantum Neural Sync", category: "Discussion", icon: MessageSquare },
-    { title: "Bhargav S.", category: "Operator", icon: User },
+    { title: "Distributed Systems Design", category: "Project", icon: Compass },
+    { title: "Algorithmic Complexity", category: "Topic", icon: Layout },
   ].filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   useEffect(() => {
@@ -62,17 +61,17 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
   const profileGroups = [
     { label: "Account", items: [
       { label: "Profile",        desc: "Personal info & settings",  icon: User,        color: "#6366f1", page: "profile" },
-      { label: "Pause Learning", desc: "Hold your course progress", icon: PauseCircle, color: "#f59e0b" },
+      // { label: "Pause Learning", desc: "Hold your course progress", icon: PauseCircle, color: "#f59e0b" },
     ]},
-    { label: "Learning Tools", items: [
-      { label: "Streak Freeze", desc: "Save your daily momentum", icon: Snowflake, color: "#3b82f6" },
-      { label: "Course Speed",  desc: "Global playback controls", icon: Zap,       color: "#eab308" },
-    ]},
-    { label: "Support & Help", items: [
-      { label: "Mentor Support", desc: "Chat with expert guides",       icon: LifeBuoy,    color: "#10b981" },
-      // { label: "Council",        desc: "Sovereign community hub",       icon: MessageSquare, color: "#06b6d4", page: "council" },
-      { label: "Product Tour",   desc: "Explore new platform features", icon: Compass,     color: "#a855f7" },
-    ]},
+    // { label: "Learning Tools", items: [
+    //   { label: "Streak Freeze", desc: "Save your daily momentum", icon: Snowflake, color: "#3b82f6" },
+    //   { label: "Course Speed",  desc: "Global playback controls", icon: Zap,       color: "#eab308" },
+    // ]},
+    // { label: "Support & Help", items: [
+    //   { label: "Mentor Support", desc: "Chat with expert guides",       icon: LifeBuoy,    color: "#10b981" },
+    //   // { label: "Council",        desc: "Sovereign community hub",       icon: MessageSquare, color: "#06b6d4", page: "council" },
+    //   { label: "Product Tour",   desc: "Explore new platform features", icon: Compass,     color: "#a855f7" },
+    // ]},
   ];
 
   const handleMenuItemClick = (item) => {
@@ -108,13 +107,42 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
   );
 
   return (
-    <nav className="nx-navbar" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40, height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.75rem', backgroundColor: navBg, borderBottom: 'none', boxShadow: 'none', transition: 'background-color 0.3s ease' }}>
+    <nav
+      style={{
+        position: 'fixed',
+        top: 0,
+        /*
+         * Navbar positioning strategy:
+         * • On DESKTOP: the main workspace wrapper already has margin-left:260px,
+         *   so the nav just spans the full width of that wrapper.
+         *   left = 260px so it doesn’t overlap the sidebar.
+         * • On MOBILE: left = 0, full width.
+         */
+        left: isDesktop ? '260px' : '0px',
+        right: 0,
+        zIndex: 30,
+        height: 'calc(64px + max(28px, env(safe-area-inset-top, 0px)))',
+        paddingTop: 'max(28px, env(safe-area-inset-top, 0px))',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingLeft: 'max(1.25rem, env(safe-area-inset-left, 0px))',
+        paddingRight: 'max(1.25rem, env(safe-area-inset-right, 0px))',
+        backgroundColor: navBg,
+        borderBottom: 'none',
+        boxShadow: 'none',
+        transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease',
+        boxSizing: 'border-box',
+      }}
+    >
 
-      {/* LEFT: Hamburger + Pill search */}
+      {/* LEFT: Hamburger (Mobile/Tablet only) + Pill search */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, maxWidth: '520px' }}>
-        <button className="lg-hidden" onClick={toggleSidebar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: isDark ? '#94a3b8' : '#64748b', display: 'flex', padding: '4px' }}>
-          <Menu size={22} />
-        </button>
+        {!isDesktop && (
+          <button onClick={toggleSidebar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: isDark ? '#94a3b8' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '10px', transition: 'background 0.2s ease' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+            <Menu size={22} />
+          </button>
+        )}
         <div className="hidden lg-block" ref={searchRef} style={{ position: 'relative', flex: 1 }}>
           <Search size={16} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: searchIcon, pointerEvents: 'none', transition: 'color 0.2s' }} />
           <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onFocus={() => setIsSearchFocused(true)} placeholder="Search for courses, projects..."
@@ -164,7 +192,7 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
                 animate={{ opacity: 1, y: 0, scale: 1 }} 
                 exit={{ opacity: 0, y: 10, scale: 0.97 }} 
                 transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="fixed top-[68px] right-3 left-3 sm:absolute sm:top-[calc(100%+12px)] sm:right-0 sm:left-auto sm:w-[360px]"
+                className="nx-notif-modal"
                 style={{ borderRadius: '20px', zIndex: 100, overflow: 'hidden', border: `1px solid ${navBorder}`, backgroundColor: isDark ? 'rgba(13,15,26,0.98)' : 'rgba(255,255,255,0.98)', backdropFilter: 'blur(20px)', boxShadow: isDark ? '0 20px 50px rgba(0,0,0,0.5)' : '0 20px 50px rgba(0,0,0,0.12)' }}
               >
                 <div style={{ padding: '16px 20px 12px', borderBottom: `1px solid ${navBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -209,11 +237,9 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
-
-        {/* Profile: purple circle avatar + Name + PLATFORM ADMIN + Chevron */}
+        </div>        {/* Profile: purple circle avatar + Name + PLATFORM ADMIN */}
         <div ref={dropdownRef} style={{ position: 'relative' }}>
-          <button onClick={() => { setIsProfileOpen(v => !v); setIsNotifOpen(false); }}
+          <button onClick={() => setActivePage('profile')}
             style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 2px', borderRadius: '12px', transition: 'opacity 0.15s' }}
             onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
@@ -226,91 +252,37 @@ const Navbar = ({ toggleSidebar, setActivePage }) => {
                 {user?.isAdmin ? 'Platform Admin' : 'Verified Member'}
               </span>
             </div>
-            <ChevronDown size={15} strokeWidth={2.5} style={{ color: isDark ? '#64748b' : '#94a3b8', transform: isProfileOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.25s cubic-bezier(0.16,1,0.3,1)', flexShrink: 0 }} />
           </button>
-          <AnimatePresence mode="wait">
-            {isProfileOpen && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10, scale: 0.98 }} 
-                animate={{ opacity: 1, y: 0, scale: 1 }} 
-                exit={{ opacity: 0, y: 10, scale: 0.98 }} 
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="fixed top-[68px] right-3 left-3 sm:absolute sm:top-[calc(100%+12px)] sm:right-0 sm:left-auto sm:w-[320px]"
-                style={{ borderRadius: '24px', overflow: 'hidden', zIndex: 100, border: `1px solid ${navBorder}`, backgroundColor: isDark ? 'rgba(13,15,26,0.98)' : 'rgba(255,255,255,0.98)', backdropFilter: 'blur(20px)', boxShadow: isDark ? '0 20px 50px rgba(0,0,0,0.5)' : '0 20px 50px rgba(0,0,0,0.12)' }}
-              >
-                {/* Header */}
-                <div style={{ padding: '20px', background: 'linear-gradient(135deg, rgba(123,92,255,0.08) 0%, rgba(167,139,250,0.05) 100%)', borderBottom: `1px solid ${navBorder}` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{ position: 'relative' }}>
-                      <AvatarCircle size={52} fontSize={22} />
-                      <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '14px', height: '14px', background: '#22c55e', borderRadius: '50%', border: `2px solid ${navBg}` }} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontWeight: 800, fontSize: '15px', color: isDark ? '#f1f5f9' : '#0f172a', lineHeight: 1.2 }}>{user?.firstName ? `${user.firstName} ${user.lastName || ''}` : (user?.username || 'Nexus Admin')}</p>
-                      <p style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email || 'member@nexus.pro'}</p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px' }}>
-                        <span style={{ padding: '2px 8px', borderRadius: '6px', background: 'rgba(123,92,255,0.12)', fontSize: '10px', fontWeight: 800, color: '#7b5cff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{user?.isAdmin ? 'ADMIN' : (user?.headline || 'PRO')}</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: 'rgba(234,179,8,0.12)', color: '#eab308' }}>
-                          <ZapIcon size={10} fill="currentColor" /><span style={{ fontSize: '10px', fontWeight: 800 }}>128 XP</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ marginTop: '14px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                      <span style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Level Progress</span>
-                      <span style={{ fontSize: '10px', fontWeight: 800, color: '#7b5cff' }}>128 / 200 XP</span>
-                    </div>
-                    <div style={{ height: '5px', borderRadius: '999px', background: 'rgba(123,92,255,0.12)', overflow: 'hidden' }}>
-                      <motion.div initial={{ width: 0 }} animate={{ width: '64%' }} transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }} style={{ height: '100%', borderRadius: '999px', background: 'linear-gradient(135deg, #7b5cff 0%, #a78bfa 100%)' }} />
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
-                      <span style={{ fontSize: '9px', color: '#94a3b8', opacity: 0.6 }}>🔥 12 day streak</span>
-                      <span style={{ fontSize: '9px', color: '#94a3b8', opacity: 0.6 }}>72 XP to next level</span>
-                    </div>
-                  </div>
-                </div>
-                {/* Menu */}
-                <div style={{ padding: '8px', maxHeight: '320px', overflowY: 'auto' }} className="no-scrollbar">
-                  {profileGroups.map((group, gIdx) => (
-                    <div key={gIdx} style={{ marginBottom: '4px' }}>
-                      <div style={{ padding: '8px 12px 4px' }}><span style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#94a3b8', opacity: 0.5 }}>{group.label}</span></div>
-                      {group.items.map((item, iIdx) => (
-                        <button key={iIdx} onClick={() => handleMenuItemClick(item)}
-                          style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '9px 12px', borderRadius: '12px', border: 'none', background: 'transparent', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s' }}
-                          onMouseEnter={e => e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                          <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: `${item.color}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: item.color, flexShrink: 0 }}><item.icon size={17} /></div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f1f5f9' : '#0f172a', lineHeight: 1.2 }}>{item.label}</p>
-                            <p style={{ fontSize: '11px', color: '#94a3b8', marginTop: '1px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.desc}</p>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-                {/* Logout */}
-                <div style={{ padding: '16px', borderTop: `1px solid ${navBorder}`, background: 'rgba(123,92,255,0.02)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                  <motion.button whileHover={{ scale: 1.08, rotate: 5 }} whileTap={{ scale: 0.92 }} onClick={logout}
-                    style={{ width: '52px', height: '52px', background: 'linear-gradient(135deg, #7b5cff 0%, #a78bfa 100%)', borderRadius: '50%', border: 'none', boxShadow: '0 8px 24px rgba(123,92,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                    <LogOut size={22} color="white" strokeWidth={2.5} />
-                  </motion.button>
-                  <p style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Logout</p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+
+          {/* Profile Dropdown Popup (Temporarily Disabled) */}
         </div>
       </div>
 
       <style>{`
-        @media (min-width: 1024px) {
-          .nx-navbar { left: 260px !important; width: calc(100% - 260px) !important; }
-          .lg-block { display: block !important; }
-          .hidden { display: none; }
-          .lg-hidden { display: none !important; }
+        @media (max-width: 639px) {
+          .nx-notif-modal {
+            position: fixed !important;
+            top: calc(64px + max(28px, env(safe-area-inset-top, 0px))) !important;
+            left: 12px !important;
+            right: 12px !important;
+            width: auto !important;
+            max-width: 420px !important;
+            margin: 0 auto !important;
+            max-height: calc(75vh - env(safe-area-inset-top, 0px)) !important;
+          }
         }
+        @media (min-width: 640px) {
+          .nx-notif-modal {
+            position: absolute !important;
+            top: calc(100% + 12px) !important;
+            right: 0 !important;
+            left: auto !important;
+            width: 360px !important;
+            margin: 0 !important;
+            max-height: none !important;
+          }
+        }
+        .lg-block { display: block !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
