@@ -2,7 +2,7 @@ import React from 'react';
 import {
   LayoutGrid, GraduationCap, Layers, Folder,
   Target, Users, User, ShieldCheck, LogOut,
-  Sun, Moon, X
+  Sun, Moon, X, Brain, ChevronDown
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -12,6 +12,11 @@ const NAV_ITEMS = [
   // { id: 'learning', label: 'My Learning', icon: GraduationCap },
   // { id: 'domains', label: 'Domains', icon: Layers },
   // { id: 'projects', label: 'Projects', icon: Folder },
+  { 
+    id: 'dsa', 
+    label: 'DSA', 
+    icon: Brain 
+  },
   { id: 'aptitude', label: 'Aptitude', icon: Target },
   // { id: 'council', label: 'Council', icon: Users },
   { id: 'profile', label: 'Profile', icon: User },
@@ -19,7 +24,7 @@ const NAV_ITEMS = [
 
 const ADMIN_ITEM = { id: 'admin', label: 'Admin Panel', icon: ShieldCheck };
 
-const Sidebar = ({ isOpen, toggleSidebar, activePage, setActivePage }) => {
+const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, setActivePage }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
@@ -27,9 +32,19 @@ const Sidebar = ({ isOpen, toggleSidebar, activePage, setActivePage }) => {
 
   const allItems = isAdmin ? [...NAV_ITEMS, ADMIN_ITEM] : NAV_ITEMS;
 
+  /*
+   * On desktop: sidebar is always shown, no translateX animation.
+   * On mobile: sidebar slides in when mobileDrawerOpen=true, out when false.
+   * Backdrop is handled in App.jsx — NOT here.
+   */
+  const sidebarTranslate = isDesktop
+    ? 'translateX(0)'               // always visible on desktop
+    : mobileDrawerOpen
+      ? 'translateX(0)'             // open drawer on mobile
+      : 'translateX(-100%)';        // closed drawer on mobile
+
   return (
     <aside
-      className="sidebar-aside"
       style={{
         width: '260px',
         minWidth: '260px',
@@ -44,19 +59,21 @@ const Sidebar = ({ isOpen, toggleSidebar, activePage, setActivePage }) => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '1.25rem 1rem',
+        paddingTop: 'max(24px, calc(1rem + env(safe-area-inset-top, 0px)))',
+        paddingBottom: 'max(20px, calc(1rem + env(safe-area-inset-bottom, 0px)))',
+        paddingLeft: 'max(1rem, env(safe-area-inset-left, 0px))',
+        paddingRight: 'max(1rem, env(safe-area-inset-right, 0px))',
+        transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: sidebarTranslate,
         boxSizing: 'border-box',
-        transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease',
-        transform: isOpen
-          ? 'translateX(0)'
-          : typeof window !== 'undefined' && window.innerWidth >= 1024
-          ? 'translateX(0)'
-          : 'translateX(-100%)',
+        overflow: 'hidden',
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', overflowY: 'auto', alignItems: 'stretch' }}>
-        {/* Brand Logo Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', padding: '0 4px', width: '100%', boxSizing: 'border-box' }}>
+
+      {/* Top Header & Navigation Section */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', flex: 1, minHeight: 0, boxSizing: 'border-box' }}>
+        {/* Brand Header */}
+        <div style={{ display: 'flex', items: 'center', justifyContent: 'space-between', width: '100%', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
@@ -65,134 +82,196 @@ const Sidebar = ({ isOpen, toggleSidebar, activePage, setActivePage }) => {
                 minWidth: '42px',
                 minHeight: '42px',
                 borderRadius: '12px',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(123, 92, 255, 0.25)',
-                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.6)' : 'rgba(248, 250, 252, 0.9)',
+                border: isDark ? '1px solid rgba(123, 92, 255, 0.45)' : '1px solid rgba(123, 92, 255, 0.25)',
+                backgroundColor: '#ffffff',
+                boxShadow: isDark ? '0 0 20px rgba(123, 92, 255, 0.35)' : '0 2px 8px rgba(0, 0, 0, 0.05)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 overflow: 'hidden',
                 boxSizing: 'border-box',
-                padding: '0px',
-                flexShrink: 0
+                padding: '4px',
+                flexShrink: 0,
+                transition: 'all 0.3s ease'
               }}
             >
               <img
-                src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png"
+                src="/logo_mark.png"
                 alt="Sun Nexus Logo"
-                style={{ width: '100%', height: '100%', objectFit: 'contain', maxWidth: '100%', maxHeight: '100%', transform: 'scale(2.35)' }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  objectPosition: 'center',
+                  filter: isDark ? 'contrast(1.05)' : 'none'
+                }}
               />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <span style={{ fontSize: '17px', fontWeight: 900, letterSpacing: '-0.02em', color: isDark ? '#f8fafc' : '#0f172a', lineHeight: 1.1 }}>
                 Sun Nexus
               </span>
-              <span style={{ fontSize: '13px', fontWeight: 800, color: '#7b5cff', letterSpacing: '0.01em', lineHeight: 1.1 }}>
+              <span style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.12em', color: '#7b5cff', textTransform: 'uppercase', marginTop: '2px' }}>
                 Solutions
               </span>
             </div>
           </div>
 
-          <button
-            className="lg-hidden"
-            style={{ background: 'none', border: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer', padding: '4px' }}
-            onClick={toggleSidebar}
-          >
-            <X size={20} />
-          </button>
+          {/* Close Button — visible on mobile only (when drawer is open) */}
+          {!isDesktop && (
+            <button
+              onClick={closeMobileDrawer}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                border: 'none',
+                backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                color: isDark ? '#94a3b8' : '#64748b',
+                cursor: 'pointer'
+              }}
+            >
+              <X size={18} />
+            </button>
+          )}
         </div>
 
-        {/* Navigation Stack */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, width: '100%', alignSelf: 'stretch', boxSizing: 'border-box' }}>
+        {/* Navigation Stack (Scrollable) */}
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minHeight: 0, overflowY: 'auto', width: '100%', alignSelf: 'stretch', boxSizing: 'border-box', paddingRight: '2px' }}>
           {allItems.map((item) => {
             const IconComp = item.icon;
-            const isActive = activePage === item.id;
+            const isActive = activePage === item.id || (item.subItems && item.subItems.some(sub => sub.id === activePage)) || (item.id === 'dsa' && activePage.startsWith('dsa'));
+            const isDsaExpanded = activePage === 'dsa' || activePage.startsWith('dsa');
 
             return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActivePage(item.id);
-                  if (typeof window !== 'undefined' && window.innerWidth < 1024) toggleSidebar();
-                }}
-                className={`sidebar-nav-item-row ${isActive ? 'active-item' : ''}`}
-                style={{
-                  width: '100%',
-                  minWidth: '100%',
-                  maxWidth: '100%',
-                  alignSelf: 'stretch',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '11px 16px',
-                  minHeight: '48px',
-                  borderRadius: '12px',
-                  fontSize: '14px',
-                  fontWeight: isActive ? 700 : 500,
-                  border: 'none',
-                  cursor: 'pointer',
-                  boxSizing: 'border-box',
-                  transition: 'all 0.2s ease',
-                  whiteSpace: 'nowrap',
-                  background: isActive
-                    ? 'linear-gradient(135deg, #7b5cff 0%, #a78bfa 100%)'
-                    : 'transparent',
-                  color: isActive
-                    ? '#ffffff'
-                    : (isDark ? '#cbd5e1' : '#1e293b'),
-                  boxShadow: isActive
-                    ? '0 4px 16px rgba(123, 92, 255, 0.35)'
-                    : 'none',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                  <div style={{ width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <IconComp
-                      size={20}
+              <React.Fragment key={item.id}>
+                <button
+                  onClick={() => {
+                    setActivePage(item.id);
+                  }}
+                  className={`sidebar-nav-item-row ${isActive ? 'active-item' : ''}`}
+                  style={{
+                    width: '100%',
+                    minWidth: '100%',
+                    maxWidth: '100%',
+                    alignSelf: 'stretch',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '11px 16px',
+                    minHeight: '48px',
+                    borderRadius: '12px',
+                    fontSize: '14px',
+                    fontWeight: isActive ? 700 : 500,
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxSizing: 'border-box',
+                    transition: 'all 0.2s ease',
+                    whiteSpace: 'nowrap',
+                    background: isActive
+                      ? 'linear-gradient(135deg, #7b5cff 0%, #a78bfa 100%)'
+                      : 'transparent',
+                    color: isActive
+                      ? '#ffffff'
+                      : (isDark ? '#cbd5e1' : '#1e293b'),
+                    boxShadow: isActive
+                      ? '0 4px 16px rgba(123, 92, 255, 0.35)'
+                      : 'none',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                    <div style={{ width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <IconComp
+                        size={20}
+                        style={{
+                          color: isActive
+                            ? '#ffffff'
+                            : (isDark ? '#94a3b8' : '#475569'),
+                          flexShrink: 0,
+                          transition: 'color 0.2s ease',
+                        }}
+                      />
+                    </div>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {item.label}
+                    </span>
+                  </div>
+
+                  {item.subItems && (
+                    <ChevronDown
+                      size={14}
                       style={{
-                        color: isActive
-                          ? '#ffffff'
-                          : (isDark ? '#94a3b8' : '#475569'),
-                        flexShrink: 0,
-                        transition: 'color 0.2s ease',
+                        color: isActive ? '#ffffff' : (isDark ? '#94a3b8' : '#475569'),
+                        transform: isDsaExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s ease'
                       }}
                     />
-                  </div>
-                  <span
-                    className="nav-label"
-                    style={{ fontSize: '14px', fontWeight: isActive ? 700 : 500, color: isActive ? '#ffffff' : (isDark ? '#f8fafc' : '#0f172a'), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}
-                  >
-                    {item.label}
-                  </span>
-                </div>
+                  )}
 
-                {item.badge && (
-                  <span
-                    style={{
-                      padding: '2px 8px',
-                      borderRadius: '9999px',
-                      backgroundColor: '#f59e0b',
-                      color: '#ffffff',
-                      fontSize: '11px',
-                      fontWeight: 800,
-                      flexShrink: 0,
-                      marginLeft: '8px'
-                    }}
-                  >
-                    {item.badge}
-                  </span>
+                  {item.badge && (
+                    <span
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: '9999px',
+                        backgroundColor: '#f59e0b',
+                        color: '#ffffff',
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        flexShrink: 0,
+                        marginLeft: '8px'
+                      }}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+
+                {item.subItems && isDsaExpanded && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '40px', marginTop: '2px', marginBottom: '4px' }}>
+                    {item.subItems.map((sub) => {
+                      const isSubActive = activePage === sub.id || (activePage === 'dsa' && sub.id === 'dsa-overview');
+                      return (
+                        <button
+                          key={sub.id}
+                          onClick={() => {
+                            setActivePage(sub.id);
+                          }}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '7px 12px',
+                            borderRadius: '8px',
+                            fontSize: '13px',
+                            fontWeight: isSubActive ? 700 : 500,
+                            border: 'none',
+                            cursor: 'pointer',
+                            background: isSubActive ? (isDark ? 'rgba(123, 92, 255, 0.2)' : 'rgba(123, 92, 255, 0.12)') : 'transparent',
+                            color: isSubActive ? '#7b5cff' : (isDark ? '#94a3b8' : '#64748b'),
+                            textAlign: 'left'
+                          }}
+                        >
+                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: isSubActive ? '#7b5cff' : (isDark ? '#64748b' : '#94a3b8') }} />
+                          <span>{sub.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
-              </button>
+              </React.Fragment>
             );
           })}
         </nav>
 
         {/* Sidebar Bottom Footer Section */}
-        <div style={{ paddingTop: '1rem', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', alignSelf: 'stretch', boxSizing: 'border-box' }}>
+        <div style={{ paddingTop: '0.75rem', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', alignSelf: 'stretch', boxSizing: 'border-box', flexShrink: 0, marginTop: 'auto' }}>
           {/* User Profile Badge Card */}
           <div
             onClick={() => {
               setActivePage('profile');
-              if (typeof window !== 'undefined' && window.innerWidth < 1024) toggleSidebar();
             }}
             style={{
               padding: '10px 12px',

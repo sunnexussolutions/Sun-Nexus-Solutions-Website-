@@ -1,0 +1,28 @@
+{
+  "appId": "com.nexushub.app",
+  "appName": "Nexus Hub",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#FFFFFF",
+      "showSpinner": false,
+      "androidSplashResourceName": "splash",
+      "splashScaleType": "CENTER_INSIDE",
+      "splashFullScreen": true,
+      "splashImmersive": true
+    },
+    "StatusBar": {
+      "overlaysWebView": false,
+      "style": "DARK",
+      "backgroundColor": "#0f172a"
+    },
+    "Keyboard": {
+      "resize": "body"
+    }
+  }
+}

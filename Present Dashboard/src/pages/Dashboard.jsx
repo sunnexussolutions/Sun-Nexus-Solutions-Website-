@@ -436,14 +436,14 @@ const Dashboard = () => {
                       {user?.streak || 0}
                     </span>
                     <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#f97316', lineHeight: 1 }}>
-                      Days
+                      {(user?.streak || 0) === 1 ? 'Week' : 'Weeks'}
                     </span>
                   </div>
 
                   {(() => {
-                    const currentStreak = user?.streak || 1;
-                    const weekCycleDay = (currentStreak % 7) || 7;
-                    const streakProgressPct = Math.min(100, Math.max(14, Math.round((weekCycleDay / 7) * 100)));
+                    const currentStreak = user?.streak || 0;
+                    const weekCycle = (currentStreak % 4) || (currentStreak > 0 ? 4 : 0);
+                    const streakProgressPct = Math.min(100, Math.max(14, Math.round((weekCycle / 4) * 100)));
                     return (
                       <div 
                         style={{ 
