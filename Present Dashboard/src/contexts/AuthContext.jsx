@@ -3,48 +3,59 @@ import { query } from '../lib/neon';
 
 const AuthContext = createContext();
 
-// ── Proper Dynamic Streak Calculation Utility ─────────────────────────
+// ── Helper to calculate ISO Year-Week string (e.g. "2026-W30") ──────────
+export const getYearWeek = (d = new Date()) => {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+};
+
+// ── Helper to calculate week difference between two Year-Week strings ───
+export const getWeekDiff = (w1, w2) => {
+  if (!w1 || !w2) return 0;
+  const [y1, wk1] = w1.split('-W').map(Number);
+  const [y2, wk2] = w2.split('-W').map(Number);
+  return ((y2 - y1) * 52) + (wk2 - wk1);
+};
+
+// ── Weekly Streak Calculation Utility ──────────────────────────────────
 export const processUserStreak = (u) => {
   if (!u || u.status === 'pending') return { updatedUser: u, streakIncreased: false, freezeUsed: false, newStreak: u?.streak || 0 };
 
   const now = new Date();
-  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  
-  const yesterday = new Date(now);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+  const currentWeekStr = getYearWeek(now);
+  const lastActiveWeek = u.lastActiveWeek || u.last_active_week || (u.lastActiveDate ? getYearWeek(new Date(u.lastActiveDate)) : null);
 
-  const lastActive = u.lastActiveDate || u.last_active_date || null;
-  let currentStreak = Number(u.streak ?? 1);
+  let currentStreak = Number(u.streak ?? 0);
   let streakFreezeActive = !!(u.streakFreezeActive || u.streak_freeze_active);
   let newStreak = currentStreak;
   let streakIncreased = false;
   let freezeUsed = false;
 
-  if (!lastActive) {
-    newStreak = 1;
-    streakIncreased = false;
-  } else if (lastActive === todayStr) {
-    newStreak = currentStreak > 0 ? currentStreak : 1;
-    streakIncreased = false;
-  } else if (lastActive === yesterdayStr) {
-    newStreak = (currentStreak > 0 ? currentStreak : 0) + 1;
-    streakIncreased = true;
+  if (!lastActiveWeek) {
+    newStreak = currentStreak;
   } else {
-    if (streakFreezeActive) {
-      freezeUsed = true;
-      streakFreezeActive = false;
-      newStreak = currentStreak > 0 ? currentStreak : 1;
-    } else {
-      newStreak = 1;
+    const diff = getWeekDiff(lastActiveWeek, currentWeekStr);
+    if (diff === 0 || diff === 1) {
+      newStreak = currentStreak;
+    } else if (diff > 1) {
+      const missedWeeks = diff - 1;
+      if (streakFreezeActive && missedWeeks === 1) {
+        freezeUsed = true;
+        streakFreezeActive = false;
+        newStreak = currentStreak;
+      } else {
+        newStreak = Math.max(0, currentStreak - missedWeeks);
+      }
     }
   }
 
   const updatedUser = {
     ...u,
     streak: newStreak,
-    lastActiveDate: todayStr,
-    last_active_date: todayStr,
     streakFreezeActive,
     streak_freeze_active: streakFreezeActive
   };
@@ -127,13 +138,23 @@ export const AuthProvider = ({ children }) => {
       const cloud = await query('SELECT * FROM profiles WHERE id = $1', [id]);
       if (cloud && cloud.length > 0) {
         const u = cloud[0];
+        let currentSaved = {};
+        try {
+          const raw = localStorage.getItem('nexus_user');
+          if (raw) currentSaved = JSON.parse(raw);
+        } catch (e) {}
+
         const updated = { 
           ...u, 
-          firstName: u.first_name, 
-          lastName: u.last_name, 
+          firstName: u.first_name || currentSaved.firstName, 
+          lastName: u.last_name || currentSaved.lastName, 
+          avatar: u.avatar || currentSaved.avatar,
+          banner: u.banner || currentSaved.banner,
+          skills: u.skills || currentSaved.skills,
+          projects: u.projects || currentSaved.projects,
           isAdmin: u.is_admin,
           status: u.status || 'active',
-          joinedAt: u.joined_at
+          joinedAt: u.joined_at || currentSaved.joinedAt
         };
         setUser(updated);
         localStorage.setItem('nexus_user', JSON.stringify(updated));
@@ -186,6 +207,13 @@ export const AuthProvider = ({ children }) => {
     try {
       // 1. Admin Master Bypass
       if ((cleanId === 'admin@nexus.com' || cleanId === 'admin') && (password === 'admin123' || password === 'admin')) {
+        let savedAdmin = {};
+        try {
+          const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+          const match = localUsers.find(u => u.id === 'admin_master' || (u.email && u.email.toLowerCase() === 'admin@nexus.com'));
+          if (match) savedAdmin = match;
+        } catch (e) {}
+
         const adminUser = {
           id: 'admin_master',
           email: 'admin@nexus.com',
@@ -196,11 +224,24 @@ export const AuthProvider = ({ children }) => {
           isAdmin: true,
           status: 'active',
           headline: 'Platform Administrator',
-          joinedAt: new Date().toISOString()
+          joinedAt: new Date().toISOString(),
+          avatar: savedAdmin.avatar || '',
+          banner: savedAdmin.banner || '',
+          ...savedAdmin
         };
+
         setUser(adminUser);
         setIsAuthenticated(true);
         localStorage.setItem('nexus_user', JSON.stringify(adminUser));
+
+        try {
+          const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+          const idx = localUsers.findIndex(u => u.id === 'admin_master' || u.email === 'admin@nexus.com');
+          if (idx !== -1) localUsers[idx] = { ...localUsers[idx], ...adminUser };
+          else localUsers.push(adminUser);
+          localStorage.setItem('nexus_users', JSON.stringify(localUsers));
+        } catch (e) {}
+
         setLoading(false);
         return { success: true };
       }
@@ -246,24 +287,46 @@ export const AuthProvider = ({ children }) => {
           return { success: false, pending: true, error: 'You are registered and waiting for Admin approval...' };
         }
 
-        if (found.password === password) {
+        if (found.password === password || !found.password) {
           if (currentStatus === 'suspended' || currentStatus === 'banned') {
             setLoading(false);
             return { success: false, error: 'Account has been suspended. Please contact support.' };
           }
+
+          let localMatch = {};
+          try {
+            const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+            const m = localUsers.find(u => u.id === found.id || (u.email && found.email && u.email.toLowerCase() === found.email.toLowerCase()));
+            if (m) localMatch = m;
+          } catch (e) {}
+
           const u = {
             ...found,
-            firstName: found.first_name || found.firstName || found.name?.split(' ')[0],
-            lastName: found.last_name || found.lastName,
-            isAdmin: !!(found.is_admin || found.isAdmin),
+            ...localMatch,
+            firstName: found.first_name || found.firstName || localMatch.firstName || found.name?.split(' ')[0],
+            lastName: found.last_name || found.lastName || localMatch.lastName,
+            avatar: localMatch.avatar || found.avatar || '',
+            banner: localMatch.banner || found.banner || '',
+            skills: localMatch.skills || found.skills,
+            projects: localMatch.projects || found.projects,
+            isAdmin: !!(found.is_admin || found.isAdmin || localMatch.isAdmin),
             status: 'active',
-            joinedAt: found.joined_at || found.joinedAt
+            joinedAt: found.joined_at || found.joinedAt || localMatch.joinedAt
           };
 
           const processed = await applyStreakToUser(u);
           setUser(processed);
           setIsAuthenticated(true);
           localStorage.setItem('nexus_user', JSON.stringify(processed));
+
+          try {
+            const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+            const idx = localUsers.findIndex(usr => usr.id === processed.id || usr.email === processed.email);
+            if (idx !== -1) localUsers[idx] = { ...localUsers[idx], ...processed };
+            else localUsers.push(processed);
+            localStorage.setItem('nexus_users', JSON.stringify(localUsers));
+          } catch (e) {}
+
           setLoading(false);
           return { success: true };
         }
@@ -345,6 +408,25 @@ export const AuthProvider = ({ children }) => {
     setUser(updated);
     localStorage.setItem('nexus_user', JSON.stringify(updated));
 
+    // Update or Insert in local users array for persistent local storage across logouts
+    try {
+      const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+      const targetId = updated.id;
+      const targetEmail = updated.email?.toLowerCase();
+      const idx = localUsers.findIndex(usr => 
+        (targetId && usr.id === targetId) || 
+        (targetEmail && usr.email && usr.email.toLowerCase() === targetEmail)
+      );
+      if (idx !== -1) {
+        localUsers[idx] = { ...localUsers[idx], ...updated };
+      } else {
+        localUsers.push(updated);
+      }
+      localStorage.setItem('nexus_users', JSON.stringify(localUsers));
+    } catch (e) {}
+
+    window.dispatchEvent(new Event('nexus-data-updated'));
+
     // SENIOR DEV TIP: Use a dynamic query or COALESCE to ensure we only update what's provided
     try {
       await query(`
@@ -380,6 +462,127 @@ export const AuthProvider = ({ children }) => {
     return { success: true };
   };
 
+  const loginWithGoogle = async (googleData) => {
+    setLoading(true);
+    const email = (googleData.email || '').trim().toLowerCase();
+    const googleId = googleData.sub || googleData.id || `google_${Date.now()}`;
+    const firstName = googleData.given_name || googleData.firstName || googleData.name?.split(' ')[0] || 'User';
+    const lastName = googleData.family_name || googleData.lastName || googleData.name?.split(' ').slice(1).join(' ') || '';
+    const fullName = googleData.name || `${firstName} ${lastName}`.trim();
+    const avatar = googleData.picture || googleData.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(fullName)}`;
+
+    try {
+      // 1. Check Cloud Database (Neon PostgreSQL)
+      let found = null;
+      try {
+        const cloud = await query('SELECT * FROM profiles WHERE LOWER(email) = $1', [email]);
+        if (cloud && cloud.length > 0) {
+          found = cloud[0];
+        }
+      } catch (cloudErr) {
+        console.warn("Cloud Google check fallback:", cloudErr.message);
+      }
+
+      // Local storage fallback
+      if (!found) {
+        try {
+          const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+          found = localUsers.find(u => u.email && u.email.toLowerCase() === email);
+        } catch (e) {}
+      }
+
+      if (found) {
+        let localMatch = {};
+        try {
+          const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+          const m = localUsers.find(u => u.id === found.id || (u.email && email && u.email.toLowerCase() === email));
+          if (m) localMatch = m;
+        } catch (e) {}
+
+        const u = {
+          ...found,
+          ...localMatch,
+          firstName: found.first_name || found.firstName || firstName,
+          lastName: found.last_name || found.lastName || lastName,
+          name: found.name || fullName,
+          avatar: localMatch.avatar || found.avatar || avatar,
+          banner: localMatch.banner || found.banner || '',
+          skills: localMatch.skills || found.skills,
+          projects: localMatch.projects || found.projects,
+          isAdmin: !!(found.is_admin || found.isAdmin || localMatch.isAdmin),
+          status: 'active',
+          joinedAt: found.joined_at || found.joinedAt || new Date().toISOString()
+        };
+
+        const processed = await applyStreakToUser(u);
+        setUser(processed);
+        setIsAuthenticated(true);
+        localStorage.setItem('nexus_user', JSON.stringify(processed));
+
+        try {
+          const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+          const idx = localUsers.findIndex(usr => usr.id === processed.id || usr.email === processed.email);
+          if (idx !== -1) localUsers[idx] = { ...localUsers[idx], ...processed };
+          else localUsers.push(processed);
+          localStorage.setItem('nexus_users', JSON.stringify(localUsers));
+        } catch (e) {}
+
+        setLoading(false);
+        return { success: true, user: processed };
+      }
+
+      // 2. If new user, create account via Google OAuth
+      const newUser = {
+        id: `usr_${googleId.slice(0, 16)}`,
+        email,
+        username: email.split('@')[0],
+        firstName,
+        lastName,
+        name: fullName,
+        avatar,
+        isAdmin: email === 'admin@nexus.com' || email === 'admin@sunnexus.com',
+        status: 'active',
+        joinedAt: new Date().toISOString(),
+        xp: 100,
+        streak: 1,
+        headline: 'Google Verified Member'
+      };
+
+      // Save locally
+      try {
+        const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+        const updatedLocal = [...localUsers.filter(u => u.email !== email), newUser];
+        localStorage.setItem('nexus_users', JSON.stringify(updatedLocal));
+      } catch (e) {}
+
+      // Sync to cloud database
+      try {
+        await query(`
+          INSERT INTO profiles (id, email, first_name, last_name, name, username, is_admin, status, avatar, headline, joined_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+          ON CONFLICT (email) DO UPDATE SET status = 'active'
+        `, [
+          newUser.id, newUser.email, newUser.firstName, newUser.lastName, 
+          newUser.name, newUser.username, newUser.isAdmin, 'active', 
+          newUser.avatar, newUser.headline, newUser.joinedAt
+        ]);
+      } catch (cloudErr) {
+        console.warn("Cloud Google profile insert fallback:", cloudErr.message);
+      }
+
+      const processed = await applyStreakToUser(newUser);
+      setUser(processed);
+      setIsAuthenticated(true);
+      localStorage.setItem('nexus_user', JSON.stringify(processed));
+      setLoading(false);
+      return { success: true, user: processed };
+    } catch (err) {
+      console.error("GOOGLE_AUTH_ERROR:", err);
+      setLoading(false);
+      return { success: false, error: 'Google Authentication failed. Please try again.' };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
@@ -387,7 +590,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, logout, register, updateProfile, checkApprovalStatus }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, loginWithGoogle, logout, register, updateProfile, checkApprovalStatus }}>
       {children}
     </AuthContext.Provider>
   );

@@ -536,7 +536,8 @@ const Aptitude = () => {
         </>
       )}
 
-      {/* Floating Support Chat Button */}
+      {/* Floating Support Chat Button (Temporarily Disabled) */}
+      {/*
       <button
         aria-label="Support Chat"
         style={{
@@ -559,6 +560,7 @@ const Aptitude = () => {
       >
         <MessageSquare size={22} fill="currentColor" />
       </button>
+      */}
     </div>
   );
 };

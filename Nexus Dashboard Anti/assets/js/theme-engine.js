@@ -1,7 +1,7 @@
 /* ── Theme Engine ── */
 (function () {
-  // Apply saved theme immediately (before paint) to avoid flash
-  const saved = localStorage.getItem('nexus-theme') || 'dark';
+  // Apply saved theme immediately (before paint) to avoid flash; default to light
+  const saved = localStorage.getItem('nexus-theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
 
   document.addEventListener('DOMContentLoaded', () => {
