@@ -244,46 +244,55 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
     setEditImage(sub.imageData || null);
   };
 
-  const handleSaveEditSubmission = () => {
+  const handleSaveEditSubmission = async () => {
     if (!editingSubmission) return;
-    updateDSASolution(editingSubmission.id, {
+    await updateDSASolution(editingSubmission.id, {
       imageData: editImage,
       notes: editNotes,
       solutionNotes: editNotes,
-      status: 'pending' // Re-set status to pending upon edit for admin re-evaluation
+      status: 'pending'
     });
-    const all = getDSASolutions() || [];
-    setMySubmissions(all);
+    const all = await getDSASolutions() || [];
+    const uEmail = user?.email?.toLowerCase();
+    const uId = user?.id;
+    const matched = all.filter(s =>
+      (uEmail && s.memberEmail?.toLowerCase() === uEmail) || (uId && s.memberId === uId)
+    );
+    setMySubmissions(matched.length > 0 ? matched : all);
     setEditingSubmission(null);
-    if (typeof showToast === 'function') {
-      showToast('Submission updated successfully!');
-    }
+    showToast('Submission updated successfully!', 'success');
   };
 
-  const handleDeleteSubmission = (subId) => {
+  const handleDeleteSubmission = async (subId) => {
     if (window.confirm('Are you sure you want to delete this submission?')) {
-      deleteDSASolution(subId);
-      const all = getDSASolutions() || [];
-      setMySubmissions(all);
-      if (typeof showToast === 'function') {
-        showToast('Submission deleted.');
-      }
+      await deleteDSASolution(subId);
+      const all = await getDSASolutions() || [];
+      const uEmail = user?.email?.toLowerCase();
+      const uId = user?.id;
+      const matched = all.filter(s =>
+        (uEmail && s.memberEmail?.toLowerCase() === uEmail) || (uId && s.memberId === uId)
+      );
+      setMySubmissions(matched.length > 0 ? matched : all);
+      showToast('Submission deleted.', 'info');
     }
   };
 
   useEffect(() => {
-    const all = getDSASolutions() || [];
-    if (user?.email || user?.id) {
-      const uEmail = user?.email?.toLowerCase();
-      const uId = user?.id;
-      const matched = all.filter(s =>
-        (uEmail && s.memberEmail?.toLowerCase() === uEmail) ||
-        (uId && s.memberId === uId)
-      );
-      setMySubmissions(matched.length > 0 ? matched : all);
-    } else {
-      setMySubmissions(all);
-    }
+    const loadSubmissions = async () => {
+      const all = await getDSASolutions() || [];
+      if (user?.email || user?.id) {
+        const uEmail = user?.email?.toLowerCase();
+        const uId = user?.id;
+        const matched = all.filter(s =>
+          (uEmail && s.memberEmail?.toLowerCase() === uEmail) ||
+          (uId && s.memberId === uId)
+        );
+        setMySubmissions(matched.length > 0 ? matched : all);
+      } else {
+        setMySubmissions(all);
+      }
+    };
+    loadSubmissions();
   }, [viewMode, isSubmitted, user]);
 
   const filteredMySubmissions = mySubmissions.filter(s =>
