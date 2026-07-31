@@ -1247,14 +1247,20 @@ export default function Profile() {
         githubUrl: formData.githubUrl,
         linkedinUrl: formData.linkedinUrl,
         portfolioUrl: formData.portfolioUrl,
-        avatar: formData.avatar || profileData.avatar
+        avatar: formData.avatar || profileData.avatar,
+        headline: formData.selectedDomain || formData.branch || 'Full Stack Developer',
+        lastUpdated: 'Just now'
       };
       await updateProfile(payload);
       setProfileData(prev => ({
         ...prev,
         name: formData.fullName,
+        email: formData.email,
+        phone: formData.mobileNumber,
+        headline: formData.selectedDomain || formData.branch || 'Full Stack Developer',
         avatar: formData.avatar || prev.avatar,
-        skills: formData.skills
+        skills: formData.skills,
+        lastUpdated: 'Just now'
       }));
       setIsEditModalOpen(false);
     } catch (err) {
@@ -1594,13 +1600,21 @@ export default function Profile() {
               {profileData.headline}
             </p>
 
-            {/* Location & Joined Date */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px', fontSize: '12px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <MapPin size={13} />
-                <span>{profileData.location}</span>
+            {/* Location, Email, Phone & Joined Date */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px', flexWrap: 'wrap', fontSize: '12px', fontWeight: 600 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
+                <MapPin size={13} style={{ color: '#7b5cff' }} />
+                <span>{profileData.location || 'Mumbai, India'}</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
+                <AtSign size={13} style={{ color: '#7b5cff' }} />
+                <span>{profileData.email || 'sunexus.admin@example.com'}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
+                <Phone size={13} style={{ color: '#7b5cff' }} />
+                <span>{profileData.phone || '+91 98765 43210'}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: isDark ? '#64748b' : '#94a3b8', marginLeft: '4px' }}>
                 <Calendar size={13} />
                 <span>Joined {profileData.joined}</span>
               </div>
