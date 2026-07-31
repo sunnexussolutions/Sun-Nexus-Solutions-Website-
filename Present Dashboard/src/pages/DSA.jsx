@@ -238,6 +238,9 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
   const [editNotes, setEditNotes] = useState('');
   const [editImage, setEditImage] = useState(null);
 
+  // Roadmap Modal State
+  const [showRoadmapModal, setShowRoadmapModal] = useState(null);
+
   const handleStartEdit = (sub) => {
     setEditingSubmission(sub);
     setEditNotes(sub.notes || sub.solutionNotes || '');
@@ -820,7 +823,13 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
                   </div>
 
                   <button 
-                    onClick={() => showToast(`View roadmap for ${selectedTopic || 'this topic'}`)}
+                    onClick={() => {
+                      const topicObj = derivedTopics.find(t => t.name === selectedTopic) || { id: 'default', name: selectedTopic || 'Topic' };
+                      if (topicObj.roadmapUrl && (topicObj.roadmapUrl.startsWith('http://') || topicObj.roadmapUrl.startsWith('https://'))) {
+                        window.open(topicObj.roadmapUrl, '_blank');
+                      }
+                      setShowRoadmapModal(topicObj);
+                    }}
                     style={{
                       width: '100%',
                       padding: '10px',
@@ -2077,7 +2086,88 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
         </div>
       )}
 
-      {/* Removed mobile-bottom-nav as requested */}
+      {/* ── TOPIC ROADMAP MODAL ── */}
+      {showRoadmapModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.75)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: isDark ? '#121625' : '#ffffff',
+            border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`,
+            borderRadius: '24px',
+            padding: '24px',
+            width: '100%',
+            maxWidth: '540px',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.4)',
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'linear-gradient(135deg, #7b5cff, #4f46e5)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <BookOpen size={20} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+                    {showRoadmapModal.name || 'Topic'} Roadmap
+                  </h3>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: '#7b5cff', margin: '2px 0 0 0' }}>
+                    {dsaProblems.filter(p => p.topicId === showRoadmapModal.id || p.topicName === showRoadmapModal.name).length} Structured Problems
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => setShowRoadmapModal(null)} style={{ padding: '6px', borderRadius: '8px', background: isDark ? '#1e293b' : '#f1f5f9', border: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}>
+                <X size={18} />
+              </button>
+            </div>
+
+            {showRoadmapModal.roadmapContent ? (
+              <div style={{ fontSize: '13px', color: isDark ? '#cbd5e1' : '#334155', lineHeight: 1.6, padding: '14px', borderRadius: '14px', background: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.1)' : '#e2e8f0'}` }}>
+                {showRoadmapModal.roadmapContent}
+              </div>
+            ) : (
+              <p style={{ fontSize: '13px', color: isDark ? '#94a3b8' : '#64748b', margin: 0 }}>
+                Follow this study roadmap to master <strong>{showRoadmapModal.name || 'this topic'}</strong>:
+              </p>
+            )}
+
+            {/* Problem Roadmap Sequence */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: isDark ? '#94a3b8' : '#64748b' }}>
+                Topic Learning Path
+              </span>
+              {dsaProblems.filter(p => p.topicId === showRoadmapModal.id || p.topicName === showRoadmapModal.name).map((prob, pIdx) => (
+                <div key={prob.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderRadius: '12px', background: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.1)' : '#e2e8f0'}` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'rgba(123, 92, 255, 0.15)', color: '#7b5cff', fontSize: '11px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{pIdx + 1}</span>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>{prob.title}</span>
+                  </div>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: prob.difficulty === 'Easy' ? '#10b981' : prob.difficulty === 'Medium' ? '#f59e0b' : '#ef4444' }}>{prob.difficulty}</span>
+                </div>
+              ))}
+            </div>
+
+            {showRoadmapModal.roadmapUrl && (
+              <a href={showRoadmapModal.roadmapUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '14px', background: 'linear-gradient(135deg, #7b5cff, #4f46e5)', color: '#fff', fontWeight: 800, fontSize: '13px', textDecoration: 'none' }}>
+                <span>Open Interactive Roadmap</span>
+                <ArrowRight size={14} />
+              </a>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   );

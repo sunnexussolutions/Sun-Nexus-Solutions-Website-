@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Code2, Plus, Trash2, Save, Edit3, Brain } from "lucide-react";
 import {
@@ -36,7 +36,7 @@ const serializeExamples = (examples) => {
   ).join("\n---\n");
 };
 
-const EMPTY_TOPIC = { name: "", color: "#7b5cff", icon: "Layers" };
+const EMPTY_TOPIC = { name: "", color: "#7b5cff", icon: "Layers", roadmapUrl: "", roadmapContent: "" };
 const EMPTY_PROBLEM = { topicId: "", title: "", number: "", difficulty: "Easy", tags: "", description: "", examples: "", constraints: "", hints: "", timeComplexity: "", spaceComplexity: "", tutorial: "", videoUrl: "" };
 
 export default function AdminDSATab({ dsaTopics, setDsaTopics, dsaProblems, setDsaProblems }) {
@@ -54,7 +54,13 @@ export default function AdminDSATab({ dsaTopics, setDsaTopics, dsaProblems, setD
     : dsaProblems;
 
   const openTopicForm = (topic = null) => {
-    setTopicForm(topic ? { name: topic.name, color: topic.color, icon: topic.icon } : EMPTY_TOPIC);
+    setTopicForm(topic ? {
+      name: topic.name || "",
+      color: topic.color || "#7b5cff",
+      icon: topic.icon || "Layers",
+      roadmapUrl: topic.roadmapUrl || topic.roadmap_url || "",
+      roadmapContent: topic.roadmapContent || topic.roadmap_content || ""
+    } : EMPTY_TOPIC);
     setEditingTopicId(topic ? topic.id : null);
     setShowProblemForm(false);
     setShowTopicForm(true);
@@ -187,6 +193,14 @@ export default function AdminDSATab({ dsaTopics, setDsaTopics, dsaProblems, setD
                   <select value={topicForm.icon} onChange={e => setTopicForm(f => ({ ...f, icon: e.target.value }))} style={iS}>
                     {DSA_ICONS.map(ic => <option key={ic} value={ic}>{ic}</option>)}
                   </select>
+                </div>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label style={lS}>Topic Roadmap URL (Optional)</label>
+                  <input value={topicForm.roadmapUrl} onChange={e => setTopicForm(f => ({ ...f, roadmapUrl: e.target.value }))} placeholder="e.g. https://neetcode.io/roadmap or custom link" style={iS} />
+                </div>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label style={lS}>Topic Roadmap Guide / Notes (Optional)</label>
+                  <textarea value={topicForm.roadmapContent} onChange={e => setTopicForm(f => ({ ...f, roadmapContent: e.target.value }))} placeholder="Describe the recommended learning path or study order for this topic..." style={{ ...tS, minHeight: "70px" }} />
                 </div>
               </div>
               <div style={{ display: "flex", gap: "10px" }}>
