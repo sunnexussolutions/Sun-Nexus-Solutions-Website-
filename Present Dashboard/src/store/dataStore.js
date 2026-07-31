@@ -737,7 +737,12 @@ export const getDSATopics = async () => {
   try {
     const cloud = await query('SELECT * FROM dsa_topics ORDER BY "order" ASC');
     if (cloud && cloud.length > 0) {
-      const mapped = cloud.map(t => ({ ...t, createdAt: t.created_at }));
+      const mapped = cloud.map(t => ({
+        ...t,
+        roadmapUrl: t.roadmap_url,
+        roadmapContent: t.roadmap_content,
+        createdAt: t.created_at
+      }));
       setLocal('dsa_topics', mapped, true);
       return mapped;
     }
@@ -753,8 +758,8 @@ export const addDSATopic = async (t) => {
   setLocal('dsa_topics', [...existing, newT]);
   try {
     await query(
-      'INSERT INTO dsa_topics (id, name, color, icon, "order") VALUES ($1,$2,$3,$4,$5) ON CONFLICT (id) DO UPDATE SET name=$2,color=$3,icon=$4,"order"=$5',
-      [id, t.name, t.color, t.icon, newT.order]
+      'INSERT INTO dsa_topics (id, name, color, icon, "order", roadmap_url, roadmap_content) VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT (id) DO UPDATE SET name=$2,color=$3,icon=$4,"order"=$5,roadmap_url=$6,roadmap_content=$7',
+      [id, t.name, t.color, t.icon, newT.order, t.roadmapUrl || null, t.roadmapContent || null]
     );
   } catch (err) { console.warn('Cloud DSA topic add fallback:', err.message); }
   return newT;
@@ -763,7 +768,7 @@ export const addDSATopic = async (t) => {
 export const updateDSATopic = async (t) => {
   setLocal('dsa_topics', getLocal('dsa_topics', []).map(item => item.id === t.id ? { ...item, ...t } : item));
   try {
-    await query('UPDATE dsa_topics SET name=$1,color=$2,icon=$3,"order"=$4 WHERE id=$5', [t.name, t.color, t.icon, t.order, t.id]);
+    await query('UPDATE dsa_topics SET name=$1,color=$2,icon=$3,"order"=$4,roadmap_url=$5,roadmap_content=$6 WHERE id=$7', [t.name, t.color, t.icon, t.order, t.roadmapUrl || null, t.roadmapContent || null, t.id]);
   } catch (err) { console.warn('Cloud DSA topic update fallback:', err.message); }
 };
 
