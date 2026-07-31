@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Timer, CheckCircle, XCircle, ChevronRight, BookOpen, BarChart2, ArrowRight, FileText, Lightbulb } from 'lucide-react';
+import { X, Timer, CheckCircle, XCircle, ChevronRight, ChevronLeft, BookOpen, BarChart2, ArrowRight, FileText, Lightbulb } from 'lucide-react';
 import { saveResult } from '../store/dataStore';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -75,6 +75,11 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
   const questions = assessment?.questions || [];
   const total = questions.length || 20;
 
+  // Sync selected option state when moving between questions
+  useEffect(() => {
+    setSelected(answers[current] !== undefined ? answers[current] : null);
+  }, [current]);
+
   const handleSubmit = useCallback((finalAnswers) => {
     if (submitted) return;
     setSubmitted(true);
@@ -128,15 +133,23 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
   const handleSelect = (optIdx) => {
     if (submitted) return;
     setSelected(optIdx);
+    setAnswers(prev => ({ ...prev, [current]: optIdx }));
+  };
+
+  const handlePrev = () => {
+    if (current > 0) {
+      setShowHint(false);
+      setCurrent(c => c - 1);
+    }
   };
 
   const handleNext = () => {
-    if (selected === null) return;
-    setAnswers(prev => ({ ...prev, [current]: selected }));
-    setSelected(null);
     setShowHint(false);
-    if (current < total - 1) setCurrent(c => c + 1);
-    else handleSubmit({ ...answers, [current]: selected });
+    if (current < total - 1) {
+      setCurrent(c => c + 1);
+    } else {
+      handleSubmit({ ...answers, ...(selected !== null ? { [current]: selected } : {}) });
+    }
   };
 
   const q = questions[current];
@@ -184,7 +197,8 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
           }}
         >
           {phase === 'quiz' && q && (
-            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {/* Header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
                   <p style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#64748b', marginBottom: '2px' }}>
@@ -208,10 +222,45 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                 </div>
               </div>
 
+              {/* Question Index Pills Selector */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none' }}>
+                {questions.map((_, idx) => {
+                  const isCurrent = idx === current;
+                  const isAnswered = answers[idx] !== undefined;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => { setShowHint(false); setCurrent(idx); }}
+                      style={{
+                        width: '26px',
+                        height: '26px',
+                        minWidth: '26px',
+                        borderRadius: '8px',
+                        fontSize: '11.5px',
+                        fontWeight: 800,
+                        border: isCurrent ? '2px solid #5b46e0' : '1px solid #e2e8f0',
+                        backgroundColor: isCurrent ? '#5b46e0' : (isAnswered ? '#eeeffe' : '#f8fafc'),
+                        color: isCurrent ? '#ffffff' : (isAnswered ? '#5b46e0' : '#64748b'),
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.2s',
+                        flexShrink: 0
+                      }}
+                    >
+                      {idx + 1}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Progress Bar */}
               <div style={{ height: '5px', background: '#f1f5f9', borderRadius: '999px', overflow: 'hidden' }}>
                 <motion.div animate={{ width: `${((current + 1) / total) * 100}%` }} style={{ height: '100%', background: '#6366f1', borderRadius: '999px' }} />
               </div>
 
+              {/* Question Statement Container */}
               <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '0.875rem', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Question Statement</span>
@@ -268,6 +317,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                 );
               })()}
 
+              {/* Options */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {q.options.map((opt, i) => {
                   const isSelected = selected === i;
@@ -293,20 +343,58 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                 })}
               </div>
 
-              <motion.button
-                whileTap={{ scale: 0.98 }}
-                onClick={handleNext}
-                disabled={selected === null}
-                style={{
-                  width: '100%', padding: '12px', borderRadius: '12px', fontWeight: 800,
-                  fontSize: '13px', color: 'white', border: 'none', cursor: selected !== null ? 'pointer' : 'not-allowed',
-                  background: selected !== null ? '#5b46e0' : '#cbd5e1',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                }}
-              >
-                {current < total - 1 ? 'Next Question' : 'Submit Assessment'}
-                <ChevronRight size={15} />
-              </motion.button>
+              {/* ── PREVIOUS & NEXT / SUBMIT BUTTONS ROW ── */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handlePrev}
+                  disabled={current === 0}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '12px',
+                    fontWeight: 800,
+                    fontSize: '13px',
+                    color: current === 0 ? '#94a3b8' : '#475569',
+                    border: '1.5px solid #cbd5e1',
+                    backgroundColor: current === 0 ? '#f1f5f9' : '#ffffff',
+                    cursor: current === 0 ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <ChevronLeft size={16} />
+                  <span>Previous</span>
+                </motion.button>
+
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleNext}
+                  style={{
+                    flex: 1.2,
+                    padding: '12px',
+                    borderRadius: '12px',
+                    fontWeight: 800,
+                    fontSize: '13px',
+                    color: 'white',
+                    border: 'none',
+                    cursor: 'pointer',
+                    backgroundColor: '#5b46e0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    boxShadow: '0 4px 12px rgba(91, 70, 224, 0.3)',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <span>{current < total - 1 ? 'Next Question' : 'Submit Assessment'}</span>
+                  <ChevronRight size={16} />
+                </motion.button>
+              </div>
             </div>
           )}
 
