@@ -6,7 +6,7 @@ import {
   CheckCircle2, Sparkles, Plus, Trash2, Loader2, Target, ArrowLeft, User,
   AtSign, Phone, GraduationCap, Lock, Briefcase, BarChart2, Link as LinkIcon,
   Eye, EyeOff, Sun, Moon, Globe, Check, Building, Sliders, Bell,
-  ThumbsUp, PieChart, Folder, FileText, LayoutGrid, ExternalLink
+  ThumbsUp, PieChart, Flame, ClipboardList, ExternalLink, FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
@@ -1204,7 +1204,7 @@ export default function Profile() {
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
   const [selectedProjectType, setSelectedProjectType] = useState('completed');
-  const [activeProfileTab, setActiveProfileTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Profile local data
   const [profileData, setProfileData] = useState({
@@ -1427,373 +1427,565 @@ export default function Profile() {
   }
 
   return (
-    <div style={{ width: '100%', maxWidth: '1080px', margin: '0 auto', paddingBottom: '40px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ width: '100%', maxWidth: '1240px', margin: '0 auto', padding: '0 16px 40px 16px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      
+      {/* ── BREADCRUMB HEADER ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>
+        <span>Dashboard</span>
+        <span>›</span>
+        <span style={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 800 }}>Profile</span>
+      </div>
 
-      {/* ════════════════════════════════════════════════════════════════════════ */}
-      {/* 1. MAIN PROFILE CARD (COVER BANNER + IDENTITY + 4 METRIC STATS)           */}
-      {/* ════════════════════════════════════════════════════════════════════════ */}
-      <div style={cardStyle}>
-        
-        {/* Cover Banner */}
-        <div style={{
-          height: '190px',
-          position: 'relative',
-          background: profileData.banner
-            ? `url(${profileData.banner}) center/cover no-repeat`
-            : 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 50%, #3730a3 100%)',
-          overflow: 'hidden'
-        }}>
-          {/* Subtle grid pattern overlay */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
-            backgroundSize: '20px 20px',
-            opacity: 0.6
-          }} />
+      {/* ── TOP BANNER CARD ── */}
+      <div style={{
+        ...cardStyle,
+        padding: '24px',
+        position: 'relative',
+        background: isDark
+          ? 'linear-gradient(135deg, #121625 0%, #0d0f1a 100%)'
+          : 'linear-gradient(135deg, #ffffff 0%, #fcfaff 100%)',
+        border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '20px'
+      }}>
+        {/* Subtle Isometric Hexagon SVG Background Overlay on Right */}
+        <svg style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '45%', opacity: isDark ? 0.08 : 0.15, pointerEvents: 'none' }} viewBox="0 0 400 200">
+          <polygon points="200,20 240,40 240,80 200,100 160,80 160,40" fill="none" stroke="#7b5cff" strokeWidth="1.5" />
+          <polygon points="280,60 320,80 320,120 280,140 240,120 240,80" fill="none" stroke="#7b5cff" strokeWidth="1.5" />
+          <polygon points="120,60 160,80 160,120 120,140 80,120 80,80" fill="none" stroke="#7b5cff" strokeWidth="1.5" />
+          <polygon points="200,100 240,120 240,160 200,180 160,160 160,120" fill="none" stroke="#7b5cff" strokeWidth="1.5" />
+          <polygon points="360,20 400,40 400,80 360,100 320,80 320,40" fill="none" stroke="#7b5cff" strokeWidth="1.5" />
+        </svg>
 
-          {/* Banner Edit Button (Bottom Right) */}
-          <label style={{
-            position: 'absolute',
-            bottom: '16px',
-            right: '24px',
-            padding: '6px 14px',
-            borderRadius: '999px',
-            backgroundColor: 'rgba(0, 0, 0, 0.45)',
-            backdropFilter: 'blur(8px)',
-            color: '#ffffff',
-            fontSize: '11.5px',
-            fontWeight: 700,
-            border: '1px solid rgba(255, 255, 255, 0.25)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-            transition: 'all 0.2s ease',
-            zIndex: 10
-          }}>
-            {uploading.banner ? <Loader2 size={13} className="animate-spin" /> : <Camera size={13} />}
-            <span>Change Cover</span>
-            <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'banner')} />
-          </label>
-
-          {/* Edit Profile Pill Button (Top Right) */}
-          <button
-            onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }}
-            style={{
-              position: 'absolute',
-              top: '20px',
-              right: '24px',
-              padding: '8px 20px',
-              borderRadius: '999px',
-              border: '1.5px solid rgba(255, 255, 255, 0.85)',
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              backdropFilter: 'blur(8px)',
-              color: '#ffffff',
-              fontSize: '13px',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-            onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.transform = 'translateY(0)'; }}
-          >
-            <Edit3 size={15} />
-            <span>Edit Profile</span>
-          </button>
-        </div>
-
-        {/* Identity & Details Section */}
-        <div style={{ padding: '0 28px 24px 28px', position: 'relative' }}>
-          
-          {/* Avatar & Elite Member Badge Row */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-            
-            {/* Avatar Circle */}
-            <div style={{ position: 'relative', marginTop: '-60px' }}>
-              <div style={{
-                width: '124px',
-                height: '124px',
-                borderRadius: '50%',
-                border: `4px solid ${isDark ? '#0d0f1a' : '#ffffff'}`,
-                boxShadow: '0 8px 25px rgba(0,0,0,0.3)',
-                background: 'linear-gradient(135deg, #7b5cff 0%, #a78bfa 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#ffffff',
-                fontSize: '48px',
-                fontWeight: 900,
-                overflow: 'hidden'
-              }}>
-                {profileData.avatar ? (
-                  <img src={profileData.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  (profileData.name || 'N').charAt(0).toUpperCase()
-                )}
-              </div>
-
-              {/* Avatar Camera Button */}
-              <label style={{
-                position: 'absolute',
-                bottom: '4px',
-                right: '4px',
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                backgroundColor: '#7b5cff',
-                color: '#ffffff',
-                border: `2.5px solid ${isDark ? '#121625' : '#ffffff'}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-              }}>
-                {uploading.avatar ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
-                <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'avatar')} />
-              </label>
-            </div>
-
-            {/* Elite Member Badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', zIndex: 2 }}>
+          {/* Avatar with Camera Icon Badge */}
+          <div style={{ position: 'relative' }}>
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
-              borderRadius: '999px',
-              backgroundColor: isDark ? 'rgba(123, 92, 255, 0.18)' : '#f3e8ff',
-              border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.3)' : '#e9d5ff'}`,
-              color: '#7b5cff',
-              fontSize: '11px',
-              fontWeight: 900,
-              letterSpacing: '0.05em',
-              marginBottom: '8px'
+              width: '100px', height: '100px', borderRadius: '50%',
+              backgroundColor: '#7b5cff', color: '#ffffff', fontSize: '38px', fontWeight: 900,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+              boxShadow: '0 8px 24px rgba(123, 92, 255, 0.25)',
+              border: `3px solid ${isDark ? '#1e293b' : '#ffffff'}`
             }}>
-              <Star size={13} fill="#f59e0b" color="#f59e0b" />
-              <span>ELITE MEMBER</span>
+              {profileData.avatar ? (
+                <img src={profileData.avatar} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                (profileData.name || 'N').charAt(0).toUpperCase()
+              )}
             </div>
-
+            <label style={{
+              position: 'absolute', bottom: '2px', right: '2px', width: '28px', height: '28px',
+              borderRadius: '50%', backgroundColor: '#ffffff', color: '#0f172a',
+              border: '1.5px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
+            }}>
+              <Camera size={13} />
+              <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'avatar')} />
+            </label>
           </div>
 
-          {/* User Name & Metadata */}
-          <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <h1 style={{
-              fontSize: '26px',
-              fontWeight: 900,
-              color: isDark ? '#f8fafc' : '#0f172a',
-              margin: 0,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.2
-            }}>
-              {profileData.name}
-            </h1>
-            <p style={{
-              fontSize: '13.5px',
-              fontWeight: 600,
-              color: isDark ? '#94a3b8' : '#64748b',
-              margin: 0
-            }}>
+          {/* User Details */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <h2 style={{ fontSize: '24px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0, lineHeight: 1.1 }}>
+                {profileData.name}
+              </h2>
+              <span style={{
+                padding: '4px 10px', borderRadius: '999px',
+                backgroundColor: isDark ? 'rgba(123, 92, 255, 0.2)' : '#f3e8ff',
+                border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.3)' : '#e9d5ff'}`,
+                color: '#7b5cff', fontSize: '10.5px', fontWeight: 900, letterSpacing: '0.05em'
+              }}>
+                PLATFORM ADMIN
+              </span>
+            </div>
+            <p style={{ fontSize: '14px', fontWeight: 700, color: '#7b5cff', margin: 0 }}>
               {profileData.headline}
             </p>
+            <p style={{ fontSize: '13px', fontWeight: 500, color: isDark ? '#94a3b8' : '#64748b', margin: 0 }}>
+              {profileData.bio}
+            </p>
 
-            {/* Location, Email, Phone & Joined Date */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px', flexWrap: 'wrap', fontSize: '12px', fontWeight: 600 }}>
+            {/* Contact Glass Badges Row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '6px', flexWrap: 'wrap', fontSize: '12px', fontWeight: 600 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
                 <MapPin size={13} style={{ color: '#7b5cff' }} />
                 <span>{profileData.location || 'Mumbai, India'}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
                 <AtSign size={13} style={{ color: '#7b5cff' }} />
-                <span>{profileData.email || 'sunexus.admin@example.com'}</span>
+                <span>{profileData.email || 'nexus.admin.dev@gmail.com'}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
                 <Phone size={13} style={{ color: '#7b5cff' }} />
-                <span>{profileData.phone || '+91 98765 43210'}</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: isDark ? '#64748b' : '#94a3b8', marginLeft: '4px' }}>
-                <Calendar size={13} />
-                <span>Joined {profileData.joined}</span>
+                <span>{profileData.phone || '+91 91234 56789'}</span>
               </div>
             </div>
           </div>
-
         </div>
 
-        {/* 4 Metric Stats Grid Bar */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-          borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9'}`,
-          backgroundColor: isDark ? '#0d0f1a' : '#fafafa'
-        }}>
-          {stats.map((st, idx) => (
-            <div key={st.label} style={{
-              padding: '20px 16px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRight: idx < stats.length - 1 ? `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9'}` : 'none',
-              textAlign: 'center'
-            }}>
-              <div style={{
-                color: '#7b5cff',
-                marginBottom: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <st.icon size={22} />
-              </div>
-              <div style={{
-                fontSize: '28px',
-                fontWeight: 900,
-                color: isDark ? '#f8fafc' : '#0f172a',
-                lineHeight: 1
-              }}>
-                {st.value}
-              </div>
-              <div style={{
-                fontSize: '11px',
-                fontWeight: 800,
-                color: isDark ? '#64748b' : '#94a3b8',
-                letterSpacing: '0.08em',
-                marginTop: '6px'
-              }}>
-                {st.label}
-              </div>
-            </div>
-          ))}
-        </div>
-
+        {/* Edit Profile Button */}
+        <button
+          onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }}
+          style={{
+            padding: '8px 18px', borderRadius: '12px',
+            border: '1.5px solid #c084fc', backgroundColor: isDark ? 'rgba(192, 132, 252, 0.1)' : '#ffffff',
+            color: '#7b5cff', fontSize: '13px', fontWeight: 800, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '6px', zIndex: 2
+          }}
+        >
+          <Edit3 size={15} />
+          <span>Edit Profile</span>
+        </button>
       </div>
 
-      {/* ════════════════════════════════════════════════════════════════════════ */}
-      {/* 2. PROJECT HUB SECTION (MIDDLE CARD)                                     */}
-      {/* ════════════════════════════════════════════════════════════════════════ */}
-      <div style={{ ...cardStyle, padding: '24px' }}>
-        
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '10px',
-            backgroundColor: isDark ? 'rgba(123, 92, 255, 0.2)' : '#ede9fe',
-            color: '#7b5cff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Layers size={18} />
+      {/* ── 5 METRIC STAT CARDS ROW ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px', width: '100%' }}>
+        {/* Stat 1: Total XP */}
+        <div style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <ThumbsUp size={20} />
           </div>
-          <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
-            Project Hub
-          </h3>
+          <div>
+            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total XP</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>14,250</h4>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑340 this week</p>
+          </div>
         </div>
 
-        {/* 2 Sub-cards Stack */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {/* Stat 2: Avg Accuracy */}
+        <div style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#f3e8ff', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <PieChart size={20} />
+          </div>
+          <div>
+            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Accuracy</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>90%</h4>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑8% this week</p>
+          </div>
+        </div>
+
+        {/* Stat 3: Current Streak */}
+        <div style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#fff7ed', color: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Flame size={20} fill="#f97316" />
+          </div>
+          <div>
+            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Streak</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>12 Days</h4>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8', margin: '3px 0 0 0' }}>Best: 18 days</p>
+          </div>
+        </div>
+
+        {/* Stat 4: Projects */}
+        <div style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#f0fdf4', color: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <ClipboardList size={20} />
+          </div>
+          <div>
+            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Projects</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>28</h4>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑4 this month</p>
+          </div>
+        </div>
+
+        {/* Stat 5: Submissions */}
+        <div style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#fdf2f8', color: '#ec4899', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Award size={20} />
+          </div>
+          <div>
+            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Submissions</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>186</h4>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑12 this week</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── TABS BAR ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '24px', borderBottom: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, paddingBottom: '8px', overflowX: 'auto' }}>
+        {['Overview', 'Tech Stack', 'Activity', 'Achievements', 'Settings'].map((t) => {
+          const key = t.toLowerCase().replace(' ', '');
+          const isActive = activeTab === key;
+          return (
+            <button
+              key={t}
+              onClick={() => setActiveTab(key)}
+              style={{
+                border: 'none', background: 'none', fontSize: '14px', fontWeight: isActive ? 800 : 600,
+                color: isActive ? '#7b5cff' : (isDark ? '#94a3b8' : '#64748b'), cursor: 'pointer',
+                paddingBottom: '8px', position: 'relative', whiteSpace: 'nowrap'
+              }}
+            >
+              <span>{t}</span>
+              {isActive && (
+                <div style={{ position: 'absolute', bottom: '-9px', left: 0, right: 0, height: '3px', backgroundColor: '#7b5cff', borderRadius: '3px 3px 0 0' }} />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── 2 COLUMN MAIN CONTENT & RIGHT SIDEBAR GRID ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '24px', width: '100%', alignItems: 'start' }}>
+        
+        {/* ── LEFT COLUMN (PERSONAL, ACADEMIC & PROFESSIONAL INFO CARDS) ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, minWidth: 0 }}>
           
-          {/* Sub-card 1: Completed Projects */}
-          <div
-            onClick={() => { setSelectedProjectType('completed'); setIsProjectsModalOpen(true); }}
-            style={{
-              padding: '16px 20px',
-              borderRadius: '18px',
-              backgroundColor: isDark ? '#0d0f1a' : '#f8fafc',
-              border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
-              borderLeft: '4px solid #7b5cff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={e => e.currentTarget.style.backgroundColor = isDark ? '#181d2f' : '#f1f5f9'}
-            onMouseLeave={e => e.currentTarget.style.backgroundColor = isDark ? '#0d0f1a' : '#f8fafc'}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <div style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '14px',
-                backgroundColor: '#fff7ed',
-                color: '#f97316',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}>
-                <Trophy size={20} />
+          {/* Card 1: Personal Information */}
+          <div style={{ ...cardStyle, padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <User size={18} style={{ color: '#7b5cff' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Personal Information</h3>
               </div>
-              <div>
-                <h4 style={{ fontSize: '14px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
-                  Completed Projects
-                </h4>
-                <p style={{ fontSize: '12px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>
-                  Projects you have successfully completed.
-                </p>
-              </div>
+              <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Edit3 size={13} />
+                <span>Edit</span>
+              </button>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#7b5cff', fontSize: '13px', fontWeight: 800 }}>
-              <span>{completedProjects.length} Items</span>
-              <ChevronRight size={16} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '18px 24px' }}>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Full Name</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.name}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Username</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.username || 'nexus_admin'}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Email Address</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.email || 'nexus.admin.dev@gmail.com'}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Phone Number</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.phone || '+91 91234 56789'}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Date of Birth</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.dob || '15 Aug 2000'}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Gender</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.gender || 'Male'}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Address</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.address || 'Mumbai, Maharashtra, India'}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Member Since</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.joined || '15 May 2026'}</span>
+              </div>
             </div>
           </div>
 
-          {/* Sub-card 2: Ongoing Developments */}
-          <div
-            onClick={() => { setSelectedProjectType('ongoing'); setIsProjectsModalOpen(true); }}
-            style={{
-              padding: '16px 20px',
-              borderRadius: '18px',
-              backgroundColor: isDark ? '#0d0f1a' : '#f8fafc',
-              border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
-              borderLeft: '4px solid #7b5cff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={e => e.currentTarget.style.backgroundColor = isDark ? '#181d2f' : '#f1f5f9'}
-            onMouseLeave={e => e.currentTarget.style.backgroundColor = isDark ? '#0d0f1a' : '#f8fafc'}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <div style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '14px',
-                backgroundColor: '#fff7ed',
-                color: '#f97316',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}>
-                <Zap size={20} />
+          {/* Card 2: Academic Information */}
+          <div style={{ ...cardStyle, padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <GraduationCap size={18} style={{ color: '#7b5cff' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Academic Information</h3>
               </div>
-              <div>
-                <h4 style={{ fontSize: '14px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
-                  Ongoing Developments
-                </h4>
-                <p style={{ fontSize: '12px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>
-                  Projects currently in progress.
-                </p>
-              </div>
+              <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Edit3 size={13} />
+                <span>Edit</span>
+              </button>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#7b5cff', fontSize: '13px', fontWeight: 800 }}>
-              <span>{ongoingProjects.length} Items</span>
-              <ChevronRight size={16} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '18px 24px' }}>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>University</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.university || 'Sun Nexus University'}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Branch</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.branch || 'Computer Science Engineering'}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Specialization</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.specialization || 'Artificial Intelligence'}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Year</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.year || 'Third Year'}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Division</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.division || 'A'}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>PRN Number</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.prnNumber || 'SNXU202312345'}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Graduation Year</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>2029</span>
+              </div>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>CGPA</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>8.75 / 10</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: Professional Information */}
+          <div style={{ ...cardStyle, padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Briefcase size={18} style={{ color: '#7b5cff' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Professional Information</h3>
+              </div>
+              <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Edit3 size={13} />
+                <span>Edit</span>
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px' }}>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Selected Domain</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.selectedDomain || 'Web Development'}</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Experience Level</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.experienceLevel || 'Intermediate'}</span>
+                </div>
+              </div>
+
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '8px' }}>Skills</span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {['React.js', 'Node.js', 'Next.js', 'TypeScript', 'Tailwind CSS', 'MongoDB', 'Supabase', 'Docker'].map((sk) => (
+                    <span key={sk} style={{ padding: '5px 12px', borderRadius: '10px', backgroundColor: isDark ? '#121625' : '#f1f5f9', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, fontSize: '12px', fontWeight: 700, color: isDark ? '#cbd5e1' : '#475569' }}>
+                      {sk}
+                    </span>
+                  ))}
+                  <span style={{ padding: '5px 10px', borderRadius: '10px', backgroundColor: '#7b5cff', color: '#ffffff', fontSize: '11.5px', fontWeight: 800 }}>+2</span>
+                </div>
+              </div>
+
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Bio</span>
+                <p style={{ fontSize: '13px', fontWeight: 500, color: isDark ? '#cbd5e1' : '#475569', margin: 0, lineHeight: 1.5 }}>
+                  {profileData.bio || 'Enthusiastic Full Stack Developer with a strong foundation in building modern web applications. Love to solve problems and create impactful digital experiences.'}
+                </p>
+              </div>
+
+              {/* Links Row */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '12px', paddingTop: '12px', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9'}` }}>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>GitHub</span>
+                  <a href={profileData.githubUrl || 'https://github.com/nexusadmin'} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <span>github.com/nexusadmin</span>
+                    <ExternalLink size={12} />
+                  </a>
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>LinkedIn</span>
+                  <a href={profileData.linkedinUrl || 'https://linkedin.com/in/nexusadmin'} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <span>linkedin.com/in/nexusadmin</span>
+                    <ExternalLink size={12} />
+                  </a>
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Portfolio</span>
+                  <a href={profileData.portfolioUrl || 'https://nexusadmin.dev'} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <span>nexusadmin.dev</span>
+                    <ExternalLink size={12} />
+                  </a>
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Resume</span>
+                  <a href="#" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <span>View / Download</span>
+                    <ExternalLink size={12} />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── RIGHT COLUMN SIDEBAR STACK ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '340px' }}>
+          
+          {/* Card 1: Activity Timeline */}
+          <div style={{ ...cardStyle, padding: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Activity Timeline</h3>
+              <button onClick={() => setIsActivityModalOpen(true)} style={{ border: 'none', background: 'none', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer' }}>View All</button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#dcfce7', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <User size={16} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Updated Profile</h4>
+                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Personal information</p>
+                  </div>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', whiteSpace: 'nowrap' }}>Just now</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <ClipboardList size={16} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Completed DSA Problem</h4>
+                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Two Sum</p>
+                  </div>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8', whiteSpace: 'nowrap' }}>10 min ago</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#f0f9ff', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <FileText size={16} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Submitted Aptitude Test</h4>
+                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Logical Reasoning</p>
+                  </div>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8', whiteSpace: 'nowrap' }}>25 min ago</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#fff7ed', color: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Star size={16} fill="#f97316" />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Earned Achievement</h4>
+                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>DSA Beginner</p>
+                  </div>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8', whiteSpace: 'nowrap' }}>3 days ago</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#f3e8ff', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <User size={16} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Joined Nexus Hub</h4>
+                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Welcome to the platform!</p>
+                  </div>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8', whiteSpace: 'nowrap' }}>5 days ago</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Account Information */}
+          <div style={{ ...cardStyle, padding: '20px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 16px 0' }}>Account Information</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '12.5px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>User ID</span>
+                <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>SNXU202312345</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>Member Since</span>
+                <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>15 May 2026</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>Last Updated</span>
+                <span style={{ fontWeight: 800, color: '#16a34a' }}>Just now</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: Tech Stack */}
+          <div style={{ ...cardStyle, padding: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Tech Stack</h3>
+              <button onClick={() => setIsTechStackModalOpen(true)} style={{ padding: '5px 12px', borderRadius: '8px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '11.5px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Edit3 size={12} />
+                <span>Edit</span>
+              </button>
+            </div>
+
+            {/* 5x2 Grid of Tech Icon Badges */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
+              {['React', 'Node', 'Next.js', 'TypeScript', 'Tailwind', 'MongoDB', 'Supabase', 'Docker', 'Git', 'More'].map((t, idx) => (
+                <div key={idx} title={t} style={{
+                  height: '44px', borderRadius: '12px',
+                  backgroundColor: isDark ? '#121625' : '#f8fafc',
+                  border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
+                }}>
+                  {t === 'More' ? (
+                    <span style={{ fontSize: '14px', fontWeight: 900, color: '#7b5cff' }}>•••</span>
+                  ) : (
+                    <TechLogo name={t} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Card 4: Recent Achievements */}
+          <div style={{ ...cardStyle, padding: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Recent Achievements</h3>
+              <button style={{ border: 'none', background: 'none', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer' }}>View All</button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#7b5cff', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Star size={18} fill="#ffffff" />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>DSA Beginner</h4>
+                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Solved 10 DSA Problems</p>
+                  </div>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8' }}>25 Jul 2026</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#0284c7', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <ShieldCheck size={18} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Aptitude Challenger</h4>
+                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Scored 90% in Aptitude Test</p>
+                  </div>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8' }}>20 Jul 2026</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#f97316', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Flame size={18} fill="#ffffff" />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Consistent Learner</h4>
+                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Maintained 7 Day Streak</p>
+                  </div>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8' }}>18 Jul 2026</span>
+              </div>
             </div>
           </div>
 
@@ -1801,162 +1993,14 @@ export default function Profile() {
 
       </div>
 
-      {/* ════════════════════════════════════════════════════════════════════════ */}
-      {/* 3. BOTTOM ROW: TECH STACK & RECENT ACTIVITY (2-COLUMNS)                  */}
-      {/* ════════════════════════════════════════════════════════════════════════ */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
-        
-        {/* Left Card: Tech Stack */}
-        <div style={{ ...cardStyle, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '20px' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
-              <div style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '10px',
-                backgroundColor: isDark ? 'rgba(123, 92, 255, 0.2)' : '#ede9fe',
-                color: '#7b5cff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <Code2 size={18} />
-              </div>
-              <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
-                Tech Stack
-              </h3>
-            </div>
-
-            {/* Badges list */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-              {profileData.skills.map((sk, idx) => {
-                const name = typeof sk === 'string' ? sk : sk.name;
-                return (
-                  <div key={idx} style={{
-                    padding: '7px 16px',
-                    borderRadius: '999px',
-                    backgroundColor: isDark ? '#0d0f1a' : '#f1f5f9',
-                    border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
-                    fontSize: '12.5px',
-                    fontWeight: 700,
-                    color: isDark ? '#e2e8f0' : '#334155',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
-                  }}>
-                    <TechLogo name={name} />
-                    <span>{name}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Manage Button */}
-          <button
-            onClick={() => setIsTechStackModalOpen(true)}
-            style={{
-              width: '100%',
-              padding: '11px',
-              borderRadius: '14px',
-              border: '1.5px solid #7b5cff',
-              backgroundColor: 'transparent',
-              color: '#7b5cff',
-              fontSize: '13px',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={e => { e.currentTarget.style.backgroundColor = isDark ? 'rgba(123, 92, 255, 0.15)' : '#f5f3ff'; }}
-            onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-          >
-            <Code2 size={16} />
-            <span>Manage Tech Stack</span>
-          </button>
+      {/* ── PAGE FOOTER ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', paddingTop: '24px', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, fontSize: '12px', color: isDark ? '#64748b' : '#94a3b8', fontWeight: 600 }}>
+        <span>© 2026 Sun Nexus Solutions. All rights reserved.</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <a href="#" style={{ color: isDark ? '#64748b' : '#94a3b8', textDecoration: 'none' }}>Privacy Policy</a>
+          <a href="#" style={{ color: isDark ? '#64748b' : '#94a3b8', textDecoration: 'none' }}>Terms of Service</a>
+          <a href="#" style={{ color: isDark ? '#64748b' : '#94a3b8', textDecoration: 'none' }}>Help & Support</a>
         </div>
-
-        {/* Right Card: Recent Activity */}
-        <div style={{ ...cardStyle, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '20px' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
-              <div style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '10px',
-                backgroundColor: '#fff7ed',
-                color: '#f97316',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <Zap size={18} />
-              </div>
-              <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
-                Recent Activity
-              </h3>
-            </div>
-
-            {/* Activity Item */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '12px',
-                backgroundColor: '#fef3c7',
-                color: '#f59e0b',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}>
-                <Star size={20} fill="#f59e0b" />
-              </div>
-              <div>
-                <h4 style={{ fontSize: '14px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 2px 0' }}>
-                  Welcome to Sun Nexus!
-                </h4>
-                <p style={{ fontSize: '12px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '0 0 4px 0' }}>
-                  Your profile has been created successfully.
-                </p>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8' }}>
-                  Now
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* View All Button */}
-          <button
-            onClick={() => setIsActivityModalOpen(true)}
-            style={{
-              width: '100%',
-              padding: '11px',
-              borderRadius: '14px',
-              border: '1.5px solid #7b5cff',
-              backgroundColor: 'transparent',
-              color: '#7b5cff',
-              fontSize: '13px',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={e => { e.currentTarget.style.backgroundColor = isDark ? 'rgba(123, 92, 255, 0.15)' : '#f5f3ff'; }}
-            onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-          >
-            <span>View All Activity</span>
-            <ArrowRight size={16} />
-          </button>
-        </div>
-
       </div>
 
       {/* ════════════════════════════════════════════════════════════════════════ */}
