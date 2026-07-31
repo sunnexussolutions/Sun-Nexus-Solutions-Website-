@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Edit3, Camera, Save, X, Zap, Star, Award, MapPin, Calendar,
-  Layers, ChevronRight, Code2, Trophy, ArrowRight, ShieldCheck,
-  CheckCircle2, Sparkles, Plus, Trash2, Loader2, Target
+  Layers, ChevronRight, ChevronDown, Code2, Trophy, ArrowRight, ShieldCheck,
+  CheckCircle2, Sparkles, Plus, Trash2, Loader2, Target, ArrowLeft, User,
+  AtSign, Phone, GraduationCap, Lock, Briefcase, BarChart2, Link as LinkIcon,
+  Eye, EyeOff, Sun, Moon, Globe, Check, Building, Sliders
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
@@ -266,8 +268,836 @@ const DEFAULT_TECH_STACK = [
   { name: 'TypeScript' }
 ];
 
+// ── PIXEL PERFECT EDIT PROFILE VIEW ──────────────────────────────────────────
+function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleTheme, theme }) {
+  const [formData, setFormData] = useState({
+    avatar: profileData.avatar || '',
+    fullName: profileData.name || user?.fullName || 'Nexus Admin',
+    username: user?.username || 'nexus_admin',
+    email: user?.email || 'admin@sunnexus.com',
+    countryCode: '+91',
+    mobileNumber: user?.phone || user?.mobileNumber || '9876543210',
+    dob: user?.dob || '2000-01-01',
+    gender: user?.gender || 'Male',
+    university: user?.university || 'Sun Nexus University',
+    branch: user?.branch || 'Computer Science Engineering',
+    specialization: user?.specialization || 'Artificial Intelligence',
+    year: user?.year || 'Third Year',
+    division: user?.division || 'A',
+    prnNumber: user?.prnNumber || 'SNXU202312345',
+    selectedDomain: user?.selectedDomain || 'Data Structures & Algorithms',
+    skills: profileData.skills
+      ? profileData.skills.map(s => typeof s === 'string' ? s : s.name)
+      : ['C++', 'Python', 'DSA', 'Problem Solving'],
+    experienceLevel: user?.experienceLevel || 'Intermediate',
+    bio: user?.bio || 'Passionate about problem solving and building efficient algorithms.',
+    githubUrl: user?.githubUrl || 'https://github.com/nexusadmin',
+    linkedinUrl: user?.linkedinUrl || 'https://linkedin.com/in/nexusadmin',
+    portfolioUrl: user?.portfolioUrl || 'https://nexusadmin.dev',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+    theme: theme || 'light',
+    emailNotifications: true,
+    appNotifications: true,
+    language: 'English'
+  });
+
+  const [newSkillInput, setNewSkillInput] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Accordion Section Toggle for Mobile
+  const [expandedSections, setExpandedSections] = useState({
+    personal: true,
+    academic: true,
+    professional: true,
+    security: true,
+    preferences: true
+  });
+
+  const toggleSection = (sec) => {
+    setExpandedSections(prev => ({ ...prev, [sec]: !prev[sec] }));
+  };
+
+  const handleAddSkill = () => {
+    if (!newSkillInput.trim()) return;
+    if (formData.skills.includes(newSkillInput.trim())) return;
+    setFormData(prev => ({ ...prev, skills: [...prev.skills, newSkillInput.trim()] }));
+    setNewSkillInput('');
+  };
+
+  const handleRemoveSkill = (skillToRemove) => {
+    setFormData(prev => ({ ...prev, skills: prev.skills.filter(s => s !== skillToRemove) }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setFormData(prev => ({ ...prev, avatar: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    if (e) e.preventDefault();
+    onSave(formData);
+  };
+
+  const cardStyle = {
+    backgroundColor: isDark ? '#121625' : '#ffffff',
+    border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
+    borderRadius: '24px',
+    padding: '24px',
+    boxShadow: isDark ? '0 10px 30px rgba(0,0,0,0.35)' : '0 4px 20px rgba(0,0,0,0.03)',
+    boxSizing: 'border-box',
+    width: '100%'
+  };
+
+  const inputContainerStyle = {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%'
+  };
+
+  const inputStyle = {
+    width: '100%',
+    padding: '10px 14px 10px 38px',
+    borderRadius: '12px',
+    border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`,
+    backgroundColor: isDark ? '#0d0f1a' : '#ffffff',
+    color: isDark ? '#f8fafc' : '#0f172a',
+    fontSize: '13.5px',
+    fontWeight: 600,
+    outline: 'none',
+    boxSizing: 'border-box',
+    transition: 'all 0.2s ease'
+  };
+
+  const labelStyle = {
+    display: 'block',
+    fontSize: '12px',
+    fontWeight: 700,
+    color: isDark ? '#94a3b8' : '#475569',
+    marginBottom: '6px'
+  };
+
+  const iconStyle = {
+    position: 'absolute',
+    left: '12px',
+    color: isDark ? '#94a3b8' : '#64748b',
+    pointerEvents: 'none'
+  };
+
+  return (
+    <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '16px 0 60px 0', boxSizing: 'border-box' }}>
+      
+      {/* ── TOP HEADER BAR ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <button
+            onClick={onClose}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px', border: 'none', background: 'none',
+              color: isDark ? '#94a3b8' : '#64748b', fontSize: '13px', fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: '4px'
+            }}
+          >
+            <ArrowLeft size={16} />
+            <span>Back to Profile</span>
+          </button>
+          <h1 style={{ fontSize: '24px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0, lineHeight: 1.2 }}>
+            Edit Profile
+          </h1>
+          <p style={{ fontSize: '13px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: 0 }}>
+            Manage your personal information and account preferences.
+          </p>
+        </div>
+
+        <button
+          onClick={handleSubmit}
+          style={{
+            padding: '12px 24px', borderRadius: '14px',
+            background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)',
+            color: '#ffffff', fontSize: '14px', fontWeight: 800, border: 'none',
+            cursor: 'pointer', boxShadow: '0 4px 16px rgba(123, 92, 255, 0.35)'
+          }}
+        >
+          Save Changes
+        </button>
+      </div>
+
+      {/* ── MAIN CONTENT ── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        
+        {/* CARD 1: PROFILE PHOTO */}
+        <div style={{
+          ...cardStyle,
+          position: 'relative',
+          background: isDark
+            ? 'linear-gradient(135deg, #121625 0%, #0d0f1a 100%)'
+            : 'linear-gradient(135deg, #ffffff 0%, #fcfaff 100%)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              {/* Avatar circle with camera badge */}
+              <div style={{ position: 'relative' }}>
+                <div style={{
+                  width: '84px', height: '84px', borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#ffffff', fontSize: '32px', fontWeight: 900,
+                  boxShadow: '0 8px 24px rgba(123, 92, 255, 0.3)',
+                  overflow: 'hidden'
+                }}>
+                  {formData.avatar ? (
+                    <img src={formData.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    (formData.fullName || 'N').charAt(0).toUpperCase()
+                  )}
+                </div>
+                <label style={{
+                  position: 'absolute', bottom: '2px', right: '2px',
+                  width: '28px', height: '28px', borderRadius: '50%',
+                  backgroundColor: '#ffffff', color: '#0f172a',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)', cursor: 'pointer'
+                }}>
+                  <Camera size={14} />
+                  <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+                </label>
+              </div>
+
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 4px 0' }}>
+                  Profile Photo
+                </h3>
+                <p style={{ fontSize: '12px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: 0 }}>
+                  JPG, PNG or WEBP. Max size 5MB.
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: 'auto' }}>
+              <label style={{
+                padding: '10px 20px', borderRadius: '12px',
+                border: '1.5px solid #7b5cff', color: '#7b5cff',
+                backgroundColor: 'transparent', fontSize: '13px', fontWeight: 800,
+                cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                Upload Photo
+                <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+              </label>
+
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, avatar: '' }))}
+                style={{
+                  padding: '10px 20px', borderRadius: '12px',
+                  border: '1.5px solid #ef4444', color: '#ef4444',
+                  backgroundColor: 'transparent', fontSize: '13px', fontWeight: 800,
+                  cursor: 'pointer'
+                }}
+              >
+                Remove Photo
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── 2 COLUMN GRID FOR DESKTOP SECTIONS ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(440px, 1fr))', gap: '24px' }}>
+          
+          {/* CARD 2: PERSONAL INFORMATION */}
+          <div style={cardStyle}>
+            <div
+              onClick={() => toggleSection('personal')}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', marginBottom: expandedSections.personal ? '18px' : '0' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <User size={18} style={{ color: '#7b5cff' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+                  Personal Information
+                </h3>
+              </div>
+              <ChevronDown size={18} style={{ color: isDark ? '#94a3b8' : '#64748b', transform: expandedSections.personal ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+            </div>
+
+            {expandedSections.personal && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <div>
+                  <label style={labelStyle}>Full Name</label>
+                  <div style={inputContainerStyle}>
+                    <User size={16} style={iconStyle} />
+                    <input
+                      value={formData.fullName}
+                      onChange={e => setFormData({ ...formData, fullName: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Username</label>
+                  <div style={inputContainerStyle}>
+                    <AtSign size={16} style={iconStyle} />
+                    <input
+                      value={formData.username}
+                      onChange={e => setFormData({ ...formData, username: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Email Address</label>
+                  <div style={inputContainerStyle}>
+                    <AtSign size={16} style={iconStyle} />
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={e => setFormData({ ...formData, email: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Mobile Number</label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <div style={{ position: 'relative', width: '85px', flexShrink: 0 }}>
+                      <Phone size={15} style={{ ...iconStyle, left: '10px' }} />
+                      <select
+                        value={formData.countryCode}
+                        onChange={e => setFormData({ ...formData, countryCode: e.target.value })}
+                        style={{ ...inputStyle, paddingLeft: '28px', paddingRight: '8px' }}
+                      >
+                        <option value="+91">+91</option>
+                        <option value="+1">+1</option>
+                        <option value="+44">+44</option>
+                      </select>
+                    </div>
+                    <input
+                      value={formData.mobileNumber}
+                      onChange={e => setFormData({ ...formData, mobileNumber: e.target.value })}
+                      style={{ ...inputStyle, paddingLeft: '14px', flex: 1 }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Date of Birth</label>
+                  <div style={inputContainerStyle}>
+                    <Calendar size={16} style={iconStyle} />
+                    <input
+                      type="date"
+                      value={formData.dob}
+                      onChange={e => setFormData({ ...formData, dob: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Gender</label>
+                  <div style={inputContainerStyle}>
+                    <User size={16} style={iconStyle} />
+                    <select
+                      value={formData.gender}
+                      onChange={e => setFormData({ ...formData, gender: e.target.value })}
+                      style={inputStyle}
+                    >
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* CARD 3: ACADEMIC INFORMATION */}
+          <div style={cardStyle}>
+            <div
+              onClick={() => toggleSection('academic')}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', marginBottom: expandedSections.academic ? '18px' : '0' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <GraduationCap size={18} style={{ color: '#7b5cff' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+                  Academic Information
+                </h3>
+              </div>
+              <ChevronDown size={18} style={{ color: isDark ? '#94a3b8' : '#64748b', transform: expandedSections.academic ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+            </div>
+
+            {expandedSections.academic && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <div>
+                  <label style={labelStyle}>University</label>
+                  <div style={inputContainerStyle}>
+                    <Building size={16} style={iconStyle} />
+                    <input
+                      value={formData.university}
+                      onChange={e => setFormData({ ...formData, university: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Branch</label>
+                  <div style={inputContainerStyle}>
+                    <User size={16} style={iconStyle} />
+                    <select
+                      value={formData.branch}
+                      onChange={e => setFormData({ ...formData, branch: e.target.value })}
+                      style={inputStyle}
+                    >
+                      <option value="Computer Science Engineering">Computer Science Engineering</option>
+                      <option value="Information Technology">Information Technology</option>
+                      <option value="Electronics & Communication">Electronics & Communication</option>
+                      <option value="AI & Data Science">AI & Data Science</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Specialization</label>
+                  <div style={inputContainerStyle}>
+                    <AtSign size={16} style={iconStyle} />
+                    <input
+                      value={formData.specialization}
+                      onChange={e => setFormData({ ...formData, specialization: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Year</label>
+                  <div style={inputContainerStyle}>
+                    <GraduationCap size={16} style={iconStyle} />
+                    <select
+                      value={formData.year}
+                      onChange={e => setFormData({ ...formData, year: e.target.value })}
+                      style={inputStyle}
+                    >
+                      <option value="First Year">First Year</option>
+                      <option value="Second Year">Second Year</option>
+                      <option value="Third Year">Third Year</option>
+                      <option value="Final Year">Final Year</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Division</label>
+                  <div style={inputContainerStyle}>
+                    <Bell size={16} style={iconStyle} />
+                    <input
+                      value={formData.division}
+                      onChange={e => setFormData({ ...formData, division: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>PRN Number <span style={{ color: isDark ? '#94a3b8' : '#64748b' }}>(Read Only)</span></label>
+                  <div style={inputContainerStyle}>
+                    <Lock size={16} style={iconStyle} />
+                    <input
+                      disabled
+                      value={formData.prnNumber}
+                      style={{ ...inputStyle, backgroundColor: isDark ? 'rgba(30, 41, 59, 0.4)' : '#f1f5f9', cursor: 'not-allowed', color: isDark ? '#94a3b8' : '#64748b' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+
+        {/* CARD 4: PROFESSIONAL INFORMATION */}
+        <div style={cardStyle}>
+          <div
+            onClick={() => toggleSection('professional')}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', marginBottom: expandedSections.professional ? '18px' : '0' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Briefcase size={18} style={{ color: '#7b5cff' }} />
+              <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+                Professional Information
+              </h3>
+            </div>
+            <ChevronDown size={18} style={{ color: isDark ? '#94a3b8' : '#64748b', transform: expandedSections.professional ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+          </div>
+
+          {expandedSections.professional && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <div>
+                  <label style={labelStyle}>Selected Domain</label>
+                  <div style={inputContainerStyle}>
+                    <Briefcase size={16} style={iconStyle} />
+                    <select
+                      value={formData.selectedDomain}
+                      onChange={e => setFormData({ ...formData, selectedDomain: e.target.value })}
+                      style={inputStyle}
+                    >
+                      <option value="Data Structures & Algorithms">Data Structures & Algorithms</option>
+                      <option value="Full Stack Web Development">Full Stack Web Development</option>
+                      <option value="Mobile App Development">Mobile App Development</option>
+                      <option value="AI & Machine Learning">AI & Machine Learning</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Skills (Add up to 10)</label>
+                  <div style={{
+                    ...inputStyle, padding: '6px 12px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px', minHeight: '42px'
+                  }}>
+                    {formData.skills.map((sk, idx) => (
+                      <span key={idx} style={{
+                        padding: '4px 10px', borderRadius: '16px', backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+                        color: '#7b5cff', fontSize: '12px', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '6px'
+                      }}>
+                        {sk}
+                        <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveSkill(sk)} />
+                      </span>
+                    ))}
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <input
+                        value={newSkillInput}
+                        onChange={e => setNewSkillInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddSkill(); } }}
+                        placeholder="+ Add"
+                        style={{ border: 'none', background: 'transparent', outline: 'none', color: isDark ? '#f8fafc' : '#0f172a', fontSize: '12px', fontWeight: 700, width: '70px' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Experience Level</label>
+                  <div style={inputContainerStyle}>
+                    <BarChart2 size={16} style={iconStyle} />
+                    <select
+                      value={formData.experienceLevel}
+                      onChange={e => setFormData({ ...formData, experienceLevel: e.target.value })}
+                      style={inputStyle}
+                    >
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
+                      <option value="Expert">Expert</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label style={labelStyle}>Short Bio</label>
+                <textarea
+                  rows={2}
+                  value={formData.bio}
+                  onChange={e => setFormData({ ...formData, bio: e.target.value })}
+                  style={{
+                    ...inputStyle, padding: '12px', height: 'auto', resize: 'vertical'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+                <div>
+                  <label style={labelStyle}>GitHub URL</label>
+                  <div style={inputContainerStyle}>
+                    <LinkIcon size={16} style={iconStyle} />
+                    <input
+                      value={formData.githubUrl}
+                      onChange={e => setFormData({ ...formData, githubUrl: e.target.value })}
+                      style={inputStyle}
+                    />
+                    <LinkIcon size={14} style={{ position: 'absolute', right: '12px', color: isDark ? '#94a3b8' : '#64748b' }} />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>LinkedIn URL</label>
+                  <div style={inputContainerStyle}>
+                    <LinkIcon size={16} style={iconStyle} />
+                    <input
+                      value={formData.linkedinUrl}
+                      onChange={e => setFormData({ ...formData, linkedinUrl: e.target.value })}
+                      style={inputStyle}
+                    />
+                    <LinkIcon size={14} style={{ position: 'absolute', right: '12px', color: isDark ? '#94a3b8' : '#64748b' }} />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Portfolio URL</label>
+                  <div style={inputContainerStyle}>
+                    <LinkIcon size={16} style={iconStyle} />
+                    <input
+                      value={formData.portfolioUrl}
+                      onChange={e => setFormData({ ...formData, portfolioUrl: e.target.value })}
+                      style={inputStyle}
+                    />
+                    <LinkIcon size={14} style={{ position: 'absolute', right: '12px', color: isDark ? '#94a3b8' : '#64748b' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ── 2 COLUMN GRID FOR SECURITY & PREFERENCES ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(440px, 1fr))', gap: '24px' }}>
+          
+          {/* CARD 5: SECURITY */}
+          <div style={cardStyle}>
+            <div
+              onClick={() => toggleSection('security')}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', marginBottom: expandedSections.security ? '18px' : '0' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Lock size={18} style={{ color: '#7b5cff' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+                  Security
+                </h3>
+              </div>
+              <ChevronDown size={18} style={{ color: isDark ? '#94a3b8' : '#64748b', transform: expandedSections.security ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+            </div>
+
+            {expandedSections.security && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+                  <div>
+                    <label style={labelStyle}>Current Password</label>
+                    <div style={inputContainerStyle}>
+                      <Lock size={16} style={iconStyle} />
+                      <input
+                        type={showCurrentPassword ? 'text' : 'password'}
+                        value={formData.currentPassword}
+                        onChange={e => setFormData({ ...formData, currentPassword: e.target.value })}
+                        placeholder="Enter current password"
+                        style={inputStyle}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        style={{ position: 'absolute', right: '12px', border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}
+                      >
+                        {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>New Password</label>
+                    <div style={inputContainerStyle}>
+                      <Lock size={16} style={iconStyle} />
+                      <input
+                        type={showNewPassword ? 'text' : 'password'}
+                        value={formData.newPassword}
+                        onChange={e => setFormData({ ...formData, newPassword: e.target.value })}
+                        placeholder="Enter new password"
+                        style={inputStyle}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        style={{ position: 'absolute', right: '12px', border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}
+                      >
+                        {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Confirm Password</label>
+                    <div style={inputContainerStyle}>
+                      <Lock size={16} style={iconStyle} />
+                      <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        value={formData.confirmPassword}
+                        onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
+                        placeholder="Confirm new password"
+                        style={inputStyle}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        style={{ position: 'absolute', right: '12px', border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}
+                      >
+                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Password Strength</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
+                      <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
+                        <div style={{ height: '6px', borderRadius: '4px', backgroundColor: '#10b981', flex: 1 }} />
+                        <div style={{ height: '6px', borderRadius: '4px', backgroundColor: '#10b981', flex: 1 }} />
+                        <div style={{ height: '6px', borderRadius: '4px', backgroundColor: '#10b981', flex: 1 }} />
+                        <div style={{ height: '6px', borderRadius: '4px', backgroundColor: isDark ? '#1e293b' : '#e2e8f0', flex: 1 }} />
+                      </div>
+                      <span style={{ fontSize: '12px', fontWeight: 800, color: '#10b981' }}>Strong</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => alert('Password update feature activated')}
+                  style={{
+                    width: '100%', padding: '12px', borderRadius: '14px',
+                    background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)',
+                    color: '#ffffff', fontSize: '13.5px', fontWeight: 800, border: 'none',
+                    cursor: 'pointer', marginTop: '8px'
+                  }}
+                >
+                  Change Password
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* CARD 6: PREFERENCES */}
+          <div style={cardStyle}>
+            <div
+              onClick={() => toggleSection('preferences')}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', marginBottom: expandedSections.preferences ? '18px' : '0' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Sliders size={18} style={{ color: '#7b5cff' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+                  Preferences
+                </h3>
+              </div>
+              <ChevronDown size={18} style={{ color: isDark ? '#94a3b8' : '#64748b', transform: expandedSections.preferences ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+            </div>
+
+            {expandedSections.preferences && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>Theme</span>
+                  <div style={{ width: '130px' }}>
+                    <select
+                      value={theme}
+                      onChange={e => { if (toggleTheme) toggleTheme(e.target.value); }}
+                      style={{ ...inputStyle, paddingLeft: '12px' }}
+                    >
+                      <option value="light">Light</option>
+                      <option value="dark">Dark</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>Email Notifications</span>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(p => ({ ...p, emailNotifications: !p.emailNotifications }))}
+                    style={{
+                      width: '44px', height: '24px', borderRadius: '12px', border: 'none',
+                      backgroundColor: formData.emailNotifications ? '#7b5cff' : (isDark ? '#334155' : '#cbd5e1'),
+                      position: 'relative', cursor: 'pointer', transition: 'all 0.2s'
+                    }}
+                  >
+                    <div style={{
+                      width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#ffffff',
+                      position: 'absolute', top: '3px', left: formData.emailNotifications ? '23px' : '3px', transition: 'all 0.2s'
+                    }} />
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>App Notifications</span>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(p => ({ ...p, appNotifications: !p.appNotifications }))}
+                    style={{
+                      width: '44px', height: '24px', borderRadius: '12px', border: 'none',
+                      backgroundColor: formData.appNotifications ? '#7b5cff' : (isDark ? '#334155' : '#cbd5e1'),
+                      position: 'relative', cursor: 'pointer', transition: 'all 0.2s'
+                    }}
+                  >
+                    <div style={{
+                      width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#ffffff',
+                      position: 'absolute', top: '3px', left: formData.appNotifications ? '23px' : '3px', transition: 'all 0.2s'
+                    }} />
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>Language</span>
+                  <div style={{ width: '130px' }}>
+                    <select
+                      value={formData.language}
+                      onChange={e => setFormData({ ...formData, language: e.target.value })}
+                      style={{ ...inputStyle, paddingLeft: '12px' }}
+                    >
+                      <option value="English">English</option>
+                      <option value="Spanish">Spanish</option>
+                      <option value="French">French</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+
+        {/* ── BOTTOM ACTION BAR ── */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              padding: '12px 24px', borderRadius: '14px',
+              border: `1.5px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`,
+              backgroundColor: 'transparent', color: isDark ? '#cbd5e1' : '#475569',
+              fontSize: '14px', fontWeight: 800, cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSubmit}
+            style={{
+              padding: '12px 28px', borderRadius: '14px',
+              background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)',
+              color: '#ffffff', fontSize: '14px', fontWeight: 800, border: 'none',
+              cursor: 'pointer', boxShadow: '0 4px 16px rgba(123, 92, 255, 0.35)'
+            }}
+          >
+            Save Changes
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 export default function Profile() {
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const { user, updateProfile } = useAuth();
   const isDark = theme === 'dark';
 
@@ -295,6 +1125,46 @@ export default function Profile() {
   const [draftProfile, setDraftProfile] = useState({ ...profileData });
   const [uploading, setUploading] = useState({ avatar: false, banner: false });
   const [newSkillName, setNewSkillName] = useState('');
+
+  // Save Full Edit Profile
+  const handleSaveFullProfile = async (formData) => {
+    try {
+      const payload = {
+        name: formData.fullName,
+        fullName: formData.fullName,
+        username: formData.username,
+        email: formData.email,
+        phone: formData.mobileNumber,
+        mobileNumber: formData.mobileNumber,
+        dob: formData.dob,
+        gender: formData.gender,
+        university: formData.university,
+        branch: formData.branch,
+        specialization: formData.specialization,
+        year: formData.year,
+        division: formData.division,
+        prnNumber: formData.prnNumber,
+        selectedDomain: formData.selectedDomain,
+        skills: formData.skills,
+        experienceLevel: formData.experienceLevel,
+        bio: formData.bio,
+        githubUrl: formData.githubUrl,
+        linkedinUrl: formData.linkedinUrl,
+        portfolioUrl: formData.portfolioUrl,
+        avatar: formData.avatar || profileData.avatar
+      };
+      await updateProfile(payload);
+      setProfileData(prev => ({
+        ...prev,
+        name: formData.fullName,
+        avatar: formData.avatar || prev.avatar,
+        skills: formData.skills
+      }));
+      setIsEditModalOpen(false);
+    } catch (err) {
+      console.error("Save profile error:", err);
+    }
+  };
 
   useEffect(() => {
     let savedLocal = {};
@@ -437,6 +1307,20 @@ export default function Profile() {
     boxSizing: 'border-box',
     overflow: 'hidden'
   };
+
+  if (isEditModalOpen) {
+    return (
+      <EditProfileView
+        isDark={isDark}
+        user={user}
+        profileData={profileData}
+        onSave={handleSaveFullProfile}
+        onClose={() => setIsEditModalOpen(false)}
+        toggleTheme={toggleTheme}
+        theme={theme}
+      />
+    );
+  }
 
   return (
     <div style={{ width: '100%', maxWidth: '1080px', margin: '0 auto', paddingBottom: '40px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '24px' }}>
