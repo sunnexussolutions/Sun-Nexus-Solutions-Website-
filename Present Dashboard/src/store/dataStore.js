@@ -688,13 +688,48 @@ export const saveHomeContent = async (content) => {
   }
 };
 
-// ── DSA Topics & Problems ─────────────────────────────────────────────────────
+export const DEFAULT_DSA_TOPICS = [
+  {
+    id: 'arrays-hashing',
+    name: 'Arrays & Hashing',
+    color: '#7b5cff',
+    icon: 'Hash',
+    order: 1
+  }
+];
 
-// ── DSA Topics & Problems ─────────────────────────────────────────────────────
-
-export const DEFAULT_DSA_TOPICS = [];
-
-export const DEFAULT_DSA_PROBLEMS = [];
+export const DEFAULT_DSA_PROBLEMS = [
+  {
+    id: 'two-sum',
+    topicId: 'arrays-hashing',
+    title: 'Two Sum',
+    number: 1,
+    difficulty: 'Easy',
+    tags: ['Array', 'Hash Table'],
+    description: 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.',
+    examples: [
+      { input: 'nums = [2,7,11,15], target = 9', output: '[0,1]', explanation: 'Because nums[0] + nums[1] == 9, we return [0, 1].' },
+      { input: 'nums = [3,2,4], target = 6', output: '[1,2]', explanation: 'Because nums[1] + nums[2] == 6, we return [1, 2].' },
+      { input: 'nums = [3,3], target = 6', output: '[0,1]', explanation: 'Because nums[0] + nums[1] == 6, we return [0, 1].' }
+    ],
+    constraints: [
+      '2 <= nums.length <= 10^4',
+      '-10^9 <= nums[i] <= 10^9',
+      '-10^9 <= target <= 10^9',
+      'Only one valid answer exists.'
+    ],
+    hints: [
+      'A really brute force way would be to search for all possible pairs of numbers but that would be too slow.',
+      'So, if we fix one of the numbers, say x, we have to scan the entire array to find target - x. Can we change an array search to a constant time lookup?',
+      'Use a hash map to store the value and its index as we iterate.'
+    ],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
+    tutorial: '### Approach: Hash Map (One-pass)\n\nWhile we iterate and insert elements into the hash map, we also look back to check if the current element complement (target - nums[i]) already exists in the hash map.\n\n```python\ndef twoSum(nums, target):\n    prevMap = {}\n    for i, n in enumerate(nums):\n        diff = target - n\n        if diff in prevMap:\n            return [prevMap[diff], i]\n        prevMap[n] = i\n```',
+    videoUrl: 'https://www.youtube.com/watch?v=KLlXCFG5TnA',
+    order: 1
+  }
+];
 
 
 export const getDSATopics = async () => {
