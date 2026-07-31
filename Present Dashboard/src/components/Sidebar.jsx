@@ -83,8 +83,10 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                 minHeight: '42px',
                 borderRadius: '12px',
                 border: isDark ? '1px solid rgba(123, 92, 255, 0.45)' : '1px solid rgba(123, 92, 255, 0.25)',
-                backgroundColor: '#ffffff',
-                boxShadow: isDark ? '0 0 20px rgba(123, 92, 255, 0.35)' : '0 2px 8px rgba(0, 0, 0, 0.05)',
+                background: isDark
+                  ? 'linear-gradient(135deg, rgba(123, 92, 255, 0.22) 0%, rgba(15, 23, 42, 0.85) 100%)'
+                  : '#ffffff',
+                boxShadow: isDark ? '0 0 16px rgba(123, 92, 255, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.05)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -103,7 +105,7 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                   height: '100%',
                   objectFit: 'contain',
                   objectPosition: 'center',
-                  filter: isDark ? 'contrast(1.05)' : 'none'
+                  filter: isDark ? 'brightness(1.1) drop-shadow(0 0 4px rgba(123, 92, 255, 0.4))' : 'none'
                 }}
               />
             </div>
