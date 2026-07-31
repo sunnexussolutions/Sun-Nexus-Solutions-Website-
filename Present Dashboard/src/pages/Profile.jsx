@@ -352,10 +352,11 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
     backgroundColor: isDark ? '#121625' : '#ffffff',
     border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
     borderRadius: '24px',
-    padding: '24px',
+    padding: '18px 20px',
     boxShadow: isDark ? '0 10px 30px rgba(0,0,0,0.35)' : '0 4px 20px rgba(0,0,0,0.03)',
     boxSizing: 'border-box',
-    width: '100%'
+    width: '100%',
+    maxWidth: '100%'
   };
 
   const inputContainerStyle = {
@@ -511,7 +512,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
         </div>
 
         {/* ── 2 COLUMN GRID FOR DESKTOP SECTIONS ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(440px, 1fr))', gap: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 440px), 1fr))', gap: '24px', width: '100%' }}>
           
           {/* CARD 2: PERSONAL INFORMATION */}
           <div style={cardStyle}>
@@ -862,7 +863,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
         </div>
 
         {/* ── 2 COLUMN GRID FOR SECURITY & PREFERENCES ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(440px, 1fr))', gap: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 440px), 1fr))', gap: '24px', width: '100%' }}>
           
           {/* CARD 5: SECURITY */}
           <div style={cardStyle}>
@@ -881,7 +882,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
 
             {expandedSections.security && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '16px' }}>
                   <div>
                     <label style={labelStyle}>Current Password</label>
                     <div style={inputContainerStyle}>
@@ -992,9 +993,9 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
 
             {expandedSections.preferences && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                   <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>Theme</span>
-                  <div style={{ width: '130px' }}>
+                  <div style={{ width: '130px', minWidth: '110px' }}>
                     <select
                       value={theme}
                       onChange={e => { if (toggleTheme) toggleTheme(e.target.value); }}
@@ -1006,7 +1007,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                   <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>Email Notifications</span>
                   <button
                     type="button"
@@ -1014,7 +1015,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                     style={{
                       width: '44px', height: '24px', borderRadius: '12px', border: 'none',
                       backgroundColor: formData.emailNotifications ? '#7b5cff' : (isDark ? '#334155' : '#cbd5e1'),
-                      position: 'relative', cursor: 'pointer', transition: 'all 0.2s'
+                      position: 'relative', cursor: 'pointer', transition: 'all 0.2s', flexShrink: 0
                     }}
                   >
                     <div style={{
@@ -1024,7 +1025,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                   <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>App Notifications</span>
                   <button
                     type="button"
@@ -1032,7 +1033,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                     style={{
                       width: '44px', height: '24px', borderRadius: '12px', border: 'none',
                       backgroundColor: formData.appNotifications ? '#7b5cff' : (isDark ? '#334155' : '#cbd5e1'),
-                      position: 'relative', cursor: 'pointer', transition: 'all 0.2s'
+                      position: 'relative', cursor: 'pointer', transition: 'all 0.2s', flexShrink: 0
                     }}
                   >
                     <div style={{
@@ -1042,9 +1043,9 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                   <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>Language</span>
-                  <div style={{ width: '130px' }}>
+                  <div style={{ width: '130px', minWidth: '110px' }}>
                     <select
                       value={formData.language}
                       onChange={e => setFormData({ ...formData, language: e.target.value })}
@@ -1063,7 +1064,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
         </div>
 
         {/* ── BOTTOM ACTION BAR ── */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', marginTop: '12px', flexWrap: 'wrap' }}>
           <button
             type="button"
             onClick={onClose}
