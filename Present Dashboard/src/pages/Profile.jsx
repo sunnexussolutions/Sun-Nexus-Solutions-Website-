@@ -307,6 +307,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Accordion Section Toggle for Mobile
   const [expandedSections, setExpandedSections] = useState({
@@ -345,7 +346,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault();
-    onSave(formData);
+    setShowSuccessModal(true);
   };
 
   const cardStyle = {
@@ -1093,6 +1094,100 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
         </div>
 
       </div>
+
+      {/* ── PROFILE UPDATED SUCCESS MODAL (PIXEL PERFECT REFERENCE MATCH) ── */}
+      {showSuccessModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 999999,
+          backgroundColor: 'rgba(15, 23, 42, 0.55)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '24px',
+            maxWidth: '400px',
+            width: '100%',
+            padding: '32px 24px',
+            boxShadow: '0 25px 60px rgba(0, 0, 0, 0.3)',
+            position: 'relative',
+            textAlign: 'center',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
+          }}>
+            {/* Close Button */}
+            <button
+              onClick={() => { onSave(formData); setShowSuccessModal(false); }}
+              style={{
+                position: 'absolute', top: '16px', right: '16px', border: 'none', background: 'none',
+                color: '#94a3b8', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center'
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            {/* Confetti & Checkmark Graphics */}
+            <div style={{ position: 'relative', width: '100%', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+              {/* Confetti Particles */}
+              <div style={{ position: 'absolute', top: '10px', left: '22%', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ec4899' }} />
+              <div style={{ position: 'absolute', top: '28%', left: '16%', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#06b6d4' }} />
+              <div style={{ position: 'absolute', top: '14%', left: '38%', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#a855f7' }} />
+              <div style={{ position: 'absolute', top: '12%', right: '38%', width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#8b5cf6' }} />
+              <div style={{ position: 'absolute', top: '26%', right: '20%', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f97316' }} />
+              <div style={{ position: 'absolute', top: '48%', right: '15%', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#eab308' }} />
+              <div style={{ position: 'absolute', top: '65%', right: '22%', width: '8px', height: '8px', borderRadius: '2px', backgroundColor: '#8b5cf6', transform: 'rotate(45deg)' }} />
+              <div style={{ position: 'absolute', top: '62%', left: '18%', width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#3b82f6' }} />
+              <div style={{ position: 'absolute', top: '42%', left: '26%', width: '8px', height: '8px', backgroundColor: '#10b981', transform: 'rotate(45deg)' }} />
+
+              {/* Green Circle Badge with Checkmark */}
+              <div style={{
+                width: '76px', height: '76px', borderRadius: '50%',
+                backgroundColor: '#dcfce7', color: '#16a34a',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 8px 24px rgba(22, 163, 74, 0.15)'
+              }}>
+                <Check size={36} strokeWidth={3} />
+              </div>
+            </div>
+
+            {/* Modal Title */}
+            <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', margin: '0 0 10px 0', lineHeight: 1.2 }}>
+              Profile Updated Successfully!
+            </h3>
+
+            {/* Modal Description */}
+            <p style={{ fontSize: '13.5px', fontWeight: 600, color: '#64748b', margin: '0 0 24px 0', lineHeight: 1.5 }}>
+              Your changes have been saved successfully.<br />
+              Your profile information is now up to date.
+            </p>
+
+            {/* Continue Button */}
+            <button
+              onClick={() => { onSave(formData); setShowSuccessModal(false); }}
+              style={{
+                width: '100%',
+                padding: '14px',
+                borderRadius: '14px',
+                background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)',
+                color: '#ffffff',
+                fontSize: '14px',
+                fontWeight: 800,
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 6px 20px rgba(123, 92, 255, 0.35)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
