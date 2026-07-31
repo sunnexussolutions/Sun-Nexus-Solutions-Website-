@@ -499,6 +499,25 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
           box-sizing: border-box;
         }
 
+        .dsa-pill-nav::-webkit-scrollbar {
+          display: none;
+        }
+
+        .dsa-pill-button {
+          flex-shrink: 0 !important;
+          white-space: nowrap !important;
+        }
+
+        @media (max-width: 640px) {
+          .dsa-header-bar {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+          .dsa-pill-nav {
+            width: 100% !important;
+          }
+        }
+
         @media (min-width: 1024px) {
           .dsa-workspace-grid {
             grid-template-columns: 280px minmax(0, 1fr);
@@ -533,7 +552,7 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
       )}
 
       {/* TOP VIEW SWITCHER BAR */}
-      <div style={{
+      <div className="dsa-header-bar" style={{
         marginBottom: '24px',
         display: 'flex',
         flexWrap: 'wrap',
@@ -545,7 +564,9 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
         backgroundColor: isDark ? '#121625' : '#ffffff',
         border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
         boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.02)',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        maxWidth: '100%',
+        overflow: 'hidden'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
@@ -572,19 +593,25 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
         </div>
 
         {/* View mode toggle pills */}
-        <div style={{
+        <div className="dsa-pill-nav" style={{
           display: 'flex',
           alignItems: 'center',
+          maxWidth: '100%',
+          overflowX: 'auto',
           padding: '4px',
           borderRadius: '14px',
           backgroundColor: isDark ? '#0d0f1a' : '#f1f5f9',
           border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
-          gap: '4px'
+          gap: '4px',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch'
         }}>
           <button
             onClick={() => setViewMode('workspace')}
+            className="dsa-pill-button"
             style={{
-              padding: '8px 16px',
+              padding: '8px 14px',
               borderRadius: '10px',
               fontSize: '12px',
               fontWeight: 700,
@@ -596,7 +623,9 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
               background: viewMode === 'workspace' ? 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)' : 'transparent',
               color: viewMode === 'workspace' ? '#ffffff' : (isDark ? '#94a3b8' : '#475569'),
               boxShadow: viewMode === 'workspace' ? '0 2px 10px rgba(123, 92, 255, 0.3)' : 'none',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              flexShrink: 0,
+              whiteSpace: 'nowrap'
             }}
           >
             <Eye size={14} />
@@ -605,8 +634,9 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
 
           <button
             onClick={() => setViewMode('overview')}
+            className="dsa-pill-button"
             style={{
-              padding: '8px 16px',
+              padding: '8px 14px',
               borderRadius: '10px',
               fontSize: '12px',
               fontWeight: 700,
@@ -618,7 +648,9 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
               background: viewMode === 'overview' ? 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)' : 'transparent',
               color: viewMode === 'overview' ? '#ffffff' : (isDark ? '#94a3b8' : '#475569'),
               boxShadow: viewMode === 'overview' ? '0 2px 10px rgba(123, 92, 255, 0.3)' : 'none',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              flexShrink: 0,
+              whiteSpace: 'nowrap'
             }}
           >
             <BookOpen size={14} />
@@ -627,8 +659,9 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
 
           <button
             onClick={() => setViewMode('submissions')}
+            className="dsa-pill-button"
             style={{
-              padding: '8px 16px',
+              padding: '8px 14px',
               borderRadius: '10px',
               fontSize: '12px',
               fontWeight: 700,
@@ -640,7 +673,9 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
               background: viewMode === 'submissions' ? 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)' : 'transparent',
               color: viewMode === 'submissions' ? '#ffffff' : (isDark ? '#94a3b8' : '#475569'),
               boxShadow: viewMode === 'submissions' ? '0 2px 10px rgba(123, 92, 255, 0.3)' : 'none',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              flexShrink: 0,
+              whiteSpace: 'nowrap'
             }}
           >
             <FileText size={14} />
@@ -649,8 +684,9 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
 
           <button
             onClick={() => { setIsUploadModalOpen(true); setUploadedImage(null); setIsSubmitted(false); }}
+            className="dsa-pill-button"
             style={{
-              padding: '8px 16px',
+              padding: '8px 14px',
               borderRadius: '10px',
               fontSize: '12px',
               fontWeight: 700,
@@ -666,7 +702,9 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
                 ? '#ffffff'
                 : (isDark ? '#94a3b8' : '#475569'),
               boxShadow: isUploadModalOpen ? '0 2px 10px rgba(123, 92, 255, 0.3)' : 'none',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              flexShrink: 0,
+              whiteSpace: 'nowrap'
             }}
           >
             <UploadCloud size={14} />
