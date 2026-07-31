@@ -5,7 +5,8 @@ import {
   Layers, ChevronRight, ChevronDown, Code2, Trophy, ArrowRight, ShieldCheck,
   CheckCircle2, Sparkles, Plus, Trash2, Loader2, Target, ArrowLeft, User,
   AtSign, Phone, GraduationCap, Lock, Briefcase, BarChart2, Link as LinkIcon,
-  Eye, EyeOff, Sun, Moon, Globe, Check, Building, Sliders, Bell
+  Eye, EyeOff, Sun, Moon, Globe, Check, Building, Sliders, Bell,
+  ThumbsUp, PieChart, Folder, FileText, LayoutGrid, ExternalLink
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
@@ -1203,6 +1204,7 @@ export default function Profile() {
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
   const [selectedProjectType, setSelectedProjectType] = useState('completed');
+  const [activeProfileTab, setActiveProfileTab] = useState('overview');
 
   // Profile local data
   const [profileData, setProfileData] = useState({
