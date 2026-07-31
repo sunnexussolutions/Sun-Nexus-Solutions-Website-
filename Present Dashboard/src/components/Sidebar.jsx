@@ -303,14 +303,19 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
+                  overflow: 'hidden',
                   boxShadow: '0 2px 8px rgba(123, 92, 255, 0.3)',
                 }}
               >
-                {user?.firstName?.[0] || user?.username?.[0] || 'N'}
+                {user?.avatar?.length > 5 ? (
+                  <img src={user.avatar} alt="User Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  (user?.name || user?.fullName || user?.firstName || user?.username || 'N').charAt(0).toUpperCase()
+                )}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left', minWidth: 0, flex: 1 }}>
                 <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : (user?.username || 'Nexus Admin')}
+                  {user?.name || user?.fullName || (user?.firstName ? `${user.firstName} ${user.lastName || ''}` : (user?.username || 'Nexus Admin'))}
                 </span>
                 <span style={{ fontSize: '9.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: isDark ? '#a78bfa' : '#7b5cff' }}>
                   {isAdmin ? 'PLATFORM ADMIN' : 'VERIFIED MEMBER'}
