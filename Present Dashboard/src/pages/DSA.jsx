@@ -2077,45 +2077,7 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
         </div>
       )}
 
-      {/* MOBILE BOTTOM NAVIGATION (Visible only on Mobile screens < 1024px) */}
-      <div className="mobile-bottom-nav" style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 99,
-        backgroundColor: isDark ? 'rgba(13, 15, 26, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(12px)',
-        borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
-        padding: '10px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        boxShadow: '0 -4px 20px rgba(0,0,0,0.1)'
-      }}>
-        <button onClick={() => setActivePage('dashboard')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>
-          <Home size={20} />
-          <span>Home</span>
-        </button>
-        <button onClick={() => setActivePage('learning')} style={{ display: 'flex', flexDirection: 'column', items: 'center', gap: '4px', border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>
-          <GraduationCap size={20} />
-          <span>My Learning</span>
-        </button>
-        <button onClick={() => setActivePage('dsa')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', border: 'none', background: 'none', color: '#7b5cff', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#7b5cff', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(123, 92, 255, 0.4)' }}>
-            <Brain size={16} />
-          </div>
-          <span>DSA</span>
-        </button>
-        <button onClick={() => setActivePage('aptitude')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>
-          <Target size={20} />
-          <span>Aptitude</span>
-        </button>
-        <button onClick={() => setActivePage('profile')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>
-          <User size={20} />
-          <span>Profile</span>
-        </button>
-      </div>
+      {/* Removed mobile-bottom-nav as requested */}
 
     </div>
   );
