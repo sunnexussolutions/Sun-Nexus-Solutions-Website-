@@ -5,7 +5,7 @@ import {
   Layers, ChevronRight, ChevronDown, Code2, Trophy, ArrowRight, ShieldCheck,
   CheckCircle2, Sparkles, Plus, Trash2, Loader2, Target, ArrowLeft, User,
   AtSign, Phone, GraduationCap, Lock, Briefcase, BarChart2, Link as LinkIcon,
-  Eye, EyeOff, Sun, Moon, Globe, Check, Building, Sliders
+  Eye, EyeOff, Sun, Moon, Globe, Check, Building, Sliders, Bell
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
