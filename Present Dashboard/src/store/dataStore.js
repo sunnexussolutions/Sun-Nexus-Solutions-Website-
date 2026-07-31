@@ -810,42 +810,99 @@ export const deleteDSAProblem = async (id) => {
   catch (err) { console.warn('Cloud DSA problem delete fallback:', err.message); }
 };
 
-// ── DSA Solution Submissions (Member → Admin) ────────────────────────────────
-export const getDSASolutions = () => {
+// ── DSA Solution Submissions (Member → Admin) — DB-backed ────────────────────
+
+export const getDSASolutions = async () => {
+  try {
+    const cloud = await query('SELECT * FROM dsa_solutions ORDER BY submitted_at DESC');
+    if (cloud && cloud.length >= 0) {
+      const mapped = cloud.map(s => ({
+        id:           s.id,
+        memberId:     s.member_id,
+        memberName:   s.member_name,
+        memberEmail:  s.member_email,
+        problemId:    s.problem_id,
+        problemTitle: s.problem_title,
+        difficulty:   s.difficulty,
+        topicName:    s.topic_name,
+        imageData:    s.image_data,
+        notes:        s.notes,
+        description:  s.description,
+        status:       s.status,
+        adminNote:    s.admin_note,
+        submittedAt:  s.submitted_at,
+        reviewedAt:   s.reviewed_at,
+        updatedAt:    s.updated_at,
+      }));
+      setLocal('dsa_solutions', mapped, true);
+      return mapped;
+    }
+  } catch (err) { console.warn('DSA solutions DB fallback:', err.message); }
   return getLocal('dsa_solutions', []);
 };
 
-export const addDSASolution = (submission) => {
+export const addDSASolution = async (submission) => {
   const id = crypto.randomUUID();
   const newEntry = {
     id,
     ...submission,
-    status: 'pending',   // 'pending' | 'reviewed' | 'approved' | 'rejected'
+    status: 'pending',
+    adminNote: '',
     submittedAt: new Date().toISOString(),
   };
+  // Optimistic local update
   const existing = getLocal('dsa_solutions', []);
   setLocal('dsa_solutions', [newEntry, ...existing]);
+  try {
+    await query(
+      `INSERT INTO dsa_solutions
+        (id, member_id, member_name, member_email, problem_id, problem_title, difficulty, topic_name, image_data, notes, description, status, admin_note)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'pending','')`,
+      [id, submission.memberId, submission.memberName, submission.memberEmail,
+       submission.problemId, submission.problemTitle, submission.difficulty,
+       submission.topicName, submission.imageData || null,
+       submission.notes || null, submission.description || submission.notes || null]
+    );
+  } catch (err) { console.warn('DSA solution add DB fallback:', err.message); }
   return newEntry;
 };
 
-export const updateDSASolutionStatus = (id, status, adminNote = '') => {
+export const updateDSASolutionStatus = async (id, status, adminNote = '') => {
+  // Optimistic local update
   const updated = getLocal('dsa_solutions', []).map(s =>
     s.id === id ? { ...s, status, adminNote, reviewedAt: new Date().toISOString() } : s
   );
   setLocal('dsa_solutions', updated);
+  try {
+    await query(
+      `UPDATE dsa_solutions SET status=$1, admin_note=$2, reviewed_at=NOW() WHERE id=$3`,
+      [status, adminNote, id]
+    );
+  } catch (err) { console.warn('DSA solution status update DB fallback:', err.message); }
 };
 
-export const updateDSASolution = (id, updates) => {
+export const updateDSASolution = async (id, updates) => {
+  // Optimistic local update
   const updated = getLocal('dsa_solutions', []).map(s =>
     s.id === id ? { ...s, ...updates, updatedAt: new Date().toISOString() } : s
   );
   setLocal('dsa_solutions', updated);
-  return updated.find(s => s.id === id);
+  const result = updated.find(s => s.id === id);
+  try {
+    await query(
+      `UPDATE dsa_solutions SET image_data=$1, notes=$2, description=$3, status=$4, updated_at=NOW() WHERE id=$5`,
+      [updates.imageData ?? result?.imageData, updates.notes ?? result?.notes,
+       updates.description ?? updates.notes ?? result?.description,
+       updates.status ?? result?.status, id]
+    );
+  } catch (err) { console.warn('DSA solution update DB fallback:', err.message); }
+  return result;
 };
 
-export const deleteDSASolution = (id) => {
+export const deleteDSASolution = async (id) => {
   const all = getLocal('dsa_solutions', []);
   const target = all.find(s => s.id === id);
+  // Record penalty for streak calculation
   if (target) {
     const keys = [target.memberId, target.memberEmail].filter(Boolean);
     keys.forEach(k => {
@@ -857,5 +914,9 @@ export const deleteDSASolution = (id) => {
     });
   }
   setLocal('dsa_solutions', all.filter(s => s.id !== id));
+  try {
+    await query('DELETE FROM dsa_solutions WHERE id=$1', [id]);
+  } catch (err) { console.warn('DSA solution delete DB fallback:', err.message); }
 };
+
 

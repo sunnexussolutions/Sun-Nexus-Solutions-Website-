@@ -613,7 +613,7 @@ const Admin = () => {
       setDiscussions(d); setNotifications(n); setSubmissions(s);
       setProjects(p); setDomains(doms); setHomeContent(hc);
       setDsaTopics(dt || []); setDsaProblems(dp || []);
-      setDsaSolutions(getDSASolutions());
+      const sols = await getDSASolutions(); setDsaSolutions(sols);
     } catch (err) {
       console.error("Refresh error:", err);
     }
@@ -1689,7 +1689,7 @@ const Admin = () => {
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>Submissions</h3>
                 <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Review DSA solution uploads and Aptitude quiz results</p>
               </div>
-              <button onClick={() => { setDsaSolutions(getDSASolutions()); refresh(); }}
+              <button onClick={async () => { const sols = await getDSASolutions(); setDsaSolutions(sols); refresh(); }}
                 style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>
                 ↻ Refresh
               </button>
@@ -1788,7 +1788,7 @@ const Admin = () => {
                                   e.stopPropagation();
                                   if (confirm(`Delete submission by ${sol.memberName || 'this student'} permanently?`)) {
                                     deleteDSASolution(sol.id);
-                                    setDsaSolutions(getDSASolutions());
+                                    getDSASolutions().then(sols => setDsaSolutions(sols));
                                     if (selectedSubDetail === sol.id) setSelectedSubDetail(null);
                                   }
                                 }}
@@ -1842,19 +1842,19 @@ const Admin = () => {
                                 </div>
                               )}
                               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', paddingTop: '8px' }}>
-                                <button onClick={() => { updateDSASolutionStatus(sol.id, 'approved'); setDsaSolutions(getDSASolutions()); }}
+                                <button onClick={async () => { await updateDSASolutionStatus(sol.id, 'approved'); getDSASolutions().then(sols => setDsaSolutions(sols)); }}
                                   style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', background: 'rgba(34,197,94,0.1)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.25)', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
                                   <Check size={14} /> Approve
                                 </button>
-                                <button onClick={() => { updateDSASolutionStatus(sol.id, 'rejected'); setDsaSolutions(getDSASolutions()); }}
+                                <button onClick={async () => { await updateDSASolutionStatus(sol.id, 'rejected'); getDSASolutions().then(sols => setDsaSolutions(sols)); }}
                                   style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.25)', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
                                   <X size={14} /> Reject
                                 </button>
-                                <button onClick={() => { updateDSASolutionStatus(sol.id, 'reviewed'); setDsaSolutions(getDSASolutions()); }}
+                                <button onClick={async () => { await updateDSASolutionStatus(sol.id, 'reviewed'); getDSASolutions().then(sols => setDsaSolutions(sols)); }}
                                   style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
                                   <Eye size={14} /> Mark Reviewed
                                 </button>
-                                <button onClick={() => { if (confirm('Delete this submission permanently?')) { deleteDSASolution(sol.id); setDsaSolutions(getDSASolutions()); setSelectedSubDetail(null); } }}
+                                <button onClick={async () => { if (confirm('Delete this submission permanently?')) { await deleteDSASolution(sol.id); getDSASolutions().then(sols => setDsaSolutions(sols)); setSelectedSubDetail(null); } }}
                                   style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', background: 'rgba(239,68,68,0.06)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.15)', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>
                                   <Trash2 size={13} /> Delete
                                 </button>
