@@ -512,9 +512,22 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
           .dsa-header-bar {
             flex-direction: column !important;
             align-items: stretch !important;
+            gap: 12px !important;
+            padding: 12px 14px !important;
           }
           .dsa-pill-nav {
             width: 100% !important;
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 6px !important;
+            padding: 6px !important;
+            box-sizing: border-box !important;
+          }
+          .dsa-pill-button {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 10px 8px !important;
+            font-size: 11px !important;
           }
         }
 
