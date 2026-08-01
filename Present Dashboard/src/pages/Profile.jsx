@@ -281,6 +281,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
     mobileNumber:    profileData.phone?.replace(/^\+91\s?/, '') || user?.phone || user?.mobileNumber || '',
     dob:             profileData.dob               || user?.dob            || '',
     gender:          profileData.gender            || user?.gender         || 'Male',
+    location:        profileData.location          || profileData.address  || user?.location || '',
     university:      profileData.university        || user?.university     || '',
     branch:          profileData.branch            || user?.branch         || '',
     specialization:  profileData.specialization    || user?.specialization || '',
@@ -625,6 +626,19 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                       <option value="Female">Female</option>
                       <option value="Other">Other</option>
                     </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Location / Address</label>
+                  <div style={inputContainerStyle}>
+                    <MapPin size={16} style={iconStyle} />
+                    <input
+                      value={formData.location}
+                      onChange={e => setFormData({ ...formData, location: e.target.value })}
+                      placeholder="e.g. Mumbai, India"
+                      style={inputStyle}
+                    />
                   </div>
                 </div>
               </div>
@@ -1351,6 +1365,8 @@ export default function Profile() {
       phone:           `${formData.countryCode || '+91'} ${formData.mobileNumber}`.trim() || profileData.phone,
       dob:             formData.dob                 || profileData.dob,
       gender:          formData.gender              || profileData.gender,
+      location:        formData.location            || profileData.location,
+      address:         formData.location            || profileData.address,
       university:      formData.university          || profileData.university,
       branch:          formData.branch              || profileData.branch,
       specialization:  formData.specialization      || profileData.specialization,
@@ -1388,6 +1404,8 @@ export default function Profile() {
         mobileNumber:    formData.mobileNumber,
         dob:             updatedProfile.dob,
         gender:          updatedProfile.gender,
+        location:        formData.location,
+        address:         formData.location,
         university:      updatedProfile.university,
         branch:          updatedProfile.branch,
         specialization:  updatedProfile.specialization,
@@ -1420,6 +1438,8 @@ export default function Profile() {
       mobileNumber:    formData.mobileNumber,
       dob:             formData.dob,
       gender:          formData.gender,
+      location:        formData.location,
+      address:         formData.location,
       university:      formData.university,
       branch:          formData.branch,
       specialization:  formData.specialization,
@@ -1658,30 +1678,38 @@ export default function Profile() {
                 border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.3)' : '#e9d5ff'}`,
                 color: '#7b5cff', fontSize: '10.5px', fontWeight: 900, letterSpacing: '0.05em'
               }}>
-                PLATFORM ADMIN
+                {user?.isAdmin ? 'PLATFORM ADMIN' : (profileData.selectedDomain || profileData.branch || 'NEXUS MEMBER').toUpperCase()}
               </span>
             </div>
             <p style={{ fontSize: '14px', fontWeight: 700, color: '#7b5cff', margin: 0 }}>
-              {profileData.headline}
+              {profileData.headline || profileData.selectedDomain || profileData.branch || 'Full Stack Developer'}
             </p>
-            <p style={{ fontSize: '13px', fontWeight: 500, color: isDark ? '#94a3b8' : '#64748b', margin: 0 }}>
-              {profileData.bio}
-            </p>
+            {profileData.bio && (
+              <p style={{ fontSize: '13px', fontWeight: 500, color: isDark ? '#94a3b8' : '#64748b', margin: 0 }}>
+                {profileData.bio}
+              </p>
+            )}
 
             {/* Contact Glass Badges Row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '6px', flexWrap: 'wrap', fontSize: '12px', fontWeight: 600 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
-                <MapPin size={13} style={{ color: '#7b5cff' }} />
-                <span>{profileData.location || 'Mumbai, India'}</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
-                <AtSign size={13} style={{ color: '#7b5cff' }} />
-                <span>{profileData.email || 'nexus.admin.dev@gmail.com'}</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
-                <Phone size={13} style={{ color: '#7b5cff' }} />
-                <span>{profileData.phone || '+91 91234 56789'}</span>
-              </div>
+              {profileData.location && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
+                  <MapPin size={13} style={{ color: '#7b5cff' }} />
+                  <span>{profileData.location}</span>
+                </div>
+              )}
+              {profileData.email && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
+                  <AtSign size={13} style={{ color: '#7b5cff' }} />
+                  <span>{profileData.email}</span>
+                </div>
+              )}
+              {profileData.phone && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
+                  <Phone size={13} style={{ color: '#7b5cff' }} />
+                  <span>{profileData.phone}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
