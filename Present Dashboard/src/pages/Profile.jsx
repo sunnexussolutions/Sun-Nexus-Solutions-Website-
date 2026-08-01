@@ -2018,10 +2018,6 @@ export default function Profile() {
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Address</span>
                 <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.address || profileData.location || '—'}</span>
               </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Member Since</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.joined || 'May 2026'}</span>
-              </div>
             </div>
           </div>
 
