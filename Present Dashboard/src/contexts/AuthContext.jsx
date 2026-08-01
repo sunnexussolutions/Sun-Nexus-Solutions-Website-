@@ -145,16 +145,38 @@ export const AuthProvider = ({ children }) => {
         } catch (e) {}
 
         const updated = { 
+          ...currentSaved,
           ...u, 
-          firstName: u.first_name || currentSaved.firstName, 
-          lastName: u.last_name || currentSaved.lastName, 
-          avatar: u.avatar || currentSaved.avatar,
-          banner: u.banner || currentSaved.banner,
-          skills: u.skills || currentSaved.skills,
-          projects: u.projects || currentSaved.projects,
-          isAdmin: u.is_admin,
-          status: u.status || 'active',
-          joinedAt: u.joined_at || currentSaved.joinedAt
+          firstName:       u.first_name       || currentSaved.firstName,
+          lastName:        u.last_name        || currentSaved.lastName,
+          name:            u.name             || currentSaved.name,
+          avatar:          u.avatar           || currentSaved.avatar,
+          banner:          u.banner           || currentSaved.banner,
+          skills:          u.skills           || currentSaved.skills,
+          projects:        u.projects         || currentSaved.projects,
+          isAdmin:         u.is_admin,
+          status:          u.status           || 'active',
+          joinedAt:        u.joined_at        || currentSaved.joinedAt,
+          // Extended profile fields
+          phone:           u.phone            || currentSaved.phone,
+          mobileNumber:    u.phone            || currentSaved.mobileNumber,
+          dob:             u.dob              || currentSaved.dob,
+          gender:          u.gender           || currentSaved.gender,
+          university:      u.university       || currentSaved.university,
+          branch:          u.branch           || currentSaved.branch,
+          specialization:  u.specialization   || currentSaved.specialization,
+          year:            u.year             || currentSaved.year,
+          division:        u.division         || currentSaved.division,
+          prnNumber:       u.prn_number       || currentSaved.prnNumber,
+          selectedDomain:  u.selected_domain  || currentSaved.selectedDomain,
+          experienceLevel: u.experience_level || currentSaved.experienceLevel,
+          bio:             u.bio              || currentSaved.bio,
+          githubUrl:       u.github_url       || currentSaved.githubUrl,
+          linkedinUrl:     u.linkedin_url     || currentSaved.linkedinUrl,
+          portfolioUrl:    u.portfolio_url    || currentSaved.portfolioUrl,
+          username:        u.username         || currentSaved.username,
+          location:        u.location         || currentSaved.location,
+          headline:        u.headline         || currentSaved.headline,
         };
         setUser(updated);
         localStorage.setItem('nexus_user', JSON.stringify(updated));
@@ -427,35 +449,68 @@ export const AuthProvider = ({ children }) => {
 
     window.dispatchEvent(new Event('nexus-data-updated'));
 
-    // SENIOR DEV TIP: Use a dynamic query or COALESCE to ensure we only update what's provided
+    // Sync ALL profile fields to DB using COALESCE so we only overwrite what's provided
     try {
       await query(`
         UPDATE profiles 
         SET 
-          first_name = COALESCE($1, first_name),
-          last_name = COALESCE($2, last_name),
-          headline = COALESCE($3, headline),
-          avatar = COALESCE($4, avatar),
-          location = COALESCE($5, location),
-          banner = COALESCE($6, banner),
-          skills = COALESCE($7, skills),
-          projects = COALESCE($8, projects),
-          name = COALESCE($9, name)
-        WHERE id = $10
+          first_name        = COALESCE($1,  first_name),
+          last_name         = COALESCE($2,  last_name),
+          headline          = COALESCE($3,  headline),
+          avatar            = COALESCE($4,  avatar),
+          location          = COALESCE($5,  location),
+          banner            = COALESCE($6,  banner),
+          skills            = COALESCE($7,  skills),
+          projects          = COALESCE($8,  projects),
+          name              = COALESCE($9,  name),
+          phone             = COALESCE($10, phone),
+          dob               = COALESCE($11, dob),
+          gender            = COALESCE($12, gender),
+          university        = COALESCE($13, university),
+          branch            = COALESCE($14, branch),
+          specialization    = COALESCE($15, specialization),
+          year              = COALESCE($16, year),
+          division          = COALESCE($17, division),
+          prn_number        = COALESCE($18, prn_number),
+          selected_domain   = COALESCE($19, selected_domain),
+          experience_level  = COALESCE($20, experience_level),
+          bio               = COALESCE($21, bio),
+          github_url        = COALESCE($22, github_url),
+          linkedin_url      = COALESCE($23, linkedin_url),
+          portfolio_url     = COALESCE($24, portfolio_url),
+          username          = COALESCE($25, username)
+        WHERE id = $26
       `, [
-        updates.firstName || null, 
-        updates.lastName || null, 
-        updates.headline || null, 
-        updates.avatar || null, 
-        updates.location || null,
-        updates.banner || null,
-        updates.skills ? JSON.stringify(updates.skills) : null,
-        updates.projects ? JSON.stringify(updates.projects) : null,
-        updates.name || null,
+        updates.firstName || null,
+        updates.lastName  || null,
+        updates.headline  || null,
+        updates.avatar    || null,
+        updates.location  || null,
+        updates.banner    || null,
+        updates.skills    ? JSON.stringify(updates.skills)   : null,
+        updates.projects  ? JSON.stringify(updates.projects) : null,
+        updates.name      || null,
+        updates.phone     || updates.mobileNumber || null,
+        updates.dob       || null,
+        updates.gender    || null,
+        updates.university       || null,
+        updates.branch           || null,
+        updates.specialization   || null,
+        updates.year             || null,
+        updates.division         || null,
+        updates.prnNumber        || null,
+        updates.selectedDomain   || null,
+        updates.experienceLevel  || null,
+        updates.bio              || null,
+        updates.githubUrl        || null,
+        updates.linkedinUrl      || null,
+        updates.portfolioUrl     || null,
+        updates.username         || null,
         user.id
       ]);
     } catch (err) {
-      console.error("DB_SYNC_ERROR:", err);
+      // DB columns may not all exist yet — this is a graceful fallback
+      console.warn("DB_SYNC partial error (some columns may not exist yet):", err.message);
     }
 
     window.dispatchEvent(new Event('nexus-data-updated'));

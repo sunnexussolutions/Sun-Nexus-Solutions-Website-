@@ -1,25 +1,18 @@
 import React from 'react';
 import {
-  LayoutGrid, GraduationCap, Layers, Folder,
-  Target, Users, User, ShieldCheck, LogOut,
-  Sun, Moon, X, Brain, ChevronDown
+  LayoutGrid, Braces, Target, Users, FolderKanban,
+  User, ShieldCheck, LogOut, Sun, Moon, X, ChevronDown
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
-  // { id: 'learning', label: 'My Learning', icon: GraduationCap },
-  // { id: 'domains', label: 'Domains', icon: Layers },
-  // { id: 'projects', label: 'Projects', icon: Folder },
-  { 
-    id: 'dsa', 
-    label: 'DSA', 
-    icon: Brain 
-  },
+  { id: 'dsa', label: 'DSA', icon: Braces, badge: 'New' },
   { id: 'aptitude', label: 'Aptitude', icon: Target },
-  // { id: 'council', label: 'Council', icon: Users },
-  { id: 'profile', label: 'Profile', icon: User },
+  { id: 'domains', label: 'Domains', icon: Users },
+  { id: 'projects', label: 'Projects', icon: FolderKanban },
+  { id: 'profile', label: 'Profile', icon: User, badge: 'Updated' },
 ];
 
 const ADMIN_ITEM = { id: 'admin', label: 'Admin Panel', icon: ShieldCheck };
@@ -73,7 +66,7 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
       {/* Top Header & Navigation Section */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', flex: 1, minHeight: 0, boxSizing: 'border-box' }}>
         {/* Brand Header */}
-        <div style={{ display: 'flex', items: 'center', justifyContent: 'space-between', width: '100%', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
@@ -163,41 +156,40 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '11px 16px',
+                    padding: '12px 16px',
                     minHeight: '48px',
-                    borderRadius: '12px',
-                    fontSize: '14px',
-                    fontWeight: isActive ? 700 : 500,
+                    borderRadius: '14px',
+                    fontSize: '15px',
+                    fontWeight: isActive ? 700 : 600,
                     border: 'none',
                     cursor: 'pointer',
                     boxSizing: 'border-box',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     whiteSpace: 'nowrap',
                     background: isActive
-                      ? 'linear-gradient(135deg, #7b5cff 0%, #a78bfa 100%)'
+                      ? (isDark ? 'rgba(139, 92, 246, 0.16)' : '#f3e8ff')
                       : 'transparent',
                     color: isActive
-                      ? '#ffffff'
-                      : (isDark ? '#cbd5e1' : '#1e293b'),
-                    boxShadow: isActive
-                      ? '0 4px 16px rgba(123, 92, 255, 0.35)'
-                      : 'none',
+                      ? (isDark ? '#c4b5fd' : '#6d28d9')
+                      : (isDark ? '#cbd5e1' : '#1e1b4b'),
+                    boxShadow: 'none',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
                     <div style={{ width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <IconComp
-                        size={20}
+                        size={22}
+                        strokeWidth={2.2}
                         style={{
                           color: isActive
-                            ? '#ffffff'
-                            : (isDark ? '#94a3b8' : '#475569'),
+                            ? (isDark ? '#c4b5fd' : '#6d28d9')
+                            : (isDark ? '#94a3b8' : '#1e1b4b'),
                           flexShrink: 0,
                           transition: 'color 0.2s ease',
                         }}
                       />
                     </div>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.01em' }}>
                       {item.label}
                     </span>
                   </div>
@@ -206,7 +198,7 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                     <ChevronDown
                       size={14}
                       style={{
-                        color: isActive ? '#ffffff' : (isDark ? '#94a3b8' : '#475569'),
+                        color: isActive ? (isDark ? '#c4b5fd' : '#6d28d9') : (isDark ? '#94a3b8' : '#475569'),
                         transform: isDsaExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
                         transition: 'transform 0.2s ease'
                       }}
@@ -216,14 +208,17 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                   {item.badge && (
                     <span
                       style={{
-                        padding: '2px 8px',
-                        borderRadius: '9999px',
-                        backgroundColor: '#f59e0b',
-                        color: '#ffffff',
-                        fontSize: '11px',
-                        fontWeight: 800,
+                        padding: '2px 10px',
+                        borderRadius: '8px',
+                        backgroundColor: isDark ? 'rgba(139, 92, 246, 0.15)' : '#ffffff',
+                        color: isDark ? '#c4b5fd' : '#7c3aed',
+                        border: `1.5px solid ${isDark ? '#8b5cf6' : '#a78bfa'}`,
+                        fontSize: '11.5px',
+                        fontWeight: 700,
                         flexShrink: 0,
-                        marginLeft: '8px'
+                        marginLeft: '8px',
+                        letterSpacing: '-0.01em',
+                        lineHeight: '1.2'
                       }}
                     >
                       {item.badge}
