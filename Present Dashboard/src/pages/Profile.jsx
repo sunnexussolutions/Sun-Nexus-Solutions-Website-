@@ -675,7 +675,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                 </div>
 
                 <div>
-                  <label style={labelStyle}>Branch</label>
+                  <label style={labelStyle}>Branch / Stream</label>
                   <div style={inputContainerStyle}>
                     <User size={16} style={iconStyle} />
                     <select
@@ -684,9 +684,23 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                       style={inputStyle}
                     >
                       <option value="Computer Science Engineering">Computer Science Engineering</option>
+                      <option value="Computer Science (AI & ML)">Computer Science (AI & ML)</option>
+                      <option value="Computer Science (Data Science)">Computer Science (Data Science)</option>
+                      <option value="Computer Science (Cyber Security)">Computer Science (Cyber Security)</option>
                       <option value="Information Technology">Information Technology</option>
-                      <option value="Electronics & Communication">Electronics & Communication</option>
-                      <option value="AI & Data Science">AI & Data Science</option>
+                      <option value="Artificial Intelligence & Data Science">Artificial Intelligence & Data Science</option>
+                      <option value="Electronics & Telecommunication Engineering">Electronics & Telecommunication Engineering</option>
+                      <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
+                      <option value="Electrical Engineering">Electrical Engineering</option>
+                      <option value="Mechanical Engineering">Mechanical Engineering</option>
+                      <option value="Civil Engineering">Civil Engineering</option>
+                      <option value="Mechatronics Engineering">Mechatronics Engineering</option>
+                      <option value="Robotics & Automation">Robotics & Automation</option>
+                      <option value="Aerospace Engineering">Aerospace Engineering</option>
+                      <option value="Chemical Engineering">Chemical Engineering</option>
+                      <option value="Biotechnology">Biotechnology</option>
+                      <option value="Data Science & Analytics">Data Science & Analytics</option>
+                      <option value="Other / Interdisciplinary">Other / Interdisciplinary</option>
                     </select>
                   </div>
                 </div>
@@ -698,6 +712,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                     <input
                       value={formData.specialization}
                       onChange={e => setFormData({ ...formData, specialization: e.target.value })}
+                      placeholder="e.g. Artificial Intelligence"
                       style={inputStyle}
                     />
                   </div>
@@ -716,6 +731,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                       <option value="Second Year">Second Year</option>
                       <option value="Third Year">Third Year</option>
                       <option value="Final Year">Final Year</option>
+                      <option value="Graduated / Alumni">Graduated / Alumni</option>
                     </select>
                   </div>
                 </div>
@@ -727,19 +743,21 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                     <input
                       value={formData.division}
                       onChange={e => setFormData({ ...formData, division: e.target.value })}
+                      placeholder="e.g. A"
                       style={inputStyle}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label style={labelStyle}>PRN Number <span style={{ color: isDark ? '#94a3b8' : '#64748b' }}>(Read Only)</span></label>
+                  <label style={labelStyle}>PRN Number / Student ID</label>
                   <div style={inputContainerStyle}>
                     <Lock size={16} style={iconStyle} />
                     <input
-                      disabled
                       value={formData.prnNumber}
-                      style={{ ...inputStyle, backgroundColor: isDark ? 'rgba(30, 41, 59, 0.4)' : '#f1f5f9', cursor: 'not-allowed', color: isDark ? '#94a3b8' : '#64748b' }}
+                      onChange={e => setFormData({ ...formData, prnNumber: e.target.value })}
+                      placeholder="e.g. SNXU202312345"
+                      style={inputStyle}
                     />
                   </div>
                 </div>
