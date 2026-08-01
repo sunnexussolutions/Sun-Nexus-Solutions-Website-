@@ -296,6 +296,8 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
     githubUrl:       profileData.githubUrl         || user?.githubUrl       || '',
     linkedinUrl:     profileData.linkedinUrl       || user?.linkedinUrl     || '',
     portfolioUrl:    profileData.portfolioUrl      || user?.portfolioUrl    || '',
+    graduationYear:  profileData.graduationYear    || user?.graduationYear  || '',
+    cgpa:            profileData.cgpa              || user?.cgpa            || '',
     currentPassword: '',
     newPassword:     '',
     confirmPassword: '',
@@ -724,6 +726,32 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                       disabled
                       value={formData.prnNumber}
                       style={{ ...inputStyle, backgroundColor: isDark ? 'rgba(30, 41, 59, 0.4)' : '#f1f5f9', cursor: 'not-allowed', color: isDark ? '#94a3b8' : '#64748b' }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Graduation Year</label>
+                  <div style={inputContainerStyle}>
+                    <Calendar size={16} style={iconStyle} />
+                    <input
+                      value={formData.graduationYear}
+                      onChange={e => setFormData({ ...formData, graduationYear: e.target.value })}
+                      placeholder="e.g. 2027"
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>CGPA / Percentage</label>
+                  <div style={inputContainerStyle}>
+                    <Award size={16} style={iconStyle} />
+                    <input
+                      value={formData.cgpa}
+                      onChange={e => setFormData({ ...formData, cgpa: e.target.value })}
+                      placeholder="e.g. 8.75 / 10"
+                      style={inputStyle}
                     />
                   </div>
                 </div>
@@ -1214,7 +1242,7 @@ export default function Profile() {
   const buildProfileData = (src) => ({
     name: src?.name || src?.fullName || src?.username || 'Nexus_Operator',
     headline: src?.headline || src?.selectedDomain || src?.role || 'Nexus Admin',
-    location: src?.location || 'Global',
+    location: src?.location || src?.address || '',
     email: src?.email || '',
     phone: src?.phone || src?.mobileNumber || '',
     username: src?.username || '',
@@ -1233,9 +1261,11 @@ export default function Profile() {
     githubUrl: src?.githubUrl || '',
     linkedinUrl: src?.linkedinUrl || '',
     portfolioUrl: src?.portfolioUrl || '',
+    graduationYear: src?.graduationYear || src?.graduation_year || '',
+    cgpa: src?.cgpa || '',
     joined: src?.joinedAt
       ? new Date(src.joinedAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-      : 'May 2026',
+      : (src?.joined || 'May 2026'),
     lastUpdated: src?.lastUpdated || '',
     avatar: src?.avatar || '',
     banner: src?.banner || '',
@@ -1333,6 +1363,8 @@ export default function Profile() {
       githubUrl:       formData.githubUrl           || profileData.githubUrl,
       linkedinUrl:     formData.linkedinUrl         || profileData.linkedinUrl,
       portfolioUrl:    formData.portfolioUrl        || profileData.portfolioUrl,
+      graduationYear:  formData.graduationYear      || profileData.graduationYear,
+      cgpa:            formData.cgpa                || profileData.cgpa,
       headline:        formData.selectedDomain || formData.branch || profileData.headline,
       avatar:          formData.avatar              || profileData.avatar,
       skills:          formData.skills              || profileData.skills,
@@ -1368,6 +1400,8 @@ export default function Profile() {
         githubUrl:       updatedProfile.githubUrl,
         linkedinUrl:     updatedProfile.linkedinUrl,
         portfolioUrl:    updatedProfile.portfolioUrl,
+        graduationYear:  updatedProfile.graduationYear,
+        cgpa:            updatedProfile.cgpa,
         headline:        updatedProfile.headline,
         avatar:          updatedProfile.avatar,
         skills:          updatedProfile.skills,
@@ -1399,6 +1433,8 @@ export default function Profile() {
       githubUrl:       formData.githubUrl,
       linkedinUrl:     formData.linkedinUrl,
       portfolioUrl:    formData.portfolioUrl,
+      graduationYear:  formData.graduationYear,
+      cgpa:            formData.cgpa,
       avatar:          formData.avatar || profileData.avatar,
       headline:        formData.selectedDomain || formData.branch || 'Full Stack Developer',
       lastUpdated:     'Just now'
@@ -1797,35 +1833,35 @@ export default function Profile() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '18px 24px' }}>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Full Name</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.name}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.name || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Username</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.username || 'nexus_admin'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.username || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Email Address</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.email || 'nexus.admin.dev@gmail.com'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.email || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Phone Number</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.phone || '+91 91234 56789'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.phone || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Date of Birth</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.dob || '15 Aug 2000'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.dob || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Gender</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.gender || 'Male'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.gender || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Address</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.address || 'Mumbai, Maharashtra, India'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.address || profileData.location || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Member Since</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.joined || '15 May 2026'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.joined || 'May 2026'}</span>
               </div>
             </div>
           </div>
@@ -1846,35 +1882,35 @@ export default function Profile() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '18px 24px' }}>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>University</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.university || 'Sun Nexus University'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.university || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Branch</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.branch || 'Computer Science Engineering'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.branch || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Specialization</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.specialization || 'Artificial Intelligence'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.specialization || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Year</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.year || 'Third Year'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.year || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Division</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.division || 'A'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.division || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>PRN Number</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.prnNumber || 'SNXU202312345'}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.prnNumber || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Graduation Year</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>2029</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.graduationYear || '—'}</span>
               </div>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>CGPA</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>8.75 / 10</span>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.cgpa || '—'}</span>
               </div>
             </div>
           </div>
@@ -1896,32 +1932,33 @@ export default function Profile() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px' }}>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Selected Domain</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.selectedDomain || 'Web Development'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.selectedDomain || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Experience Level</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.experienceLevel || 'Intermediate'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.experienceLevel || '—'}</span>
                 </div>
               </div>
 
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '8px' }}>Skills</span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {(profileData.skills && profileData.skills.length > 0
-                    ? profileData.skills.map(s => typeof s === 'string' ? s : s.name)
-                    : ['React.js', 'Node.js', 'Next.js', 'TypeScript', 'Tailwind CSS', 'MongoDB', 'Supabase', 'Docker']
-                  ).map((sk) => (
-                    <span key={sk} style={{ padding: '5px 12px', borderRadius: '10px', backgroundColor: isDark ? '#121625' : '#f1f5f9', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, fontSize: '12px', fontWeight: 700, color: isDark ? '#cbd5e1' : '#475569' }}>
-                      {sk}
-                    </span>
-                  ))}
+                  {profileData.skills && profileData.skills.length > 0 ? (
+                    profileData.skills.map(s => typeof s === 'string' ? s : s.name).map((sk) => (
+                      <span key={sk} style={{ padding: '5px 12px', borderRadius: '10px', backgroundColor: isDark ? '#121625' : '#f1f5f9', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, fontSize: '12px', fontWeight: 700, color: isDark ? '#cbd5e1' : '#475569' }}>
+                        {sk}
+                      </span>
+                    ))
+                  ) : (
+                    <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8', fontStyle: 'italic' }}>No skills added yet</span>
+                  )}
                 </div>
               </div>
 
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Bio</span>
                 <p style={{ fontSize: '13px', fontWeight: 500, color: isDark ? '#cbd5e1' : '#475569', margin: 0, lineHeight: 1.5 }}>
-                  {profileData.bio || 'Enthusiastic Full Stack Developer with a strong foundation in building modern web applications. Love to solve problems and create impactful digital experiences.'}
+                  {profileData.bio || 'No bio provided yet.'}
                 </p>
               </div>
 
@@ -1955,11 +1992,13 @@ export default function Profile() {
                   ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
                 </div>
                 <div>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Resume</span>
-                  <a href="#" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <span>View / Download</span>
-                    <ExternalLink size={12} />
-                  </a>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Resume / Website</span>
+                  {profileData.portfolioUrl ? (
+                    <a href={profileData.portfolioUrl} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <span>View Portfolio</span>
+                      <ExternalLink size={12} />
+                    </a>
+                  ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
                 </div>
               </div>
             </div>
@@ -2051,11 +2090,11 @@ export default function Profile() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '12.5px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>User ID</span>
-                <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>{profileData.prnNumber || user?.id?.slice(0, 12).toUpperCase() || 'SNXU202312345'}</span>
+                <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>{profileData.prnNumber || user?.id?.slice(0, 12).toUpperCase() || '—'}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>Member Since</span>
-                <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>{profileData.joined || '15 May 2026'}</span>
+                <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>{profileData.joined || 'May 2026'}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>Last Updated</span>
@@ -2076,23 +2115,41 @@ export default function Profile() {
               </button>
             </div>
 
-            {/* 5x2 Grid of Tech Icon Badges */}
+            {/* Dynamic Grid of Tech Icon Badges */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
-              {['React', 'Node', 'Next.js', 'TypeScript', 'Tailwind', 'MongoDB', 'Supabase', 'Docker', 'Git', 'More'].map((t, idx) => (
-                <div key={idx} title={t} style={{
-                  height: '44px', borderRadius: '12px',
-                  backgroundColor: isDark ? '#121625' : '#f8fafc',
-                  border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
-                }}>
-                  {t === 'More' ? (
-                    <span style={{ fontSize: '14px', fontWeight: 900, color: '#7b5cff' }}>•••</span>
-                  ) : (
-                    <TechLogo name={t} />
-                  )}
-                </div>
-              ))}
+              {(() => {
+                const rawSkills = profileData.skills && profileData.skills.length > 0
+                  ? profileData.skills.map(s => typeof s === 'string' ? s : s.name)
+                  : ['React', 'Node', 'Next.js', 'TypeScript', 'Tailwind'];
+                const displaySkills = rawSkills.slice(0, 9);
+                const hasMore = rawSkills.length > 9;
+                return (
+                  <>
+                    {displaySkills.map((t, idx) => (
+                      <div key={idx} title={t} style={{
+                        height: '44px', borderRadius: '12px',
+                        backgroundColor: isDark ? '#121625' : '#f8fafc',
+                        border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
+                      }}>
+                        <TechLogo name={t} />
+                      </div>
+                    ))}
+                    {hasMore && (
+                      <div title={`${rawSkills.length - 9} more skills`} style={{
+                        height: '44px', borderRadius: '12px',
+                        backgroundColor: isDark ? '#121625' : '#f8fafc',
+                        border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '12px', fontWeight: 900, color: '#7b5cff'
+                      }}>
+                        +{rawSkills.length - 9}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
 

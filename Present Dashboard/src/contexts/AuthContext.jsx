@@ -177,6 +177,8 @@ export const AuthProvider = ({ children }) => {
           username:        u.username         || currentSaved.username,
           location:        u.location         || currentSaved.location,
           headline:        u.headline         || currentSaved.headline,
+          graduationYear:  u.graduation_year  || currentSaved.graduationYear,
+          cgpa:            u.cgpa             || currentSaved.cgpa,
         };
         setUser(updated);
         localStorage.setItem('nexus_user', JSON.stringify(updated));
@@ -478,8 +480,10 @@ export const AuthProvider = ({ children }) => {
           github_url        = COALESCE($22, github_url),
           linkedin_url      = COALESCE($23, linkedin_url),
           portfolio_url     = COALESCE($24, portfolio_url),
-          username          = COALESCE($25, username)
-        WHERE id = $26
+          username          = COALESCE($25, username),
+          graduation_year   = COALESCE($26, graduation_year),
+          cgpa              = COALESCE($27, cgpa)
+        WHERE id = $28
       `, [
         updates.firstName || null,
         updates.lastName  || null,
@@ -506,6 +510,8 @@ export const AuthProvider = ({ children }) => {
         updates.linkedinUrl      || null,
         updates.portfolioUrl     || null,
         updates.username         || null,
+        updates.graduationYear   || null,
+        updates.cgpa             || null,
         user.id
       ]);
     } catch (err) {
