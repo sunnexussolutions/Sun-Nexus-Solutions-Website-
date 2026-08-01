@@ -1266,6 +1266,7 @@ export default function Profile() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isTechStackModalOpen, setIsTechStackModalOpen] = useState(false);
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
+  const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
   const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
   const [selectedProjectType, setSelectedProjectType] = useState('completed');
   const [activeTab, setActiveTab] = useState('overview');
@@ -1367,6 +1368,116 @@ export default function Profile() {
   const currentStreak  = user?.streak || 0;
   const bestStreak     = user?.bestStreak || user?.best_streak || currentStreak;
 
+  // Dynamic Activity Timeline constructed from real user actions
+  const activityList = useMemo(() => {
+    const list = [];
+
+    // Profile updated event
+    if (profileData.lastUpdated) {
+      list.push({
+        id: 'act-prof-update',
+        title: 'Updated Profile Details',
+        desc: 'Personal & Academic information updated',
+        time: profileData.lastUpdated,
+        icon: User,
+        bg: '#dcfce7',
+        color: '#16a34a'
+      });
+    }
+
+    // DSA Submissions
+    (dsaSolutions || []).forEach(s => {
+      list.push({
+        id: `act-dsa-${s.id || Math.random()}`,
+        title: `Submitted DSA Solution`,
+        desc: `${s.problemTitle || s.title || 'DSA Problem'} (${s.status || 'pending'})`,
+        time: s.submittedAt || s.submitted_at ? new Date(s.submittedAt || s.submitted_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Recently',
+        icon: ClipboardList,
+        bg: '#eff6ff',
+        color: '#3b82f6'
+      });
+    });
+
+    // Aptitude Test attempts
+    (aptitudeResults || []).forEach(r => {
+      list.push({
+        id: `act-apt-${r.id || Math.random()}`,
+        title: `Submitted Aptitude Test`,
+        desc: `${r.topic || 'Assessment'} (${Math.round(r.percentage || 0)}%)`,
+        time: r.submitted_at ? new Date(r.submitted_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Recently',
+        icon: FileText,
+        bg: '#f0f9ff',
+        color: '#0284c7'
+      });
+    });
+
+    // Joined Platform
+    list.push({
+      id: 'act-joined',
+      title: 'Joined Sun Nexus Platform',
+      desc: 'Welcome to the platform!',
+      time: profileData.joined || 'May 2026',
+      icon: Sparkles,
+      bg: '#f3e8ff',
+      color: '#8b5cf6'
+    });
+
+    return list;
+  }, [profileData.lastUpdated, profileData.joined, dsaSolutions, aptitudeResults]);
+
+  // Dynamic Recent Achievements constructed from real user milestones
+  const achievementsList = useMemo(() => {
+    const list = [];
+
+    // Milestone 1: Joined Platform
+    list.push({
+      id: 'ach-member',
+      title: 'Platform Pioneer',
+      desc: 'Joined Sun Nexus Community',
+      date: profileData.joined || 'May 2026',
+      icon: Sparkles,
+      bg: '#7b5cff'
+    });
+
+    // Milestone 2: DSA Problems Solved
+    if (dsaApproved.length > 0) {
+      list.push({
+        id: 'ach-dsa',
+        title: 'DSA Problem Solver',
+        desc: `Solved ${dsaApproved.length} DSA Problem${dsaApproved.length === 1 ? '' : 's'}`,
+        date: 'Active',
+        icon: Star,
+        bg: '#16a34a'
+      });
+    }
+
+    // Milestone 3: Aptitude Tests Completed
+    if (aptitudeStats.count > 0) {
+      list.push({
+        id: 'ach-aptitude',
+        title: 'Aptitude Challenger',
+        desc: `Completed ${aptitudeStats.count} Test${aptitudeStats.count === 1 ? '' : 's'} (Best: ${aptitudeStats.best}%)`,
+        date: 'Active',
+        icon: ShieldCheck,
+        bg: '#0284c7'
+      });
+    }
+
+    // Milestone 4: Active Streak
+    if (currentStreak > 0) {
+      list.push({
+        id: 'ach-streak',
+        title: 'Consistent Learner',
+        desc: `Maintained ${currentStreak} week streak`,
+        date: 'Active',
+        icon: Flame,
+        bg: '#f97316'
+      });
+    }
+
+    return list;
+  }, [profileData.joined, dsaApproved.length, aptitudeStats, currentStreak]);
+
   // Save Full Edit Profile — Optimistic Update pattern:
 
   // 1. Update local profileData state IMMEDIATELY (instant UI update, no waiting for DB)
@@ -1377,28 +1488,28 @@ export default function Profile() {
     // instant the user clicks "Continue" in the success modal.
     const updatedProfile = {
       ...profileData,
-      name:            formData.fullName            ?? profileData.name,
-      username:        formData.username            ?? profileData.username,
-      email:           formData.email               ?? profileData.email,
-      phone:           formData.mobileNumber ? `${formData.countryCode || '+91'} ${formData.mobileNumber}`.trim() : profileData.phone,
-      dob:             formData.dob                 ?? profileData.dob,
-      gender:          formData.gender              ?? profileData.gender,
-      location:        formData.location            ?? profileData.location,
-      address:         formData.location            ?? profileData.address,
-      university:      formData.university          ?? profileData.university,
-      branch:          formData.branch              ?? profileData.branch,
-      specialization:  formData.specialization      ?? profileData.specialization,
-      year:            formData.year                ?? profileData.year,
-      division:        formData.division            ?? profileData.division,
-      prnNumber:       formData.prnNumber           ?? profileData.prnNumber,
-      selectedDomain:  formData.selectedDomain      ?? profileData.selectedDomain,
-      experienceLevel: formData.experienceLevel     ?? profileData.experienceLevel,
-      bio:             formData.bio                 ?? profileData.bio,
-      githubUrl:       formData.githubUrl           ?? profileData.githubUrl,
-      linkedinUrl:     formData.linkedinUrl         ?? profileData.linkedinUrl,
-      portfolioUrl:    formData.portfolioUrl        ?? profileData.portfolioUrl,
-      graduationYear:  formData.graduationYear      ?? profileData.graduationYear,
-      cgpa:            formData.cgpa                ?? profileData.cgpa,
+      name:            formData.fullName            || profileData.name,
+      username:        formData.username            || profileData.username,
+      email:           formData.email               || profileData.email,
+      phone:           `${formData.countryCode || '+91'} ${formData.mobileNumber}`.trim() || profileData.phone,
+      dob:             formData.dob                 || profileData.dob,
+      gender:          formData.gender              || profileData.gender,
+      location:        formData.location            || profileData.location,
+      address:         formData.location            || profileData.address,
+      university:      formData.university          || profileData.university,
+      branch:          formData.branch              || profileData.branch,
+      specialization:  formData.specialization      || profileData.specialization,
+      year:            formData.year                || profileData.year,
+      division:        formData.division            || profileData.division,
+      prnNumber:       formData.prnNumber           || profileData.prnNumber,
+      selectedDomain:  formData.selectedDomain      || profileData.selectedDomain,
+      experienceLevel: formData.experienceLevel     || profileData.experienceLevel,
+      bio:             formData.bio                 || profileData.bio,
+      githubUrl:       formData.githubUrl           || profileData.githubUrl,
+      linkedinUrl:     formData.linkedinUrl         || profileData.linkedinUrl,
+      portfolioUrl:    formData.portfolioUrl        || profileData.portfolioUrl,
+      graduationYear:  formData.graduationYear      || profileData.graduationYear,
+      cgpa:            formData.cgpa                || profileData.cgpa,
       headline:        formData.selectedDomain || formData.branch || profileData.headline,
       avatar:          formData.avatar              || profileData.avatar,
       skills:          formData.skills              || profileData.skills,
@@ -2063,70 +2174,23 @@ export default function Profile() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#dcfce7', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <User size={16} />
+              {activityList.slice(0, 4).map((act) => {
+                const IconComp = act.icon;
+                return (
+                  <div key={act.id} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: act.bg, color: act.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <IconComp size={16} />
+                      </div>
+                      <div>
+                        <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{act.title}</h4>
+                        <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>{act.desc}</p>
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: act.color, whiteSpace: 'nowrap' }}>{act.time}</span>
                   </div>
-                  <div>
-                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Updated Profile</h4>
-                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Personal information</p>
-                  </div>
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', whiteSpace: 'nowrap' }}>Just now</span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <ClipboardList size={16} />
-                  </div>
-                  <div>
-                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Completed DSA Problem</h4>
-                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Two Sum</p>
-                  </div>
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8', whiteSpace: 'nowrap' }}>10 min ago</span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#f0f9ff', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <FileText size={16} />
-                  </div>
-                  <div>
-                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Submitted Aptitude Test</h4>
-                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Logical Reasoning</p>
-                  </div>
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8', whiteSpace: 'nowrap' }}>25 min ago</span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#fff7ed', color: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <Star size={16} fill="#f97316" />
-                  </div>
-                  <div>
-                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Earned Achievement</h4>
-                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>DSA Beginner</p>
-                  </div>
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8', whiteSpace: 'nowrap' }}>3 days ago</span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#f3e8ff', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <User size={16} />
-                  </div>
-                  <div>
-                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Joined Nexus Hub</h4>
-                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Welcome to the platform!</p>
-                  </div>
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8', whiteSpace: 'nowrap' }}>5 days ago</span>
-              </div>
+                );
+              })}
             </div>
           </div>
 
@@ -2203,48 +2267,27 @@ export default function Profile() {
           <div style={{ ...cardStyle, padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Recent Achievements</h3>
-              <button style={{ border: 'none', background: 'none', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer' }}>View All</button>
+              <button onClick={() => setIsAchievementsModalOpen(true)} style={{ border: 'none', background: 'none', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer' }}>View All</button>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#7b5cff', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <Star size={18} fill="#ffffff" />
+              {achievementsList.map((ach) => {
+                const IconComp = ach.icon;
+                return (
+                  <div key={ach.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: ach.bg, color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <IconComp size={18} fill="#ffffff" />
+                      </div>
+                      <div>
+                        <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{ach.title}</h4>
+                        <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>{ach.desc}</p>
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8' }}>{ach.date}</span>
                   </div>
-                  <div>
-                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>DSA Beginner</h4>
-                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Solved 10 DSA Problems</p>
-                  </div>
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8' }}>25 Jul 2026</span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#0284c7', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <ShieldCheck size={18} />
-                  </div>
-                  <div>
-                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Aptitude Challenger</h4>
-                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Scored 90% in Aptitude Test</p>
-                  </div>
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8' }}>20 Jul 2026</span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#f97316', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <Flame size={18} fill="#ffffff" />
-                  </div>
-                  <div>
-                    <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Consistent Learner</h4>
-                    <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>Maintained 7 Day Streak</p>
-                  </div>
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8' }}>18 Jul 2026</span>
-              </div>
+                );
+              })}
             </div>
           </div>
 
@@ -2362,21 +2405,62 @@ export default function Profile() {
           </div>
         </div>
       )}
-
-      {/* Recent Activity Modal */}
       {isActivityModalOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', borderRadius: '24px', maxWidth: '520px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', borderRadius: '24px', maxWidth: '540px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '80vh' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Activity Log</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>⚡ Full Activity History</h3>
               <button onClick={() => setIsActivityModalOpen(false)} style={{ border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}><X size={20} /></button>
             </div>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '16px', borderRadius: '16px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}` }}>
-              <Star size={20} fill="#f59e0b" color="#f59e0b" style={{ flexShrink: 0, marginTop: '2px' }} />
-              <div>
-                <h4 style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 4px 0' }}>Welcome to Sun Nexus!</h4>
-                <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: 0 }}>Your profile has been created successfully.</p>
-              </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', paddingRight: '4px' }}>
+              {activityList.map((act) => {
+                const IconComp = act.icon;
+                return (
+                  <div key={act.id} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', padding: '14px 16px', borderRadius: '16px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}` }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: act.bg, color: act.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <IconComp size={18} />
+                      </div>
+                      <div>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{act.title}</h4>
+                        <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>{act.desc}</p>
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: act.color, whiteSpace: 'nowrap' }}>{act.time}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Achievements Modal */}
+      {isAchievementsModalOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', borderRadius: '24px', maxWidth: '540px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '80vh' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>🏆 Earned Achievements & Badges</h3>
+              <button onClick={() => setIsAchievementsModalOpen(false)} style={{ border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}><X size={20} /></button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', paddingRight: '4px' }}>
+              {achievementsList.map((ach) => {
+                const IconComp = ach.icon;
+                return (
+                  <div key={ach.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: '16px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}` }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: ach.bg, color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <IconComp size={20} fill="#ffffff" />
+                      </div>
+                      <div>
+                        <h4 style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{ach.title}</h4>
+                        <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>{ach.desc}</p>
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#7b5cff', whiteSpace: 'nowrap' }}>{ach.date}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
