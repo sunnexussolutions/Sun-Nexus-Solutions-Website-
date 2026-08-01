@@ -347,6 +347,9 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault();
+    // Call onSave IMMEDIATELY so the profile view updates in real-time
+    // The success modal is shown for confirmation, but changes are already persisted
+    onSave(formData);
     setShowSuccessModal(true);
   };
 
@@ -1123,7 +1126,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
           }}>
             {/* Close Button */}
             <button
-              onClick={() => { onSave(formData); setShowSuccessModal(false); }}
+              onClick={() => setShowSuccessModal(false)}
               style={{
                 position: 'absolute', top: '16px', right: '16px', border: 'none', background: 'none',
                 color: '#94a3b8', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center'
@@ -1167,9 +1170,9 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
               Your profile information is now up to date.
             </p>
 
-            {/* Continue Button */}
+            {/* Continue Button — closes success modal and returns to Profile view */}
             <button
-              onClick={() => { onSave(formData); setShowSuccessModal(false); }}
+              onClick={() => { setShowSuccessModal(false); onClose(); }}
               style={{
                 width: '100%',
                 padding: '14px',
@@ -1206,19 +1209,40 @@ export default function Profile() {
   const [selectedProjectType, setSelectedProjectType] = useState('completed');
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Profile local data
-  const [profileData, setProfileData] = useState({
-    name: user?.name || user?.username || 'Nexus_Operator',
-    headline: user?.headline || user?.role || 'Nexus Admin',
-    location: user?.location || 'Global',
-    joined: user?.joinedAt
-      ? new Date(user.joinedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  // Profile local data — all fields synced from user / EditProfileView
+  const buildProfileData = (src) => ({
+    name: src?.name || src?.fullName || src?.username || 'Nexus_Operator',
+    headline: src?.headline || src?.selectedDomain || src?.role || 'Nexus Admin',
+    location: src?.location || 'Global',
+    email: src?.email || '',
+    phone: src?.phone || src?.mobileNumber || '',
+    username: src?.username || '',
+    dob: src?.dob || '',
+    gender: src?.gender || '',
+    address: src?.address || (src?.location || ''),
+    university: src?.university || '',
+    branch: src?.branch || '',
+    specialization: src?.specialization || '',
+    year: src?.year || '',
+    division: src?.division || '',
+    prnNumber: src?.prnNumber || '',
+    selectedDomain: src?.selectedDomain || '',
+    experienceLevel: src?.experienceLevel || '',
+    bio: src?.bio || '',
+    githubUrl: src?.githubUrl || '',
+    linkedinUrl: src?.linkedinUrl || '',
+    portfolioUrl: src?.portfolioUrl || '',
+    joined: src?.joinedAt
+      ? new Date(src.joinedAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
       : 'May 2026',
-    avatar: user?.avatar || '',
-    banner: user?.banner || '',
-    skills: user?.skills ? (typeof user.skills === 'string' ? JSON.parse(user.skills) : user.skills) : DEFAULT_TECH_STACK,
-    projects: user?.projects ? (typeof user.projects === 'string' ? JSON.parse(user.projects) : user.projects) : []
+    lastUpdated: src?.lastUpdated || '',
+    avatar: src?.avatar || '',
+    banner: src?.banner || '',
+    skills: src?.skills ? (typeof src.skills === 'string' ? JSON.parse(src.skills) : src.skills) : DEFAULT_TECH_STACK,
+    projects: src?.projects ? (typeof src.projects === 'string' ? JSON.parse(src.projects) : src.projects) : []
   });
+
+  const [profileData, setProfileData] = useState(() => buildProfileData(user));
 
   const [draftProfile, setDraftProfile] = useState({ ...profileData });
   const [uploading, setUploading] = useState({ avatar: false, banner: false });
@@ -1254,17 +1278,36 @@ export default function Profile() {
         lastUpdated: 'Just now'
       };
       await updateProfile(payload);
+      // Update ALL fields in the profile view immediately (no page refresh needed)
       setProfileData(prev => ({
         ...prev,
-        name: formData.fullName,
-        email: formData.email,
-        phone: formData.mobileNumber,
-        headline: formData.selectedDomain || formData.branch || 'Full Stack Developer',
+        name: formData.fullName || prev.name,
+        username: formData.username || prev.username,
+        email: formData.email || prev.email,
+        phone: `${formData.countryCode || '+91'} ${formData.mobileNumber}`.trim() || prev.phone,
+        dob: formData.dob || prev.dob,
+        gender: formData.gender || prev.gender,
+        address: formData.location || prev.address,
+        location: formData.location || prev.location,
+        university: formData.university || prev.university,
+        branch: formData.branch || prev.branch,
+        specialization: formData.specialization || prev.specialization,
+        year: formData.year || prev.year,
+        division: formData.division || prev.division,
+        prnNumber: formData.prnNumber || prev.prnNumber,
+        selectedDomain: formData.selectedDomain || prev.selectedDomain,
+        experienceLevel: formData.experienceLevel || prev.experienceLevel,
+        bio: formData.bio || prev.bio,
+        githubUrl: formData.githubUrl || prev.githubUrl,
+        linkedinUrl: formData.linkedinUrl || prev.linkedinUrl,
+        portfolioUrl: formData.portfolioUrl || prev.portfolioUrl,
+        headline: formData.selectedDomain || formData.branch || prev.headline,
         avatar: formData.avatar || prev.avatar,
-        skills: formData.skills,
+        skills: formData.skills || prev.skills,
         lastUpdated: 'Just now'
       }));
-      setIsEditModalOpen(false);
+      // DO NOT close the modal here — the EditProfileView will show the success modal,
+      // and closing happens when the user clicks "Continue" inside the success modal.
     } catch (err) {
       console.error("Save profile error:", err);
     }
@@ -1278,20 +1321,8 @@ export default function Profile() {
     } catch (e) {}
 
     const curr = user || savedLocal;
-
     if (curr) {
-      setProfileData({
-        name: curr.name || curr.username || savedLocal.name || 'Nexus_Operator',
-        headline: curr.headline || curr.role || savedLocal.headline || 'Nexus Admin',
-        location: curr.location || savedLocal.location || 'Global',
-        joined: curr.joinedAt
-          ? new Date(curr.joinedAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-          : 'May 2026',
-        avatar: curr.avatar || savedLocal.avatar || '',
-        banner: curr.banner || savedLocal.banner || '',
-        skills: curr.skills ? (typeof curr.skills === 'string' ? JSON.parse(curr.skills) : curr.skills) : (savedLocal.skills || DEFAULT_TECH_STACK),
-        projects: curr.projects ? (typeof curr.projects === 'string' ? JSON.parse(curr.projects) : curr.projects) : (savedLocal.projects || [])
-      });
+      setProfileData(buildProfileData({ ...savedLocal, ...curr }));
     }
   }, [user]);
 
@@ -1551,8 +1582,8 @@ export default function Profile() {
           </div>
           <div>
             <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total XP</p>
-            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>14,250</h4>
-            <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑340 this week</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>{user?.xp ? user.xp.toLocaleString() : '0'}</h4>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑ Lifetime XP</p>
           </div>
         </div>
 
@@ -1599,8 +1630,8 @@ export default function Profile() {
           </div>
           <div>
             <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Submissions</p>
-            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>186</h4>
-            <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑12 this week</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>{user?.results?.length ?? 0}</h4>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑ Total Attempts</p>
           </div>
         </div>
       </div>
@@ -1761,12 +1792,14 @@ export default function Profile() {
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '8px' }}>Skills</span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {['React.js', 'Node.js', 'Next.js', 'TypeScript', 'Tailwind CSS', 'MongoDB', 'Supabase', 'Docker'].map((sk) => (
+                  {(profileData.skills && profileData.skills.length > 0
+                    ? profileData.skills.map(s => typeof s === 'string' ? s : s.name)
+                    : ['React.js', 'Node.js', 'Next.js', 'TypeScript', 'Tailwind CSS', 'MongoDB', 'Supabase', 'Docker']
+                  ).map((sk) => (
                     <span key={sk} style={{ padding: '5px 12px', borderRadius: '10px', backgroundColor: isDark ? '#121625' : '#f1f5f9', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, fontSize: '12px', fontWeight: 700, color: isDark ? '#cbd5e1' : '#475569' }}>
                       {sk}
                     </span>
                   ))}
-                  <span style={{ padding: '5px 10px', borderRadius: '10px', backgroundColor: '#7b5cff', color: '#ffffff', fontSize: '11.5px', fontWeight: 800 }}>+2</span>
                 </div>
               </div>
 
@@ -1781,24 +1814,30 @@ export default function Profile() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '12px', paddingTop: '12px', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9'}` }}>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>GitHub</span>
-                  <a href={profileData.githubUrl || 'https://github.com/nexusadmin'} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <span>github.com/nexusadmin</span>
-                    <ExternalLink size={12} />
-                  </a>
+                  {profileData.githubUrl ? (
+                    <a href={profileData.githubUrl} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <span>{profileData.githubUrl.replace('https://github.com/', 'github.com/')}</span>
+                      <ExternalLink size={12} />
+                    </a>
+                  ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>LinkedIn</span>
-                  <a href={profileData.linkedinUrl || 'https://linkedin.com/in/nexusadmin'} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <span>linkedin.com/in/nexusadmin</span>
-                    <ExternalLink size={12} />
-                  </a>
+                  {profileData.linkedinUrl ? (
+                    <a href={profileData.linkedinUrl} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <span>{profileData.linkedinUrl.replace('https://linkedin.com/in/', 'linkedin.com/in/')}</span>
+                      <ExternalLink size={12} />
+                    </a>
+                  ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Portfolio</span>
-                  <a href={profileData.portfolioUrl || 'https://nexusadmin.dev'} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <span>nexusadmin.dev</span>
-                    <ExternalLink size={12} />
-                  </a>
+                  {profileData.portfolioUrl ? (
+                    <a href={profileData.portfolioUrl} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <span>{profileData.portfolioUrl.replace('https://', '')}</span>
+                      <ExternalLink size={12} />
+                    </a>
+                  ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Resume</span>
@@ -1897,15 +1936,17 @@ export default function Profile() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '12.5px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>User ID</span>
-                <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>SNXU202312345</span>
+                <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>{profileData.prnNumber || user?.id?.slice(0, 12).toUpperCase() || 'SNXU202312345'}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>Member Since</span>
-                <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>15 May 2026</span>
+                <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>{profileData.joined || '15 May 2026'}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>Last Updated</span>
-                <span style={{ fontWeight: 800, color: '#16a34a' }}>Just now</span>
+                <span style={{ fontWeight: 800, color: profileData.lastUpdated ? '#16a34a' : (isDark ? '#94a3b8' : '#64748b') }}>
+                  {profileData.lastUpdated || 'N/A'}
+                </span>
               </div>
             </div>
           </div>

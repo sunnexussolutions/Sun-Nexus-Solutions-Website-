@@ -28,3 +28,6 @@ Thumbs.db
 package-lock.json
 !Present Dashboard/package-lock.json
 !resources2/package-lock.json
+
+.vercel
+.env*
