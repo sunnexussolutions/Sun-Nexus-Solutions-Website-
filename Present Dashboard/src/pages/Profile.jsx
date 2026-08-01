@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Edit3, Camera, Save, X, Zap, Star, Award, MapPin, Calendar,
@@ -11,7 +11,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
-import { getProjects } from '../store/dataStore';
+import { getProjects, getResults, getDSASolutions } from '../store/dataStore';
+import { calculateUserStats } from '../utils/analytics';
 
 // SVG Tech Logos renderer supporting extensive tech stack library + smart fallback
 const TechLogo = ({ name }) => {
@@ -1248,7 +1249,64 @@ export default function Profile() {
   const [uploading, setUploading] = useState({ avatar: false, banner: false });
   const [newSkillName, setNewSkillName] = useState('');
 
+  // ── Dynamic Stat Cards Data ───────────────────────────────────────────────
+  const [aptitudeResults, setAptitudeResults] = useState([]);
+  const [dsaSolutions, setDsaSolutions] = useState([]);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    const fetchStats = async () => {
+      try {
+        const [allResults, allDSA] = await Promise.all([getResults(), getDSASolutions()]);
+        if (cancelled) return;
+        // Filter results to this user only
+        setAptitudeResults((allResults || []).filter(r => r.userId === user.id || r.user_id === user.id));
+        // Filter DSA solutions to this user only (by email or member_id)
+        setDsaSolutions((allDSA || []).filter(s =>
+          s.memberEmail === user.email || s.memberId === user.id ||
+          s.member_email === user.email || s.member_id === user.id
+        ));
+      } catch (e) {
+        console.warn('Profile stats fetch error:', e.message);
+      } finally {
+        if (!cancelled) setStatsLoading(false);
+      }
+    };
+    fetchStats();
+    window.addEventListener('nexus-data-updated', fetchStats);
+    return () => { cancelled = true; window.removeEventListener('nexus-data-updated', fetchStats); };
+  }, [user]);
+
+  // Computed stat values
+  const aptitudeStats = useMemo(() => calculateUserStats(aptitudeResults), [aptitudeResults]);
+
+  // Accuracy change this week
+  const accuracyTrend = useMemo(() => {
+    if (!aptitudeResults.length) return null;
+    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const thisWeek = aptitudeResults.filter(r => new Date(r.submitted_at) >= oneWeekAgo);
+    const before   = aptitudeResults.filter(r => new Date(r.submitted_at) <  oneWeekAgo);
+    if (!thisWeek.length || !before.length) return null;
+    const avgThisWeek = Math.round(thisWeek.reduce((a, r) => a + (r.percentage || 0), 0) / thisWeek.length);
+    const avgBefore   = Math.round(before.reduce((a, r)  => a + (r.percentage || 0), 0) / before.length);
+    return avgThisWeek - avgBefore;
+  }, [aptitudeResults]);
+
+  // DSA: total approved submissions & how many this month
+  const dsaApproved    = useMemo(() => dsaSolutions.filter(s => s.status === 'approved'), [dsaSolutions]);
+  const dsaThisMonth   = useMemo(() => {
+    const startOfMonth = new Date(); startOfMonth.setDate(1); startOfMonth.setHours(0,0,0,0);
+    return dsaApproved.filter(s => new Date(s.submittedAt || s.submitted_at) >= startOfMonth).length;
+  }, [dsaApproved]);
+
+  // Streak: from user object (weeks-based, but we display as "X Weeks")
+  const currentStreak  = user?.streak || 0;
+  const bestStreak     = user?.bestStreak || user?.best_streak || currentStreak;
+
   // Save Full Edit Profile — Optimistic Update pattern:
+
   // 1. Update local profileData state IMMEDIATELY (instant UI update, no waiting for DB)
   // 2. Sync to DB + user context in the background via updateProfile
   const handleSaveFullProfile = (formData) => {
@@ -1609,6 +1667,7 @@ export default function Profile() {
 
       {/* ── 5 METRIC STAT CARDS ROW ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px', width: '100%' }}>
+
         {/* Stat 1: Total XP */}
         <div style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1616,58 +1675,80 @@ export default function Profile() {
           </div>
           <div>
             <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total XP</p>
-            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>{user?.xp ? user.xp.toLocaleString() : '0'}</h4>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>
+              {user?.xp ? user.xp.toLocaleString() : '0'}
+            </h4>
             <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑ Lifetime XP</p>
           </div>
         </div>
 
-        {/* Stat 2: Avg Accuracy */}
+        {/* Stat 2: Avg Accuracy — from real aptitude results */}
         <div style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#f3e8ff', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <PieChart size={20} />
           </div>
           <div>
             <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Accuracy</p>
-            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>90%</h4>
-            <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑8% this week</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>
+              {statsLoading ? '—' : aptitudeStats.count > 0 ? `${aptitudeStats.avg}%` : 'N/A'}
+            </h4>
+            <p style={{ fontSize: '11px', fontWeight: 700, margin: '3px 0 0 0',
+              color: accuracyTrend === null ? (isDark ? '#64748b' : '#94a3b8') : accuracyTrend >= 0 ? '#16a34a' : '#ef4444' }}>
+              {accuracyTrend === null
+                ? `Best: ${aptitudeStats.best}%`
+                : `${accuracyTrend >= 0 ? '↑' : '↓'}${Math.abs(accuracyTrend)}% this week`}
+            </p>
           </div>
         </div>
 
-        {/* Stat 3: Current Streak */}
+        {/* Stat 3: Current Streak — from user.streak (weeks) */}
         <div style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#fff7ed', color: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Flame size={20} fill="#f97316" />
           </div>
           <div>
             <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Streak</p>
-            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>12 Days</h4>
-            <p style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8', margin: '3px 0 0 0' }}>Best: 18 days</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>
+              {currentStreak} {currentStreak === 1 ? 'Week' : 'Weeks'}
+            </h4>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8', margin: '3px 0 0 0' }}>
+              Best: {bestStreak} {bestStreak === 1 ? 'week' : 'weeks'}
+            </p>
           </div>
         </div>
 
-        {/* Stat 4: Projects */}
+        {/* Stat 4: DSA Submissions (approved) — real data from DB */}
         <div style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#f0fdf4', color: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <ClipboardList size={20} />
           </div>
           <div>
-            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Projects</p>
-            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>28</h4>
-            <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑4 this month</p>
+            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>DSA Solved</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>
+              {statsLoading ? '—' : dsaApproved.length}
+            </h4>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: dsaThisMonth > 0 ? '#16a34a' : (isDark ? '#64748b' : '#94a3b8'), margin: '3px 0 0 0' }}>
+              {dsaThisMonth > 0 ? `↑${dsaThisMonth} this month` : `${dsaSolutions.length} total submitted`}
+            </p>
           </div>
         </div>
 
-        {/* Stat 5: Submissions */}
+        {/* Stat 5: Aptitude Tests — real count from results */}
         <div style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#fdf2f8', color: '#ec4899', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Award size={20} />
           </div>
           <div>
-            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Submissions</p>
-            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>{user?.results?.length ?? 0}</h4>
-            <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑ Total Attempts</p>
+            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Aptitude Tests</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>
+              {statsLoading ? '—' : aptitudeStats.count}
+            </h4>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: aptitudeStats.best > 0 ? '#16a34a' : (isDark ? '#64748b' : '#94a3b8'), margin: '3px 0 0 0' }}>
+              {aptitudeStats.best > 0 ? `Best: ${aptitudeStats.best}%` : '↑ Total Attempts'}
+            </p>
           </div>
         </div>
+
       </div>
 
       {/* ── TABS BAR ── */}
