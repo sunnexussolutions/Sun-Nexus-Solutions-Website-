@@ -2166,35 +2166,7 @@ export default function Profile() {
         {/* ── RIGHT COLUMN SIDEBAR STACK ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '340px' }}>
           
-          {/* Card 1: Activity Timeline */}
-          <div style={{ ...cardStyle, padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Activity Timeline</h3>
-              <button onClick={() => setIsActivityModalOpen(true)} style={{ border: 'none', background: 'none', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer' }}>View All</button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {activityList.slice(0, 4).map((act) => {
-                const IconComp = act.icon;
-                return (
-                  <div key={act.id} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: act.bg, color: act.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <IconComp size={16} />
-                      </div>
-                      <div>
-                        <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{act.title}</h4>
-                        <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>{act.desc}</p>
-                      </div>
-                    </div>
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: act.color, whiteSpace: 'nowrap' }}>{act.time}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Card 2: Account Information */}
+          {/* Card 1: Account Information */}
           <div style={{ ...cardStyle, padding: '20px' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 16px 0' }}>Account Information</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '12.5px' }}>
@@ -2215,7 +2187,7 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Card 3: Tech Stack */}
+          {/* Card 2: Tech Stack */}
           <div style={{ ...cardStyle, padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Tech Stack</h3>
@@ -2260,34 +2232,6 @@ export default function Profile() {
                   </>
                 );
               })()}
-            </div>
-          </div>
-
-          {/* Card 4: Recent Achievements */}
-          <div style={{ ...cardStyle, padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Recent Achievements</h3>
-              <button onClick={() => setIsAchievementsModalOpen(true)} style={{ border: 'none', background: 'none', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer' }}>View All</button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {achievementsList.map((ach) => {
-                const IconComp = ach.icon;
-                return (
-                  <div key={ach.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: ach.bg, color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <IconComp size={18} fill="#ffffff" />
-                      </div>
-                      <div>
-                        <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{ach.title}</h4>
-                        <p style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>{ach.desc}</p>
-                      </div>
-                    </div>
-                    <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8' }}>{ach.date}</span>
-                  </div>
-                );
-              })}
             </div>
           </div>
 
