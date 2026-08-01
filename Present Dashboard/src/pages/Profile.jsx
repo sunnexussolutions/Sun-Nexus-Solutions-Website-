@@ -1970,297 +1970,407 @@ export default function Profile() {
         })}
       </div>
 
-      {/* ── 2 COLUMN MAIN CONTENT & RIGHT SIDEBAR GRID ── */}
-      <style>{`
-        .profile-main-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 24px;
-          width: 100%;
-          align-items: start;
-        }
-        @media (min-width: 1024px) {
-          .profile-main-grid {
-            grid-template-columns: minmax(0, 1fr) 340px;
-          }
-        }
-      `}</style>
-      <div className="profile-main-grid">
-        
-        {/* ── LEFT COLUMN (PERSONAL -> ACADEMIC -> PROFESSIONAL INFO CARDS) ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, minWidth: 0 }}>
-          
-          {/* Card 1: Personal Information */}
-          <div style={{ ...cardStyle, padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <User size={18} style={{ color: '#7b5cff' }} />
-                <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Personal Information</h3>
-              </div>
-              <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Edit3 size={13} />
-                <span>Edit</span>
-              </button>
-            </div>
+      {/* ── TAB CONTENT ── */}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '18px 24px' }}>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Full Name</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.name || '—'}</span>
+      {/* TAB 1: OVERVIEW */}
+      {activeTab === 'overview' && (
+        <div className="profile-main-grid">
+          {/* ── LEFT COLUMN (PERSONAL -> ACADEMIC -> PROFESSIONAL INFO CARDS) ── */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, minWidth: 0 }}>
+            
+            {/* Card 1: Personal Information */}
+            <div style={{ ...cardStyle, padding: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <User size={18} style={{ color: '#7b5cff' }} />
+                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Personal Information</h3>
+                </div>
+                <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Edit3 size={13} />
+                  <span>Edit</span>
+                </button>
               </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Username</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.username || '—'}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Email Address</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.email || '—'}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Phone Number</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.phone || '—'}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Date of Birth</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.dob || '—'}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Gender</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.gender || '—'}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Address</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.address || profileData.location || '—'}</span>
-              </div>
-            </div>
-          </div>
 
-          {/* Card 2: Academic Information */}
-          <div style={{ ...cardStyle, padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <GraduationCap size={18} style={{ color: '#7b5cff' }} />
-                <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Academic Information</h3>
-              </div>
-              <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Edit3 size={13} />
-                <span>Edit</span>
-              </button>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '18px 24px' }}>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>University</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.university || '—'}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Branch</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.branch || '—'}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Specialization</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.specialization || '—'}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Year</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.year || '—'}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Division</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.division || '—'}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>PRN Number</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.prnNumber || '—'}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Graduation Year</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.graduationYear || '—'}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>CGPA</span>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.cgpa || '—'}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3: Professional Information */}
-          <div style={{ ...cardStyle, padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Briefcase size={18} style={{ color: '#7b5cff' }} />
-                <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Professional Information</h3>
-              </div>
-              <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Edit3 size={13} />
-                <span>Edit</span>
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '18px 24px' }}>
                 <div>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Selected Domain</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.selectedDomain || '—'}</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Full Name</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.name || '—'}</span>
                 </div>
                 <div>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Experience Level</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.experienceLevel || '—'}</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Username</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.username || '—'}</span>
                 </div>
-              </div>
-
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '8px' }}>Skills</span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {profileData.skills && profileData.skills.length > 0 ? (
-                    profileData.skills.map(s => typeof s === 'string' ? s : s.name).map((sk) => (
-                      <span key={sk} style={{ padding: '5px 12px', borderRadius: '10px', backgroundColor: isDark ? '#121625' : '#f1f5f9', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, fontSize: '12px', fontWeight: 700, color: isDark ? '#cbd5e1' : '#475569' }}>
-                        {sk}
-                      </span>
-                    ))
-                  ) : (
-                    <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8', fontStyle: 'italic' }}>No skills added yet</span>
-                  )}
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Email Address</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.email || '—'}</span>
                 </div>
-              </div>
-
-              <div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Bio</span>
-                <p style={{ fontSize: '13px', fontWeight: 500, color: isDark ? '#cbd5e1' : '#475569', margin: 0, lineHeight: 1.5 }}>
-                  {profileData.bio || 'No bio provided yet.'}
-                </p>
-              </div>
-
-              {/* Links Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))', gap: '16px', paddingTop: '14px', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9'}` }}>
-                <div style={{ minWidth: 0 }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>GitHub</span>
-                  {profileData.githubUrl ? (
-                    <a href={profileData.githubUrl.startsWith('http') ? profileData.githubUrl : `https://${profileData.githubUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
-                        {profileData.githubUrl.replace(/^https?:\/\/(www\.)?github\.com\//, 'github.com/').replace(/^https?:\/\//, '')}
-                      </span>
-                      <ExternalLink size={12} style={{ flexShrink: 0 }} />
-                    </a>
-                  ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Phone Number</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.phone || '—'}</span>
                 </div>
-
-                <div style={{ minWidth: 0 }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>LinkedIn</span>
-                  {profileData.linkedinUrl ? (
-                    <a href={profileData.linkedinUrl.startsWith('http') ? profileData.linkedinUrl : `https://${profileData.linkedinUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
-                        {profileData.linkedinUrl.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, 'linkedin.com/in/').replace(/^https?:\/\//, '')}
-                      </span>
-                      <ExternalLink size={12} style={{ flexShrink: 0 }} />
-                    </a>
-                  ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Date of Birth</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.dob || '—'}</span>
                 </div>
-
-                <div style={{ minWidth: 0 }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Portfolio</span>
-                  {profileData.portfolioUrl ? (
-                    <a href={profileData.portfolioUrl.startsWith('http') ? profileData.portfolioUrl : `https://${profileData.portfolioUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
-                        {profileData.portfolioUrl.replace(/^https?:\/\//, '')}
-                      </span>
-                      <ExternalLink size={12} style={{ flexShrink: 0 }} />
-                    </a>
-                  ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Gender</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.gender || '—'}</span>
                 </div>
-
-                <div style={{ minWidth: 0 }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Resume / Website</span>
-                  {profileData.resumeUrl || profileData.portfolioUrl ? (
-                    <a href={(profileData.resumeUrl || profileData.portfolioUrl).startsWith('http') ? (profileData.resumeUrl || profileData.portfolioUrl) : `https://${profileData.resumeUrl || profileData.portfolioUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
-                        {profileData.resumeUrl ? 'View Resume' : 'View Portfolio'}
-                      </span>
-                      <ExternalLink size={12} style={{ flexShrink: 0 }} />
-                    </a>
-                  ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Address</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.address || profileData.location || '—'}</span>
                 </div>
               </div>
             </div>
-          </div>
 
-        </div>
+            {/* Card 2: Academic Information */}
+            <div style={{ ...cardStyle, padding: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <GraduationCap size={18} style={{ color: '#7b5cff' }} />
+                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Academic Information</h3>
+                </div>
+                <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Edit3 size={13} />
+                  <span>Edit</span>
+                </button>
+              </div>
 
-        {/* ── RIGHT COLUMN SIDEBAR STACK ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '340px' }}>
-          
-          {/* Card 1: Account Information */}
-          <div style={{ ...cardStyle, padding: '20px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 16px 0' }}>Account Information</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '12.5px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>User ID</span>
-                <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>{profileData.prnNumber || user?.id?.slice(0, 12).toUpperCase() || '—'}</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>Member Since</span>
-                <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>{profileData.joined || 'May 2026'}</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>Last Updated</span>
-                <span style={{ fontWeight: 800, color: profileData.lastUpdated ? '#16a34a' : (isDark ? '#94a3b8' : '#64748b') }}>
-                  {profileData.lastUpdated || 'N/A'}
-                </span>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '18px 24px' }}>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>University</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.university || '—'}</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Branch</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.branch || '—'}</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Specialization</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.specialization || '—'}</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Year</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.year || '—'}</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Division</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.division || '—'}</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>PRN Number</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.prnNumber || '—'}</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Graduation Year</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.graduationYear || '—'}</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>CGPA</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.cgpa || '—'}</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Card 2: Tech Stack */}
-          <div style={{ ...cardStyle, padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Tech Stack</h3>
-              <button onClick={() => setIsTechStackModalOpen(true)} style={{ padding: '5px 12px', borderRadius: '8px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '11.5px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Edit3 size={12} />
-                <span>Edit</span>
-              </button>
-            </div>
+            {/* Card 3: Professional Information */}
+            <div style={{ ...cardStyle, padding: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Briefcase size={18} style={{ color: '#7b5cff' }} />
+                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Professional Information</h3>
+                </div>
+                <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Edit3 size={13} />
+                  <span>Edit</span>
+                </button>
+              </div>
 
-            {/* Dynamic Grid of Tech Icon Badges */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
-              {(() => {
-                const rawSkills = profileData.skills && profileData.skills.length > 0
-                  ? profileData.skills.map(s => typeof s === 'string' ? s : s.name)
-                  : ['React', 'Node', 'Next.js', 'TypeScript', 'Tailwind'];
-                const displaySkills = rawSkills.slice(0, 9);
-                const hasMore = rawSkills.length > 9;
-                return (
-                  <>
-                    {displaySkills.map((t, idx) => (
-                      <div key={idx} title={t} style={{
-                        height: '44px', borderRadius: '12px',
-                        backgroundColor: isDark ? '#121625' : '#f8fafc',
-                        border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
-                      }}>
-                        <TechLogo name={t} />
-                      </div>
-                    ))}
-                    {hasMore && (
-                      <div title={`${rawSkills.length - 9} more skills`} style={{
-                        height: '44px', borderRadius: '12px',
-                        backgroundColor: isDark ? '#121625' : '#f8fafc',
-                        border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '12px', fontWeight: 900, color: '#7b5cff'
-                      }}>
-                        +{rawSkills.length - 9}
-                      </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px' }}>
+                  <div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Selected Domain</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.selectedDomain || '—'}</span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Experience Level</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.experienceLevel || '—'}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '8px' }}>Skills</span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {profileData.skills && profileData.skills.length > 0 ? (
+                      profileData.skills.map(s => typeof s === 'string' ? s : s.name).map((sk) => (
+                        <span key={sk} style={{ padding: '5px 12px', borderRadius: '10px', backgroundColor: isDark ? '#121625' : '#f1f5f9', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, fontSize: '12px', fontWeight: 700, color: isDark ? '#cbd5e1' : '#475569' }}>
+                          {sk}
+                        </span>
+                      ))
+                    ) : (
+                      <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8', fontStyle: 'italic' }}>No skills added yet</span>
                     )}
-                  </>
-                );
-              })()}
+                  </div>
+                </div>
+
+                <div>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Bio</span>
+                  <p style={{ fontSize: '13px', fontWeight: 500, color: isDark ? '#cbd5e1' : '#475569', margin: 0, lineHeight: 1.5 }}>
+                    {profileData.bio || 'No bio provided yet.'}
+                  </p>
+                </div>
+
+                {/* Links Row */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))', gap: '16px', paddingTop: '14px', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9'}` }}>
+                  <div style={{ minWidth: 0 }}>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>GitHub</span>
+                    {profileData.githubUrl ? (
+                      <a href={profileData.githubUrl.startsWith('http') ? profileData.githubUrl : `https://${profileData.githubUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
+                          {profileData.githubUrl.replace(/^https?:\/\/(www\.)?github\.com\//, 'github.com/').replace(/^https?:\/\//, '')}
+                        </span>
+                        <ExternalLink size={12} style={{ flexShrink: 0 }} />
+                      </a>
+                    ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
+                  </div>
+
+                  <div style={{ minWidth: 0 }}>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>LinkedIn</span>
+                    {profileData.linkedinUrl ? (
+                      <a href={profileData.linkedinUrl.startsWith('http') ? profileData.linkedinUrl : `https://${profileData.linkedinUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
+                          {profileData.linkedinUrl.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, 'linkedin.com/in/').replace(/^https?:\/\//, '')}
+                        </span>
+                        <ExternalLink size={12} style={{ flexShrink: 0 }} />
+                      </a>
+                    ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
+                  </div>
+
+                  <div style={{ minWidth: 0 }}>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Portfolio</span>
+                    {profileData.portfolioUrl ? (
+                      <a href={profileData.portfolioUrl.startsWith('http') ? profileData.portfolioUrl : `https://${profileData.portfolioUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
+                          {profileData.portfolioUrl.replace(/^https?:\/\//, '')}
+                        </span>
+                        <ExternalLink size={12} style={{ flexShrink: 0 }} />
+                      </a>
+                    ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
+                  </div>
+
+                  <div style={{ minWidth: 0 }}>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Resume / Website</span>
+                    {profileData.resumeUrl || profileData.portfolioUrl ? (
+                      <a href={(profileData.resumeUrl || profileData.portfolioUrl).startsWith('http') ? (profileData.resumeUrl || profileData.portfolioUrl) : `https://${profileData.resumeUrl || profileData.portfolioUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
+                          {profileData.resumeUrl ? 'View Resume' : 'View Portfolio'}
+                        </span>
+                        <ExternalLink size={12} style={{ flexShrink: 0 }} />
+                      </a>
+                    ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-        </div>
+          {/* ── RIGHT COLUMN SIDEBAR STACK ── */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '340px' }}>
+            
+            {/* Card 1: Account Information */}
+            <div style={{ ...cardStyle, padding: '20px' }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 16px 0' }}>Account Information</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '12.5px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>User ID</span>
+                  <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>{profileData.prnNumber || user?.id?.slice(0, 12).toUpperCase() || '—'}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>Member Since</span>
+                  <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>{profileData.joined || 'May 2026'}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>Last Updated</span>
+                  <span style={{ fontWeight: 800, color: profileData.lastUpdated ? '#16a34a' : (isDark ? '#94a3b8' : '#64748b') }}>
+                    {profileData.lastUpdated || 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-      </div>
+            {/* Card 2: Tech Stack */}
+            <div style={{ ...cardStyle, padding: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Tech Stack</h3>
+                <button onClick={() => setIsTechStackModalOpen(true)} style={{ padding: '5px 12px', borderRadius: '8px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '11.5px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Edit3 size={12} />
+                  <span>Edit</span>
+                </button>
+              </div>
+
+              {/* Dynamic Grid of Tech Icon Badges */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
+                {(() => {
+                  const rawSkills = profileData.skills && profileData.skills.length > 0
+                    ? profileData.skills.map(s => typeof s === 'string' ? s : s.name)
+                    : ['React', 'Node', 'Next.js', 'TypeScript', 'Tailwind'];
+                  const displaySkills = rawSkills.slice(0, 9);
+                  const hasMore = rawSkills.length > 9;
+                  return (
+                    <>
+                      {displaySkills.map((t, idx) => (
+                        <div key={idx} title={t} style={{
+                          height: '44px', borderRadius: '12px',
+                          backgroundColor: isDark ? '#121625' : '#f8fafc',
+                          border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
+                        }}>
+                          <TechLogo name={t} />
+                        </div>
+                      ))}
+                      {hasMore && (
+                        <div title={`${rawSkills.length - 9} more skills`} style={{
+                          height: '44px', borderRadius: '12px',
+                          backgroundColor: isDark ? '#121625' : '#f8fafc',
+                          border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '12px', fontWeight: 900, color: '#7b5cff'
+                        }}>
+                          +{rawSkills.length - 9}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: TECH STACK */}
+      {activeTab === 'techstack' && (
+        <div style={{ ...cardStyle, padding: '28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+            <div>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>⚡ Technical Stack & Skills Matrix</h3>
+              <p style={{ fontSize: '13px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 0 0' }}>Manage and showcase your technical proficiencies</p>
+            </div>
+            <button onClick={() => setIsTechStackModalOpen(true)} style={{ padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Edit3 size={15} />
+              <span>Manage Skills</span>
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
+            {(profileData.skills && profileData.skills.length > 0 ? profileData.skills : ['React', 'Node.js', 'TypeScript', 'Tailwind', 'Next.js', 'PostgreSQL']).map((sk, idx) => {
+              const name = typeof sk === 'string' ? sk : sk.name;
+              return (
+                <div key={idx} style={{ padding: '16px', borderRadius: '16px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: isDark ? '#1e293b' : '#ffffff', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <TechLogo name={name} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{name}</h4>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#7b5cff' }}>Active Skill</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: ACTIVITY */}
+      {activeTab === 'activity' && (
+        <div style={{ ...cardStyle, padding: '28px' }}>
+          <div style={{ marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>📜 Activity Timeline & Audit Log</h3>
+            <p style={{ fontSize: '13px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 0 0' }}>Your recent platform actions and activity history</p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {activityList.map((act) => {
+              const IconComp = act.icon;
+              return (
+                <div key={act.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderRadius: '16px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: act.bg, color: act.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <IconComp size={20} />
+                    </div>
+                    <div>
+                      <h4 style={{ fontSize: '14.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{act.title}</h4>
+                      <p style={{ fontSize: '12.5px', color: isDark ? '#94a3b8' : '#64748b', margin: '3px 0 0 0' }}>{act.desc}</p>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: act.color }}>{act.time}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: ACHIEVEMENTS */}
+      {activeTab === 'achievements' && (
+        <div style={{ ...cardStyle, padding: '28px' }}>
+          <div style={{ marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>🏆 Earned Achievements & Milestones</h3>
+            <p style={{ fontSize: '13px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 0 0' }}>Platform milestones and earned activity badges</p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '18px' }}>
+            {achievementsList.map((ach) => {
+              const IconComp = ach.icon;
+              return (
+                <div key={ach.id} style={{ padding: '20px', borderRadius: '20px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+                  <div style={{ width: '46px', height: '46px', borderRadius: '50%', backgroundColor: ach.bg, color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <IconComp size={22} fill="#ffffff" />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{ach.title}</h4>
+                    <p style={{ fontSize: '12.5px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 8px 0' }}>{ach.desc}</p>
+                    <span style={{ fontSize: '11px', fontWeight: 800, color: '#7b5cff', padding: '3px 10px', borderRadius: '12px', backgroundColor: isDark ? '#1e293b' : '#f1f5f9' }}>{ach.date}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 5: SETTINGS */}
+      {activeTab === 'settings' && (
+        <div style={{ ...cardStyle, padding: '28px' }}>
+          <div style={{ marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>⚙️ Account & Profile Preferences</h3>
+            <p style={{ fontSize: '13px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 0 0' }}>Customize your account settings and preferences</p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ padding: '20px', borderRadius: '16px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Edit Full Profile</h4>
+                <p style={{ fontSize: '12.5px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 0 0' }}>Update personal, academic, and professional information</p>
+              </div>
+              <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
+                Open Profile Editor
+              </button>
+            </div>
+
+            <div style={{ padding: '20px', borderRadius: '16px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Theme Mode</h4>
+                <p style={{ fontSize: '12.5px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 0 0' }}>Currently active: {isDark ? 'Dark Mode 🌙' : 'Light Mode ☀️'}</p>
+              </div>
+              <button onClick={toggleTheme} style={{ padding: '10px 20px', borderRadius: '12px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, backgroundColor: isDark ? '#1e293b' : '#ffffff', color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
+                Switch Theme Mode
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── PAGE FOOTER ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', paddingTop: '24px', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, fontSize: '12px', color: isDark ? '#64748b' : '#94a3b8', fontWeight: 600 }}>
