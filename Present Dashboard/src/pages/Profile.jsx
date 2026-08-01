@@ -272,36 +272,36 @@ const DEFAULT_TECH_STACK = [
 // ── PIXEL PERFECT EDIT PROFILE VIEW ──────────────────────────────────────────
 function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleTheme, theme }) {
   const [formData, setFormData] = useState({
-    avatar: profileData.avatar || '',
-    fullName: profileData.name || user?.fullName || 'Nexus Admin',
-    username: user?.username || 'nexus_admin',
-    email: user?.email || 'admin@sunnexus.com',
-    countryCode: '+91',
-    mobileNumber: user?.phone || user?.mobileNumber || '9876543210',
-    dob: user?.dob || '2000-01-01',
-    gender: user?.gender || 'Male',
-    university: user?.university || 'Sun Nexus University',
-    branch: user?.branch || 'Computer Science Engineering',
-    specialization: user?.specialization || 'Artificial Intelligence',
-    year: user?.year || 'Third Year',
-    division: user?.division || 'A',
-    prnNumber: user?.prnNumber || 'SNXU202312345',
-    selectedDomain: user?.selectedDomain || 'Data Structures & Algorithms',
+    avatar:          profileData.avatar            || '',
+    fullName:        profileData.name              || user?.fullName       || '',
+    username:        profileData.username          || user?.username       || '',
+    email:           profileData.email             || user?.email          || '',
+    countryCode:     '+91',
+    mobileNumber:    profileData.phone?.replace(/^\+91\s?/, '') || user?.phone || user?.mobileNumber || '',
+    dob:             profileData.dob               || user?.dob            || '',
+    gender:          profileData.gender            || user?.gender         || 'Male',
+    university:      profileData.university        || user?.university     || '',
+    branch:          profileData.branch            || user?.branch         || '',
+    specialization:  profileData.specialization    || user?.specialization || '',
+    year:            profileData.year              || user?.year           || '',
+    division:        profileData.division          || user?.division       || '',
+    prnNumber:       profileData.prnNumber         || user?.prnNumber      || '',
+    selectedDomain:  profileData.selectedDomain    || user?.selectedDomain || '',
     skills: profileData.skills
       ? profileData.skills.map(s => typeof s === 'string' ? s : s.name)
-      : ['C++', 'Python', 'DSA', 'Problem Solving'],
-    experienceLevel: user?.experienceLevel || 'Intermediate',
-    bio: user?.bio || 'Passionate about problem solving and building efficient algorithms.',
-    githubUrl: user?.githubUrl || 'https://github.com/nexusadmin',
-    linkedinUrl: user?.linkedinUrl || 'https://linkedin.com/in/nexusadmin',
-    portfolioUrl: user?.portfolioUrl || 'https://nexusadmin.dev',
+      : [],
+    experienceLevel: profileData.experienceLevel   || user?.experienceLevel || '',
+    bio:             profileData.bio               || user?.bio             || '',
+    githubUrl:       profileData.githubUrl         || user?.githubUrl       || '',
+    linkedinUrl:     profileData.linkedinUrl       || user?.linkedinUrl     || '',
+    portfolioUrl:    profileData.portfolioUrl      || user?.portfolioUrl    || '',
     currentPassword: '',
-    newPassword: '',
+    newPassword:     '',
     confirmPassword: '',
-    theme: theme || 'light',
+    theme:           theme || 'light',
     emailNotifications: true,
-    appNotifications: true,
-    language: 'English'
+    appNotifications:   true,
+    language:        'English'
   });
 
   const [newSkillInput, setNewSkillInput] = useState('');
@@ -1248,69 +1248,103 @@ export default function Profile() {
   const [uploading, setUploading] = useState({ avatar: false, banner: false });
   const [newSkillName, setNewSkillName] = useState('');
 
-  // Save Full Edit Profile
-  const handleSaveFullProfile = async (formData) => {
+  // Save Full Edit Profile — Optimistic Update pattern:
+  // 1. Update local profileData state IMMEDIATELY (instant UI update, no waiting for DB)
+  // 2. Sync to DB + user context in the background via updateProfile
+  const handleSaveFullProfile = (formData) => {
+    // ── STEP 1: Immediate optimistic update ───────────────────────────────────
+    // This runs synchronously. The profile view will show the new data the
+    // instant the user clicks "Continue" in the success modal.
+    const updatedProfile = {
+      ...profileData,
+      name:            formData.fullName            || profileData.name,
+      username:        formData.username            || profileData.username,
+      email:           formData.email               || profileData.email,
+      phone:           `${formData.countryCode || '+91'} ${formData.mobileNumber}`.trim() || profileData.phone,
+      dob:             formData.dob                 || profileData.dob,
+      gender:          formData.gender              || profileData.gender,
+      university:      formData.university          || profileData.university,
+      branch:          formData.branch              || profileData.branch,
+      specialization:  formData.specialization      || profileData.specialization,
+      year:            formData.year                || profileData.year,
+      division:        formData.division            || profileData.division,
+      prnNumber:       formData.prnNumber           || profileData.prnNumber,
+      selectedDomain:  formData.selectedDomain      || profileData.selectedDomain,
+      experienceLevel: formData.experienceLevel     || profileData.experienceLevel,
+      bio:             formData.bio                 || profileData.bio,
+      githubUrl:       formData.githubUrl           || profileData.githubUrl,
+      linkedinUrl:     formData.linkedinUrl         || profileData.linkedinUrl,
+      portfolioUrl:    formData.portfolioUrl        || profileData.portfolioUrl,
+      headline:        formData.selectedDomain || formData.branch || profileData.headline,
+      avatar:          formData.avatar              || profileData.avatar,
+      skills:          formData.skills              || profileData.skills,
+      lastUpdated:     'Just now'
+    };
+
+    // Apply to React state immediately — guarantees instant render
+    setProfileData(updatedProfile);
+
+    // Also persist to localStorage immediately so it survives a refresh
     try {
-      const payload = {
-        name: formData.fullName,
-        fullName: formData.fullName,
-        username: formData.username,
-        email: formData.email,
-        phone: formData.mobileNumber,
-        mobileNumber: formData.mobileNumber,
-        dob: formData.dob,
-        gender: formData.gender,
-        university: formData.university,
-        branch: formData.branch,
-        specialization: formData.specialization,
-        year: formData.year,
-        division: formData.division,
-        prnNumber: formData.prnNumber,
-        selectedDomain: formData.selectedDomain,
-        skills: formData.skills,
-        experienceLevel: formData.experienceLevel,
-        bio: formData.bio,
-        githubUrl: formData.githubUrl,
-        linkedinUrl: formData.linkedinUrl,
-        portfolioUrl: formData.portfolioUrl,
-        avatar: formData.avatar || profileData.avatar,
-        headline: formData.selectedDomain || formData.branch || 'Full Stack Developer',
-        lastUpdated: 'Just now'
-      };
-      await updateProfile(payload);
-      // Update ALL fields in the profile view immediately (no page refresh needed)
-      setProfileData(prev => ({
-        ...prev,
-        name: formData.fullName || prev.name,
-        username: formData.username || prev.username,
-        email: formData.email || prev.email,
-        phone: `${formData.countryCode || '+91'} ${formData.mobileNumber}`.trim() || prev.phone,
-        dob: formData.dob || prev.dob,
-        gender: formData.gender || prev.gender,
-        address: formData.location || prev.address,
-        location: formData.location || prev.location,
-        university: formData.university || prev.university,
-        branch: formData.branch || prev.branch,
-        specialization: formData.specialization || prev.specialization,
-        year: formData.year || prev.year,
-        division: formData.division || prev.division,
-        prnNumber: formData.prnNumber || prev.prnNumber,
-        selectedDomain: formData.selectedDomain || prev.selectedDomain,
-        experienceLevel: formData.experienceLevel || prev.experienceLevel,
-        bio: formData.bio || prev.bio,
-        githubUrl: formData.githubUrl || prev.githubUrl,
-        linkedinUrl: formData.linkedinUrl || prev.linkedinUrl,
-        portfolioUrl: formData.portfolioUrl || prev.portfolioUrl,
-        headline: formData.selectedDomain || formData.branch || prev.headline,
-        avatar: formData.avatar || prev.avatar,
-        skills: formData.skills || prev.skills,
-        lastUpdated: 'Just now'
+      const raw = localStorage.getItem('nexus_user');
+      const saved = raw ? JSON.parse(raw) : {};
+      localStorage.setItem('nexus_user', JSON.stringify({
+        ...saved,
+        name:            updatedProfile.name,
+        fullName:        formData.fullName,
+        username:        updatedProfile.username,
+        email:           updatedProfile.email,
+        phone:           formData.mobileNumber,
+        mobileNumber:    formData.mobileNumber,
+        dob:             updatedProfile.dob,
+        gender:          updatedProfile.gender,
+        university:      updatedProfile.university,
+        branch:          updatedProfile.branch,
+        specialization:  updatedProfile.specialization,
+        year:            updatedProfile.year,
+        division:        updatedProfile.division,
+        prnNumber:       updatedProfile.prnNumber,
+        selectedDomain:  updatedProfile.selectedDomain,
+        experienceLevel: updatedProfile.experienceLevel,
+        bio:             updatedProfile.bio,
+        githubUrl:       updatedProfile.githubUrl,
+        linkedinUrl:     updatedProfile.linkedinUrl,
+        portfolioUrl:    updatedProfile.portfolioUrl,
+        headline:        updatedProfile.headline,
+        avatar:          updatedProfile.avatar,
+        skills:          updatedProfile.skills,
       }));
-      // DO NOT close the modal here — the EditProfileView will show the success modal,
-      // and closing happens when the user clicks "Continue" inside the success modal.
-    } catch (err) {
-      console.error("Save profile error:", err);
-    }
+    } catch (e) {}
+
+    // ── STEP 2: Background DB + user-context sync (fire and forget) ───────────
+    // Does NOT block the UI. Errors are caught silently since local state is
+    // already updated and localStorage is already saved.
+    updateProfile({
+      name:            formData.fullName,
+      fullName:        formData.fullName,
+      username:        formData.username,
+      email:           formData.email,
+      phone:           formData.mobileNumber,
+      mobileNumber:    formData.mobileNumber,
+      dob:             formData.dob,
+      gender:          formData.gender,
+      university:      formData.university,
+      branch:          formData.branch,
+      specialization:  formData.specialization,
+      year:            formData.year,
+      division:        formData.division,
+      prnNumber:       formData.prnNumber,
+      selectedDomain:  formData.selectedDomain,
+      skills:          formData.skills,
+      experienceLevel: formData.experienceLevel,
+      bio:             formData.bio,
+      githubUrl:       formData.githubUrl,
+      linkedinUrl:     formData.linkedinUrl,
+      portfolioUrl:    formData.portfolioUrl,
+      avatar:          formData.avatar || profileData.avatar,
+      headline:        formData.selectedDomain || formData.branch || 'Full Stack Developer',
+      lastUpdated:     'Just now'
+    }).catch(err => console.warn('Background profile sync error (UI already updated):', err));
   };
 
   useEffect(() => {
