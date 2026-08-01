@@ -1947,7 +1947,7 @@ export default function Profile() {
       </div>
 
       {/* ── TABS BAR ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '24px', borderBottom: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, paddingBottom: '8px', overflowX: 'auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '24px', borderBottom: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, paddingBottom: '8px', marginBottom: '24px', overflowX: 'auto' }}>
         {['Overview', 'Tech Stack', 'Activity', 'Achievements', 'Settings'].map((t) => {
           const key = t.toLowerCase().replace(' ', '');
           const isActive = activeTab === key;
@@ -1971,12 +1971,27 @@ export default function Profile() {
       </div>
 
       {/* ── TAB CONTENT ── */}
+      <style>{`
+        .profile-main-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 32px;
+          width: 100%;
+          align-items: start;
+        }
+        @media (min-width: 1024px) {
+          .profile-main-grid {
+            grid-template-columns: minmax(0, 1fr) 340px;
+            gap: 32px;
+          }
+        }
+      `}</style>
 
       {/* TAB 1: OVERVIEW */}
       {activeTab === 'overview' && (
         <div className="profile-main-grid">
           {/* ── LEFT COLUMN (PERSONAL -> ACADEMIC -> PROFESSIONAL INFO CARDS) ── */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', flex: 1, minWidth: 0 }}>
             
             {/* Card 1: Personal Information */}
             <div style={{ ...cardStyle, padding: '24px' }}>
@@ -2174,7 +2189,7 @@ export default function Profile() {
           </div>
 
           {/* ── RIGHT COLUMN SIDEBAR STACK ── */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '340px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', width: '100%', maxWidth: '340px' }}>
             
             {/* Card 1: Account Information */}
             <div style={{ ...cardStyle, padding: '20px' }}>
