@@ -20,8 +20,8 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
   { id: 'dsa', label: 'DSA', icon: Braces, badge: 'New' },
   { id: 'aptitude', label: 'Aptitude', icon: Target },
-  { id: 'domains', label: 'Domains', icon: Users },
-  { id: 'projects', label: 'Projects', icon: FolderKanban },
+  // { id: 'domains', label: 'Domains', icon: Users },
+  // { id: 'projects', label: 'Projects', icon: FolderKanban },
   { id: 'profile', label: 'Profile', icon: User, badge: 'Updated' },
   { id: 'admin', label: 'Admin Panel', icon: ShieldCheck },
 ];
