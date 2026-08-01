@@ -1294,6 +1294,7 @@ export default function Profile() {
     githubUrl: src?.githubUrl || '',
     linkedinUrl: src?.linkedinUrl || '',
     portfolioUrl: src?.portfolioUrl || '',
+    resumeUrl: src?.resumeUrl || src?.resume_url || '',
     graduationYear: src?.graduationYear || src?.graduation_year || '',
     cgpa: src?.cgpa || '',
     joined: src?.joinedAt
@@ -1508,6 +1509,7 @@ export default function Profile() {
       githubUrl:       formData.githubUrl           || profileData.githubUrl,
       linkedinUrl:     formData.linkedinUrl         || profileData.linkedinUrl,
       portfolioUrl:    formData.portfolioUrl        || profileData.portfolioUrl,
+      resumeUrl:       formData.resumeUrl           || profileData.resumeUrl,
       graduationYear:  formData.graduationYear      || profileData.graduationYear,
       cgpa:            formData.cgpa                || profileData.cgpa,
       headline:        formData.selectedDomain || formData.branch || profileData.headline,
@@ -2120,40 +2122,51 @@ export default function Profile() {
               </div>
 
               {/* Links Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '12px', paddingTop: '12px', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9'}` }}>
-                <div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))', gap: '16px', paddingTop: '14px', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9'}` }}>
+                <div style={{ minWidth: 0 }}>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>GitHub</span>
                   {profileData.githubUrl ? (
-                    <a href={profileData.githubUrl} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <span>{profileData.githubUrl.replace('https://github.com/', 'github.com/')}</span>
-                      <ExternalLink size={12} />
+                    <a href={profileData.githubUrl.startsWith('http') ? profileData.githubUrl : `https://${profileData.githubUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
+                        {profileData.githubUrl.replace(/^https?:\/\/(www\.)?github\.com\//, 'github.com/').replace(/^https?:\/\//, '')}
+                      </span>
+                      <ExternalLink size={12} style={{ flexShrink: 0 }} />
                     </a>
                   ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
                 </div>
-                <div>
+
+                <div style={{ minWidth: 0 }}>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>LinkedIn</span>
                   {profileData.linkedinUrl ? (
-                    <a href={profileData.linkedinUrl} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <span>{profileData.linkedinUrl.replace('https://linkedin.com/in/', 'linkedin.com/in/')}</span>
-                      <ExternalLink size={12} />
+                    <a href={profileData.linkedinUrl.startsWith('http') ? profileData.linkedinUrl : `https://${profileData.linkedinUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
+                        {profileData.linkedinUrl.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, 'linkedin.com/in/').replace(/^https?:\/\//, '')}
+                      </span>
+                      <ExternalLink size={12} style={{ flexShrink: 0 }} />
                     </a>
                   ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
                 </div>
-                <div>
+
+                <div style={{ minWidth: 0 }}>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Portfolio</span>
                   {profileData.portfolioUrl ? (
-                    <a href={profileData.portfolioUrl} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <span>{profileData.portfolioUrl.replace('https://', '')}</span>
-                      <ExternalLink size={12} />
+                    <a href={profileData.portfolioUrl.startsWith('http') ? profileData.portfolioUrl : `https://${profileData.portfolioUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
+                        {profileData.portfolioUrl.replace(/^https?:\/\//, '')}
+                      </span>
+                      <ExternalLink size={12} style={{ flexShrink: 0 }} />
                     </a>
                   ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
                 </div>
-                <div>
+
+                <div style={{ minWidth: 0 }}>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Resume / Website</span>
-                  {profileData.portfolioUrl ? (
-                    <a href={profileData.portfolioUrl} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <span>View Portfolio</span>
-                      <ExternalLink size={12} />
+                  {profileData.resumeUrl || profileData.portfolioUrl ? (
+                    <a href={(profileData.resumeUrl || profileData.portfolioUrl).startsWith('http') ? (profileData.resumeUrl || profileData.portfolioUrl) : `https://${profileData.resumeUrl || profileData.portfolioUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
+                        {profileData.resumeUrl ? 'View Resume' : 'View Portfolio'}
+                      </span>
+                      <ExternalLink size={12} style={{ flexShrink: 0 }} />
                     </a>
                   ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
                 </div>
