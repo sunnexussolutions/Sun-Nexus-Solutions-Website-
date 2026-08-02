@@ -92,23 +92,85 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
     }
   }, []);
 
+  const requestCameraAccess = async () => {
+    setCamStatus('checking');
+    try {
+      const vStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const videoTrack = vStream.getVideoTracks()[0];
+      if (videoTrack) {
+        setCamStatus('ready');
+
+        // Add track to existing stream or create new one
+        if (!streamRef.current) {
+          streamRef.current = new MediaStream();
+        }
+        streamRef.current.addTrack(videoTrack);
+
+        if (videoPreviewRef.current) {
+          videoPreviewRef.current.srcObject = streamRef.current;
+        }
+      }
+    } catch (err) {
+      console.warn("Camera request error:", err);
+      setCamStatus('denied');
+      setShowPermissionGuide(true);
+    }
+  };
+
+  const requestMicAccess = async () => {
+    setMicStatus('checking');
+    try {
+      const aStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioTrack = aStream.getAudioTracks()[0];
+      if (audioTrack) {
+        setMicStatus('ready');
+
+        if (!streamRef.current) {
+          streamRef.current = new MediaStream();
+        }
+        streamRef.current.addTrack(audioTrack);
+
+        // Setup audio decibel meter
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            const audioCtx = new AudioCtx();
+            const source = audioCtx.createMediaStreamSource(streamRef.current);
+            const analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 64;
+            source.connect(analyser);
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            const checkVolume = () => {
+              if (!analyser) return;
+              analyser.getByteFrequencyData(dataArray);
+              let sum = 0;
+              for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+              const avg = sum / dataArray.length;
+              setAudioLevel(Math.min(100, Math.round((avg / 128) * 100)));
+              animFrameRef.current = requestAnimationFrame(checkVolume);
+            };
+            checkVolume();
+          }
+        } catch (e) {
+          console.warn("Audio meter setup issue:", e);
+        }
+      }
+    } catch (err) {
+      console.warn("Microphone request error:", err);
+      setMicStatus('denied');
+      setShowPermissionGuide(true);
+    }
+  };
+
   // Direct user-gesture handler for Retry Diagnostic button
   const handleRetryDiagnostic = async () => {
     setIsRetrying(true);
     setShowPermissionGuide(true);
 
-    try {
-      // Direct call within click gesture handler to trigger browser permission modal
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        const testStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        // Stop test stream immediately, runDiagnostic will manage the active stream
-        testStream.getTracks().forEach(track => track.stop());
-      }
-    } catch (err) {
-      console.warn("Direct retry user gesture permission prompt result:", err);
-    }
+    await requestCameraAccess();
+    await requestMicAccess();
 
-    await runDiagnostic();
     setIsRetrying(false);
   };
 
@@ -195,43 +257,82 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
             <div style={{ width: '100%', height: '110px', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#000', marginBottom: '10px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <video ref={videoPreviewRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               {camStatus !== 'ready' && (
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.75)', padding: '8px', gap: '8px' }}>
                   <Camera size={24} color="#a855f7" />
+                  <button
+                    onClick={requestCameraAccess}
+                    style={{
+                      padding: '5px 12px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)',
+                      color: '#ffffff',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 8px rgba(168, 85, 247, 0.4)'
+                    }}
+                  >
+                    Allow Camera
+                  </button>
                 </div>
               )}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 800, color: camStatus === 'ready' ? '#10b981' : '#f59e0b' }}>
               {camStatus === 'ready' ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
-              <span>{camStatus === 'ready' ? 'Camera Active' : 'Camera Access Required'}</span>
+              <span>{camStatus === 'ready' ? 'Camera Active' : camStatus === 'checking' ? 'Checking Cam...' : 'Camera Denied'}</span>
             </div>
           </div>
 
           {/* Microphone Box */}
-          <div style={{ borderRadius: '16px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <Mic size={18} color="#06b6d4" />
-              <span style={{ fontSize: '13px', fontWeight: 800 }}>Microphone Test</span>
-            </div>
-            <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)', margin: '0 0 12px 0' }}>
-              Speak to test audio responsiveness:
-            </p>
+          <div style={{ borderRadius: '16px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Mic size={18} color="#06b6d4" />
+                  <span style={{ fontSize: '13px', fontWeight: 800 }}>Microphone Test</span>
+                </div>
+              </div>
+              <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)', margin: '0 0 10px 0' }}>
+                Speak to test audio responsiveness:
+              </p>
 
-            {/* Audio Decibel Bar */}
-            <div style={{ width: '100%', height: '12px', borderRadius: '99px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden', position: 'relative', marginBottom: '12px' }}>
-              <div
-                style={{
-                  height: '100%',
-                  width: `${audioLevel}%`,
-                  background: audioLevel > 60 ? 'linear-gradient(90deg, #10b981, #ef4444)' : 'linear-gradient(90deg, #10b981, #f59e0b)',
-                  borderRadius: '99px',
-                  transition: 'width 0.1s ease'
-                }}
-              />
+              {/* Audio Decibel Bar */}
+              <div style={{ width: '100%', height: '12px', borderRadius: '99px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden', position: 'relative', marginBottom: '12px' }}>
+                <div
+                  style={{
+                    height: '100%',
+                    width: `${audioLevel}%`,
+                    background: audioLevel > 60 ? 'linear-gradient(90deg, #10b981, #ef4444)' : 'linear-gradient(90deg, #10b981, #f59e0b)',
+                    borderRadius: '99px',
+                    transition: 'width 0.1s ease'
+                  }}
+                />
+              </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 800, color: micStatus === 'ready' ? '#10b981' : '#f59e0b' }}>
-              {micStatus === 'ready' ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
-              <span>{micStatus === 'ready' ? 'Audio Stream Live' : 'Mic Check Pending'}</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 800, color: micStatus === 'ready' ? '#10b981' : '#f59e0b' }}>
+                {micStatus === 'ready' ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
+                <span>{micStatus === 'ready' ? 'Audio Stream Live' : micStatus === 'checking' ? 'Checking Mic...' : 'Mic Denied'}</span>
+              </div>
+              {micStatus !== 'ready' && (
+                <button
+                  onClick={requestMicAccess}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    background: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
+                    color: '#ffffff',
+                    fontSize: '10.5px',
+                    fontWeight: 800,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Allow Mic
+                </button>
+              )}
             </div>
           </div>
         </div>
