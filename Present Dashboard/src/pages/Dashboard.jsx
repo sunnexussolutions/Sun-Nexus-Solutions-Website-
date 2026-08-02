@@ -718,15 +718,36 @@ const Dashboard = () => {
                   />
                 </div>
                 <button
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all"
                   style={{
-                    backgroundColor: 'var(--pill-btn-bg, rgba(255, 255, 255, 0.04))',
-                    border: '1px solid var(--pill-btn-border, rgba(255, 255, 255, 0.1))',
-                    color: 'var(--text-primary)'
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '9px 18px',
+                    borderRadius: '14px',
+                    background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.08) 100%)',
+                    border: '1.5px solid rgba(6, 182, 212, 0.32)',
+                    boxShadow: '0 4px 14px rgba(6, 182, 212, 0.1)',
+                    color: '#06b6d4',
+                    fontSize: '12.5px',
+                    fontWeight: 800,
+                    letterSpacing: '0.04em',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(12px)',
+                    transition: 'all 0.25s ease'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(6, 182, 212, 0.22) 0%, rgba(59, 130, 246, 0.2) 100%)';
+                    e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.65)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(6, 182, 212, 0.25)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.08) 100%)';
+                    e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.32)';
+                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(6, 182, 212, 0.1)';
                   }}
                 >
                   <span>View All</span>
-                  <ArrowRight size={13} />
+                  <ArrowRight size={14} style={{ color: '#06b6d4' }} />
                 </button>
               </div>
             </div>
