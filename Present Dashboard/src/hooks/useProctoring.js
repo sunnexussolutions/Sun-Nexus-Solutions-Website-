@@ -16,7 +16,7 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
   const [hasCamera, setHasCamera] = useState(false);
   const [hasMic, setHasMic] = useState(false);
   const [stream, setStream] = useState(null);
-  const [autoSubmitCountdown, setAutoSubmitCountdown] = useState(null); // null | 3 | 2 | 1
+  const [isAutoSubmitting, setIsAutoSubmitting] = useState(false); // true when final submit is firing
 
   const videoRef = useRef(null);
   const audioContextRef = useRef(null);
@@ -110,28 +110,17 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     }
   }, [stream]);
 
-  // Start the 3-second auto-submit countdown
-  const startAutoSubmitCountdown = useCallback(() => {
-    // Clear any existing countdown
-    if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
-
-    setAutoSubmitCountdown(3);
-    let count = 3;
-
-    countdownTimerRef.current = setInterval(() => {
-      count -= 1;
-      if (count <= 0) {
-        clearInterval(countdownTimerRef.current);
-        countdownTimerRef.current = null;
-        setAutoSubmitCountdown(0);
-        // Fire auto-submit using the stable ref
-        if (onAutoSubmitRef.current) {
-          onAutoSubmitRef.current();
-        }
-      } else {
-        setAutoSubmitCountdown(count);
+  // Immediately fire auto-submit on 4th violation
+  const startImmediateAutoSubmit = useCallback(() => {
+    if (countdownTimerRef.current) return; // already running
+    setIsAutoSubmitting(true);
+    // Small delay so the UI can flash the "Submitting..." state before unmounting
+    countdownTimerRef.current = setTimeout(() => {
+      countdownTimerRef.current = null;
+      if (onAutoSubmitRef.current) {
+        onAutoSubmitRef.current();
       }
-    }, 1000);
+    }, 800);
   }, []);
 
   // Handle a detected security violation — uses ref to read latest warningCount
@@ -153,13 +142,13 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
       setIsWarningModalOpen(true);
 
       if (nextCount >= 4) {
-        // Kick off the visible countdown to auto-submit
-        startAutoSubmitCountdown();
+        // Submit immediately on 4th violation
+        startImmediateAutoSubmit();
       }
 
       return nextCount;
     });
-  }, [isExamActive, startAutoSubmitCountdown]);
+  }, [isExamActive, startImmediateAutoSubmit]);
 
   // Tab switch & window blur security event listeners
   useEffect(() => {
@@ -200,17 +189,17 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
       initMedia();
     } else {
       stopMedia();
-      // Clear any active countdown if exam ends externally
+      // Clear any active submit timer if exam ends externally
       if (countdownTimerRef.current) {
-        clearInterval(countdownTimerRef.current);
+        clearTimeout(countdownTimerRef.current);
         countdownTimerRef.current = null;
       }
-      setAutoSubmitCountdown(null);
+      setIsAutoSubmitting(false);
     }
     return () => {
       stopMedia();
       if (countdownTimerRef.current) {
-        clearInterval(countdownTimerRef.current);
+        clearTimeout(countdownTimerRef.current);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -228,7 +217,7 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     warningCount,
     isWarningModalOpen,
     lastViolationReason,
-    autoSubmitCountdown,
+    isAutoSubmitting,
     dismissWarning,
     audioLevel,
     hasCamera,
