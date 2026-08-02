@@ -226,7 +226,8 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
     audioLevel,
     hasCamera,
     hasMic,
-    videoRef
+    videoRef,
+    retryMedia
   } = useProctoring({
     isExamActive: phase === 'quiz' && !submitted && !showPreCheck,
     onAutoSubmit: () => {
@@ -423,6 +424,44 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ── MANDATORY CAMERA & MIC MISSING OVERLAY ── */}
+          {phase === 'quiz' && !submitted && (!hasCamera || !hasMic) && (
+            <div style={{
+              position: 'absolute', inset: 0, zIndex: 22,
+              background: 'rgba(15, 23, 42, 0.96)',
+              backdropFilter: 'blur(12px)',
+              borderRadius: '24px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              padding: '2rem', textAlign: 'center', gap: '14px', color: '#ffffff'
+            }}>
+              <div style={{
+                width: '64px', height: '64px', borderRadius: '50%',
+                background: 'rgba(239, 68, 68, 0.15)', border: '2px solid #ef4444',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <Camera size={30} style={{ color: '#ef4444' }} />
+              </div>
+              <p style={{ fontSize: '16px', fontWeight: 900, color: '#fca5a5', margin: 0, letterSpacing: '0.02em' }}>
+                Camera & Microphone Required
+              </p>
+              <p style={{ fontSize: '12px', color: '#94a3b8', maxWidth: '320px', margin: 0, lineHeight: 1.6 }}>
+                Proctored aptitude tests require active camera and microphone access. Please allow permissions in your browser to continue the test.
+              </p>
+              <button
+                onClick={retryMedia}
+                style={{
+                  marginTop: '8px', padding: '10px 22px', borderRadius: '12px', border: 'none',
+                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                  color: '#ffffff', fontWeight: 800, fontSize: '13px', cursor: 'pointer',
+                  boxShadow: '0 4px 16px rgba(239, 68, 68, 0.4)',
+                  letterSpacing: '0.01em'
+                }}
+              >
+                Grant Permission / Retry Camera & Mic
+              </button>
             </div>
           )}
 

@@ -191,16 +191,56 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
         </div>
 
         {/* Security Rules Checklist */}
-        <div style={{ borderRadius: '16px', background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%)', border: '1px solid rgba(239, 68, 68, 0.25)', padding: '14px', marginBottom: '20px' }}>
+        <div style={{ borderRadius: '16px', background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%)', border: '1px solid rgba(239, 68, 68, 0.25)', padding: '14px', marginBottom: '16px' }}>
           <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#f87171', display: 'block', marginBottom: '8px' }}>
             RULES & ANTI-CHEATING COMMITMENT
           </span>
           <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', gap: '6px', fontWeight: 600 }}>
+            <li>Camera and Microphone access are <strong>strictly mandatory</strong> for the entire exam.</li>
             <li>No tab switching, window minimizing, or secondary monitor usage allowed.</li>
-            <li>3 security warnings will result in instant automated exam submission.</li>
+            <li>4 security warnings will result in instant automated exam submission.</li>
             <li>Fullscreen mode will be locked for the entire assessment duration.</li>
           </ul>
         </div>
+
+        {/* Media Denied Warning & Retry Banner */}
+        {(camStatus !== 'ready' || micStatus !== 'ready') && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justify: 'space-between',
+            gap: '12px',
+            padding: '12px 14px',
+            borderRadius: '14px',
+            background: 'rgba(239, 68, 68, 0.12)',
+            border: '1px solid rgba(239, 68, 68, 0.35)',
+            marginBottom: '16px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertTriangle size={18} color="#ef4444" style={{ flexShrink: 0 }} />
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#fca5a5' }}>
+                Camera & Microphone permissions are mandatory to take this test.
+              </span>
+            </div>
+            <button
+              onClick={runDiagnostic}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '8px',
+                border: '1px solid rgba(239, 68, 68, 0.5)',
+                background: '#ef4444',
+                color: '#ffffff',
+                fontSize: '11.5px',
+                fontWeight: 800,
+                cursor: 'pointer',
+                flexShrink: 0,
+                whiteSpace: 'nowrap'
+              }}
+            >
+              Retry Diagnostic
+            </button>
+          </div>
+        )}
 
         {/* Agreement Checkbox */}
         <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', marginBottom: '22px', userSelect: 'none' }}>
@@ -214,39 +254,50 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
         </label>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button
-            onClick={onClose}
-            style={{ flex: 1, padding: '12px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.15)', background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-primary)', fontWeight: 800, cursor: 'pointer' }}
-          >
-            Cancel
-          </button>
-          <button
-            disabled={!agreed}
-            onClick={handleConfirmStart}
-            style={{
-              flex: 2,
-              padding: '12px 20px',
-              borderRadius: '14px',
-              border: 'none',
-              background: agreed
-                ? 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)'
-                : 'rgba(255, 255, 255, 0.1)',
-              color: agreed ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
-              fontWeight: 900,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              cursor: agreed ? 'pointer' : 'not-allowed',
-              boxShadow: agreed ? '0 6px 20px rgba(168, 85, 247, 0.35)' : 'none',
-              transition: 'all 0.2s'
-            }}
-          >
-            <Play size={16} fill="currentColor" />
-            <span>Enter Proctored Exam</span>
-          </button>
-        </div>
+        {(() => {
+          const canStart = agreed && camStatus === 'ready' && micStatus === 'ready';
+          return (
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={onClose}
+                style={{ flex: 1, padding: '12px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.15)', background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-primary)', fontWeight: 800, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                disabled={!canStart}
+                onClick={handleConfirmStart}
+                style={{
+                  flex: 2,
+                  padding: '12px 20px',
+                  borderRadius: '14px',
+                  border: 'none',
+                  background: canStart
+                    ? 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)'
+                    : 'rgba(255, 255, 255, 0.1)',
+                  color: canStart ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
+                  fontWeight: 900,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  cursor: canStart ? 'pointer' : 'not-allowed',
+                  boxShadow: canStart ? '0 6px 20px rgba(168, 85, 247, 0.35)' : 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <Play size={16} fill="currentColor" />
+                <span>
+                  {camStatus !== 'ready' || micStatus !== 'ready'
+                    ? 'Cam & Mic Access Required'
+                    : !agreed
+                      ? 'Accept Rules to Begin'
+                      : 'Enter Proctored Exam'}
+                </span>
+              </button>
+            </div>
+          );
+        })()}
       </motion.div>
     </div>,
     document.body
