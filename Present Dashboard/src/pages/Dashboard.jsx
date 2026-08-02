@@ -268,31 +268,26 @@ const Dashboard = () => {
             Welcome back,{' '}
             <span
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
                 background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 45%, #7b5cff 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                filter: 'drop-shadow(0 4px 14px rgba(79, 172, 254, 0.4))',
                 fontWeight: 900
               }}
             >
               {dynamicFirstName}
-              <motion.span
-                animate={{ rotate: [0, 14, -8, 14, -4, 10, 0] }}
-                transition={{ repeat: Infinity, repeatDelay: 2.2, duration: 1.4 }}
-                style={{
-                  display: 'inline-block',
-                  transformOrigin: '70% 70%',
-                  WebkitTextFillColor: 'initial',
-                  fontSize: '0.9em',
-                  filter: 'none'
-                }}
-              >
-                👋
-              </motion.span>
             </span>
+            {' '}
+            <motion.span
+              animate={{ rotate: [0, 14, -8, 14, -4, 10, 0] }}
+              transition={{ repeat: Infinity, repeatDelay: 2.2, duration: 1.4 }}
+              style={{
+                display: 'inline-block',
+                transformOrigin: '70% 70%',
+                fontSize: '0.9em'
+              }}
+            >
+              👋
+            </motion.span>
           </h1>
 
           {/* Subtitle with Pulse Dot Indicator */}
