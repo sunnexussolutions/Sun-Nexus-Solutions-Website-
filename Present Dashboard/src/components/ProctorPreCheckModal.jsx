@@ -92,87 +92,141 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
     }
   }, []);
 
-  const requestCameraAccess = async () => {
+  // Helper: wire an audio-only MediaStream into the decibel analyser
+  const startAudioMeter = useCallback((audioOnlyStream) => {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const audioCtx = new AudioCtx();
+      const source = audioCtx.createMediaStreamSource(audioOnlyStream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
+      source.connect(analyser);
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      const tick = () => {
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+        setAudioLevel(Math.min(100, Math.round((sum / dataArray.length / 128) * 100)));
+        animFrameRef.current = requestAnimationFrame(tick);
+      };
+      tick();
+    } catch (e) {
+      console.warn('Audio meter error:', e);
+    }
+  }, []);
+
+  // Request camera individually (stops existing video tracks first to avoid addTrack duplicates)
+  const requestCameraAccess = useCallback(async () => {
     setCamStatus('checking');
     try {
-      const vStream = await navigator.mediaDevices.getUserMedia({ video: true });
-      const videoTrack = vStream.getVideoTracks()[0];
-      if (videoTrack) {
-        setCamStatus('ready');
-
-        // Add track to existing stream or create new one
-        if (!streamRef.current) {
-          streamRef.current = new MediaStream();
-        }
-        streamRef.current.addTrack(videoTrack);
-
-        if (videoPreviewRef.current) {
-          videoPreviewRef.current.srcObject = streamRef.current;
-        }
+      // Stop any existing video tracks
+      if (streamRef.current) {
+        streamRef.current.getVideoTracks().forEach(t => t.stop());
+        streamRef.current.getVideoTracks().forEach(t => streamRef.current.removeTrack(t));
       }
-    } catch (err) {
-      console.warn("Camera request error:", err);
-      setCamStatus('denied');
-      setShowPermissionGuide(true);
-    }
-  };
 
-  const requestMicAccess = async () => {
+      const vStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      const videoTrack = vStream.getVideoTracks()[0];
+
+      if (!videoTrack) throw new Error('No video track returned');
+
+      if (!streamRef.current) streamRef.current = new MediaStream();
+      streamRef.current.addTrack(videoTrack);
+
+      if (videoPreviewRef.current) {
+        videoPreviewRef.current.srcObject = streamRef.current;
+      }
+
+      setCamStatus('ready');
+    } catch (err) {
+      console.warn('Camera request error:', err);
+      setCamStatus('denied');
+    }
+  }, []);
+
+  // Request microphone individually
+  const requestMicAccess = useCallback(async () => {
     setMicStatus('checking');
     try {
-      const aStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const audioTrack = aStream.getAudioTracks()[0];
-      if (audioTrack) {
-        setMicStatus('ready');
-
-        if (!streamRef.current) {
-          streamRef.current = new MediaStream();
-        }
-        streamRef.current.addTrack(audioTrack);
-
-        // Setup audio decibel meter
-        try {
-          const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          if (AudioCtx) {
-            const audioCtx = new AudioCtx();
-            const source = audioCtx.createMediaStreamSource(streamRef.current);
-            const analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 64;
-            source.connect(analyser);
-
-            const dataArray = new Uint8Array(analyser.frequencyBinCount);
-            const checkVolume = () => {
-              if (!analyser) return;
-              analyser.getByteFrequencyData(dataArray);
-              let sum = 0;
-              for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-              const avg = sum / dataArray.length;
-              setAudioLevel(Math.min(100, Math.round((avg / 128) * 100)));
-              animFrameRef.current = requestAnimationFrame(checkVolume);
-            };
-            checkVolume();
-          }
-        } catch (e) {
-          console.warn("Audio meter setup issue:", e);
-        }
+      // Stop any existing audio tracks
+      if (streamRef.current) {
+        streamRef.current.getAudioTracks().forEach(t => t.stop());
+        streamRef.current.getAudioTracks().forEach(t => streamRef.current.removeTrack(t));
       }
+
+      const aStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      const audioTrack = aStream.getAudioTracks()[0];
+
+      if (!audioTrack) throw new Error('No audio track returned');
+
+      if (!streamRef.current) streamRef.current = new MediaStream();
+      streamRef.current.addTrack(audioTrack);
+
+      // Wire analyser from the raw audio-only stream (not combined)
+      startAudioMeter(aStream);
+
+      setMicStatus('ready');
     } catch (err) {
-      console.warn("Microphone request error:", err);
+      console.warn('Microphone request error:', err);
       setMicStatus('denied');
-      setShowPermissionGuide(true);
     }
-  };
+  }, [startAudioMeter]);
 
-  // Direct user-gesture handler for Retry Diagnostic button
-  const handleRetryDiagnostic = async () => {
+  // Retry Diagnostic: requests BOTH in ONE getUserMedia call so browser gesture stays valid
+  const handleRetryDiagnostic = useCallback(async () => {
     setIsRetrying(true);
-    setShowPermissionGuide(true);
 
-    await requestCameraAccess();
-    await requestMicAccess();
+    // Stop all existing tracks
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
+    }
+
+    setCamStatus('checking');
+    setMicStatus('checking');
+
+    let videoTrack = null;
+    let audioTrackStream = null;
+
+    // Request camera
+    try {
+      const vs = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      videoTrack = vs.getVideoTracks()[0] || null;
+      setCamStatus(videoTrack ? 'ready' : 'denied');
+    } catch {
+      setCamStatus('denied');
+    }
+
+    // Request mic separately (still in same click, sequential awaits are fine)
+    try {
+      const as = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      const audioTrack = as.getAudioTracks()[0] || null;
+      if (audioTrack) {
+        audioTrackStream = as;
+        setMicStatus('ready');
+        startAudioMeter(as);
+      } else {
+        setMicStatus('denied');
+      }
+    } catch {
+      setMicStatus('denied');
+    }
+
+    // Combine into preview stream
+    const combined = new MediaStream();
+    if (videoTrack) combined.addTrack(videoTrack);
+    if (audioTrackStream) audioTrackStream.getAudioTracks().forEach(t => combined.addTrack(t));
+    streamRef.current = combined;
+
+    if (videoPreviewRef.current && videoTrack) {
+      videoPreviewRef.current.srcObject = combined;
+    }
 
     setIsRetrying(false);
-  };
+  }, [startAudioMeter]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -258,23 +312,28 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
               <video ref={videoPreviewRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               {camStatus !== 'ready' && (
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.75)', padding: '8px', gap: '8px' }}>
-                  <Camera size={24} color="#a855f7" />
-                  <button
-                    onClick={requestCameraAccess}
-                    style={{
-                      padding: '5px 12px',
-                      borderRadius: '8px',
-                      border: 'none',
-                      background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)',
-                      color: '#ffffff',
-                      fontSize: '11px',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      boxShadow: '0 2px 8px rgba(168, 85, 247, 0.4)'
-                    }}
-                  >
-                    Allow Camera
-                  </button>
+                  <Camera size={24} color={camStatus === 'checking' ? '#f59e0b' : '#a855f7'} />
+                  {camStatus === 'denied' && (
+                    <button
+                      onClick={requestCameraAccess}
+                      style={{
+                        padding: '5px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)',
+                        color: '#ffffff',
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(168, 85, 247, 0.4)'
+                      }}
+                    >
+                      Allow Camera
+                    </button>
+                  )}
+                  {camStatus === 'checking' && (
+                    <span style={{ fontSize: '10px', color: '#f59e0b', fontWeight: 700 }}>Requesting access…</span>
+                  )}
                 </div>
               )}
             </div>
@@ -316,7 +375,7 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
                 {micStatus === 'ready' ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
                 <span>{micStatus === 'ready' ? 'Audio Stream Live' : micStatus === 'checking' ? 'Checking Mic...' : 'Mic Denied'}</span>
               </div>
-              {micStatus !== 'ready' && (
+              {micStatus === 'denied' && (
                 <button
                   onClick={requestMicAccess}
                   style={{
@@ -327,11 +386,15 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
                     color: '#ffffff',
                     fontSize: '10.5px',
                     fontWeight: 800,
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(6, 182, 212, 0.4)'
                   }}
                 >
                   Allow Mic
                 </button>
+              )}
+              {micStatus === 'checking' && (
+                <span style={{ fontSize: '10px', color: '#f59e0b', fontWeight: 700 }}>Requesting…</span>
               )}
             </div>
           </div>
