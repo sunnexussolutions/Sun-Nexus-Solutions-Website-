@@ -218,12 +218,43 @@ const Dashboard = () => {
 
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-3xl md:text-5xl font-black tracking-tighter">
-            Welcome back, <span style={{ background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{user?.firstName || 'Operator'}</span>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col gap-2"
+        >
+          {/* Operator Status Pill Badge */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '999px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.12) 100%)', border: '1.5px solid rgba(168, 85, 247, 0.35)', width: 'fit-content', boxShadow: '0 4px 14px rgba(168, 85, 247, 0.12)' }}>
+            <Sparkles size={14} style={{ color: '#c084fc' }} />
+            <span style={{ fontSize: '11.5px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#c084fc' }}>
+              OPERATOR DASHBOARD HUB
+            </span>
+          </div>
+
+          {/* Welcome Title */}
+          <h1 className="text-3xl md:text-5xl font-black tracking-tight" style={{ color: 'var(--text-primary)', margin: 0, lineHeight: 1.15 }}>
+            Welcome back,{' '}
+            <span
+              style={{
+                background: 'linear-gradient(135deg, #7b5cff 0%, #00f2fe 50%, #38ef7d 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                filter: 'drop-shadow(0 4px 12px rgba(123, 92, 255, 0.3))'
+              }}
+            >
+              {user?.firstName || user?.name || 'Nexus'} 👋
+            </span>
           </h1>
-          <p className="text-lg font-medium text-secondary mt-2">Here is your performance pulse for this week.</p>
-        </div>
+
+          {/* Subtitle with Pulse Dot Indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '2px' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 10px #10b981' }} />
+            <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-secondary)', margin: 0 }}>
+              Here is your live performance pulse for this week.
+            </p>
+          </div>
+        </motion.div>
         
         <div className="flex items-center gap-4 flex-wrap">
           {(() => {
