@@ -13,6 +13,8 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
   const streamRef = useRef(null);
   const animFrameRef = useRef(null);
 
+  const [showPermissionGuide, setShowPermissionGuide] = useState(false);
+
   const runDiagnostic = useCallback(async () => {
     setCamStatus('checking');
     setMicStatus('checking');
@@ -24,49 +26,70 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
       streamRef.current = null;
     }
 
+    let videoTrack = null;
+    let audioTrack = null;
+
+    // 1. Request Camera Stream (triggers browser camera permission prompt)
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 320, height: 240, facingMode: 'user' },
-        audio: true
+      const vStream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 320, height: 240, facingMode: 'user' }
       });
-
-      streamRef.current = stream;
+      videoTrack = vStream.getVideoTracks()[0];
       setCamStatus('ready');
-      setMicStatus('ready');
+    } catch (vErr) {
+      console.warn("Camera diagnostic error:", vErr);
+      setCamStatus('denied');
+    }
 
-      if (videoPreviewRef.current) {
-        videoPreviewRef.current.srcObject = stream;
+    // 2. Request Microphone Stream (triggers browser microphone permission prompt)
+    try {
+      const aStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioTrack = aStream.getAudioTracks()[0];
+      setMicStatus('ready');
+    } catch (aErr) {
+      console.warn("Microphone diagnostic error:", aErr);
+      setMicStatus('denied');
+    }
+
+    // Combine active tracks into preview stream
+    if (videoTrack || audioTrack) {
+      const combinedStream = new MediaStream();
+      if (videoTrack) combinedStream.addTrack(videoTrack);
+      if (audioTrack) combinedStream.addTrack(audioTrack);
+
+      streamRef.current = combinedStream;
+
+      if (videoPreviewRef.current && videoTrack) {
+        videoPreviewRef.current.srcObject = combinedStream;
       }
 
       // Web Audio decibel meter for pre-check
-      try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) {
-          const audioCtx = new AudioCtx();
-          const source = audioCtx.createMediaStreamSource(stream);
-          const analyser = audioCtx.createAnalyser();
-          analyser.fftSize = 64;
-          source.connect(analyser);
+      if (audioTrack) {
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            const audioCtx = new AudioCtx();
+            const source = audioCtx.createMediaStreamSource(combinedStream);
+            const analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 64;
+            source.connect(analyser);
 
-          const dataArray = new Uint8Array(analyser.frequencyBinCount);
-          const checkVolume = () => {
-            if (!analyser) return;
-            analyser.getByteFrequencyData(dataArray);
-            let sum = 0;
-            for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-            const avg = sum / dataArray.length;
-            setAudioLevel(Math.min(100, Math.round((avg / 128) * 100)));
-            animFrameRef.current = requestAnimationFrame(checkVolume);
-          };
-          checkVolume();
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            const checkVolume = () => {
+              if (!analyser) return;
+              analyser.getByteFrequencyData(dataArray);
+              let sum = 0;
+              for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+              const avg = sum / dataArray.length;
+              setAudioLevel(Math.min(100, Math.round((avg / 128) * 100)));
+              animFrameRef.current = requestAnimationFrame(checkVolume);
+            };
+            checkVolume();
+          }
+        } catch (e) {
+          console.warn("Audio meter setup issue:", e);
         }
-      } catch (e) {
-        console.warn("Audio meter setup issue:", e);
       }
-    } catch (err) {
-      console.warn("Diagnostic error:", err);
-      setCamStatus('denied');
-      setMicStatus('denied');
     }
   }, []);
 
@@ -209,40 +232,67 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
 
         {/* Media Denied Warning & Retry Banner */}
         {(camStatus !== 'ready' || micStatus !== 'ready') && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justify: 'space-between',
-            gap: '12px',
-            padding: '12px 14px',
-            borderRadius: '14px',
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.35)',
-            marginBottom: '16px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <AlertTriangle size={18} color="#ef4444" style={{ flexShrink: 0 }} />
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#fca5a5' }}>
-                Camera & Microphone permissions are mandatory to take this test.
-              </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justify: 'space-between',
+              gap: '12px',
+              padding: '12px 14px',
+              borderRadius: '14px',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.35)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <AlertTriangle size={18} color="#ef4444" style={{ flexShrink: 0 }} />
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#fca5a5' }}>
+                  Camera & Microphone permissions are mandatory to take this test.
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  runDiagnostic();
+                  setShowPermissionGuide(true);
+                }}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(239, 68, 68, 0.6)',
+                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                  color: '#ffffff',
+                  fontSize: '11.5px',
+                  fontWeight: 900,
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 2px 10px rgba(239, 68, 68, 0.3)'
+                }}
+              >
+                Retry Diagnostic
+              </button>
             </div>
-            <button
-              onClick={runDiagnostic}
-              style={{
-                padding: '6px 12px',
-                borderRadius: '8px',
-                border: '1px solid rgba(239, 68, 68, 0.5)',
-                background: '#ef4444',
-                color: '#ffffff',
-                fontSize: '11.5px',
-                fontWeight: 800,
-                cursor: 'pointer',
-                flexShrink: 0,
-                whiteSpace: 'nowrap'
-              }}
-            >
-              Retry Diagnostic
-            </button>
+
+            {/* Step-by-Step Browser Permission Unblock Guide */}
+            <div style={{
+              padding: '12px 14px',
+              borderRadius: '12px',
+              background: 'rgba(15, 23, 42, 0.6)',
+              border: '1px solid rgba(168, 85, 247, 0.25)',
+              fontSize: '11.5px',
+              color: '#cbd5e1',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px'
+            }}>
+              <span style={{ fontWeight: 800, color: '#c084fc', textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '10px' }}>
+                💡 If permissions are blocked in your browser:
+              </span>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '2px' }}>
+                <span>🔒 <strong>1. Click Padlock / Settings</strong> icon near address bar at top</span>
+                <span>🎥 <strong>2. Set Camera & Mic</strong> to "Allow"</span>
+                <span>🔄 <strong>3. Click "Retry Diagnostic"</strong></span>
+              </div>
+            </div>
           </div>
         )}
 
