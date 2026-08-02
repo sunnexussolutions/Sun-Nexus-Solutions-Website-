@@ -535,10 +535,10 @@ const Dashboard = () => {
                   EFFICIENCY OVER TIME
                 </p>
               </div>
-              <div ref={timeDropdownRef} style={{ position: 'relative' }}>
+              <div ref={timeDropdownRef} className="self-start sm:self-center" style={{ position: 'relative', display: 'inline-block' }}>
                 <button
                   onClick={() => setIsTimeDropdownOpen(v => !v)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all self-start sm:self-center"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all"
                   style={{
                     backgroundColor: 'var(--pill-btn-bg, rgba(255, 255, 255, 0.06))',
                     border: '1.5px solid var(--pill-btn-border, rgba(255, 255, 255, 0.18))',
@@ -554,10 +554,10 @@ const Dashboard = () => {
                   <div
                     style={{
                       position: 'absolute',
-                      right: 0,
+                      left: 0,
                       top: 'calc(100% + 8px)',
                       zIndex: 50,
-                      minWidth: '150px',
+                      minWidth: '160px',
                       padding: '6px',
                       borderRadius: '16px',
                       backgroundColor: 'var(--card-bg, #0f172a)',
