@@ -430,7 +430,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
           {isWarningModalOpen && (
             <div style={{
               position: 'absolute', inset: 0, zIndex: 20,
-              background: warningCount >= 3 ? 'rgba(10,5,20,0.95)' : 'rgba(15,23,42,0.88)',
+              background: warningCount >= 4 ? 'rgba(10,5,20,0.95)' : 'rgba(15,23,42,0.88)',
               backdropFilter: 'blur(8px)',
               borderRadius: '24px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -438,7 +438,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
               textAlign: 'center'
             }}>
 
-              {warningCount >= 3 ? (
+              {warningCount >= 4 ? (
                 /* ── FINAL VIOLATION: 3-2-1 Countdown ── */
                 <>
                   {/* Pulsing red ring countdown */}
@@ -496,7 +496,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                   </div>
                 </>
               ) : (
-                /* ── WARNING 1 or 2: Dismissable ── */
+                /* ── WARNINGS 1, 2 or 3: Dismissable ── */
                 <>
                   <div style={{
                     width: '56px', height: '56px', borderRadius: '50%',
@@ -509,13 +509,13 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
 
                   <div>
                     <p style={{ fontSize: '14px', fontWeight: 800, color: '#fef3c7', marginBottom: '6px' }}>
-                      ⚠️ Security Warning {warningCount} of 3
+                      ⚠️ Security Warning {warningCount} of 4
                     </p>
                     <p style={{ fontSize: '11px', color: '#94a3b8', lineHeight: 1.6, marginBottom: '4px' }}>
                       {lastViolationReason}
                     </p>
                     <p style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600 }}>
-                      {3 - warningCount} more violation{3 - warningCount !== 1 ? 's' : ''} will auto-submit your exam.
+                      {4 - warningCount} more violation{4 - warningCount !== 1 ? 's' : ''} will auto-submit your exam.
                     </p>
                   </div>
 
@@ -563,43 +563,52 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                 </div>
               </div>
 
-              {/* ── 3-SLOT VIOLATION TRACKER ── */}
+              {/* ── 4-SLOT VIOLATION TRACKER ── */}
               <div style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '8px 12px', borderRadius: '12px',
                 background: warningCount === 0
                   ? 'rgba(16,185,129,0.06)'
-                  : warningCount === 1
+                  : warningCount <= 2
                     ? 'rgba(245,158,11,0.08)'
-                    : 'rgba(239,68,68,0.10)',
-                border: `1.5px solid ${warningCount === 0 ? 'rgba(16,185,129,0.2)' : warningCount === 1 ? 'rgba(245,158,11,0.3)' : 'rgba(239,68,68,0.4)'}`,
+                    : warningCount === 3
+                      ? 'rgba(249,115,22,0.09)'
+                      : 'rgba(239,68,68,0.10)',
+                border: `1.5px solid ${
+                  warningCount === 0 ? 'rgba(16,185,129,0.2)'
+                  : warningCount <= 2 ? 'rgba(245,158,11,0.3)'
+                  : warningCount === 3 ? 'rgba(249,115,22,0.35)'
+                  : 'rgba(239,68,68,0.4)'
+                }`,
                 transition: 'all 0.4s ease',
               }}>
                 {/* Left: status label */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <Shield size={12} style={{
-                    color: warningCount === 0 ? '#10b981' : warningCount === 1 ? '#f59e0b' : '#ef4444',
+                    color: warningCount === 0 ? '#10b981' : warningCount <= 2 ? '#f59e0b' : warningCount === 3 ? '#f97316' : '#ef4444',
                     transition: 'color 0.3s ease'
                   }} />
                   <span style={{
                     fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase',
-                    color: warningCount === 0 ? '#10b981' : warningCount === 1 ? '#f59e0b' : '#ef4444',
+                    color: warningCount === 0 ? '#10b981' : warningCount <= 2 ? '#f59e0b' : warningCount === 3 ? '#f97316' : '#ef4444',
                     transition: 'color 0.3s ease'
                   }}>
                     {warningCount === 0 && 'Proctored · Secure'}
-                    {warningCount === 1 && '⚠ Warning 1 — 2 left'}
-                    {warningCount === 2 && '⚠ Warning 2 — Last chance!'}
-                    {warningCount >= 3 && '🚨 Exam Terminating...'}
+                    {warningCount === 1 && '⚠ Warning 1 — 3 left'}
+                    {warningCount === 2 && '⚠ Warning 2 — 2 left'}
+                    {warningCount === 3 && '⚠ Warning 3 — Last chance!'}
+                    {warningCount >= 4 && '🚨 Exam Terminating...'}
                   </span>
                 </div>
 
-                {/* Right: 3 individual strike slots */}
+                {/* Right: 4 individual strike slots */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontSize: '9px', fontWeight: 600, color: '#94a3b8', marginRight: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Strikes</span>
                   {[
                     { slot: 1, activeColor: '#f59e0b', glowColor: 'rgba(245,158,11,0.4)' },
                     { slot: 2, activeColor: '#f97316', glowColor: 'rgba(249,115,22,0.4)' },
-                    { slot: 3, activeColor: '#ef4444', glowColor: 'rgba(239,68,68,0.45)' },
+                    { slot: 3, activeColor: '#fb923c', glowColor: 'rgba(251,146,60,0.4)' },
+                    { slot: 4, activeColor: '#ef4444', glowColor: 'rgba(239,68,68,0.45)' },
                   ].map(({ slot, activeColor, glowColor }) => {
                     const isUsed = warningCount >= slot;
                     return (
@@ -607,8 +616,8 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                         key={slot}
                         title={isUsed ? `Violation ${slot} triggered` : `Strike ${slot} — not yet used`}
                         style={{
-                          width: '28px', height: '28px', borderRadius: '8px',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1px',
+                          width: '26px', height: '26px', borderRadius: '8px',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
                           background: isUsed ? `${activeColor}1A` : 'rgba(241,245,249,0.7)',
                           border: `1.5px solid ${isUsed ? activeColor : '#e2e8f0'}`,
                           boxShadow: isUsed ? `0 0 8px ${glowColor}` : 'none',
@@ -617,7 +626,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                         }}
                       >
                         <Shield
-                          size={13}
+                          size={12}
                           style={{
                             color: isUsed ? activeColor : '#cbd5e1',
                             fill: isUsed ? `${activeColor}30` : 'none',

@@ -142,7 +142,7 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
       setLastViolationReason(reason);
       setIsWarningModalOpen(true);
 
-      if (nextCount >= 3) {
+      if (nextCount >= 4) {
         // Kick off the visible countdown to auto-submit
         startAutoSubmitCountdown();
       }
@@ -206,12 +206,12 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isExamActive]);
 
-  // Only allow dismissing warnings 1 & 2, not the final violation
+  // Only allow dismissing warnings 1, 2 & 3 — not the final violation
   const dismissWarning = useCallback(() => {
-    if (warningCountRef.current < 3) {
+    if (warningCountRef.current < 4) {
       setIsWarningModalOpen(false);
     }
-    // On 3rd violation, modal stays open until countdown fires
+    // On 4th violation, modal stays open until countdown fires
   }, []);
 
   return {
