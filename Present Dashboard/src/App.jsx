@@ -141,7 +141,7 @@ function App() {
             display: 'flex',
             flexDirection: 'column',
             padding: '1.5rem',
-            marginTop: 'calc(64px + max(28px, env(safe-area-inset-top, 0px)))',
+            marginTop: isDesktop ? 'calc(54px + max(10px, env(safe-area-inset-top, 0px)))' : 'calc(64px + max(28px, env(safe-area-inset-top, 0px)))',
             paddingBottom: 'max(2.5rem, calc(2rem + env(safe-area-inset-bottom, 0px)))',
             width: '100%',
             boxSizing: 'border-box',

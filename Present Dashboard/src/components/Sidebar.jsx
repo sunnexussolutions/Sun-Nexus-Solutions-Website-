@@ -52,7 +52,7 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        paddingTop: 'max(24px, calc(1rem + env(safe-area-inset-top, 0px)))',
+        paddingTop: isDesktop ? 'max(12px, calc(0.5rem + env(safe-area-inset-top, 0px)))' : 'max(24px, calc(1rem + env(safe-area-inset-top, 0px)))',
         paddingBottom: 'max(20px, calc(1rem + env(safe-area-inset-bottom, 0px)))',
         paddingLeft: 'max(1rem, env(safe-area-inset-left, 0px))',
         paddingRight: 'max(1rem, env(safe-area-inset-right, 0px))',
