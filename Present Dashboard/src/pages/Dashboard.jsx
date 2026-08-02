@@ -538,16 +538,40 @@ const Dashboard = () => {
               <div ref={timeDropdownRef} className="self-start sm:self-center" style={{ position: 'relative', display: 'inline-block' }}>
                 <button
                   onClick={() => setIsTimeDropdownOpen(v => !v)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all"
                   style={{
-                    backgroundColor: 'var(--pill-btn-bg, rgba(255, 255, 255, 0.06))',
-                    border: '1.5px solid var(--pill-btn-border, rgba(255, 255, 255, 0.18))',
-                    color: 'var(--text-primary)',
-                    cursor: 'pointer'
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '9px 18px',
+                    borderRadius: '14px',
+                    background: isTimeDropdownOpen
+                      ? 'linear-gradient(135deg, rgba(168, 85, 247, 0.22) 0%, rgba(99, 102, 241, 0.22) 100%)'
+                      : 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(99, 102, 241, 0.06) 100%)',
+                    border: isTimeDropdownOpen
+                      ? '1.5px solid rgba(168, 85, 247, 0.65)'
+                      : '1.5px solid rgba(168, 85, 247, 0.32)',
+                    boxShadow: isTimeDropdownOpen
+                      ? '0 6px 20px rgba(168, 85, 247, 0.25), 0 0 15px rgba(168, 85, 247, 0.15)'
+                      : '0 4px 14px rgba(168, 85, 247, 0.08)',
+                    color: '#a855f7',
+                    fontSize: '12.5px',
+                    fontWeight: 800,
+                    letterSpacing: '0.04em',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(12px)',
+                    transition: 'all 0.25s ease'
                   }}
                 >
+                  <Calendar size={14} style={{ color: '#a855f7' }} />
                   <span>{timeRange}</span>
-                  <ChevronDown size={14} style={{ transform: isTimeDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} className="text-muted" />
+                  <ChevronDown
+                    size={14}
+                    style={{
+                      color: '#a855f7',
+                      transform: isTimeDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.25s ease'
+                    }}
+                  />
                 </button>
 
                 {isTimeDropdownOpen && (
@@ -557,13 +581,13 @@ const Dashboard = () => {
                       left: 0,
                       top: 'calc(100% + 8px)',
                       zIndex: 50,
-                      minWidth: '160px',
+                      minWidth: '165px',
                       padding: '6px',
-                      borderRadius: '16px',
-                      backgroundColor: 'var(--card-bg, #0f172a)',
-                      border: '1.5px solid var(--card-border, rgba(255, 255, 255, 0.15))',
-                      boxShadow: '0 16px 40px rgba(0,0,0,0.5)',
-                      backdropFilter: 'blur(16px)',
+                      borderRadius: '18px',
+                      backgroundColor: 'var(--card-bg, #0b0f19)',
+                      border: '1.5px solid rgba(168, 85, 247, 0.35)',
+                      boxShadow: '0 16px 45px rgba(0, 0, 0, 0.45), 0 0 20px rgba(168, 85, 247, 0.15)',
+                      backdropFilter: 'blur(20px)',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '4px'
@@ -582,12 +606,12 @@ const Dashboard = () => {
                           setIsTimeDropdownOpen(false);
                         }}
                         style={{
-                          padding: '9px 12px',
-                          borderRadius: '10px',
+                          padding: '10px 14px',
+                          borderRadius: '12px',
                           border: 'none',
-                          backgroundColor: timeRange === opt.label ? 'rgba(123, 92, 255, 0.2)' : 'transparent',
+                          backgroundColor: timeRange === opt.label ? 'rgba(168, 85, 247, 0.18)' : 'transparent',
                           color: timeRange === opt.label ? '#a855f7' : 'var(--text-primary)',
-                          fontSize: '12px',
+                          fontSize: '12.5px',
                           fontWeight: 800,
                           display: 'flex',
                           alignItems: 'center',
@@ -597,7 +621,7 @@ const Dashboard = () => {
                         }}
                       >
                         <span>{opt.label}</span>
-                        <span style={{ fontSize: '10px', opacity: 0.65, fontWeight: 600 }}>{opt.desc}</span>
+                        <span style={{ fontSize: '10.5px', opacity: 0.65, fontWeight: 600 }}>{opt.desc}</span>
                       </button>
                     ))}
                   </div>
