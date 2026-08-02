@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Trophy, Flame, Target, Zap, TrendingUp, 
+  Trophy, Flame, Target, Zap, TrendingUp, Activity,
   ArrowUpRight, Award, Clock, Calendar, Star, BrainCircuit,
   BarChart3, MessageSquare, ChevronDown, ArrowRight, CheckCircle, ShieldAlert, Sparkles
 } from 'lucide-react';
@@ -558,13 +558,50 @@ const Dashboard = () => {
         >
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
-              <div>
-                <h3 className="text-xl sm:text-2xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>
-                  Performance Pulse
-                </h3>
-                <p className="text-xs font-extrabold uppercase tracking-[0.14em]" style={{ color: '#8b5cf6' }}>
-                  EFFICIENCY OVER TIME
-                </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '14px',
+                    backgroundColor: 'rgba(168, 85, 247, 0.12)',
+                    border: '1.5px solid rgba(168, 85, 247, 0.32)',
+                    boxShadow: '0 0 16px rgba(168, 85, 247, 0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}
+                >
+                  <Activity size={22} color="#a855f7" strokeWidth={2.5} />
+                </div>
+                <div>
+                  <h3
+                    className="text-xl sm:text-2xl font-black tracking-tight"
+                    style={{
+                      margin: 0,
+                      background: 'linear-gradient(135deg, var(--text-primary) 0%, #c084fc 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      filter: 'drop-shadow(0 2px 8px rgba(168, 85, 247, 0.2))'
+                    }}
+                  >
+                    Performance Pulse
+                  </h3>
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 900,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.14em',
+                      color: '#a855f7',
+                      display: 'block',
+                      marginTop: '2px'
+                    }}
+                  >
+                    ⚡ EFFICIENCY OVER TIME
+                  </span>
+                </div>
               </div>
               <div ref={timeDropdownRef} className="self-start sm:self-center" style={{ position: 'relative', display: 'inline-block' }}>
                 <button
@@ -734,19 +771,50 @@ const Dashboard = () => {
           >
             <div>
               <div className="flex items-center justify-between mb-2">
-                <div>
-                  <h3 className="text-xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>
-                    Recent Sessions
-                  </h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <div
                     style={{
-                      width: '28px',
-                      height: '2px',
-                      backgroundColor: '#06b6d4',
-                      marginTop: '6px',
-                      borderRadius: '99px'
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '14px',
+                      backgroundColor: 'rgba(6, 182, 212, 0.12)',
+                      border: '1.5px solid rgba(6, 182, 212, 0.32)',
+                      boxShadow: '0 0 16px rgba(6, 182, 212, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
                     }}
-                  />
+                  >
+                    <Clock size={22} color="#06b6d4" strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <h3
+                      className="text-xl font-black tracking-tight"
+                      style={{
+                        margin: 0,
+                        background: 'linear-gradient(135deg, var(--text-primary) 0%, #22d3ee 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        filter: 'drop-shadow(0 2px 8px rgba(6, 182, 212, 0.2))'
+                      }}
+                    >
+                      Recent Sessions
+                    </h3>
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 900,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.14em',
+                        color: '#06b6d4',
+                        display: 'block',
+                        marginTop: '2px'
+                      }}
+                    >
+                      🌐 ACTIVITY LOG
+                    </span>
+                  </div>
                 </div>
                 <button
                   style={{
