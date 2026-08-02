@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { Shield, Camera, Mic, CheckCircle, AlertTriangle, Lock, ArrowRight, X, Play } from 'lucide-react';
@@ -13,72 +13,76 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
   const streamRef = useRef(null);
   const animFrameRef = useRef(null);
 
+  const runDiagnostic = useCallback(async () => {
+    setCamStatus('checking');
+    setMicStatus('checking');
+
+    // Clean up previous stream if any
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 320, height: 240, facingMode: 'user' },
+        audio: true
+      });
+
+      streamRef.current = stream;
+      setCamStatus('ready');
+      setMicStatus('ready');
+
+      if (videoPreviewRef.current) {
+        videoPreviewRef.current.srcObject = stream;
+      }
+
+      // Web Audio decibel meter for pre-check
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          const audioCtx = new AudioCtx();
+          const source = audioCtx.createMediaStreamSource(stream);
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 64;
+          source.connect(analyser);
+
+          const dataArray = new Uint8Array(analyser.frequencyBinCount);
+          const checkVolume = () => {
+            if (!analyser) return;
+            analyser.getByteFrequencyData(dataArray);
+            let sum = 0;
+            for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+            const avg = sum / dataArray.length;
+            setAudioLevel(Math.min(100, Math.round((avg / 128) * 100)));
+            animFrameRef.current = requestAnimationFrame(checkVolume);
+          };
+          checkVolume();
+        }
+      } catch (e) {
+        console.warn("Audio meter setup issue:", e);
+      }
+    } catch (err) {
+      console.warn("Diagnostic error:", err);
+      setCamStatus('denied');
+      setMicStatus('denied');
+    }
+  }, []);
+
   useEffect(() => {
     if (!isOpen) return;
-
-    let isMounted = true;
-
-    const runDiagnostic = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 320, height: 240, facingMode: 'user' },
-          audio: true
-        });
-
-        if (!isMounted) return;
-
-        streamRef.current = stream;
-        setCamStatus('ready');
-        setMicStatus('ready');
-
-        if (videoPreviewRef.current) {
-          videoPreviewRef.current.srcObject = stream;
-        }
-
-        // Web Audio decibel meter for pre-check
-        try {
-          const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          if (AudioCtx) {
-            const audioCtx = new AudioCtx();
-            const source = audioCtx.createMediaStreamSource(stream);
-            const analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 64;
-            source.connect(analyser);
-
-            const dataArray = new Uint8Array(analyser.frequencyBinCount);
-            const checkVolume = () => {
-              if (!isMounted) return;
-              analyser.getByteFrequencyData(dataArray);
-              let sum = 0;
-              for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-              const avg = sum / dataArray.length;
-              setAudioLevel(Math.min(100, Math.round((avg / 128) * 100)));
-              animFrameRef.current = requestAnimationFrame(checkVolume);
-            };
-            checkVolume();
-          }
-        } catch (e) {
-          console.warn("Audio meter setup issue:", e);
-        }
-      } catch (err) {
-        if (!isMounted) return;
-        console.warn("Diagnostic error:", err);
-        setCamStatus('denied');
-        setMicStatus('denied');
-      }
-    };
 
     runDiagnostic();
 
     return () => {
-      isMounted = false;
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(t => t.stop());
         streamRef.current = null;
       }
     };
-  }, [isOpen]);
+  }, [isOpen, runDiagnostic]);
 
   if (!isOpen) return null;
 
