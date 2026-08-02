@@ -117,116 +117,113 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
     }
   }, []);
 
-  // Request camera individually (stops existing video tracks first to avoid addTrack duplicates)
+  // Helper: safely stop and clear all tracks of a given kind from streamRef
+  const clearTracks = useCallback((kind) => {
+    if (!streamRef.current) return;
+    const tracks = kind === 'video'
+      ? [...streamRef.current.getVideoTracks()]
+      : kind === 'audio'
+        ? [...streamRef.current.getAudioTracks()]
+        : [...streamRef.current.getTracks()];
+    tracks.forEach(t => {
+      t.stop();
+      streamRef.current?.removeTrack(t);
+    });
+  }, []);
+
+  // Request camera individually - always clears old video tracks first
   const requestCameraAccess = useCallback(async () => {
     setCamStatus('checking');
     try {
-      // Stop any existing video tracks
-      if (streamRef.current) {
-        streamRef.current.getVideoTracks().forEach(t => t.stop());
-        streamRef.current.getVideoTracks().forEach(t => streamRef.current.removeTrack(t));
-      }
-
+      clearTracks('video');
       const vStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       const videoTrack = vStream.getVideoTracks()[0];
-
       if (!videoTrack) throw new Error('No video track returned');
-
       if (!streamRef.current) streamRef.current = new MediaStream();
       streamRef.current.addTrack(videoTrack);
-
-      if (videoPreviewRef.current) {
-        videoPreviewRef.current.srcObject = streamRef.current;
-      }
-
+      if (videoPreviewRef.current) videoPreviewRef.current.srcObject = streamRef.current;
       setCamStatus('ready');
     } catch (err) {
       console.warn('Camera request error:', err);
       setCamStatus('denied');
     }
-  }, []);
+  }, [clearTracks]);
 
-  // Request microphone individually
+  // Request microphone individually - always clears old audio tracks first
   const requestMicAccess = useCallback(async () => {
     setMicStatus('checking');
     try {
-      // Stop any existing audio tracks
-      if (streamRef.current) {
-        streamRef.current.getAudioTracks().forEach(t => t.stop());
-        streamRef.current.getAudioTracks().forEach(t => streamRef.current.removeTrack(t));
-      }
-
+      clearTracks('audio');
       const aStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
       const audioTrack = aStream.getAudioTracks()[0];
-
       if (!audioTrack) throw new Error('No audio track returned');
-
       if (!streamRef.current) streamRef.current = new MediaStream();
       streamRef.current.addTrack(audioTrack);
-
-      // Wire analyser from the raw audio-only stream (not combined)
       startAudioMeter(aStream);
-
       setMicStatus('ready');
     } catch (err) {
       console.warn('Microphone request error:', err);
       setMicStatus('denied');
     }
-  }, [startAudioMeter]);
+  }, [clearTracks, startAudioMeter]);
 
-  // Retry Diagnostic: requests BOTH in ONE getUserMedia call so browser gesture stays valid
+  // Retry Diagnostic — always runs fresh even if previous attempt errored
   const handleRetryDiagnostic = useCallback(async () => {
     setIsRetrying(true);
 
     // Stop all existing tracks
-    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(t => t.stop());
-      streamRef.current = null;
-    }
-
-    setCamStatus('checking');
-    setMicStatus('checking');
-
-    let videoTrack = null;
-    let audioTrackStream = null;
-
-    // Request camera
     try {
-      const vs = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      videoTrack = vs.getVideoTracks()[0] || null;
-      setCamStatus(videoTrack ? 'ready' : 'denied');
-    } catch {
-      setCamStatus('denied');
-    }
+      // Cancel any running animation frame and stop all existing tracks
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      if (streamRef.current) {
+        [...streamRef.current.getTracks()].forEach(t => t.stop());
+        streamRef.current = null;
+      }
 
-    // Request mic separately (still in same click, sequential awaits are fine)
-    try {
-      const as = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-      const audioTrack = as.getAudioTracks()[0] || null;
-      if (audioTrack) {
-        audioTrackStream = as;
-        setMicStatus('ready');
-        startAudioMeter(as);
-      } else {
+      setCamStatus('checking');
+      setMicStatus('checking');
+
+      let videoTrack = null;
+      let audioOnlyStream = null;
+
+      // 1. Request camera
+      try {
+        const vs = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        videoTrack = vs.getVideoTracks()[0] || null;
+        setCamStatus(videoTrack ? 'ready' : 'denied');
+      } catch {
+        setCamStatus('denied');
+      }
+
+      // 2. Request mic (sequential await in the same gesture handler is fine)
+      try {
+        const as = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        const audioTrack = as.getAudioTracks()[0] || null;
+        if (audioTrack) {
+          audioOnlyStream = as;
+          startAudioMeter(as);
+          setMicStatus('ready');
+        } else {
+          setMicStatus('denied');
+        }
+      } catch {
         setMicStatus('denied');
       }
-    } catch {
-      setMicStatus('denied');
+
+      // 3. Assemble combined preview stream
+      const combined = new MediaStream();
+      if (videoTrack) combined.addTrack(videoTrack);
+      if (audioOnlyStream) audioOnlyStream.getAudioTracks().forEach(t => combined.addTrack(t));
+      streamRef.current = combined;
+
+      if (videoPreviewRef.current && videoTrack) {
+        videoPreviewRef.current.srcObject = combined;
+      }
+    } finally {
+      // ALWAYS reset — ensures button is never permanently stuck
+      setIsRetrying(false);
     }
-
-    // Combine into preview stream
-    const combined = new MediaStream();
-    if (videoTrack) combined.addTrack(videoTrack);
-    if (audioTrackStream) audioTrackStream.getAudioTracks().forEach(t => combined.addTrack(t));
-    streamRef.current = combined;
-
-    if (videoPreviewRef.current && videoTrack) {
-      videoPreviewRef.current.srcObject = combined;
-    }
-
-    setIsRetrying(false);
-  }, [startAudioMeter]);
+  }, [startAudioMeter, clearTracks]);
 
   useEffect(() => {
     if (!isOpen) return;
