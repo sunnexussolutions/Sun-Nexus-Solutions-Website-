@@ -1956,6 +1956,16 @@ button {
   -webkit-text-fill-color: transparent;
 }
 
+.welcome-name-gradient {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 40%, #7b5cff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  display: inline;
+  font-weight: 900;
+}
+
 .aurora-accent {
   position: absolute;
   width: 60vw;

@@ -265,18 +265,7 @@ const Dashboard = () => {
 
           {/* Welcome Title */}
           <h1 className="text-3xl md:text-5xl font-black tracking-tight" style={{ color: 'var(--text-primary)', margin: 0, lineHeight: 1.15 }}>
-            Welcome back,{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 45%, #7b5cff 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                fontWeight: 900
-              }}
-            >
-              {dynamicFirstName}
-            </span>
-            {' '}
+            Welcome back, <span className="welcome-name-gradient">{dynamicFirstName}</span>{' '}
             <motion.span
               animate={{ rotate: [0, 14, -8, 14, -4, 10, 0] }}
               transition={{ repeat: Infinity, repeatDelay: 2.2, duration: 1.4 }}
