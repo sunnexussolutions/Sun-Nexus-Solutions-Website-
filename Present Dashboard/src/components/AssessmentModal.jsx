@@ -221,7 +221,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
     warningCount,
     isWarningModalOpen,
     lastViolationReason,
-    autoSubmitCountdown,
+    isAutoSubmitting,
     dismissWarning,
     audioLevel,
     hasCamera,
@@ -439,18 +439,17 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
             }}>
 
               {warningCount >= 4 ? (
-                /* ── FINAL VIOLATION: 3-2-1 Countdown ── */
+                /* ── FINAL VIOLATION: Immediate submit ── */
                 <>
-                  {/* Pulsing red ring countdown */}
+                  {/* Pulsing red ring */}
                   <div style={{
                     position: 'relative', width: '88px', height: '88px',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    {/* Outer animated ring */}
                     <div style={{
                       position: 'absolute', inset: 0, borderRadius: '50%',
                       border: '3px solid #ef4444',
-                      animation: 'proctorPulse 1s ease-in-out infinite',
+                      animation: 'proctorPulse 0.8s ease-in-out infinite',
                       opacity: 0.6
                     }} />
                     <div style={{
@@ -458,15 +457,14 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                       background: 'rgba(239,68,68,0.15)',
                       border: '2px solid #ef4444',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexDirection: 'column'
                     }}>
-                      {autoSubmitCountdown > 0 ? (
-                        <span style={{ fontSize: '28px', fontWeight: 900, color: '#ef4444', lineHeight: 1 }}>
-                          {autoSubmitCountdown}
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: '11px', fontWeight: 800, color: '#ef4444', lineHeight: 1.2 }}>EXAM{' '}ENDED</span>
-                      )}
+                      {/* Spinning loader */}
+                      <div style={{
+                        width: '28px', height: '28px', borderRadius: '50%',
+                        border: '3px solid rgba(239,68,68,0.2)',
+                        borderTopColor: '#ef4444',
+                        animation: 'spin 0.7s linear infinite'
+                      }} />
                     </div>
                   </div>
 
@@ -474,25 +472,12 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                     <p style={{ fontSize: '15px', fontWeight: 900, color: '#fca5a5', marginBottom: '6px', letterSpacing: '0.02em' }}>
                       🚨 Final Violation!
                     </p>
-                    <p style={{ fontSize: '11px', color: '#94a3b8', lineHeight: 1.6, marginBottom: '4px' }}>
+                    <p style={{ fontSize: '11px', color: '#94a3b8', lineHeight: 1.6, marginBottom: '6px' }}>
                       {lastViolationReason}
                     </p>
-                    <p style={{ fontSize: '12px', fontWeight: 700, color: '#ef4444' }}>
-                      {autoSubmitCountdown > 0
-                        ? `Exam auto-submitting in ${autoSubmitCountdown} second${autoSubmitCountdown !== 1 ? 's' : ''}...`
-                        : 'Submitting your exam now...'}
+                    <p style={{ fontSize: '13px', fontWeight: 800, color: '#ef4444' }}>
+                      {isAutoSubmitting ? 'Submitting your answers...' : 'Exam Terminated'}
                     </p>
-                  </div>
-
-                  {/* Progress bar draining */}
-                  <div style={{ width: '100%', maxWidth: '200px', height: '4px', background: 'rgba(239,68,68,0.2)', borderRadius: '999px', overflow: 'hidden' }}>
-                    <div style={{
-                      height: '100%',
-                      width: autoSubmitCountdown > 0 ? `${(autoSubmitCountdown / 3) * 100}%` : '0%',
-                      background: 'linear-gradient(90deg, #ef4444, #dc2626)',
-                      borderRadius: '999px',
-                      transition: 'width 0.9s linear'
-                    }} />
                   </div>
                 </>
               ) : (
