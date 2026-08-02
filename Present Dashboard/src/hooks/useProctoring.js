@@ -42,55 +42,89 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
 
   // Initialize Camera & Microphone WebRTC streams
   const initMedia = useCallback(async () => {
+    let combinedStream = null;
+    let videoTrack = null;
+    let audioTrack = null;
+
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
+      combinedStream = await navigator.mediaDevices.getUserMedia({
         video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: 'user' },
         audio: true
       });
-
-      setStream(mediaStream);
       setHasCamera(true);
       setHasMic(true);
+    } catch (err) {
+      console.warn('Combined media request failed, attempting separate requests:', err.message);
+
+      // Attempt Video separately
+      try {
+        const vStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: 'user' }
+        });
+        videoTrack = vStream.getVideoTracks()[0];
+        setHasCamera(true);
+      } catch (vErr) {
+        console.warn('Camera access denied:', vErr.message);
+        setHasCamera(false);
+      }
+
+      // Attempt Audio separately
+      try {
+        const aStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioTrack = aStream.getAudioTracks()[0];
+        setHasMic(true);
+      } catch (aErr) {
+        console.warn('Microphone access denied:', aErr.message);
+        setHasMic(false);
+      }
+
+      if (videoTrack || audioTrack) {
+        combinedStream = new MediaStream();
+        if (videoTrack) combinedStream.addTrack(videoTrack);
+        if (audioTrack) combinedStream.addTrack(audioTrack);
+      }
+    }
+
+    if (combinedStream) {
+      setStream(combinedStream);
 
       // Attach stream to video element
       if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
+        videoRef.current.srcObject = combinedStream;
       }
 
-      // Initialize Web Audio API Decibel Meter
-      try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) {
-          const audioCtx = new AudioCtx();
-          audioContextRef.current = audioCtx;
-          const source = audioCtx.createMediaStreamSource(mediaStream);
-          const analyser = audioCtx.createAnalyser();
-          analyser.fftSize = 64;
-          source.connect(analyser);
-          analyserRef.current = analyser;
+      // Initialize Web Audio API Decibel Meter if audio is active
+      if (combinedStream.getAudioTracks().length > 0) {
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            const audioCtx = new AudioCtx();
+            audioContextRef.current = audioCtx;
+            const source = audioCtx.createMediaStreamSource(combinedStream);
+            const analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 64;
+            source.connect(analyser);
+            analyserRef.current = analyser;
 
-          const dataArray = new Uint8Array(analyser.frequencyBinCount);
-          const updateAudioLevel = () => {
-            if (!analyserRef.current) return;
-            analyserRef.current.getByteFrequencyData(dataArray);
-            let sum = 0;
-            for (let i = 0; i < dataArray.length; i++) {
-              sum += dataArray[i];
-            }
-            const average = sum / dataArray.length;
-            const level = Math.min(100, Math.round((average / 128) * 100));
-            setAudioLevel(level);
-            animFrameRef.current = requestAnimationFrame(updateAudioLevel);
-          };
-          updateAudioLevel();
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            const updateAudioLevel = () => {
+              if (!analyserRef.current) return;
+              analyserRef.current.getByteFrequencyData(dataArray);
+              let sum = 0;
+              for (let i = 0; i < dataArray.length; i++) {
+                sum += dataArray[i];
+              }
+              const average = sum / dataArray.length;
+              const level = Math.min(100, Math.round((average / 128) * 100));
+              setAudioLevel(level);
+              animFrameRef.current = requestAnimationFrame(updateAudioLevel);
+            };
+            updateAudioLevel();
+          }
+        } catch (audioErr) {
+          console.warn('Audio Context setup warning:', audioErr);
         }
-      } catch (audioErr) {
-        console.warn('Audio Context setup warning:', audioErr);
       }
-    } catch (err) {
-      console.warn('Media devices access denied or unavailable:', err.message);
-      setHasCamera(false);
-      setHasMic(false);
     }
   }, []);
 
