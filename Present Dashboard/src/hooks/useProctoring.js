@@ -4,8 +4,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
  * Custom hook for managing proctored exam security:
  * - Webcam live video stream
  * - Microphone decibel audio analyzer
- * - Tab switch & window blur detection (max 3 warnings before auto-submit)
+ * - Tab switch & window blur detection (max 4 warnings before auto-submit)
  * - Fullscreen mode enforcement
+ * - Violation cooldown guard to prevent double-counting simultaneous events
  */
 export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
   const [warningCount, setWarningCount] = useState(0);
@@ -22,6 +23,10 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
   const analyserRef = useRef(null);
   const animFrameRef = useRef(null);
   const countdownTimerRef = useRef(null);
+  // Cooldown ref: timestamp of last violation — prevents double-counting
+  // when window.blur + visibilitychange both fire for the same tab switch
+  const lastViolationTimeRef = useRef(0);
+  const VIOLATION_COOLDOWN_MS = 2000; // minimum ms between violations
 
   // Stable ref for onAutoSubmit to avoid stale closures
   const onAutoSubmitRef = useRef(onAutoSubmit);
@@ -135,6 +140,11 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
 
     // Prevent stacking violations during an active countdown
     if (countdownTimerRef.current) return;
+
+    // Cooldown guard: ignore if another violation fired within VIOLATION_COOLDOWN_MS
+    const now = Date.now();
+    if (now - lastViolationTimeRef.current < VIOLATION_COOLDOWN_MS) return;
+    lastViolationTimeRef.current = now;
 
     setWarningCount(prev => {
       const nextCount = prev + 1;
