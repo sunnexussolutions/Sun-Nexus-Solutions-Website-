@@ -56,6 +56,143 @@ const TrophyGraphic = () => (
   </div>
 );
 
+// Comprehensive Reference Notes & Formula Cheatsheets for Aptitude topics
+const REFERENCE_NOTES_DATA = {
+  'Fractions and Decimals': {
+    notes: [
+      'Convert fraction to decimal by dividing numerator by denominator (e.g., 3/4 = 0.75).',
+      'Cross-multiplication rule: To compare A/B and C/D, compare A×D and B×C.',
+      'Recurring decimals: 0.333... = 1/3, 0.666... = 2/3, 0.111... = 1/9.',
+      'Addition & Subtraction: Always find the Least Common Multiple (LCM) of denominators first.'
+    ],
+    videoUrl: 'https://www.youtube.com/watch?v=tnc9ojITRg4',
+    cheatsheet: 'A/B + C/D = (A×D + B×C) / (B×D)'
+  },
+  'Simplification': {
+    notes: [
+      'BODMAS Order: Brackets () [] {}, Orders/Exponents x², Division ÷, Multiplication ×, Addition +, Subtraction -.',
+      'Key Algebraic Identities:',
+      '  - (a + b)² = a² + 2ab + b²',
+      '  - (a - b)² = a² - 2ab + b²',
+      '  - a² - b² = (a - b)(a + b)',
+      '  - (a + b)³ = a³ + b³ + 3ab(a + b)'
+    ],
+    videoUrl: 'https://www.youtube.com/watch?v=ZuMJFleXmiw',
+    cheatsheet: 'Follow BODMAS strictly left-to-right for operators with same priority.'
+  },
+  'Surds and Indices': {
+    notes: [
+      'Product Rule: aᵐ × aⁿ = aᵐ⁺ⁿ',
+      'Quotient Rule: aᵐ ÷ aⁿ = aᵐ⁻ⁿ',
+      'Power of Power Rule: (aᵐ)ⁿ = aᵐⁿ',
+      'Zero Index: a⁰ = 1 (where a ≠ 0)',
+      'Negative Exponent: a⁻ⁿ = 1 / aⁿ',
+      'Radical Product: √(a × b) = √a × √b'
+    ],
+    videoUrl: 'https://www.youtube.com/watch?v=jAbpPTpz2bQ',
+    cheatsheet: 'If aᵐ = aⁿ, then m = n (for base a > 0 and a ≠ 1)'
+  },
+  'Permutation & Combination': {
+    notes: [
+      'Permutation (Order Matters): P(n, r) = n! / (n - r)!',
+      'Combination (Selection Only): C(n, r) = n! / [r! (n - r)!]',
+      'Circular Permutation: (n - 1)! for n distinct items in a circle.',
+      'Handshakes/Matches Formula: C(n, 2) = n(n - 1) / 2'
+    ],
+    videoUrl: 'https://www.youtube.com/watch?v=ETiRE7N7pEI',
+    cheatsheet: 'P(n, r) = C(n, r) × r!'
+  },
+  'Syllogisms': {
+    notes: [
+      'All A are B: Set A is completely inside Set B.',
+      'No A is B: Sets A and B have 0 intersection.',
+      'Some A are B: Sets A and B overlap (at least 1 element in common).',
+      'Some A are not B: At least 1 element of A is outside B.',
+      'Either/Or Condition: Both individual conclusions must be uncertain, one positive and one negative.'
+    ],
+    videoUrl: 'https://www.youtube.com/results?search_query=syllogisms+logical+reasoning',
+    cheatsheet: 'Draw minimum overlapping Venn diagrams for quick verification.'
+  },
+  'Blood Relations': {
+    notes: [
+      'Male (+), Female (-), Married couple (=), Siblings (-).',
+      'Father/Mother = 1 generation above (+1).',
+      'Grandfather/Grandmother = 2 generations above (+2).',
+      'Brother/Sister/Cousin = Same generation (0).',
+      'Son/Daughter = 1 generation below (-1).'
+    ],
+    videoUrl: 'https://www.youtube.com/results?search_query=blood+relations+logical+reasoning',
+    cheatsheet: 'Replace names with family tree relations from self perspective.'
+  },
+  'Seating Arrangement': {
+    notes: [
+      'Facing Inside (Center): Clockwise = LEFT, Anti-clockwise = RIGHT.',
+      'Facing Outside: Clockwise = RIGHT, Anti-clockwise = LEFT.',
+      'Linear Row (Facing North): Left = West, Right = East.',
+      'Tip: Always start with fixed, definite positions before relative clues.'
+    ],
+    videoUrl: 'https://www.youtube.com/results?search_query=seating+arrangement+reasoning',
+    cheatsheet: 'Circle Center: Clockwise = Left | Circle Outside: Clockwise = Right'
+  },
+  'Coding-Decoding': {
+    notes: [
+      'Forward Letter Positions: A=1, B=2, C=3 ... Z=26',
+      'EJOTY Shortcut: E=5, J=10, O=15, T=20, Y=25',
+      'Reverse Position Formula: Reverse Rank = 27 - Forward Rank',
+      'Opposite Pairs: A-Z, B-Y, C-X, D-W, E-V, F-U, G-T, H-S, I-R, J-Q, K-P, L-O, M-N'
+    ],
+    videoUrl: 'https://www.youtube.com/results?search_query=coding+decoding+reasoning',
+    cheatsheet: 'Sum of forward rank and reverse rank of any letter = 27'
+  },
+  'Direction Sense': {
+    notes: [
+      'Cardinal Directions: North (Up), South (Down), East (Right), West (Left).',
+      'Turns: Right Turn = 90° Clockwise | Left Turn = 90° Anti-clockwise.',
+      'Shortest Distance: Use Pythagoras Theorem: Hypotenuse = √(Base² + Height²).',
+      'Sun Shadow: Morning shadow is to the West; Evening shadow is to the East.'
+    ],
+    videoUrl: 'https://www.youtube.com/results?search_query=direction+sense+reasoning',
+    cheatsheet: 'Right = 90° CW | Left = 90° CCW | Shortest Path = √(x² + y²)'
+  },
+  'Synonyms & Antonyms': {
+    notes: [
+      'Context Clues: Identify whether sentence tone is positive (+), negative (-), or neutral.',
+      'Prefix Meanings: Un-, Dis-, In-, Im-, Non- mean NOT.',
+      'Root Words: Bene- (Good), Mal- (Bad), Chrono- (Time), Tele- (Far), Dict- (Speak).'
+    ],
+    videoUrl: 'https://www.youtube.com/results?search_query=synonyms+antonyms+verbal+ability',
+    cheatsheet: 'Eliminate options that have opposite connotation to the target word.'
+  },
+  'Sentence Correction': {
+    notes: [
+      'Subject-Verb Agreement: Singular subjects take singular verbs.',
+      'Parallelism: Items in a series must share grammatical form (e.g. running, swimming, and biking).',
+      'Pronoun Agreement: Pronouns must match their antecedents in number and gender.',
+      'Modifiers: Place descriptive phrases next to the noun they modify.'
+    ],
+    videoUrl: 'https://www.youtube.com/results?search_query=sentence+correction+verbal+ability',
+    cheatsheet: 'Identify subject & main verb first to test agreement.'
+  },
+  'Reading Comprehension': {
+    notes: [
+      'Skimming Strategy: Read first and last paragraphs + first sentence of middle paragraphs.',
+      'Question Types: Main Idea, Author Tone, Fact-based, Inference, Vocabulary in Context.',
+      'Elimination Tip: Beware of extreme words (Always, Never, Only, Must).'
+    ],
+    videoUrl: 'https://www.youtube.com/results?search_query=reading+comprehension+verbal+ability',
+    cheatsheet: 'Passage Evidence > Personal Knowledge. Never assume outside facts.'
+  },
+  'Cloze Test': {
+    notes: [
+      'Read full passage once before filling blanks to grasp overall context.',
+      'Check Grammar: Preposition collocations (e.g., Interested IN, Accused OF).',
+      'Tense Continuity: Ensure verb tenses match surrounding sentences.'
+    ],
+    videoUrl: 'https://www.youtube.com/results?search_query=cloze+test+verbal+ability',
+    cheatsheet: 'Identify required part of speech (noun/verb/adj) before choosing option.'
+  }
+};
+
 const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
   const { user } = useAuth();
   const [phase, setPhase] = useState(previousResult ? 'result' : 'quiz');
@@ -64,6 +201,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
   const [answers, setAnswers] = useState(previousResult?.answers || {});
   const [selected, setSelected] = useState(null);
   const [showHint, setShowHint] = useState(false);
+  const [showReferenceNotes, setShowReferenceNotes] = useState(false);
 
   const initialSeconds = (assessment?.timeLimit && typeof assessment.timeLimit === 'number' && assessment.timeLimit > 0)
     ? assessment.timeLimit * 60
@@ -209,6 +347,21 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <button
+                    onClick={() => setShowReferenceNotes(true)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '5px',
+                      padding: '4px 11px', borderRadius: '999px',
+                      background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+                      color: '#ffffff', border: 'none',
+                      fontSize: '12px', fontWeight: 800, cursor: 'pointer',
+                      boxShadow: '0 2px 6px rgba(124, 58, 237, 0.25)',
+                      transition: 'all 0.2s', flexShrink: 0
+                    }}
+                  >
+                    <BookOpen size={13} />
+                    <span>Reference Notes</span>
+                  </button>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '999px', background: `${timerColor}15`, border: `1px solid ${timerColor}40` }}>
                     <Timer size={13} style={{ color: timerColor }} />
                     <span style={{ fontSize: '13px', fontWeight: 800, color: timerColor }}>{formatTime(timeLeft)}</span>
@@ -264,22 +417,40 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
               <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '0.875rem', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Question Statement</span>
-                  <button
-                    onClick={() => setShowHint(prev => !prev)}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '5px',
-                      padding: '4px 10px', borderRadius: '20px',
-                      background: showHint ? '#fef3c7' : '#ffffff',
-                      border: showHint ? '1px solid #f59e0b' : '1px solid #cbd5e1',
-                      color: showHint ? '#d97706' : '#475569',
-                      fontSize: '12px', fontWeight: 700, cursor: 'pointer',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    <Lightbulb size={13} style={{ color: showHint ? '#d97706' : '#64748b' }} />
-                    <span>{showHint ? 'Hide Hint' : 'Hint'}</span>
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <button
+                      onClick={() => setShowReferenceNotes(true)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '5px',
+                        padding: '4px 10px', borderRadius: '20px',
+                        background: '#f3e8ff',
+                        border: '1px solid #d8cefe',
+                        color: '#6d28d9',
+                        fontSize: '12px', fontWeight: 700, cursor: 'pointer',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <BookOpen size={13} style={{ color: '#6d28d9' }} />
+                      <span>Notes</span>
+                    </button>
+                    <button
+                      onClick={() => setShowHint(prev => !prev)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '5px',
+                        padding: '4px 10px', borderRadius: '20px',
+                        background: showHint ? '#fef3c7' : '#ffffff',
+                        border: showHint ? '1px solid #f59e0b' : '1px solid #cbd5e1',
+                        color: showHint ? '#d97706' : '#475569',
+                        fontSize: '12px', fontWeight: 700, cursor: 'pointer',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <Lightbulb size={13} style={{ color: showHint ? '#d97706' : '#64748b' }} />
+                      <span>{showHint ? 'Hide Hint' : 'Hint'}</span>
+                    </button>
+                  </div>
                 </div>
                 <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', lineHeight: 1.5, margin: 0 }}>{q.question || q.text}</p>
               </div>
@@ -473,6 +644,28 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                       }}
                     />
                   )}
+                </button>
+
+                <button
+                  onClick={() => setShowReferenceNotes(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '13px',
+                    fontWeight: 800,
+                    border: '1px solid #d8cefe',
+                    background: '#f3e8ff',
+                    cursor: 'pointer',
+                    color: '#6d28d9',
+                    padding: '5px 12px',
+                    borderRadius: '20px',
+                    marginLeft: 'auto',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <BookOpen size={14} style={{ color: '#6d28d9' }} />
+                  <span>Reference Notes</span>
                 </button>
               </div>
 
@@ -736,6 +929,178 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
           )}
         </motion.div>
       </div>
+
+      {/* Reference Notes Modal Overlay Popup */}
+      {showReferenceNotes && (() => {
+        const topicName = assessment?.topic || assessment?.title || '';
+        const refData = REFERENCE_NOTES_DATA[topicName] || {
+          notes: [
+            `Review key fundamentals, rules, and formulas for ${topicName || assessment?.category || 'this module'}.`,
+            'Pay close attention to problem statements and eliminate incorrect choices systematically.',
+            'Double-check calculation steps before submitting final answer.'
+          ],
+          videoUrl: 'https://www.youtube.com/results?search_query=' + encodeURIComponent((topicName || 'aptitude') + ' reasoning tutorial'),
+          cheatsheet: 'Key Formulas & Rules Cheatsheet for ' + (topicName || 'Assessment')
+        };
+
+        const customNotes = (q?.notes || q?.referenceNotes || assessment?.notes || assessment?.referenceNotes || '').trim();
+
+        return (
+          <>
+            <motion.div
+              key="refNotesBackdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowReferenceNotes(false)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 10005,
+                background: 'rgba(15, 23, 42, 0.8)',
+                backdropFilter: 'blur(6px)',
+              }}
+            />
+            <div style={{ position: 'fixed', inset: 0, zIndex: 10006, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', pointerEvents: 'none' }}>
+              <motion.div
+                key="refNotesModal"
+                initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.92, y: 20 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+                style={{
+                  pointerEvents: 'auto',
+                  width: '100%',
+                  maxWidth: '480px',
+                  maxHeight: '85vh',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '24px',
+                  overflow: 'hidden',
+                  boxShadow: '0 25px 70px rgba(0, 0, 0, 0.35)',
+                  color: '#0f172a',
+                  fontFamily: "'Inter', sans-serif",
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}
+              >
+                {/* Header */}
+                <div style={{ padding: '18px 22px', background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <BookOpen size={20} style={{ color: '#ffffff' }} />
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 900, margin: 0, letterSpacing: '-0.01em' }}>Reference Notes</h3>
+                      <span style={{ fontSize: '11px', opacity: 0.9, fontWeight: 700 }}>
+                        {assessment.category} · {topicName || 'Core Module'}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowReferenceNotes(false)}
+                    style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.2)', border: 'none', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                {/* Scrollable Notes Content */}
+                <div style={{ padding: '20px 22px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
+                  
+                  {/* Custom Question/Admin Notes if available */}
+                  {customNotes && (
+                    <div style={{ padding: '14px', borderRadius: '14px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#16a34a', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', marginBottom: '4px' }}>
+                        <Lightbulb size={14} /> Question Specific Reference
+                      </div>
+                      <p style={{ fontSize: '13px', fontWeight: 600, color: '#166534', margin: 0, lineHeight: 1.5 }}>
+                        {customNotes}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Core Concepts */}
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+                      <FileText size={16} style={{ color: '#6d28d9' }} />
+                      <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Core Concepts & Solving Rules</h4>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {refData.notes.map((noteItem, idx) => (
+                        <div key={idx} style={{ padding: '10px 14px', borderRadius: '12px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', fontSize: '12.5px', fontWeight: 600, color: '#334155', lineHeight: 1.5 }}>
+                          {noteItem}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Cheatsheet Banner */}
+                  {refData.cheatsheet && (
+                    <div style={{ padding: '14px 16px', borderRadius: '14px', background: 'linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%)', border: '1px solid #c7d2fe', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <Zap size={20} style={{ color: '#4f46e5', flexShrink: 0 }} />
+                      <div>
+                        <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#4338ca' }}>Quick Formula Cheatsheet</span>
+                        <p style={{ fontSize: '13px', fontWeight: 800, color: '#1e1b4b', margin: '2px 0 0 0' }}>
+                          {refData.cheatsheet}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Video Tutorial Option */}
+                  {refData.videoUrl && (
+                    <a
+                      href={refData.videoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        padding: '12px 16px',
+                        borderRadius: '14px',
+                        backgroundColor: '#fef2f2',
+                        border: '1px solid #fecaca',
+                        color: '#dc2626',
+                        fontWeight: 800,
+                        fontSize: '13px',
+                        textDecoration: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <PlayCircle size={20} style={{ color: '#dc2626' }} />
+                        <span>Watch Video Explanation & Examples</span>
+                      </div>
+                      <ArrowRight size={16} />
+                    </a>
+                  )}
+                </div>
+
+                {/* Footer Action */}
+                <div style={{ padding: '14px 22px', borderTop: '1px solid #f1f5f9', backgroundColor: '#f8fafc', display: 'flex', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => setShowReferenceNotes(false)}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '12px',
+                      border: 'none',
+                      backgroundColor: '#5b46e0',
+                      color: '#ffffff',
+                      fontWeight: 800,
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(91, 70, 224, 0.25)'
+                    }}
+                  >
+                    Back to Assessment
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          </>
+        );
+      })()}
     </AnimatePresence>,
     document.body
   );
