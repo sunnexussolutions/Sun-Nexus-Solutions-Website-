@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Timer, CheckCircle, XCircle, ChevronRight, ChevronLeft, BookOpen, BarChart2, ArrowRight, FileText, Lightbulb, Zap, PlayCircle } from 'lucide-react';
+import { X, Timer, CheckCircle, XCircle, ChevronRight, ChevronLeft, BookOpen, BarChart2, ArrowRight, FileText, Lightbulb, Zap, PlayCircle, Shield, AlertTriangle, Camera, Mic } from 'lucide-react';
 import { saveResult } from '../store/dataStore';
 import { useAuth } from '../contexts/AuthContext';
+import { useProctoring } from '../hooks/useProctoring';
+import { ProctorPreCheckModal } from './ProctorPreCheckModal';
 
 /** Golden 3D Trophy with particles graphic matching the reference image */
 const TrophyGraphic = () => (
@@ -209,9 +211,27 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
 
   const [timeLeft, setTimeLeft] = useState(initialSeconds);
   const [submitted, setSubmitted] = useState(!!previousResult);
+  const [showPreCheck, setShowPreCheck] = useState(!previousResult);
 
   const questions = assessment?.questions || [];
   const total = questions.length || 20;
+
+  // AI Proctoring Security Hook
+  const {
+    warningCount,
+    isWarningModalOpen,
+    lastViolationReason,
+    dismissWarning,
+    audioLevel,
+    hasCamera,
+    hasMic,
+    videoRef
+  } = useProctoring({
+    isExamActive: phase === 'quiz' && !submitted && !showPreCheck,
+    onAutoSubmit: () => {
+      handleSubmit();
+    }
+  });
 
   // Sync selected option state when moving between questions
   useEffect(() => {
@@ -299,6 +319,17 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
 
   const gradeText = pct >= 80 ? 'Excellent Work!' : pct >= 60 ? 'Good Job!' : 'Keep Practicing!';
 
+  if (showPreCheck) {
+    return (
+      <ProctorPreCheckModal
+        isOpen={showPreCheck}
+        topicTitle={assessment?.topic || assessment?.title}
+        onClose={onClose}
+        onStartExam={() => setShowPreCheck(false)}
+      />
+    );
+  }
+
   return createPortal(
     <AnimatePresence>
       <motion.div
@@ -332,8 +363,120 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
             color: '#0f172a',
             fontFamily: "'Inter', sans-serif",
+            position: 'relative',
           }}
         >
+          {/* ── PROCTOR PIP: Live Webcam + Audio Meter ── */}
+          {phase === 'quiz' && !submitted && hasCamera && (
+            <div style={{
+              position: 'absolute',
+              bottom: '12px',
+              right: '12px',
+              zIndex: 10,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: '4px',
+              pointerEvents: 'none'
+            }}>
+              {/* Live Video PIP Box */}
+              <div style={{
+                width: '96px',
+                height: '72px',
+                borderRadius: '10px',
+                overflow: 'hidden',
+                border: '2px solid rgba(99,102,241,0.6)',
+                boxShadow: '0 4px 16px rgba(99,102,241,0.25)',
+                background: '#0f172a',
+                position: 'relative'
+              }}>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  muted
+                  playsInline
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)' }}
+                />
+                {/* Camera Label */}
+                <div style={{
+                  position: 'absolute', top: '3px', left: '3px',
+                  display: 'flex', alignItems: 'center', gap: '3px',
+                  background: 'rgba(0,0,0,0.55)', borderRadius: '4px', padding: '1px 5px'
+                }}>
+                  <Camera size={8} style={{ color: '#6ee7b7' }} />
+                  <span style={{ fontSize: '7px', fontWeight: 800, color: '#6ee7b7', letterSpacing: '0.05em' }}>LIVE</span>
+                </div>
+              </div>
+              {/* Microphone Audio Level Bar */}
+              {hasMic && (
+                <div style={{ width: '96px', display: 'flex', alignItems: 'center', gap: '5px', pointerEvents: 'none' }}>
+                  <Mic size={9} style={{ color: '#a78bfa', flexShrink: 0 }} />
+                  <div style={{ flex: 1, height: '5px', background: 'rgba(148,163,184,0.25)', borderRadius: '999px', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${audioLevel}%`,
+                      borderRadius: '999px',
+                      background: audioLevel > 70 ? '#ef4444' : audioLevel > 40 ? '#f59e0b' : '#10b981',
+                      transition: 'width 0.1s ease, background 0.3s ease'
+                    }} />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── SECURITY VIOLATION WARNING MODAL OVERLAY ── */}
+          {isWarningModalOpen && (
+            <div style={{
+              position: 'absolute', inset: 0, zIndex: 20,
+              background: 'rgba(15,23,42,0.88)',
+              backdropFilter: 'blur(6px)',
+              borderRadius: '24px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexDirection: 'column', gap: '12px', padding: '2rem',
+              textAlign: 'center'
+            }}>
+              {/* Warning Icon */}
+              <div style={{
+                width: '56px', height: '56px', borderRadius: '50%',
+                background: warningCount >= 3 ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)',
+                border: `2px solid ${warningCount >= 3 ? '#ef4444' : '#f59e0b'}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                animation: 'pulse 1s infinite'
+              }}>
+                <AlertTriangle size={26} style={{ color: warningCount >= 3 ? '#ef4444' : '#f59e0b' }} />
+              </div>
+              <div>
+                <p style={{ fontSize: '14px', fontWeight: 800, color: '#f1f5f9', marginBottom: '4px' }}>
+                  ⚠️ Security Violation Detected!
+                </p>
+                <p style={{ fontSize: '11px', color: '#94a3b8', lineHeight: 1.5, marginBottom: '2px' }}>
+                  {lastViolationReason}
+                </p>
+                <p style={{
+                  fontSize: '12px', fontWeight: 700,
+                  color: warningCount >= 3 ? '#ef4444' : '#f59e0b',
+                  marginTop: '4px'
+                }}>
+                  Warning {warningCount} of 3{warningCount >= 3 ? ' — Auto-submitting exam...' : ''}
+                </p>
+              </div>
+              {warningCount < 3 && (
+                <button
+                  onClick={dismissWarning}
+                  style={{
+                    padding: '8px 20px', borderRadius: '10px', border: 'none',
+                    background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+                    color: '#fff', fontWeight: 800, fontSize: '12px', cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(245,158,11,0.35)'
+                  }}
+                >
+                  I Understand — Resume Exam
+                </button>
+              )}
+            </div>
+          )}
+
           {phase === 'quiz' && q && (
             <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {/* Header */}
@@ -346,7 +489,21 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                     Question {current + 1} of {total}
                   </p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {/* Proctoring Security Badge */}
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: '4px',
+                    padding: '4px 9px', borderRadius: '999px',
+                    background: warningCount >= 2 ? 'rgba(239,68,68,0.12)' : warningCount === 1 ? 'rgba(245,158,11,0.12)' : 'rgba(16,185,129,0.12)',
+                    border: `1px solid ${warningCount >= 2 ? '#ef444460' : warningCount === 1 ? '#f59e0b60' : '#10b98160'}`,
+                    cursor: 'default'
+                  }}>
+                    <Shield size={11} style={{ color: warningCount >= 2 ? '#ef4444' : warningCount === 1 ? '#f59e0b' : '#10b981' }} />
+                    <span style={{ fontSize: '10px', fontWeight: 800, color: warningCount >= 2 ? '#ef4444' : warningCount === 1 ? '#f59e0b' : '#10b981' }}>
+                      {warningCount}/3
+                    </span>
+                  </div>
+                  {/* Timer */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '999px', background: `${timerColor}15`, border: `1px solid ${timerColor}40` }}>
                     <Timer size={13} style={{ color: timerColor }} />
                     <span style={{ fontSize: '13px', fontWeight: 800, color: timerColor }}>{formatTime(timeLeft)}</span>
