@@ -221,6 +221,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
     warningCount,
     isWarningModalOpen,
     lastViolationReason,
+    autoSubmitCountdown,
     dismissWarning,
     audioLevel,
     hasCamera,
@@ -429,50 +430,108 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
           {isWarningModalOpen && (
             <div style={{
               position: 'absolute', inset: 0, zIndex: 20,
-              background: 'rgba(15,23,42,0.88)',
-              backdropFilter: 'blur(6px)',
+              background: warningCount >= 3 ? 'rgba(10,5,20,0.95)' : 'rgba(15,23,42,0.88)',
+              backdropFilter: 'blur(8px)',
               borderRadius: '24px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexDirection: 'column', gap: '12px', padding: '2rem',
+              flexDirection: 'column', gap: '14px', padding: '2rem',
               textAlign: 'center'
             }}>
-              {/* Warning Icon */}
-              <div style={{
-                width: '56px', height: '56px', borderRadius: '50%',
-                background: warningCount >= 3 ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)',
-                border: `2px solid ${warningCount >= 3 ? '#ef4444' : '#f59e0b'}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                animation: 'pulse 1s infinite'
-              }}>
-                <AlertTriangle size={26} style={{ color: warningCount >= 3 ? '#ef4444' : '#f59e0b' }} />
-              </div>
-              <div>
-                <p style={{ fontSize: '14px', fontWeight: 800, color: '#f1f5f9', marginBottom: '4px' }}>
-                  ⚠️ Security Violation Detected!
-                </p>
-                <p style={{ fontSize: '11px', color: '#94a3b8', lineHeight: 1.5, marginBottom: '2px' }}>
-                  {lastViolationReason}
-                </p>
-                <p style={{
-                  fontSize: '12px', fontWeight: 700,
-                  color: warningCount >= 3 ? '#ef4444' : '#f59e0b',
-                  marginTop: '4px'
-                }}>
-                  Warning {warningCount} of 3{warningCount >= 3 ? ' — Auto-submitting exam...' : ''}
-                </p>
-              </div>
-              {warningCount < 3 && (
-                <button
-                  onClick={dismissWarning}
-                  style={{
-                    padding: '8px 20px', borderRadius: '10px', border: 'none',
-                    background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
-                    color: '#fff', fontWeight: 800, fontSize: '12px', cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(245,158,11,0.35)'
-                  }}
-                >
-                  I Understand — Resume Exam
-                </button>
+
+              {warningCount >= 3 ? (
+                /* ── FINAL VIOLATION: 3-2-1 Countdown ── */
+                <>
+                  {/* Pulsing red ring countdown */}
+                  <div style={{
+                    position: 'relative', width: '88px', height: '88px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    {/* Outer animated ring */}
+                    <div style={{
+                      position: 'absolute', inset: 0, borderRadius: '50%',
+                      border: '3px solid #ef4444',
+                      animation: 'proctorPulse 1s ease-in-out infinite',
+                      opacity: 0.6
+                    }} />
+                    <div style={{
+                      width: '72px', height: '72px', borderRadius: '50%',
+                      background: 'rgba(239,68,68,0.15)',
+                      border: '2px solid #ef4444',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexDirection: 'column'
+                    }}>
+                      {autoSubmitCountdown > 0 ? (
+                        <span style={{ fontSize: '28px', fontWeight: 900, color: '#ef4444', lineHeight: 1 }}>
+                          {autoSubmitCountdown}
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: '11px', fontWeight: 800, color: '#ef4444', lineHeight: 1.2 }}>EXAM{' '}ENDED</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p style={{ fontSize: '15px', fontWeight: 900, color: '#fca5a5', marginBottom: '6px', letterSpacing: '0.02em' }}>
+                      🚨 Final Violation!
+                    </p>
+                    <p style={{ fontSize: '11px', color: '#94a3b8', lineHeight: 1.6, marginBottom: '4px' }}>
+                      {lastViolationReason}
+                    </p>
+                    <p style={{ fontSize: '12px', fontWeight: 700, color: '#ef4444' }}>
+                      {autoSubmitCountdown > 0
+                        ? `Exam auto-submitting in ${autoSubmitCountdown} second${autoSubmitCountdown !== 1 ? 's' : ''}...`
+                        : 'Submitting your exam now...'}
+                    </p>
+                  </div>
+
+                  {/* Progress bar draining */}
+                  <div style={{ width: '100%', maxWidth: '200px', height: '4px', background: 'rgba(239,68,68,0.2)', borderRadius: '999px', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%',
+                      width: autoSubmitCountdown > 0 ? `${(autoSubmitCountdown / 3) * 100}%` : '0%',
+                      background: 'linear-gradient(90deg, #ef4444, #dc2626)',
+                      borderRadius: '999px',
+                      transition: 'width 0.9s linear'
+                    }} />
+                  </div>
+                </>
+              ) : (
+                /* ── WARNING 1 or 2: Dismissable ── */
+                <>
+                  <div style={{
+                    width: '56px', height: '56px', borderRadius: '50%',
+                    background: 'rgba(245,158,11,0.15)',
+                    border: '2px solid #f59e0b',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  }}>
+                    <AlertTriangle size={26} style={{ color: '#f59e0b' }} />
+                  </div>
+
+                  <div>
+                    <p style={{ fontSize: '14px', fontWeight: 800, color: '#fef3c7', marginBottom: '6px' }}>
+                      ⚠️ Security Warning {warningCount} of 3
+                    </p>
+                    <p style={{ fontSize: '11px', color: '#94a3b8', lineHeight: 1.6, marginBottom: '4px' }}>
+                      {lastViolationReason}
+                    </p>
+                    <p style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600 }}>
+                      {3 - warningCount} more violation{3 - warningCount !== 1 ? 's' : ''} will auto-submit your exam.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={dismissWarning}
+                    style={{
+                      padding: '10px 24px', borderRadius: '12px', border: 'none',
+                      background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                      color: '#fff', fontWeight: 800, fontSize: '13px', cursor: 'pointer',
+                      boxShadow: '0 4px 16px rgba(245,158,11,0.4)',
+                      letterSpacing: '0.01em'
+                    }}
+                  >
+                    I Understand — Resume Exam
+                  </button>
+                </>
               )}
             </div>
           )}
