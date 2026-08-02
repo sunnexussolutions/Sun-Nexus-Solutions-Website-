@@ -461,9 +461,9 @@ const Aptitude = () => {
                             style={{
                               padding: '10px 18px',
                               borderRadius: '12px',
-                              border: isDark ? '2px solid #7c3aed' : '2px solid #a78bfa',
-                              backgroundColor: isDark ? 'rgba(124, 58, 237, 0.2)' : '#f3e8ff',
-                              color: isDark ? '#c084fc' : '#6d28d9',
+                              border: isPurple ? (isDark ? '2px solid #a78bfa' : '2px solid #a78bfa') : (isDark ? '2px solid #34d399' : '2px solid #34d399'),
+                              backgroundColor: isDark ? (isPurple ? 'rgba(124, 58, 237, 0.25)' : 'rgba(16, 185, 129, 0.25)') : (isPurple ? '#e4dcff' : '#c2eee1'),
+                              color: isDark ? (isPurple ? '#c084fc' : '#34d399') : (isPurple ? '#6d28d9' : '#047857'),
                               fontSize: '12px',
                               fontWeight: 900,
                               cursor: 'pointer',
