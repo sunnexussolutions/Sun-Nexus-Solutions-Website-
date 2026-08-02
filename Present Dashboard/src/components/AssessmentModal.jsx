@@ -549,19 +549,6 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  {/* Proctoring Security Badge */}
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: '4px',
-                    padding: '4px 9px', borderRadius: '999px',
-                    background: warningCount >= 2 ? 'rgba(239,68,68,0.12)' : warningCount === 1 ? 'rgba(245,158,11,0.12)' : 'rgba(16,185,129,0.12)',
-                    border: `1px solid ${warningCount >= 2 ? '#ef444460' : warningCount === 1 ? '#f59e0b60' : '#10b98160'}`,
-                    cursor: 'default'
-                  }}>
-                    <Shield size={11} style={{ color: warningCount >= 2 ? '#ef4444' : warningCount === 1 ? '#f59e0b' : '#10b981' }} />
-                    <span style={{ fontSize: '10px', fontWeight: 800, color: warningCount >= 2 ? '#ef4444' : warningCount === 1 ? '#f59e0b' : '#10b981' }}>
-                      {warningCount}/3
-                    </span>
-                  </div>
                   {/* Timer */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '999px', background: `${timerColor}15`, border: `1px solid ${timerColor}40` }}>
                     <Timer size={13} style={{ color: timerColor }} />
@@ -573,6 +560,73 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                   >
                     <X size={13} />
                   </button>
+                </div>
+              </div>
+
+              {/* ── 3-SLOT VIOLATION TRACKER ── */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '8px 12px', borderRadius: '12px',
+                background: warningCount === 0
+                  ? 'rgba(16,185,129,0.06)'
+                  : warningCount === 1
+                    ? 'rgba(245,158,11,0.08)'
+                    : 'rgba(239,68,68,0.10)',
+                border: `1.5px solid ${warningCount === 0 ? 'rgba(16,185,129,0.2)' : warningCount === 1 ? 'rgba(245,158,11,0.3)' : 'rgba(239,68,68,0.4)'}`,
+                transition: 'all 0.4s ease',
+              }}>
+                {/* Left: status label */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Shield size={12} style={{
+                    color: warningCount === 0 ? '#10b981' : warningCount === 1 ? '#f59e0b' : '#ef4444',
+                    transition: 'color 0.3s ease'
+                  }} />
+                  <span style={{
+                    fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase',
+                    color: warningCount === 0 ? '#10b981' : warningCount === 1 ? '#f59e0b' : '#ef4444',
+                    transition: 'color 0.3s ease'
+                  }}>
+                    {warningCount === 0 && 'Proctored · Secure'}
+                    {warningCount === 1 && '⚠ Warning 1 — 2 left'}
+                    {warningCount === 2 && '⚠ Warning 2 — Last chance!'}
+                    {warningCount >= 3 && '🚨 Exam Terminating...'}
+                  </span>
+                </div>
+
+                {/* Right: 3 individual strike slots */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ fontSize: '9px', fontWeight: 600, color: '#94a3b8', marginRight: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Strikes</span>
+                  {[
+                    { slot: 1, activeColor: '#f59e0b', glowColor: 'rgba(245,158,11,0.4)' },
+                    { slot: 2, activeColor: '#f97316', glowColor: 'rgba(249,115,22,0.4)' },
+                    { slot: 3, activeColor: '#ef4444', glowColor: 'rgba(239,68,68,0.45)' },
+                  ].map(({ slot, activeColor, glowColor }) => {
+                    const isUsed = warningCount >= slot;
+                    return (
+                      <div
+                        key={slot}
+                        title={isUsed ? `Violation ${slot} triggered` : `Strike ${slot} — not yet used`}
+                        style={{
+                          width: '28px', height: '28px', borderRadius: '8px',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1px',
+                          background: isUsed ? `${activeColor}1A` : 'rgba(241,245,249,0.7)',
+                          border: `1.5px solid ${isUsed ? activeColor : '#e2e8f0'}`,
+                          boxShadow: isUsed ? `0 0 8px ${glowColor}` : 'none',
+                          transition: 'all 0.35s ease',
+                          cursor: 'default',
+                        }}
+                      >
+                        <Shield
+                          size={13}
+                          style={{
+                            color: isUsed ? activeColor : '#cbd5e1',
+                            fill: isUsed ? `${activeColor}30` : 'none',
+                            transition: 'all 0.35s ease',
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
