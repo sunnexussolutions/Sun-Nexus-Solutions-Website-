@@ -662,24 +662,6 @@
       document.getElementById('loginPassword').value = 'admin123';
     }
 
-    const NEON_URL = 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech';
-    const NEON_DB  = 'neondb';
-    const NEON_KEY = 'npg_izrW7bvHTnO6';
-
-    async function neonQuery(sql, params = []) {
-      const res = await fetch(`${NEON_URL}/sql`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Neon-Connection-String': `postgresql://neondb_owner:${NEON_KEY}@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/${NEON_DB}?sslmode=require`
-        },
-        body: JSON.stringify({ query: sql, params })
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const data = await res.json();
-      return data.rows || [];
-    }
-
     async function handleLoginSubmit(e) {
       e.preventDefault();
       const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -695,33 +677,6 @@
       btn.innerHTML = 'Checking... <i class="bi bi-hourglass-split"></i>';
 
       try {
-        const rows = await neonQuery(
-          'SELECT * FROM profiles WHERE LOWER(email) = $1 OR LOWER(username) = $1',
-          [email]
-        );
-
-        if (rows.length > 0 && rows[0].password === password) {
-          if (rows[0].status === 'pending') {
-            showMsg('loginMessage', 'success', 'You are registered and waiting for Admin approval...');
-            btn.disabled = false;
-            btn.innerHTML = 'Login <i class="bi bi-arrow-right"></i>';
-            return;
-          }
-          showMsg('loginMessage', 'success', 'Session authorized. Redirecting...');
-          localStorage.setItem(SESSION_KEY, JSON.stringify({ name: rows[0].name, email: rows[0].email }));
-          setTimeout(() => { window.location.href = 'https://sun-nexus-solutions-website-urs3.vercel.app/'; }, 1000);
-          return;
-        }
-
-        // Fallback: localStorage
-        const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
-        const local = localUsers.find(u => (u.email === email || u.username === email) && u.password === password);
-        if (local) {
-          if (local.status === 'pending') {
-            showMsg('loginMessage', 'success', 'You are registered and waiting for Admin approval...');
-            btn.disabled = false;
-            btn.innerHTML = 'Login <i class="bi bi-arrow-right"></i>';
-            return;
           }
           showMsg('loginMessage', 'success', 'Session authorized. Redirecting...');
           localStorage.setItem(SESSION_KEY, JSON.stringify({ name: local.name, email: local.email }));

@@ -9,7 +9,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Neon Database Connection
-const sql = neon("postgresql://neondb_owner:npg_izrW7bvHTnO6@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require");
+const sql = neon(process.env.VITE_NEON_URL || process.env.DATABASE_URL || '');
 
 app.use(cors());
 app.use(express.json());

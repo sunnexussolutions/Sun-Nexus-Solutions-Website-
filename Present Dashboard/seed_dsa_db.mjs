@@ -1,6 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 
-const DATABASE_URL = 'postgresql://neondb_owner:npg_izrW7bvHTnO6@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
+const DATABASE_URL = process.env.VITE_NEON_URL || process.env.DATABASE_URL || '';
 const sql = neon(DATABASE_URL);
 
 async function seed() {

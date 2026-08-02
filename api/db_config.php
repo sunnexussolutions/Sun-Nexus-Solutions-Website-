@@ -2,10 +2,10 @@
 /**
  * DATABASE CONFIGURATION — NEON DB (PostgreSQL) — AP-SOUTHEAST-1
  */
-$host = 'ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech';
-$db_name = 'neondb';
-$username = 'neondb_owner';
-$password = 'npg_izrW7bvHTnO6';
+$host = getenv('DB_HOST') ?: 'ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech';
+$db_name = getenv('DB_NAME') ?: 'neondb';
+$username = getenv('DB_USER') ?: 'neondb_owner';
+$password = getenv('DB_PASSWORD') ?: '';
 $port = '5432';
 
 try {

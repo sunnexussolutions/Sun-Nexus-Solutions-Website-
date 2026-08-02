@@ -596,24 +596,6 @@
       }, 3500);
     }
 
-    const NEON_URL = 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech';
-    const NEON_DB  = 'neondb';
-    const NEON_KEY = 'npg_izrW7bvHTnO6';
-
-    async function neonQuery(sql, params = []) {
-      const res = await fetch(`${NEON_URL}/sql`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Neon-Connection-String': `postgresql://neondb_owner:${NEON_KEY}@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/${NEON_DB}?sslmode=require`
-        },
-        body: JSON.stringify({ query: sql, params })
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const data = await res.json();
-      return data.rows || [];
-    }
-
     function showPendingMsg(containerId) {
       const el = document.getElementById(containerId);
       if (!el) return;
@@ -631,7 +613,6 @@
       e.preventDefault();
       const email    = document.getElementById('login-email').value.trim().toLowerCase();
       const password = document.getElementById('login-password').value;
-      const msgEl    = document.getElementById('login-msg');
 
       if (!email || !password) {
         showToast('Please fill in all fields.', 'error');
@@ -639,13 +620,14 @@
       }
 
       try {
-        const rows = await neonQuery(
-          'SELECT * FROM profiles WHERE LOWER(email) = $1 OR LOWER(username) = $1',
-          [email]
-        );
-
-        if (rows.length > 0 && rows[0].password === password) {
-          if (rows[0].status === 'pending') {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: email, password })
+        });
+        const data = await res.json();
+        if (res.ok && data.user) {
+          if (data.user.status === 'pending') {
             showPendingMsg('login-msg');
             return;
           }
@@ -653,20 +635,8 @@
           setTimeout(() => { window.location.href = 'index.html'; }, 1000);
           return;
         }
-
-        // Fallback: localStorage
-        const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
-        const local = localUsers.find(u => (u.email === email || u.username === email) && u.password === password);
-        if (local) {
-          if (local.status === 'pending') { showPendingMsg('login-msg'); return; }
-          showToast('Session authorized. Redirecting...');
-          setTimeout(() => { window.location.href = 'index.html'; }, 1000);
-          return;
-        }
-
-        showToast('Invalid email or password.', 'error');
+        showToast(data.message || 'Invalid email or password.', 'error');
       } catch (err) {
-        console.warn('Neon login failed:', err.message);
         const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
         const local = localUsers.find(u => (u.email === email || u.username === email) && u.password === password);
         if (local && local.status === 'pending') { showPendingMsg('login-msg'); }
@@ -693,38 +663,29 @@
         return;
       }
 
-      const id       = `user_${Date.now()}`;
-      const uname    = username || email.split('@')[0];
-      const fullName = `${firstName} ${lastName}`.trim();
-      const now      = new Date().toISOString();
-
       try {
-        const existing = await neonQuery(
-          'SELECT id FROM profiles WHERE LOWER(email) = $1 OR LOWER(username) = $2',
-          [email, uname]
-        );
-        if (existing.length > 0) {
-          showToast('An account with this email or username already exists.', 'error');
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ firstName, lastName, email, username, password: p1 })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showPendingMsg('signup-msg');
           return;
         }
-        await neonQuery(
-          `INSERT INTO profiles (id, email, first_name, last_name, name, username, password, is_admin, status, joined_at)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-          [id, email, firstName, lastName, fullName, uname, p1, false, 'pending', now]
-        );
+        showToast(data.message || 'Registration failed.', 'error');
       } catch (err) {
-        console.warn('Neon signup failed, saving locally:', err.message);
         const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
         if (localUsers.find(u => u.email === email)) {
           showToast('An account with this email already exists.', 'error');
           return;
         }
         localStorage.setItem('nexus_users', JSON.stringify([...localUsers,
-          { id, email, name: fullName, username: uname, password: p1, status: 'pending', joinedAt: now }
+          { id: `user_${Date.now()}`, email, name: `${firstName} ${lastName}`.trim(), username: username || email.split('@')[0], password: p1, status: 'pending', joinedAt: new Date().toISOString() }
         ]));
+        showPendingMsg('signup-msg');
       }
-
-      showPendingMsg('signup-msg');
     }
 
     /* =================== 3D CYBER WAVE BACKGROUND CANVAS =================== */

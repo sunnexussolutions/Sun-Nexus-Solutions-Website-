@@ -7,7 +7,7 @@ export default async (req, res) => {
 
     const { name, email, mobile, prn, division, academic_year, graduation_year, branch, other_branch, specialization, skills, domain, projects, github, linkedin, codechef, hackerrank, languages } = req.body;
     
-    const sql = neon(process.env.VITE_NEON_URL || "postgresql://neondb_owner:npg_izrW7bvHTnO6@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require");
+    const sql = neon(process.env.VITE_NEON_URL || process.env.DATABASE_URL || '');
 
     try {
         const final_branch = (branch === 'Other') ? other_branch : branch;
