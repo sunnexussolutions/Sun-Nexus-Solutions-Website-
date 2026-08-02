@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Timer, CheckCircle, XCircle, ChevronRight, ChevronLeft, BookOpen, BarChart2, ArrowRight, FileText, Lightbulb } from 'lucide-react';
+import { X, Timer, CheckCircle, XCircle, ChevronRight, ChevronLeft, BookOpen, BarChart2, ArrowRight, FileText, Lightbulb, Zap, PlayCircle } from 'lucide-react';
 import { saveResult } from '../store/dataStore';
 import { useAuth } from '../contexts/AuthContext';
 
