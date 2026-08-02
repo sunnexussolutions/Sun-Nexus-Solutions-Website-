@@ -81,6 +81,37 @@ const clampNumber = (min, max) => `clamp(${min}px, 2vw + ${min}px, ${max}px)`;
 const Dashboard = () => {
   const { user } = useAuth();
   const [results, setResults] = React.useState([]);
+
+  // Dynamically resolve user's true first name across all profile variants
+  const dynamicFirstName = useMemo(() => {
+    if (!user) return 'Member';
+    
+    // Explicit firstName property
+    const fn = user.firstName || user.first_name;
+    if (fn && typeof fn === 'string' && fn.trim()) {
+      return fn.trim().split(' ')[0];
+    }
+    
+    // Combined full name property (e.g. "Bhargava Srinivas" -> "Bhargava")
+    if (user.name && typeof user.name === 'string' && user.name.trim()) {
+      return user.name.trim().split(' ')[0];
+    }
+
+    // Username property fallback
+    if (user.username && typeof user.username === 'string' && user.username.trim()) {
+      const u = user.username.trim().split('@')[0];
+      return u.charAt(0).toUpperCase() + u.slice(1);
+    }
+
+    // Email property fallback
+    if (user.email && typeof user.email === 'string' && user.email.trim()) {
+      const e = user.email.trim().split('@')[0];
+      return e.charAt(0).toUpperCase() + e.slice(1);
+    }
+
+    return 'Nexus';
+  }, [user]);
+
   const [userStatus, setUserStatus] = React.useState(() => {
     // Read fresh status from localStorage to pick up admin changes immediately
     try {
@@ -237,13 +268,30 @@ const Dashboard = () => {
             Welcome back,{' '}
             <span
               style={{
-                background: 'linear-gradient(135deg, #7b5cff 0%, #00f2fe 50%, #38ef7d 100%)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 45%, #7b5cff 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                filter: 'drop-shadow(0 4px 12px rgba(123, 92, 255, 0.3))'
+                filter: 'drop-shadow(0 4px 14px rgba(79, 172, 254, 0.4))',
+                fontWeight: 900
               }}
             >
-              {user?.firstName || user?.name || 'Nexus'} 👋
+              {dynamicFirstName}
+              <motion.span
+                animate={{ rotate: [0, 14, -8, 14, -4, 10, 0] }}
+                transition={{ repeat: Infinity, repeatDelay: 2.2, duration: 1.4 }}
+                style={{
+                  display: 'inline-block',
+                  transformOrigin: '70% 70%',
+                  WebkitTextFillColor: 'initial',
+                  fontSize: '0.9em',
+                  filter: 'none'
+                }}
+              >
+                👋
+              </motion.span>
             </span>
           </h1>
 
