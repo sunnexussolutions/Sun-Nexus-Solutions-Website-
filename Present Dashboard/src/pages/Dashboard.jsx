@@ -903,23 +903,102 @@ const Dashboard = () => {
                   </p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-4">
-                  {recentAssms.map((res, i) => (
-                    <div key={i} className="flex items-center justify-between p-4 rounded-2xl border border-subtle transition-colors group" style={{ backgroundColor: 'var(--item-row-bg, rgba(255, 255, 255, 0.02))' }}>
-                      <div className="flex flex-col gap-0.5">
-                        <p className="text-sm font-bold truncate max-w-[150px]">{res.topic}</p>
-                        <p className="text-[10px] font-medium text-muted uppercase tracking-widest">
-                          {new Date(res.submittedAt).toLocaleDateString()}
-                        </p>
+                <div className="flex flex-col gap-3">
+                  {recentAssms.map((res, i) => {
+                    const pct = res.percentage ?? 0;
+                    const isPassing = pct >= 80;
+                    const isMid = pct >= 60 && pct < 80;
+                    const scoreColor = isPassing ? '#10b981' : isMid ? '#f97316' : '#ef4444';
+                    const scoreBg   = isPassing ? 'rgba(16,185,129,0.12)' : isMid ? 'rgba(249,115,22,0.12)' : 'rgba(239,68,68,0.12)';
+                    const scoreBorder = isPassing ? 'rgba(16,185,129,0.35)' : isMid ? 'rgba(249,115,22,0.35)' : 'rgba(239,68,68,0.35)';
+                    const label = isPassing ? 'PASS' : isMid ? 'AVG' : 'FAIL';
+
+                    const dateStr = res.submittedAt
+                      ? new Date(res.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                      : '—';
+
+                    return (
+                      <div
+                        key={i}
+                        style={{
+                          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                          padding: '12px 16px',
+                          borderRadius: '16px',
+                          background: 'var(--item-row-bg, rgba(255,255,255,0.025))',
+                          border: '1px solid var(--card-border, rgba(255,255,255,0.07))',
+                          transition: 'all 0.22s ease',
+                          cursor: 'default',
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.background = `${scoreBg}`;
+                          e.currentTarget.style.borderColor = scoreBorder;
+                          e.currentTarget.style.boxShadow = `0 4px 18px ${scoreColor}22`;
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.background = 'var(--item-row-bg, rgba(255,255,255,0.025))';
+                          e.currentTarget.style.borderColor = 'var(--card-border, rgba(255,255,255,0.07))';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        {/* Left: icon dot + topic + date */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                          {/* Colored dot indicator */}
+                          <div style={{
+                            width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0,
+                            background: scoreBg,
+                            border: `1.5px solid ${scoreBorder}`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}>
+                            <CheckCircle size={16} style={{ color: scoreColor }} strokeWidth={2.5} />
+                          </div>
+
+                          <div style={{ minWidth: 0 }}>
+                            <p style={{
+                              fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)',
+                              margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                              maxWidth: '140px'
+                            }}>
+                              {res.topic || 'Assessment'}
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
+                              {res.category && (
+                                <span style={{
+                                  fontSize: '9px', fontWeight: 800, textTransform: 'uppercase',
+                                  letterSpacing: '0.07em', color: '#06b6d4',
+                                  background: 'rgba(6,182,212,0.1)', border: '1px solid rgba(6,182,212,0.25)',
+                                  padding: '1px 6px', borderRadius: '4px',
+                                }}>
+                                  {res.category}
+                                </span>
+                              )}
+                              <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-muted, #64748b)' }}>
+                                {dateStr}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right: score pill */}
+                        <div style={{
+                          display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0,
+                        }}>
+                          <div style={{
+                            display: 'flex', flexDirection: 'column', alignItems: 'center',
+                            padding: '5px 12px', borderRadius: '10px',
+                            background: scoreBg, border: `1.5px solid ${scoreBorder}`,
+                            boxShadow: `0 2px 10px ${scoreColor}22`,
+                          }}>
+                            <span style={{ fontSize: '14px', fontWeight: 900, color: scoreColor, lineHeight: 1 }}>
+                              {pct}%
+                            </span>
+                            <span style={{ fontSize: '8px', fontWeight: 800, color: scoreColor, letterSpacing: '0.08em', opacity: 0.8, marginTop: '2px' }}>
+                              {label}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className={`text-sm font-black ${res.percentage >= 80 ? 'text-green-500' : res.percentage >= 60 ? 'text-orange-500' : 'text-red-500'}`}>
-                          {res.percentage}%
-                        </span>
-                        <ArrowUpRight size={14} className="text-muted group-hover:text-accent-primary transition-colors" />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
