@@ -347,21 +347,6 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <button
-                    onClick={() => setShowReferenceNotes(true)}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '5px',
-                      padding: '4px 11px', borderRadius: '999px',
-                      background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
-                      color: '#ffffff', border: 'none',
-                      fontSize: '12px', fontWeight: 800, cursor: 'pointer',
-                      boxShadow: '0 2px 6px rgba(124, 58, 237, 0.25)',
-                      transition: 'all 0.2s', flexShrink: 0
-                    }}
-                  >
-                    <BookOpen size={13} />
-                    <span>Reference Notes</span>
-                  </button>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '999px', background: `${timerColor}15`, border: `1px solid ${timerColor}40` }}>
                     <Timer size={13} style={{ color: timerColor }} />
                     <span style={{ fontSize: '13px', fontWeight: 800, color: timerColor }}>{formatTime(timeLeft)}</span>
@@ -417,40 +402,22 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
               <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '0.875rem', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Question Statement</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <button
-                      onClick={() => setShowReferenceNotes(true)}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: '5px',
-                        padding: '4px 10px', borderRadius: '20px',
-                        background: '#f3e8ff',
-                        border: '1px solid #d8cefe',
-                        color: '#6d28d9',
-                        fontSize: '12px', fontWeight: 700, cursor: 'pointer',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      <BookOpen size={13} style={{ color: '#6d28d9' }} />
-                      <span>Notes</span>
-                    </button>
-                    <button
-                      onClick={() => setShowHint(prev => !prev)}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: '5px',
-                        padding: '4px 10px', borderRadius: '20px',
-                        background: showHint ? '#fef3c7' : '#ffffff',
-                        border: showHint ? '1px solid #f59e0b' : '1px solid #cbd5e1',
-                        color: showHint ? '#d97706' : '#475569',
-                        fontSize: '12px', fontWeight: 700, cursor: 'pointer',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      <Lightbulb size={13} style={{ color: showHint ? '#d97706' : '#64748b' }} />
-                      <span>{showHint ? 'Hide Hint' : 'Hint'}</span>
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => setShowHint(prev => !prev)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '5px',
+                      padding: '4px 10px', borderRadius: '20px',
+                      background: showHint ? '#fef3c7' : '#ffffff',
+                      border: showHint ? '1px solid #f59e0b' : '1px solid #cbd5e1',
+                      color: showHint ? '#d97706' : '#475569',
+                      fontSize: '12px', fontWeight: 700, cursor: 'pointer',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <Lightbulb size={13} style={{ color: showHint ? '#d97706' : '#64748b' }} />
+                    <span>{showHint ? 'Hide Hint' : 'Hint'}</span>
+                  </button>
                 </div>
                 <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', lineHeight: 1.5, margin: 0 }}>{q.question || q.text}</p>
               </div>
@@ -644,28 +611,6 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                       }}
                     />
                   )}
-                </button>
-
-                <button
-                  onClick={() => setShowReferenceNotes(true)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '13px',
-                    fontWeight: 800,
-                    border: '1px solid #d8cefe',
-                    background: '#f3e8ff',
-                    cursor: 'pointer',
-                    color: '#6d28d9',
-                    padding: '5px 12px',
-                    borderRadius: '20px',
-                    marginLeft: 'auto',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <BookOpen size={14} style={{ color: '#6d28d9' }} />
-                  <span>Reference Notes</span>
                 </button>
               </div>
 
