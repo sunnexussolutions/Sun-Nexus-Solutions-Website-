@@ -201,7 +201,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
   const [answers, setAnswers] = useState(previousResult?.answers || {});
   const [selected, setSelected] = useState(null);
   const [showHint, setShowHint] = useState(false);
-  const [showReferenceNotes, setShowReferenceNotes] = useState(false);
+  const [showReferenceNotes, setShowReferenceNotes] = useState(Boolean(assessment?.openNotesFirst));
 
   const initialSeconds = (assessment?.timeLimit && typeof assessment.timeLimit === 'number' && assessment.timeLimit > 0)
     ? assessment.timeLimit * 60
