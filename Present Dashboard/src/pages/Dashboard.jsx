@@ -91,6 +91,19 @@ const Dashboard = () => {
 
   const [currentTime, setCurrentTime] = React.useState(new Date());
   const [lastSyncTime, setLastSyncTime] = React.useState(new Date());
+  const [timeRange, setTimeRange] = React.useState('Week');
+  const [isTimeDropdownOpen, setIsTimeDropdownOpen] = React.useState(false);
+  const timeDropdownRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (timeDropdownRef.current && !timeDropdownRef.current.contains(e.target)) {
+        setIsTimeDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const refreshData = React.useCallback(async () => {
     if (!user) return;
@@ -114,8 +127,22 @@ const Dashboard = () => {
     };
   }, [refreshData]);
 
-  const chartData = useMemo(() => prepareUserChartData(results), [results]);
-  const stats = useMemo(() => calculateUserStats(results), [results]);
+  const filteredResults = useMemo(() => {
+    if (!results || results.length === 0) return [];
+    const now = new Date();
+    return results.filter(r => {
+      if (!r.submitted_at) return true;
+      const subDate = new Date(r.submitted_at);
+      const diffDays = (now - subDate) / (1000 * 60 * 60 * 24);
+      if (timeRange === 'Week') return diffDays <= 7;
+      if (timeRange === 'Month') return diffDays <= 30;
+      if (timeRange === 'Year') return diffDays <= 365;
+      return true;
+    });
+  }, [results, timeRange]);
+
+  const chartData = useMemo(() => prepareUserChartData(filteredResults), [filteredResults]);
+  const stats = useMemo(() => calculateUserStats(filteredResults), [filteredResults]);
 
   const recentAssms = [...results]
     .sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))
@@ -508,17 +535,74 @@ const Dashboard = () => {
                   EFFICIENCY OVER TIME
                 </p>
               </div>
-              <button
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-colors self-start sm:self-center"
-                style={{
-                  backgroundColor: 'var(--pill-btn-bg, rgba(255, 255, 255, 0.04))',
-                  border: '1px solid var(--pill-btn-border, rgba(255, 255, 255, 0.1))',
-                  color: 'var(--text-primary)'
-                }}
-              >
-                <span>Week</span>
-                <ChevronDown size={14} className="text-muted" />
-              </button>
+              <div ref={timeDropdownRef} style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setIsTimeDropdownOpen(v => !v)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all self-start sm:self-center"
+                  style={{
+                    backgroundColor: 'var(--pill-btn-bg, rgba(255, 255, 255, 0.06))',
+                    border: '1.5px solid var(--pill-btn-border, rgba(255, 255, 255, 0.18))',
+                    color: 'var(--text-primary)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <span>{timeRange}</span>
+                  <ChevronDown size={14} style={{ transform: isTimeDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} className="text-muted" />
+                </button>
+
+                {isTimeDropdownOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: 'calc(100% + 8px)',
+                      zIndex: 50,
+                      minWidth: '150px',
+                      padding: '6px',
+                      borderRadius: '16px',
+                      backgroundColor: 'var(--card-bg, #0f172a)',
+                      border: '1.5px solid var(--card-border, rgba(255, 255, 255, 0.15))',
+                      boxShadow: '0 16px 40px rgba(0,0,0,0.5)',
+                      backdropFilter: 'blur(16px)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px'
+                    }}
+                  >
+                    {[
+                      { label: 'Week', desc: 'Last 7 Days' },
+                      { label: 'Month', desc: 'Last 30 Days' },
+                      { label: 'Year', desc: 'Last 365 Days' },
+                      { label: 'All', desc: 'All Time' }
+                    ].map((opt) => (
+                      <button
+                        key={opt.label}
+                        onClick={() => {
+                          setTimeRange(opt.label);
+                          setIsTimeDropdownOpen(false);
+                        }}
+                        style={{
+                          padding: '9px 12px',
+                          borderRadius: '10px',
+                          border: 'none',
+                          backgroundColor: timeRange === opt.label ? 'rgba(123, 92, 255, 0.2)' : 'transparent',
+                          color: timeRange === opt.label ? '#a855f7' : 'var(--text-primary)',
+                          fontSize: '12px',
+                          fontWeight: 800,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s'
+                        }}
+                      >
+                        <span>{opt.label}</span>
+                        <span style={{ fontSize: '10px', opacity: 0.65, fontWeight: 600 }}>{opt.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center gap-2 mb-6">
