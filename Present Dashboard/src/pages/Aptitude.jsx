@@ -7,6 +7,7 @@ import {
 import { motion } from 'framer-motion';
 import { getAssessments, getResults } from '../store/dataStore';
 import AssessmentModal from '../components/AssessmentModal';
+import ReferenceNotesModal from '../components/ReferenceNotesModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -153,6 +154,7 @@ const Aptitude = () => {
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [activeAssessment, setActiveAssessment] = useState(null);
+  const [notesTopic, setNotesTopic] = useState(null);
   const [allResults, setAllResults] = useState([]);
   const [assessments, setAssessments] = useState([]);
 
@@ -197,6 +199,21 @@ const Aptitude = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '1200px', margin: '0 auto', paddingBottom: '3rem', boxSizing: 'border-box' }}>
+      {/* Reference Notes Modal */}
+      {notesTopic && (
+        <ReferenceNotesModal
+          topicItem={notesTopic}
+          onClose={() => setNotesTopic(null)}
+          onStartAssessment={() => {
+            const topicToStart = notesTopic;
+            setNotesTopic(null);
+            if (topicToStart) {
+              setActiveAssessment(topicToStart);
+            }
+          }}
+        />
+      )}
+
       {/* Assessment Modal Container */}
       {activeAssessment && (
         <AssessmentModal
@@ -439,7 +456,7 @@ const Aptitude = () => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginTop: '16px' }}>
                           <button
                             onClick={() => {
-                              setActiveAssessment({ ...topicItem, timeLimit, previousResult: res, openNotesFirst: true });
+                              setNotesTopic({ ...topicItem, timeLimit, previousResult: res });
                             }}
                             style={{
                               padding: '10px 18px',
