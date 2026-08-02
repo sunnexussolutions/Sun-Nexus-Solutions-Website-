@@ -223,5 +223,6 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     hasCamera,
     hasMic,
     videoRef,
+    retryMedia: initMedia,
   };
 };
