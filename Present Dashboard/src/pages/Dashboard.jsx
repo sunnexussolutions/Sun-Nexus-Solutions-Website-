@@ -883,7 +883,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="flex-1 flex flex-col justify-center py-10">
+            <div className="flex-1 flex flex-col" style={{ marginTop: '16px' }}>
               {recentAssms.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center gap-4">
                   <div
