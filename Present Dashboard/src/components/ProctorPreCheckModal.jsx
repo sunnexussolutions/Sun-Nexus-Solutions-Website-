@@ -14,6 +14,7 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
   const animFrameRef = useRef(null);
 
   const [showPermissionGuide, setShowPermissionGuide] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   const runDiagnostic = useCallback(async () => {
     setCamStatus('checking');
@@ -29,11 +30,9 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
     let videoTrack = null;
     let audioTrack = null;
 
-    // 1. Request Camera Stream (triggers browser camera permission prompt)
+    // 1. Request Camera Stream (standard constraints to prevent OverconstrainedError)
     try {
-      const vStream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 320, height: 240, facingMode: 'user' }
-      });
+      const vStream = await navigator.mediaDevices.getUserMedia({ video: true });
       videoTrack = vStream.getVideoTracks()[0];
       setCamStatus('ready');
     } catch (vErr) {
@@ -41,7 +40,7 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
       setCamStatus('denied');
     }
 
-    // 2. Request Microphone Stream (triggers browser microphone permission prompt)
+    // 2. Request Microphone Stream
     try {
       const aStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioTrack = aStream.getAudioTracks()[0];
@@ -92,6 +91,26 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
       }
     }
   }, []);
+
+  // Direct user-gesture handler for Retry Diagnostic button
+  const handleRetryDiagnostic = async () => {
+    setIsRetrying(true);
+    setShowPermissionGuide(true);
+
+    try {
+      // Direct call within click gesture handler to trigger browser permission modal
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        const testStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        // Stop test stream immediately, runDiagnostic will manage the active stream
+        testStream.getTracks().forEach(track => track.stop());
+      }
+    } catch (err) {
+      console.warn("Direct retry user gesture permission prompt result:", err);
+    }
+
+    await runDiagnostic();
+    setIsRetrying(false);
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -250,25 +269,24 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
                 </span>
               </div>
               <button
-                onClick={() => {
-                  runDiagnostic();
-                  setShowPermissionGuide(true);
-                }}
+                disabled={isRetrying}
+                onClick={handleRetryDiagnostic}
                 style={{
                   padding: '6px 14px',
                   borderRadius: '8px',
                   border: '1px solid rgba(239, 68, 68, 0.6)',
-                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                  background: isRetrying ? 'rgba(239, 68, 68, 0.5)' : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                   color: '#ffffff',
                   fontSize: '11.5px',
                   fontWeight: 900,
-                  cursor: 'pointer',
+                  cursor: isRetrying ? 'wait' : 'pointer',
                   flexShrink: 0,
                   whiteSpace: 'nowrap',
-                  boxShadow: '0 2px 10px rgba(239, 68, 68, 0.3)'
+                  boxShadow: '0 2px 10px rgba(239, 68, 68, 0.3)',
+                  transition: 'all 0.2s ease'
                 }}
               >
-                Retry Diagnostic
+                {isRetrying ? 'Prompting Permissions...' : 'Retry Diagnostic'}
               </button>
             </div>
 
