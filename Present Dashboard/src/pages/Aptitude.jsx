@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Clock, Calendar, Trophy, Target, Award, BarChart3,
   ArrowRight, ArrowLeft, Lock, MessageSquare, Brain,
-  TrendingUp, PlayCircle, HelpCircle, Zap, RotateCcw
+  TrendingUp, PlayCircle, HelpCircle, Zap, RotateCcw, BookOpen
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getAssessments, getResults } from '../store/dataStore';
@@ -436,34 +436,60 @@ const Aptitude = () => {
                           Focused practice module covering core concepts for {topicItem.topic || topicItem.title}.
                         </p>
 
-                        <button
-                          onClick={() => {
-                            if (isScheduledLocked) {
-                              alert(`🔒 This assessment is locked until ${formattedUnlock}. Please check back after the scheduled time!`);
-                              return;
-                            }
-                            setActiveAssessment({ ...topicItem, timeLimit, previousResult: res });
-                          }}
-                          style={{
-                            padding: '10px 24px',
-                            borderRadius: '12px',
-                            border: isScheduledLocked ? '2px solid #cbd5e1' : (isPurple ? '2px solid #a78bfa' : '2px solid #34d399'),
-                            backgroundColor: isScheduledLocked ? (isDark ? '#334155' : '#f1f5f9') : (isDark ? '#1e293b' : 'rgba(255,255,255,0.7)'),
-                            color: isScheduledLocked ? '#94a3b8' : (isDark ? (isPurple ? '#c084fc' : '#34d399') : (isPurple ? '#6d28d9' : '#059669')),
-                            fontSize: '12px',
-                            fontWeight: 900,
-                            cursor: isScheduledLocked ? 'not-allowed' : 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            transition: 'all 0.2s',
-                            letterSpacing: '0.05em',
-                            opacity: isScheduledLocked ? 0.8 : 1
-                          }}
-                        >
-                          <span>{isScheduledLocked ? 'LOCKED' : (isCompleted ? 'REVIEW' : 'START TEST')}</span>
-                          {isScheduledLocked || isCompleted ? <Lock size={14} /> : <Zap size={14} />}
-                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginTop: '16px' }}>
+                          <button
+                            onClick={() => {
+                              setActiveAssessment({ ...topicItem, timeLimit, previousResult: res, openNotesFirst: true });
+                            }}
+                            style={{
+                              padding: '10px 18px',
+                              borderRadius: '12px',
+                              border: isDark ? '2px solid #7c3aed' : '2px solid #a78bfa',
+                              backgroundColor: isDark ? 'rgba(124, 58, 237, 0.2)' : '#f3e8ff',
+                              color: isDark ? '#c084fc' : '#6d28d9',
+                              fontSize: '12px',
+                              fontWeight: 900,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              transition: 'all 0.2s',
+                              letterSpacing: '0.05em'
+                            }}
+                          >
+                            <BookOpen size={14} />
+                            <span>NOTES</span>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              if (isScheduledLocked) {
+                                alert(`🔒 This assessment is locked until ${formattedUnlock}. Please check back after the scheduled time!`);
+                                return;
+                              }
+                              setActiveAssessment({ ...topicItem, timeLimit, previousResult: res });
+                            }}
+                            style={{
+                              padding: '10px 24px',
+                              borderRadius: '12px',
+                              border: isScheduledLocked ? '2px solid #cbd5e1' : (isPurple ? '2px solid #a78bfa' : '2px solid #34d399'),
+                              backgroundColor: isScheduledLocked ? (isDark ? '#334155' : '#f1f5f9') : (isDark ? '#1e293b' : 'rgba(255,255,255,0.7)'),
+                              color: isScheduledLocked ? '#94a3b8' : (isDark ? (isPurple ? '#c084fc' : '#34d399') : (isPurple ? '#6d28d9' : '#059669')),
+                              fontSize: '12px',
+                              fontWeight: 900,
+                              cursor: isScheduledLocked ? 'not-allowed' : 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              transition: 'all 0.2s',
+                              letterSpacing: '0.05em',
+                              opacity: isScheduledLocked ? 0.8 : 1
+                            }}
+                          >
+                            <span>{isScheduledLocked ? 'LOCKED' : (isCompleted ? 'REVIEW' : 'START TEST')}</span>
+                            {isScheduledLocked || isCompleted ? <Lock size={14} /> : <Zap size={14} />}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
