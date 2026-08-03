@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { Shield, Camera, Mic, CheckCircle, AlertTriangle, Lock, X, Play, RefreshCw } from 'lucide-react';
+import { Shield, Camera, Mic, CheckCircle, X, Play } from 'lucide-react';
 
 function friendlyErr(err, type) {
   if (!err) return type + ' access failed.';
@@ -24,8 +24,6 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
   const [micError,   setMicError]   = useState('');
   const [audioLevel, setAudioLevel] = useState(0);
   const [agreed,     setAgreed]     = useState(false);
-  const [isRetrying, setIsRetrying] = useState(false);
-  const [debugMsg,   setDebugMsg]   = useState('');
 
   const videoRef    = useRef(null);
   const streamRef   = useRef(null);
@@ -79,18 +77,14 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
       const msg = 'WebRTC not available. Please use HTTPS and a modern browser.';
       setCamStatus('denied'); setMicStatus('denied');
       setCamError(msg); setMicError(msg);
-      setDebugMsg('Error: navigator.mediaDevices is undefined');
       return;
     }
-    setDebugMsg(fromUserClick ? 'Calling getUserMedia (user click)...' : 'Calling getUserMedia (auto)...');
     stopAll();
     setCamStatus('checking'); setMicStatus('checking');
     setCamError(''); setMicError('');
 
     try {
-      // getUserMedia IS the first await - browser sees this as a direct user gesture call
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      setDebugMsg('');
       streamRef.current = stream;
       const hasV = stream.getVideoTracks().length > 0;
       const hasA = stream.getAudioTracks().length > 0;
@@ -101,20 +95,12 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
       if (hasA) { setMicStatus('ready'); await startMeter(stream); }
       else       { setMicStatus('denied'); setMicError('No audio track returned.'); }
     } catch (err) {
-      const detail = (err.name || 'Error') + ': ' + err.message;
-      setDebugMsg('Failed — ' + detail);
-      console.error('[ProctorModal]', detail);
+      console.error('[ProctorModal]', (err.name || 'Error') + ': ' + err.message);
       setCamStatus('denied'); setMicStatus('denied');
       setCamError(friendlyErr(err, 'Camera'));
       setMicError(friendlyErr(err, 'Microphone'));
     }
   }, [stopAll, startMeter]);
-
-  const handleRetry = useCallback(async () => {
-    if (isRetrying) return;
-    setIsRetrying(true);
-    try { await runCheck(true); } finally { setIsRetrying(false); }
-  }, [isRetrying, runCheck]);
 
   const handleAllowCam = useCallback(async () => {
     if (!navigator.mediaDevices) return;
@@ -144,16 +130,15 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
 
   useEffect(() => {
     if (!isOpen) return;
-    setAgreed(false); setDebugMsg('');
+    setAgreed(false);
     setCamStatus('idle'); setMicStatus('idle'); setCamError(''); setMicError('');
     const t = setTimeout(() => { runCheck(false); }, 500);
     return () => { clearTimeout(t); stopAll(); };
   }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isOpen) return null;
-  const bothReady    = camStatus === 'ready' && micStatus === 'ready';
-  const eitherDenied = camStatus === 'denied' || micStatus === 'denied';
-  const canStart     = bothReady && agreed;
+  const bothReady = camStatus === 'ready' && micStatus === 'ready';
+  const canStart  = bothReady && agreed;
 
   const handleStart = () => {
     try { if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); } catch {}
@@ -187,11 +172,7 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
           Assessment <strong>"{topicTitle || 'Selected Topic'}"</strong> requires mandatory live proctoring. Verify your camera and microphone below.
         </p>
 
-        {debugMsg && (
-          <div style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.35)', fontSize: '11px', color: '#fef08a', marginBottom: '14px', fontFamily: 'monospace', wordBreak: 'break-all' }}>
-            ⚙ {debugMsg}
-          </div>
-        )}
+
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
           <div style={{ borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -242,40 +223,7 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
           </ul>
         </div>
 
-        {!bothReady && (
-          <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '14px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)' }}>
-              <AlertTriangle size={18} color="#ef4444" style={{ flexShrink: 0 }} />
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#fca5a5', flex: 1 }}>Camera & Microphone are mandatory to start this assessment.</span>
-              <button disabled={isRetrying} onClick={handleRetry} style={{ padding: '7px 16px', borderRadius: '10px', border: '1px solid rgba(239,68,68,0.6)', background: isRetrying ? 'rgba(239,68,68,0.5)' : 'linear-gradient(135deg,#ef4444,#dc2626)', color: '#fff', fontSize: '11.5px', fontWeight: 900, cursor: isRetrying ? 'wait' : 'pointer', flexShrink: 0, whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <RefreshCw size={13} style={{ animation: isRetrying ? 'spin 1s linear infinite' : 'none' }} />
-                <span>{isRetrying ? 'Re-checking…' : 'Retry Diagnostic'}</span>
-              </button>
-            </div>
 
-            {eitherDenied && (
-              <div style={{ padding: '14px', borderRadius: '14px', background: 'rgba(15,23,42,0.85)', border: '1px solid rgba(168,85,247,0.35)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Lock size={15} color="#c084fc" />
-                  <span style={{ fontWeight: 900, color: '#c084fc', textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '11px' }}>Your browser has blocked camera & mic — here is how to fix it:</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: '#cbd5e1', lineHeight: 1.5 }}>
-                  <div style={{ display: 'flex', gap: '8px' }}><span>&#x1F512;</span><span><strong>Step 1:</strong> Click the <strong>Lock icon</strong> in your browser address bar at the top of the screen.</span></div>
-                  <div style={{ display: 'flex', gap: '8px' }}><span>&#x1F39B;&#xFE0F;</span><span><strong>Step 2:</strong> Open <strong>Site Settings</strong> → set <strong>Camera</strong> and <strong>Microphone</strong> to <strong>Allow</strong>.</span></div>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <span>&#x1F504;</span>
-                    <button onClick={() => window.location.reload()} style={{ padding: '5px 14px', borderRadius: '6px', border: '1px solid rgba(192,132,252,0.5)', background: 'rgba(168,85,247,0.2)', color: '#c084fc', fontSize: '12px', fontWeight: 900, cursor: 'pointer' }}>
-                      &#x1F504; Reload & Apply Permissions
-                    </button>
-                  </div>
-                </div>
-                <div style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', fontSize: '11px', color: '#fef08a', fontWeight: 600 }}>
-                  &#x1F4A1; <strong>Chrome/Edge tip:</strong> Type <strong>chrome://settings/content/camera</strong> in the address bar and ensure this site is not in the Blocked list.
-                </div>
-              </div>
-            )}
-          </div>
-        )}
 
         <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', marginBottom: '22px', userSelect: 'none' }}>
           <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} style={{ width: '18px', height: '18px', accentColor: '#a855f7', cursor: 'pointer' }} />
