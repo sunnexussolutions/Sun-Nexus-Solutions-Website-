@@ -1935,6 +1935,19 @@ const Admin = () => {
                               </div>
                             </div>
                           </div>
+                          {r.proctorVideo && (
+                            <div style={{ padding: '12px 14px', borderRadius: '14px', background: 'rgba(15,23,42,0.85)', border: '1px solid rgba(168,85,247,0.35)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <span style={{ fontSize: '11px', fontWeight: 900, color: '#c084fc', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  📹 Live Proctoring Session Recording (Video + Audio)
+                                </span>
+                                <a href={r.proctorVideo} download={`proctor_${r.userName || 'user'}_${r.topic || 'exam'}.webm`} style={{ fontSize: '11px', fontWeight: 800, color: '#c084fc', textDecoration: 'none', background: 'rgba(168,85,247,0.2)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(168,85,247,0.4)' }}>
+                                  ⬇ Download
+                                </a>
+                              </div>
+                              <video src={r.proctorVideo} controls style={{ width: '100%', maxHeight: '220px', borderRadius: '10px', background: '#000' }} />
+                            </div>
+                          )}
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)', fontSize: '11px', color: 'var(--text-muted)' }}>
                             <span>ID: <code style={{ fontSize: '10px' }}>{r.id}</code></span>
                             <span>Submitted: {r.submittedAt ? new Date(r.submittedAt).toLocaleString() : 'Recently'}</span>
@@ -1946,12 +1959,12 @@ const Admin = () => {
                 </div>
 
                 {/* Inspect Answers Modal */}
-                {selectedSubDetail && typeof selectedSubDetail === 'object' && selectedSubDetail.answers && (
+                {selectedSubDetail && typeof selectedSubDetail === 'object' && (selectedSubDetail.answers || selectedSubDetail.proctorVideo) && (
                   <div style={{ position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
                     <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-strong)', borderRadius: '24px', width: '100%', maxWidth: '650px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.3)' }}>
                       <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-tertiary)' }}>
                         <div>
-                          <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>Answer Inspection</h3>
+                          <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>Proctoring & Answer Inspection</h3>
                           <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>{selectedSubDetail.userName} · {selectedSubDetail.topic} ({selectedSubDetail.percentage}%)</p>
                         </div>
                         <button onClick={() => setSelectedSubDetail(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}>
@@ -1959,6 +1972,23 @@ const Admin = () => {
                         </button>
                       </div>
                       <div style={{ padding: '20px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                        {selectedSubDetail.proctorVideo ? (
+                          <div style={{ padding: '16px', borderRadius: '16px', background: 'rgba(15,23,42,0.9)', border: '1px solid rgba(168,85,247,0.4)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{ fontSize: '12px', fontWeight: 900, color: '#c084fc', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                                📹 Recorded Proctoring Video & Audio
+                              </span>
+                              <a href={selectedSubDetail.proctorVideo} download={`proctor_${selectedSubDetail.userName || 'user'}_${selectedSubDetail.topic || 'exam'}.webm`} style={{ fontSize: '11px', fontWeight: 800, color: '#c084fc', textDecoration: 'none', background: 'rgba(168,85,247,0.2)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(168,85,247,0.4)' }}>
+                                ⬇ Download Recording
+                              </a>
+                            </div>
+                            <video src={selectedSubDetail.proctorVideo} controls autoPlay muted style={{ width: '100%', maxHeight: '280px', borderRadius: '12px', background: '#000' }} />
+                          </div>
+                        ) : (
+                          <div style={{ padding: '12px 16px', borderRadius: '12px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', fontSize: '12px', color: '#fef08a' }}>
+                            ℹ️ No proctoring video recorded for this submission.
+                          </div>
+                        )}
                         {Object.entries(selectedSubDetail.answers || {}).map(([qIdx, ansVal], idx) => (
                           <div key={idx} style={{ padding: '12px 16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)' }}>
                             <p style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 6px 0' }}>Question #{Number(qIdx) + 1}</p>

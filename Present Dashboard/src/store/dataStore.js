@@ -287,6 +287,7 @@ export const getResults = async (userId) => {
         userEmail: r.user_email,
         assessmentId: r.assessment_id,
         submittedAt: r.submitted_at,
+        proctorVideo: r.proctor_video || r.proctorVideo || null,
         answers: typeof r.answers === 'string' ? JSON.parse(r.answers) : (r.answers || {})
       }));
       setLocal('results', mapped, true);
@@ -305,9 +306,9 @@ export const saveResult = async (res) => {
 
   try {
     await query(`
-      INSERT INTO results (id, user_id, assessment_id, topic, score, total, percentage, category, user_name, user_email, answers)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-    `, [id, res.userId, res.assessmentId, res.topic, res.score, res.total, res.percentage, res.category, res.userName || 'Anonymous', res.userEmail, JSON.stringify(res.answers || {})]);
+      INSERT INTO results (id, user_id, assessment_id, topic, score, total, percentage, category, user_name, user_email, answers, proctor_video)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    `, [id, res.userId, res.assessmentId, res.topic, res.score, res.total, res.percentage, res.category, res.userName || 'Anonymous', res.userEmail, JSON.stringify(res.answers || {}), res.proctorVideo || null]);
   } catch (err) {
     console.warn("Cloud save result fallback:", err.message);
   }

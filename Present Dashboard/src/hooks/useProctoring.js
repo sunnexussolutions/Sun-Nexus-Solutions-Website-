@@ -28,6 +28,10 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
   const lastViolationTimeRef = useRef(0);
   const VIOLATION_COOLDOWN_MS = 2000; // minimum ms between violations
 
+  const mediaRecorderRef = useRef(null);
+  const recordedChunksRef = useRef([]);
+  const [isRecording, setIsRecording] = useState(false);
+
   // Stable ref for onAutoSubmit to avoid stale closures
   const onAutoSubmitRef = useRef(onAutoSubmit);
   useEffect(() => {
@@ -40,28 +44,68 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     warningCountRef.current = warningCount;
   }, [warningCount]);
 
-// Universal WebRTC getUserMedia helper
-const safeGetUserMedia = async (constraints) => {
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    return await navigator.mediaDevices.getUserMedia(constraints);
-  }
+  // Universal WebRTC getUserMedia helper
+  const safeGetUserMedia = async (constraints) => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      return await navigator.mediaDevices.getUserMedia(constraints);
+    }
 
-  const legacyGetUserMedia =
-    navigator.getUserMedia ||
-    navigator.webkitGetUserMedia ||
-    navigator.mozGetUserMedia ||
-    navigator.msGetUserMedia;
+    const legacyGetUserMedia =
+      navigator.getUserMedia ||
+      navigator.webkitGetUserMedia ||
+      navigator.mozGetUserMedia ||
+      navigator.msGetUserMedia;
 
-  if (legacyGetUserMedia) {
-    return new Promise((resolve, reject) => {
-      legacyGetUserMedia.call(navigator, constraints, resolve, reject);
+    if (legacyGetUserMedia) {
+      return new Promise((resolve, reject) => {
+        legacyGetUserMedia.call(navigator, constraints, resolve, reject);
+      });
+    }
+
+    throw new Error('WebRTC mediaDevices is not supported in this environment.');
+  };
+
+  // Stop & package video/audio recording into a Data URL
+  const stopAndGetRecording = useCallback(() => {
+    return new Promise((resolve) => {
+      const recorder = mediaRecorderRef.current;
+      if (!recorder || recorder.state === 'inactive') {
+        resolve(null);
+        return;
+      }
+
+      recorder.onstop = () => {
+        try {
+          const blob = new Blob(recordedChunksRef.current, {
+            type: recorder.mimeType || 'video/webm'
+          });
+          if (!blob || blob.size === 0) {
+            resolve(null);
+            return;
+          }
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            resolve(reader.result);
+          };
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(blob);
+        } catch (err) {
+          console.error('Error generating proctor recording Data URL:', err);
+          resolve(null);
+        }
+      };
+
+      try {
+        recorder.stop();
+        setIsRecording(false);
+      } catch (err) {
+        console.warn('Error stopping MediaRecorder:', err);
+        resolve(null);
+      }
     });
-  }
+  }, []);
 
-  throw new Error('WebRTC mediaDevices is not supported in this environment.');
-};
-
-  // Initialize Camera & Microphone WebRTC streams
+  // Initialize Camera & Microphone WebRTC streams and MediaRecorder
   const initMedia = useCallback(async () => {
     let combinedStream = null;
     let videoTrack = null;
@@ -115,6 +159,33 @@ const safeGetUserMedia = async (constraints) => {
         videoRef.current.play().catch(e => console.warn('Video element play error:', e));
       }
 
+      // Start MediaRecorder for live proctoring audio & video session
+      if (typeof MediaRecorder !== 'undefined') {
+        try {
+          let mimeType = 'video/webm;codecs=vp8,opus';
+          if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm';
+          if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/mp4';
+          if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = '';
+
+          const opts = mimeType ? { mimeType, videoBitsPerSecond: 300000 } : {};
+          const recorder = new MediaRecorder(combinedStream, opts);
+          recordedChunksRef.current = [];
+
+          recorder.ondataavailable = (event) => {
+            if (event.data && event.data.size > 0) {
+              recordedChunksRef.current.push(event.data);
+            }
+          };
+
+          recorder.start(1000);
+          mediaRecorderRef.current = recorder;
+          setIsRecording(true);
+          console.log('📹 Live proctoring MediaRecorder started successfully.');
+        } catch (recErr) {
+          console.warn('MediaRecorder failed to initialize:', recErr);
+        }
+      }
+
       // Initialize Web Audio API Decibel Meter if audio is active
       if (combinedStream.getAudioTracks().length > 0) {
         try {
@@ -150,7 +221,7 @@ const safeGetUserMedia = async (constraints) => {
     }
   }, []);
 
-  // Cleanup WebRTC & Audio Context on unmount or exam end
+  // Cleanup WebRTC & Audio Context & MediaRecorder on unmount or exam end
   const stopMedia = useCallback(() => {
     if (animFrameRef.current) {
       cancelAnimationFrame(animFrameRef.current);
@@ -160,6 +231,11 @@ const safeGetUserMedia = async (constraints) => {
       audioContextRef.current.close().catch(() => {});
       audioContextRef.current = null;
     }
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      try { mediaRecorderRef.current.stop(); } catch {}
+      mediaRecorderRef.current = null;
+    }
+    setIsRecording(false);
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
       setStream(null);
@@ -280,5 +356,7 @@ const safeGetUserMedia = async (constraints) => {
     hasMic,
     videoRef,
     retryMedia: initMedia,
+    isRecording,
+    stopAndGetRecording,
   };
 };
