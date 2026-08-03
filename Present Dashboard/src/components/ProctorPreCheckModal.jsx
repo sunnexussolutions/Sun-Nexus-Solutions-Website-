@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { Shield, Camera, Mic, CheckCircle, X, Play } from 'lucide-react';
+import { Shield, Camera, Mic, CheckCircle, AlertTriangle, X, Play } from 'lucide-react';
 
 function friendlyErr(err, type) {
   if (!err) return type + ' access failed.';
