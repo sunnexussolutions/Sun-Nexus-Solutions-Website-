@@ -227,7 +227,8 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
     hasCamera,
     hasMic,
     videoRef,
-    retryMedia
+    retryMedia,
+    stopAndGetRecording,
   } = useProctoring({
     isExamActive: phase === 'quiz' && !submitted && !showPreCheck,
     onAutoSubmit: () => {
@@ -240,9 +241,19 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
     setSelected(answers[current] !== undefined ? answers[current] : null);
   }, [current]);
 
-  const handleSubmit = useCallback((finalAnswers) => {
+  const handleSubmit = useCallback(async (finalAnswers) => {
     if (submitted) return;
     setSubmitted(true);
+
+    let recordedVideo = null;
+    try {
+      if (stopAndGetRecording) {
+        recordedVideo = await stopAndGetRecording();
+      }
+    } catch (e) {
+      console.warn('Error saving proctor recording:', e);
+    }
+
     const ans = finalAnswers || { ...answers, ...(selected !== null ? { [current]: selected } : {}) };
     const score = questions.reduce((acc, q, i) => acc + (ans[i] === q.answer ? 1 : 0), 0);
     const result = {
@@ -256,11 +267,13 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
       userEmail: user?.email || 'guest',
       userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.username || 'Guest',
       userId: user?.id,
+      proctorVideo: recordedVideo || null,
+      warningCount,
     };
     saveResult(result);
     setAnswers(ans);
     setPhase('result');
-  }, [submitted, answers, selected, current, questions, assessment, user, total]);
+  }, [submitted, stopAndGetRecording, answers, selected, current, questions, assessment, user, total, warningCount]);
 
   useEffect(() => {
     if (phase !== 'quiz' || submitted) return;
