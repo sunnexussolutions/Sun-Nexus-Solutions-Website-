@@ -547,7 +547,24 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '6px', marginTop: '2px', fontSize: '11.5px', lineHeight: 1.4 }}>
                 <span>🔒 <strong>Step 1:</strong> Click the <strong>Lock / Site Settings</strong> icon near the address bar at the top of your browser.</span>
                 <span>🎥 <strong>Step 2:</strong> Change <strong>Camera</strong> and <strong>Microphone</strong> permissions to <strong>"Allow"</strong>.</span>
-                <span>🔄 <strong>Step 3:</strong> Click the red <strong>"Retry Diagnostic"</strong> button above.</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
+                  <span>🔄 <strong>Step 3:</strong></span>
+                  <button
+                    onClick={() => window.location.reload()}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      border: '1px solid rgba(192, 132, 252, 0.5)',
+                      background: 'rgba(168, 85, 247, 0.2)',
+                      color: '#c084fc',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Reload Permissions & Page
+                  </button>
+                </div>
               </div>
             </div>
           </div>

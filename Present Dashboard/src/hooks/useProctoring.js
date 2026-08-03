@@ -40,6 +40,27 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     warningCountRef.current = warningCount;
   }, [warningCount]);
 
+// Universal WebRTC getUserMedia helper
+const safeGetUserMedia = async (constraints) => {
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    return await navigator.mediaDevices.getUserMedia(constraints);
+  }
+
+  const legacyGetUserMedia =
+    navigator.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia ||
+    navigator.msGetUserMedia;
+
+  if (legacyGetUserMedia) {
+    return new Promise((resolve, reject) => {
+      legacyGetUserMedia.call(navigator, constraints, resolve, reject);
+    });
+  }
+
+  throw new Error('WebRTC mediaDevices is not supported in this environment.');
+};
+
   // Initialize Camera & Microphone WebRTC streams
   const initMedia = useCallback(async () => {
     let combinedStream = null;
@@ -47,7 +68,7 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     let audioTrack = null;
 
     try {
-      combinedStream = await navigator.mediaDevices.getUserMedia({
+      combinedStream = await safeGetUserMedia({
         video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: 'user' },
         audio: true
       });
@@ -58,7 +79,7 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
 
       // Attempt Video separately
       try {
-        const vStream = await navigator.mediaDevices.getUserMedia({
+        const vStream = await safeGetUserMedia({
           video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: 'user' }
         });
         videoTrack = vStream.getVideoTracks()[0];
@@ -70,7 +91,7 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
 
       // Attempt Audio separately
       try {
-        const aStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const aStream = await safeGetUserMedia({ audio: true });
         audioTrack = aStream.getAudioTracks()[0];
         setHasMic(true);
       } catch (aErr) {
@@ -88,9 +109,10 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     if (combinedStream) {
       setStream(combinedStream);
 
-      // Attach stream to video element
+      // Attach stream to video element and trigger play
       if (videoRef.current) {
         videoRef.current.srcObject = combinedStream;
+        videoRef.current.play().catch(e => console.warn('Video element play error:', e));
       }
 
       // Initialize Web Audio API Decibel Meter if audio is active
