@@ -1,7 +1,28 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { Shield, Camera, Mic, CheckCircle, AlertTriangle, Lock, ArrowRight, X, Play, RefreshCw } from 'lucide-react';
+import { Shield, Camera, Mic, CheckCircle, AlertTriangle, Lock, ArrowRight, X, Play, RefreshCw, Pointer } from 'lucide-react';
+
+// Universal WebRTC getUserMedia helper (supports modern & legacy browser APIs)
+const safeGetUserMedia = async (constraints) => {
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    return await navigator.mediaDevices.getUserMedia(constraints);
+  }
+
+  const legacyGetUserMedia =
+    navigator.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia ||
+    navigator.msGetUserMedia;
+
+  if (legacyGetUserMedia) {
+    return new Promise((resolve, reject) => {
+      legacyGetUserMedia.call(navigator, constraints, resolve, reject);
+    });
+  }
+
+  throw new Error('WebRTC mediaDevices is not supported in this browser. Please use HTTPS or a modern browser.');
+};
 
 export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle }) => {
   const [camStatus, setCamStatus] = useState('checking'); // 'checking' | 'ready' | 'denied'
@@ -121,11 +142,9 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
       clearTracksOfKind('video');
       let vStream = null;
       try {
-        vStream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
-        });
+        vStream = await safeGetUserMedia({ video: { facingMode: 'user' } });
       } catch {
-        vStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        vStream = await safeGetUserMedia({ video: true });
       }
 
       const videoTrack = vStream.getVideoTracks()[0];
@@ -158,7 +177,7 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
     setMicError('');
     try {
       clearTracksOfKind('audio');
-      const aStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const aStream = await safeGetUserMedia({ audio: true });
       const audioTrack = aStream.getAudioTracks()[0];
       if (!audioTrack) throw new Error('No audio track returned.');
 
@@ -193,10 +212,7 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
 
     // Step A: Attempt combined video + audio getUserMedia
     try {
-      const combinedStream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
-        audio: true
-      });
+      const combinedStream = await safeGetUserMedia({ video: true, audio: true });
 
       streamRef.current = combinedStream;
 
@@ -441,6 +457,29 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
             <li>Fullscreen mode will be locked for the entire assessment duration.</li>
           </ul>
         </div>
+
+        {/* Checking / Address Bar Prompt Callout */}
+        {(camStatus === 'checking' || micStatus === 'checking') && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '12px 14px',
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(234, 179, 8, 0.1) 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.45)',
+            marginBottom: '16px',
+            color: '#fef08a',
+            fontSize: '12px',
+            fontWeight: 700,
+            boxShadow: '0 4px 15px rgba(245, 158, 11, 0.15)'
+          }}>
+            <Pointer size={20} color="#f59e0b" style={{ flexShrink: 0 }} />
+            <span>
+              <strong>Look near your browser's address bar (top of screen):</strong> Click <strong>"Allow"</strong> on the pop-up permission dialog requesting Camera & Microphone access.
+            </span>
+          </div>
+        )}
 
         {/* Media Denied Warning & Retry Banner */}
         {(camStatus !== 'ready' || micStatus !== 'ready') && (
