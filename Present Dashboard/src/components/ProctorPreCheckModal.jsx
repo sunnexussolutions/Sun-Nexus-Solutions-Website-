@@ -1,288 +1,438 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { Shield, Camera, Mic, CheckCircle, AlertTriangle, X, Play, RefreshCw, Settings } from 'lucide-react';
+import { Shield, Camera, Mic, CheckCircle, AlertTriangle, Lock, ArrowRight, X, Play, RefreshCw } from 'lucide-react';
 
-/**
- * ProctorPreCheckModal
- * - Requests camera + mic in ONE getUserMedia call → single browser popup
- * - Explicit video.play() after setting srcObject
- * - Dead-simple status machine: idle | requesting | cam_ok | mic_ok | both_ok | cam_denied | mic_denied | both_denied
- * - Retry button is always re-enabled via try-finally
- */
 export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle }) => {
-  // 'idle' | 'requesting' | 'both_ok' | 'cam_denied' | 'mic_denied' | 'both_denied'
-  const [status, setStatus]     = useState('idle');
+  const [camStatus, setCamStatus] = useState('checking'); // 'checking' | 'ready' | 'denied'
+  const [micStatus, setMicStatus] = useState('checking'); // 'checking' | 'ready' | 'denied'
+  const [camError, setCamError] = useState('');
+  const [micError, setMicError] = useState('');
   const [audioLevel, setAudioLevel] = useState(0);
-  const [agreed, setAgreed]     = useState(false);
+  const [agreed, setAgreed] = useState(false);
+
+  const videoPreviewRef = useRef(null);
+  const streamRef = useRef(null);
+  const audioCtxRef = useRef(null);
+  const animFrameRef = useRef(null);
+
+  const [showPermissionGuide, setShowPermissionGuide] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
 
-  const videoRef    = useRef(null);
-  const streamRef   = useRef(null);
-  const animRef     = useRef(null);
-  const audioCtxRef = useRef(null);
+  // Helper: Format friendly error messages based on WebRTC error name
+  const parseMediaError = (err, type) => {
+    if (!err) return `${type} access failed.`;
+    const name = err.name || '';
+    if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+      return 'Permission blocked by browser settings.';
+    }
+    if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+      return `No ${type.toLowerCase()} device detected.`;
+    }
+    if (name === 'NotReadableError' || name === 'TrackStartError') {
+      return `${type} is in use by another application (Zoom, Teams, etc.).`;
+    }
+    if (name === 'OverconstrainedError') {
+      return `${type} hardware constraints not supported.`;
+    }
+    return err.message || `${type} access error.`;
+  };
 
-  /* ─── Cleanup ─────────────────────────────────────────────── */
-  const cleanup = useCallback(() => {
-    if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = null; }
-    if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch (_) {} audioCtxRef.current = null; }
+  // Clean up all active media tracks, audio contexts, and animations
+  const stopAllMedia = useCallback(() => {
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
+    if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+      audioCtxRef.current.close().catch(() => {});
+      audioCtxRef.current = null;
+    }
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(t => t.stop());
+      const tracks = [...streamRef.current.getTracks()];
+      tracks.forEach(t => t.stop());
       streamRef.current = null;
     }
-    if (videoRef.current) videoRef.current.srcObject = null;
+    if (videoPreviewRef.current) {
+      videoPreviewRef.current.srcObject = null;
+    }
     setAudioLevel(0);
   }, []);
 
-  /* ─── Audio meter ──────────────────────────────────────────── */
-  const startAudioMeter = useCallback((stream) => {
+  // Helper: Start Audio Decibel Meter with AudioContext resume handling
+  const startAudioMeter = useCallback(async (audioStream) => {
+    if (!audioStream || audioStream.getAudioTracks().length === 0) return;
+
     try {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return;
-      const ctx      = new Ctx();
-      audioCtxRef.current = ctx;
-      const source   = ctx.createMediaStreamSource(stream);
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+        audioCtxRef.current.close().catch(() => {});
+        audioCtxRef.current = null;
+      }
+
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+
+      const audioCtx = new AudioCtx();
+      audioCtxRef.current = audioCtx;
+
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume().catch(() => {});
+      }
+
+      const source = audioCtx.createMediaStreamSource(audioStream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
       source.connect(analyser);
-      const buf = new Uint8Array(analyser.frequencyBinCount);
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
       const tick = () => {
-        analyser.getByteFrequencyData(buf);
-        const avg = buf.reduce((a, b) => a + b, 0) / buf.length;
+        if (!analyser) return;
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+        const avg = sum / dataArray.length;
         setAudioLevel(Math.min(100, Math.round((avg / 128) * 100)));
-        animRef.current = requestAnimationFrame(tick);
+        animFrameRef.current = requestAnimationFrame(tick);
       };
       tick();
     } catch (e) {
-      console.warn('Audio meter error:', e);
+      console.warn('Audio meter setup warning:', e);
     }
   }, []);
 
-  /* ─── Core permission request ─────────────────────────────── */
-  const requestPermissions = useCallback(async () => {
-    cleanup();
-    setStatus('requesting');
+  // Safely clear tracks of specific kind from streamRef
+  const clearTracksOfKind = useCallback((kind) => {
+    if (!streamRef.current) return;
+    const tracks = kind === 'video'
+      ? [...streamRef.current.getVideoTracks()]
+      : [...streamRef.current.getAudioTracks()];
+    tracks.forEach(t => {
+      t.stop();
+      streamRef.current?.removeTrack(t);
+    });
+  }, []);
 
+  // 1. Request Camera Access
+  const requestCameraAccess = useCallback(async () => {
+    setCamStatus('checking');
+    setCamError('');
     try {
-      // Single getUserMedia call → single browser permission popup for both
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      streamRef.current = stream;
-
-      // Wire camera preview
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        try { await videoRef.current.play(); } catch (_) { /* autoplay policy */ }
-      }
-
-      // Wire audio meter (use audio-only stream subset for clean analyser)
-      const audioStream = new MediaStream(stream.getAudioTracks());
-      startAudioMeter(audioStream);
-
-      setStatus('both_ok');
-    } catch (err) {
-      console.warn('getUserMedia error:', err.name, err.message);
-
-      // Try to detect which permission(s) were denied
-      let camDenied = false;
-      let micDenied = false;
-
+      clearTracksOfKind('video');
+      let vStream = null;
       try {
-        const cp = await navigator.permissions.query({ name: 'camera' });
-        const mp = await navigator.permissions.query({ name: 'microphone' });
-        camDenied = cp.state === 'denied';
-        micDenied = mp.state === 'denied';
-      } catch (_) {
-        // Permissions API not available (Firefox partial support) - assume both denied
-        camDenied = true;
-        micDenied = true;
+        vStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
+        });
+      } catch {
+        vStream = await navigator.mediaDevices.getUserMedia({ video: true });
       }
 
-      // Fallback: try camera-only
-      if (!camDenied) {
-        try {
-          const vs = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-          streamRef.current = vs;
-          if (videoRef.current) {
-            videoRef.current.srcObject = vs;
-            try { await videoRef.current.play(); } catch (_) {}
-          }
-          camDenied = false;
-        } catch (_) { camDenied = true; }
+      const videoTrack = vStream.getVideoTracks()[0];
+      if (!videoTrack) throw new Error('No video track returned.');
+
+      if (!streamRef.current) streamRef.current = new MediaStream();
+      streamRef.current.addTrack(videoTrack);
+
+      if (videoPreviewRef.current) {
+        videoPreviewRef.current.srcObject = streamRef.current;
+        videoPreviewRef.current.play().catch(e => console.warn('Video element play error:', e));
       }
 
-      // Fallback: try mic-only
-      if (!micDenied) {
-        try {
-          const as = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-          startAudioMeter(as);
-          micDenied = false;
-        } catch (_) { micDenied = true; }
+      setCamStatus('ready');
+      setCamError('');
+    } catch (err) {
+      console.warn('Camera request error:', err);
+      const errMsg = parseMediaError(err, 'Camera');
+      setCamStatus('denied');
+      setCamError(errMsg);
+      if (err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError') {
+        setShowPermissionGuide(true);
       }
-
-      if (camDenied && micDenied) setStatus('both_denied');
-      else if (camDenied)         setStatus('cam_denied');
-      else if (micDenied)         setStatus('mic_denied');
-      else                        setStatus('both_ok');
     }
-  }, [cleanup, startAudioMeter]);
+  }, [clearTracksOfKind]);
 
-  /* ─── Retry button handler ────────────────────────────────── */
-  const handleRetry = useCallback(async () => {
+  // 2. Request Microphone Access
+  const requestMicAccess = useCallback(async () => {
+    setMicStatus('checking');
+    setMicError('');
+    try {
+      clearTracksOfKind('audio');
+      const aStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioTrack = aStream.getAudioTracks()[0];
+      if (!audioTrack) throw new Error('No audio track returned.');
+
+      if (!streamRef.current) streamRef.current = new MediaStream();
+      streamRef.current.addTrack(audioTrack);
+
+      await startAudioMeter(aStream);
+
+      setMicStatus('ready');
+      setMicError('');
+    } catch (err) {
+      console.warn('Microphone request error:', err);
+      const errMsg = parseMediaError(err, 'Microphone');
+      setMicStatus('denied');
+      setMicError(errMsg);
+      if (err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError') {
+        setShowPermissionGuide(true);
+      }
+    }
+  }, [clearTracksOfKind, startAudioMeter]);
+
+  // Combined Media Diagnostic (Tries combined getUserMedia first, falls back to separate calls)
+  const runDiagnostic = useCallback(async () => {
+    stopAllMedia();
+    setCamStatus('checking');
+    setMicStatus('checking');
+    setCamError('');
+    setMicError('');
+
+    let videoAcquired = false;
+    let audioAcquired = false;
+
+    // Step A: Attempt combined video + audio getUserMedia
+    try {
+      const combinedStream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+        audio: true
+      });
+
+      streamRef.current = combinedStream;
+
+      if (combinedStream.getVideoTracks().length > 0) {
+        setCamStatus('ready');
+        videoAcquired = true;
+      }
+      if (combinedStream.getAudioTracks().length > 0) {
+        setMicStatus('ready');
+        audioAcquired = true;
+        await startAudioMeter(combinedStream);
+      }
+
+      if (videoPreviewRef.current && videoAcquired) {
+        videoPreviewRef.current.srcObject = combinedStream;
+        videoPreviewRef.current.play().catch(e => console.warn('Video preview play catch:', e));
+      }
+    } catch (combinedErr) {
+      console.warn('Combined getUserMedia failed, trying individual device requests:', combinedErr);
+    }
+
+    // Step B: If combined call didn't get video, acquire video separately
+    if (!videoAcquired) {
+      await requestCameraAccess();
+    }
+
+    // Step C: If combined call didn't get audio, acquire mic separately
+    if (!audioAcquired) {
+      await requestMicAccess();
+    }
+  }, [stopAllMedia, startAudioMeter, requestCameraAccess, requestMicAccess]);
+
+  // Handler for Retry Diagnostic button (triggered by direct user gesture)
+  const handleRetryDiagnostic = useCallback(async () => {
     setIsRetrying(true);
     try {
-      await requestPermissions();
+      await runDiagnostic();
     } finally {
-      setIsRetrying(false); // ALWAYS resets — button never stays stuck
+      setIsRetrying(false);
     }
-  }, [requestPermissions]);
+  }, [runDiagnostic]);
 
-  /* ─── Run on open ─────────────────────────────────────────── */
+  // Check browser Permissions API on load to detect pre-blocked state
   useEffect(() => {
-    if (!isOpen) {
-      cleanup();
-      setStatus('idle');
-      setAgreed(false);
-      return;
+    if (!isOpen) return;
+
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: 'camera' }).then(res => {
+        if (res.state === 'denied') setShowPermissionGuide(true);
+      }).catch(() => {});
+
+      navigator.permissions.query({ name: 'microphone' }).then(res => {
+        if (res.state === 'denied') setShowPermissionGuide(true);
+      }).catch(() => {});
     }
-    requestPermissions();
-    return cleanup;
-  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    runDiagnostic();
+
+    return () => {
+      stopAllMedia();
+    };
+  }, [isOpen, runDiagnostic, stopAllMedia]);
 
   if (!isOpen) return null;
 
-  /* ─── Derived state ───────────────────────────────────────── */
-  const camOk     = status === 'both_ok' || status === 'mic_denied';
-  const micOk     = status === 'both_ok' || status === 'cam_denied';
-  const bothReady = status === 'both_ok';
-  const anyDenied = status === 'cam_denied' || status === 'mic_denied' || status === 'both_denied';
-  const canStart  = bothReady && agreed;
-
   const handleConfirmStart = () => {
+    // Attempt fullscreen lock
     try {
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen().catch(() => {});
       }
-    } catch (_) {}
-    // Keep stream alive for proctoring hook — don't stop tracks here
+    } catch {}
+
+    stopAllMedia();
     onStartExam();
   };
 
-  /* ─── Styles ──────────────────────────────────────────────── */
-  const S = {
-    overlay: {
-      position: 'fixed', inset: 0, zIndex: 99999,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '16px', backgroundColor: 'rgba(5, 8, 22, 0.88)',
-      backdropFilter: 'blur(20px)',
-    },
-    card: {
-      width: '100%', maxWidth: '560px', borderRadius: '24px',
-      backgroundColor: 'var(--card-bg, #0b0f19)',
-      border: '1.5px solid rgba(168, 85, 247, 0.4)',
-      boxShadow: '0 25px 60px rgba(0,0,0,0.6), 0 0 30px rgba(168,85,247,0.2)',
-      padding: '28px', color: 'var(--text-primary)', position: 'relative',
-    },
-    statusRow: (ok) => ({
-      display: 'flex', alignItems: 'center', gap: '6px',
-      fontSize: '12px', fontWeight: 800,
-      color: ok ? '#10b981' : status === 'requesting' ? '#f59e0b' : '#f87171',
-    }),
-  };
-
   return createPortal(
-    <div style={S.overlay}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', backgroundColor: 'rgba(5, 8, 22, 0.85)', backdropFilter: 'blur(20px)' }}>
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        style={S.card}
+        style={{
+          width: '100%',
+          maxWidth: '580px',
+          borderRadius: '24px',
+          backgroundColor: 'var(--card-bg, #0b0f19)',
+          border: '1.5px solid rgba(168, 85, 247, 0.4)',
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(168, 85, 247, 0.2)',
+          padding: '28px',
+          color: 'var(--text-primary)',
+          position: 'relative'
+        }}
       >
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '42px', height: '42px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(168,85,247,0.2), rgba(99,102,241,0.2))', border: '1px solid rgba(168,85,247,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%)', border: '1px solid rgba(168, 85, 247, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Shield size={22} color="#c084fc" />
             </div>
             <div>
               <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#c084fc', display: 'block' }}>
                 AI PROCTORING PROTOCOL
               </span>
-              <h3 style={{ fontSize: '19px', fontWeight: 900, margin: 0 }}>
+              <h3 style={{ fontSize: '19px', fontWeight: 900, margin: 0, color: 'var(--text-primary)' }}>
                 System Hardware Diagnostic
               </h3>
             </div>
           </div>
-          <button onClick={onClose} style={{ width: '34px', height: '34px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer' }}>
+          <button
+            onClick={onClose}
+            style={{ width: '34px', height: '34px', borderRadius: '10px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer' }}
+          >
             <X size={18} />
           </button>
         </div>
 
         <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', marginBottom: '20px', lineHeight: 1.5 }}>
-          This assessment for <strong>"{topicTitle || 'Selected Topic'}"</strong> is protected by AI proctoring. Camera and microphone access are <strong>mandatory</strong>.
+          This assessment for <strong>"{topicTitle || 'Selected Topic'}"</strong> requires mandatory live proctoring. Verify your camera and microphone status below.
         </p>
 
-        {/* Hardware Grid */}
+        {/* Hardware Checks Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
-
           {/* Camera Box */}
-          <div style={{ borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${camOk ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.08)'}`, padding: '14px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <div style={{ width: '100%', height: '110px', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#000', marginBottom: '10px', position: 'relative' }}>
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: camOk ? 'block' : 'none' }}
-              />
-              {!camOk && (
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                  <Camera size={28} color={status === 'requesting' ? '#f59e0b' : '#ef4444'} />
-                  <span style={{ fontSize: '10px', fontWeight: 700, color: status === 'requesting' ? '#f59e0b' : '#fca5a5' }}>
-                    {status === 'requesting' ? 'Requesting…' : 'Camera Blocked'}
-                  </span>
+          <div style={{ borderRadius: '16px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '14px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <div style={{ width: '100%', height: '110px', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#000', marginBottom: '10px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <video ref={videoPreviewRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {camStatus !== 'ready' && (
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.85)', padding: '10px', gap: '8px' }}>
+                  <Camera size={24} color={camStatus === 'checking' ? '#f59e0b' : '#ef4444'} />
+                  {camStatus === 'denied' && (
+                    <button
+                      onClick={requestCameraAccess}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)',
+                        color: '#ffffff',
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 10px rgba(168, 85, 247, 0.4)'
+                      }}
+                    >
+                      Allow Camera
+                    </button>
+                  )}
+                  {camStatus === 'checking' && (
+                    <span style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 700 }}>Requesting Camera…</span>
+                  )}
                 </div>
               )}
             </div>
-            <div style={S.statusRow(camOk)}>
-              {camOk ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
-              <span>{camOk ? 'Camera Active' : status === 'requesting' ? 'Checking…' : 'Camera Denied'}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 800, color: camStatus === 'ready' ? '#10b981' : camStatus === 'checking' ? '#f59e0b' : '#ef4444' }}>
+                {camStatus === 'ready' ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
+                <span>{camStatus === 'ready' ? 'Camera Active' : camStatus === 'checking' ? 'Checking Cam...' : 'Camera Access Blocked'}</span>
+              </div>
+              {camError && (
+                <span style={{ fontSize: '10.5px', color: '#fca5a5', lineHeight: 1.2, display: 'block' }}>
+                  {camError}
+                </span>
+              )}
             </div>
           </div>
 
           {/* Microphone Box */}
-          <div style={{ borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${micOk ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.08)'}`, padding: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div style={{ borderRadius: '16px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <Mic size={18} color={micOk ? '#10b981' : '#06b6d4'} />
-                <span style={{ fontSize: '13px', fontWeight: 800 }}>Microphone Test</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Mic size={18} color="#06b6d4" />
+                  <span style={{ fontSize: '13px', fontWeight: 800 }}>Microphone Test</span>
+                </div>
               </div>
               <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)', margin: '0 0 10px 0' }}>
-                {micOk ? 'Speak to test audio:' : status === 'requesting' ? 'Requesting mic access…' : 'Microphone access blocked'}
+                Speak to test audio responsiveness:
               </p>
 
-              {/* Decibel bar */}
-              <div style={{ width: '100%', height: '12px', borderRadius: '99px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden', marginBottom: '12px' }}>
-                <div style={{
-                  height: '100%',
-                  width: `${audioLevel}%`,
-                  background: audioLevel > 60 ? 'linear-gradient(90deg,#10b981,#ef4444)' : 'linear-gradient(90deg,#10b981,#f59e0b)',
-                  borderRadius: '99px',
-                  transition: 'width 0.1s ease',
-                }} />
+              {/* Audio Decibel Bar */}
+              <div style={{ width: '100%', height: '12px', borderRadius: '99px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden', position: 'relative', marginBottom: '12px' }}>
+                <div
+                  style={{
+                    height: '100%',
+                    width: `${audioLevel}%`,
+                    background: audioLevel > 60 ? 'linear-gradient(90deg, #10b981, #ef4444)' : 'linear-gradient(90deg, #10b981, #f59e0b)',
+                    borderRadius: '99px',
+                    transition: 'width 0.1s ease'
+                  }}
+                />
               </div>
             </div>
 
-            <div style={S.statusRow(micOk)}>
-              {micOk ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
-              <span>{micOk ? 'Audio Stream Live' : status === 'requesting' ? 'Checking…' : 'Mic Denied'}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 800, color: micStatus === 'ready' ? '#10b981' : micStatus === 'checking' ? '#f59e0b' : '#ef4444' }}>
+                  {micStatus === 'ready' ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
+                  <span>{micStatus === 'ready' ? 'Audio Stream Live' : micStatus === 'checking' ? 'Checking Mic...' : 'Mic Access Blocked'}</span>
+                </div>
+                {micStatus === 'denied' && (
+                  <button
+                    onClick={requestMicAccess}
+                    style={{
+                      padding: '5px 12px',
+                      borderRadius: '6px',
+                      border: 'none',
+                      background: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
+                      color: '#ffffff',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 8px rgba(6, 182, 212, 0.4)'
+                    }}
+                  >
+                    Allow Mic
+                  </button>
+                )}
+                {micStatus === 'checking' && (
+                  <span style={{ fontSize: '10px', color: '#f59e0b', fontWeight: 700 }}>Requesting…</span>
+                )}
+              </div>
+              {micError && (
+                <span style={{ fontSize: '10.5px', color: '#fca5a5', lineHeight: 1.2, display: 'block' }}>
+                  {micError}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Rules */}
-        <div style={{ borderRadius: '16px', background: 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(245,158,11,0.05))', border: '1px solid rgba(239,68,68,0.25)', padding: '14px', marginBottom: '16px' }}>
+        {/* Security Rules Checklist */}
+        <div style={{ borderRadius: '16px', background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%)', border: '1px solid rgba(239, 68, 68, 0.25)', padding: '14px', marginBottom: '16px' }}>
           <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#f87171', display: 'block', marginBottom: '8px' }}>
-            RULES &amp; ANTI-CHEATING COMMITMENT
+            RULES & ANTI-CHEATING COMMITMENT
           </span>
           <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', gap: '6px', fontWeight: 600 }}>
             <li>Camera and Microphone access are <strong>strictly mandatory</strong> for the entire exam.</li>
@@ -292,80 +442,75 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
           </ul>
         </div>
 
-        {/* Permission denied banner + Retry */}
-        {anyDenied && (
-          <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '12px 14px', borderRadius: '14px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)' }}>
+        {/* Media Denied Warning & Retry Banner */}
+        {(camStatus !== 'ready' || micStatus !== 'ready') && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justify: 'space-between',
+              gap: '12px',
+              padding: '12px 14px',
+              borderRadius: '14px',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.35)',
+            }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <AlertTriangle size={18} color="#ef4444" style={{ flexShrink: 0 }} />
                 <span style={{ fontSize: '12px', fontWeight: 700, color: '#fca5a5' }}>
-                  {status === 'both_denied' && 'Camera & Microphone blocked.'}
-                  {status === 'cam_denied'  && 'Camera blocked — mic is active.'}
-                  {status === 'mic_denied'  && 'Microphone blocked — camera is active.'}
-                  {' '}Grant access to continue.
+                  Camera & Microphone permissions are mandatory to start this assessment.
                 </span>
               </div>
               <button
-                onClick={handleRetry}
                 disabled={isRetrying}
+                onClick={handleRetryDiagnostic}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  padding: '7px 14px', borderRadius: '8px',
-                  border: 'none',
-                  background: isRetrying ? 'rgba(239,68,68,0.4)' : 'linear-gradient(135deg,#ef4444,#dc2626)',
-                  color: '#fff', fontSize: '11.5px', fontWeight: 900,
-                  cursor: isRetrying ? 'wait' : 'pointer', flexShrink: 0,
-                  whiteSpace: 'nowrap', boxShadow: '0 2px 10px rgba(239,68,68,0.3)',
-                  transition: 'all 0.2s',
+                  padding: '7px 16px',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(239, 68, 68, 0.6)',
+                  background: isRetrying ? 'rgba(239, 68, 68, 0.5)' : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                  color: '#ffffff',
+                  fontSize: '11.5px',
+                  fontWeight: 900,
+                  cursor: isRetrying ? 'wait' : 'pointer',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 2px 10px rgba(239, 68, 68, 0.3)',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
                 }}
               >
-                <RefreshCw size={13} className={isRetrying ? 'animate-spin' : ''} />
-                {isRetrying ? 'Requesting…' : 'Retry Diagnostic'}
+                <RefreshCw size={13} style={{ animation: isRetrying ? 'spin 1s linear infinite' : 'none' }} />
+                <span>{isRetrying ? 'Re-checking…' : 'Retry Diagnostic'}</span>
               </button>
             </div>
 
-            {/* Browser unlock guide */}
-            <div style={{ padding: '12px 14px', borderRadius: '12px', background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(168,85,247,0.25)', fontSize: '11.5px', color: '#cbd5e1' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                <Settings size={13} color="#c084fc" />
-                <span style={{ fontWeight: 800, color: '#c084fc', textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '10px' }}>
-                  If still blocked — unblock in browser:
+            {/* Step-by-Step Browser Permission Unblock Guide */}
+            <div style={{
+              padding: '14px',
+              borderRadius: '14px',
+              background: 'rgba(15, 23, 42, 0.8)',
+              border: '1px solid rgba(168, 85, 247, 0.3)',
+              fontSize: '12px',
+              color: '#cbd5e1',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Lock size={15} color="#c084fc" />
+                <span style={{ fontWeight: 800, color: '#c084fc', textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '11px' }}>
+                  How to unblock permissions in your browser:
                 </span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <span>🔒 <strong>1.</strong> Click the <strong>padlock / info icon</strong> in your browser's address bar</span>
-                <span>🎥 <strong>2.</strong> Set <strong>Camera</strong> and <strong>Microphone</strong> to <em>Allow</em></span>
-                <span>🔄 <strong>3.</strong> Click <strong>"Retry Diagnostic"</strong> above</span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '6px', marginTop: '2px', fontSize: '11.5px', lineHeight: 1.4 }}>
+                <span>🔒 <strong>Step 1:</strong> Click the <strong>Lock / Site Settings</strong> icon near the address bar at the top of your browser.</span>
+                <span>🎥 <strong>Step 2:</strong> Change <strong>Camera</strong> and <strong>Microphone</strong> permissions to <strong>"Allow"</strong>.</span>
+                <span>🔄 <strong>Step 3:</strong> Click the red <strong>"Retry Diagnostic"</strong> button above.</span>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Requesting spinner banner */}
-        {status === 'requesting' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px', borderRadius: '14px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', marginBottom: '16px' }}>
-            <AlertTriangle size={16} color="#f59e0b" />
-            <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#fcd34d' }}>
-              Waiting for browser permission — please click <strong>Allow</strong> in the popup…
-            </span>
-          </div>
-        )}
-
-        {/* Retry button when idle/requesting initially fails (but not denied) */}
-        {(status === 'idle') && (
-          <div style={{ marginBottom: '16px' }}>
-            <button
-              onClick={handleRetry}
-              disabled={isRetrying}
-              style={{
-                width: '100%', padding: '10px', borderRadius: '10px',
-                border: '1px solid rgba(168,85,247,0.4)',
-                background: 'rgba(168,85,247,0.1)', color: '#c084fc',
-                fontSize: '13px', fontWeight: 800, cursor: 'pointer',
-              }}
-            >
-              Request Camera &amp; Mic Access
-            </button>
           </div>
         )}
 
@@ -381,37 +526,50 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
         </label>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button
-            onClick={onClose}
-            style={{ flex: 1, padding: '12px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)', color: 'var(--text-primary)', fontWeight: 800, cursor: 'pointer' }}
-          >
-            Cancel
-          </button>
-          <button
-            disabled={!canStart}
-            onClick={handleConfirmStart}
-            style={{
-              flex: 2, padding: '12px 20px', borderRadius: '14px', border: 'none',
-              background: canStart ? 'linear-gradient(135deg,#a855f7,#6366f1)' : 'rgba(255,255,255,0.1)',
-              color: canStart ? '#fff' : 'rgba(255,255,255,0.4)',
-              fontWeight: 900,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-              cursor: canStart ? 'pointer' : 'not-allowed',
-              boxShadow: canStart ? '0 6px 20px rgba(168,85,247,0.35)' : 'none',
-              transition: 'all 0.2s',
-            }}
-          >
-            <Play size={16} fill="currentColor" />
-            <span>
-              {!bothReady
-                ? (anyDenied ? 'Grant Camera & Mic First' : 'Checking Devices…')
-                : !agreed
-                  ? 'Accept Rules to Begin'
-                  : 'Enter Proctored Exam'}
-            </span>
-          </button>
-        </div>
+        {(() => {
+          const canStart = agreed && camStatus === 'ready' && micStatus === 'ready';
+          return (
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={onClose}
+                style={{ flex: 1, padding: '12px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.15)', background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-primary)', fontWeight: 800, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                disabled={!canStart}
+                onClick={handleConfirmStart}
+                style={{
+                  flex: 2,
+                  padding: '12px 20px',
+                  borderRadius: '14px',
+                  border: 'none',
+                  background: canStart
+                    ? 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)'
+                    : 'rgba(255, 255, 255, 0.1)',
+                  color: canStart ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
+                  fontWeight: 900,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  cursor: canStart ? 'pointer' : 'not-allowed',
+                  boxShadow: canStart ? '0 6px 20px rgba(168, 85, 247, 0.35)' : 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <Play size={16} fill="currentColor" />
+                <span>
+                  {camStatus !== 'ready' || micStatus !== 'ready'
+                    ? 'Cam & Mic Access Required'
+                    : !agreed
+                      ? 'Accept Rules to Begin'
+                      : 'Enter Proctored Exam'}
+                </span>
+              </button>
+            </div>
+          );
+        })()}
       </motion.div>
     </div>,
     document.body
