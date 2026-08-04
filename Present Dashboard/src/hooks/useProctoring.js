@@ -407,18 +407,36 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     };
   }, [isExamActive, hasCamera, stream, triggerViolation]);
 
-  // Tab switch & window blur security event listeners
+  // Tab switch, Android Gemini / AI Assistant, window blur & overlay security event listeners
   useEffect(() => {
     if (!isExamActive) return;
 
+    const isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
+
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        triggerViolation('Tab switch or window minimization detected!');
+        if (isAndroid) {
+          triggerViolation('Gemini AI Assistant or background app switch detected on Android device!');
+        } else {
+          triggerViolation('Tab switch or window minimization detected!');
+        }
       }
     };
 
     const handleWindowBlur = () => {
-      triggerViolation('Focus loss detected! Do not click outside the exam window.');
+      if (isAndroid) {
+        triggerViolation('Gemini AI Assistant overlay or focus loss detected on Android phone!');
+      } else {
+        triggerViolation('Focus loss detected! Do not click outside the exam window.');
+      }
+    };
+
+    const handlePageHide = () => {
+      if (isAndroid) {
+        triggerViolation('Gemini AI Assistant or app switch detected on Android phone!');
+      } else {
+        triggerViolation('Exam page hidden or backgrounded!');
+      }
     };
 
     const handleFullscreenChange = () => {
@@ -427,16 +445,37 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
       }
     };
 
+    // Android Gemini overlay viewport height reduction check
+    const handleViewportResize = () => {
+      if (isAndroid && window.visualViewport) {
+        const heightDiff = window.innerHeight - window.visualViewport.height;
+        const activeElem = document.activeElement;
+        const isInput = activeElem && (activeElem.tagName === 'INPUT' || activeElem.tagName === 'TEXTAREA');
+        if (heightDiff > 130 && !isInput) {
+          triggerViolation('Gemini AI Assistant overlay or split-screen detected on Android!');
+        }
+      }
+    };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('pagehide', handlePageHide);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportResize);
+    }
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('pagehide', handlePageHide);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleViewportResize);
+      }
     };
   }, [isExamActive, triggerViolation]);
 

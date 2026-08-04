@@ -218,6 +218,7 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
           <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '6px', fontWeight: 600 }}>
             <li>Camera and Microphone are <strong>strictly mandatory</strong> for the entire exam.</li>
             <li>No tab switching, window minimizing, or secondary monitor usage.</li>
+            <li>Strictly NO AI Assistants (Gemini / Google Assistant) or background app overlays on Android phones.</li>
             <li>4 security warnings result in instant automated exam submission.</li>
             <li>Fullscreen mode will be locked for the entire assessment duration.</li>
           </ul>
