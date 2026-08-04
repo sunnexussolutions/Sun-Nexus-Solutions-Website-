@@ -363,7 +363,7 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     });
   }, [isExamActive, startImmediateAutoSubmit]);
 
-  // Real-time AI Face Recognition & Camera Presence Monitoring Loop
+  // Real-time AI Face Recognition & Camera Presence Monitoring Loop (Instant Detection)
   useEffect(() => {
     if (!isExamActive || !hasCamera) return;
 
@@ -375,28 +375,21 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
         const videoTrack = stream.getVideoTracks()[0];
         if (!videoTrack || !videoTrack.enabled || videoTrack.readyState !== 'live') {
           setIsFaceDetected(false);
-          missedFaceCountRef.current += 1;
-          if (missedFaceCountRef.current >= 2) {
-            triggerViolation('Camera feed is inactive or disabled! Please re-enable your camera.');
-          }
+          triggerViolation('Camera feed is inactive or disabled! Please re-enable your camera.');
           return;
         }
 
         const analysis = checkFaceInVideo(videoRef.current);
         if (analysis.faceDetected) {
           setIsFaceDetected(true);
-          missedFaceCountRef.current = 0;
         } else {
           setIsFaceDetected(false);
-          missedFaceCountRef.current += 1;
           console.warn('⚠️ Proctoring Face Recognition Alert:', analysis.reason);
-
-          if (missedFaceCountRef.current >= 2) {
-            triggerViolation(`Face not recognized in camera feed! ${analysis.reason || 'Please face the camera directly.'}`);
-          }
+          // Trigger security warning immediately on the very first missed frame
+          triggerViolation(`Face not recognized in camera! ${analysis.reason || 'Please position your face clearly in front of the camera.'}`);
         }
-      }, 2000);
-    }, 3000);
+      }, 500); // Check every 500ms for instant real-time warning
+    }, 500); // 500ms startup delay
 
     return () => {
       clearTimeout(initialDelay);
