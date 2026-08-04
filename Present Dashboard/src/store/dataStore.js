@@ -394,9 +394,41 @@ export const saveResult = async (res) => {
   return newRes;
 };
 
-export const deleteResult = async (id) => {
-  setLocal('results', getLocal('results').filter(r => r.id !== id));
-  await query('DELETE FROM results WHERE id = $1', [id]);
+export const deleteResult = async (id, assessmentId, topic, userId, userEmail) => {
+  const normId = String(id || '').toLowerCase().trim();
+  const targetAssId = String(assessmentId || '').toLowerCase().trim();
+  const targetTopic = String(topic || '').toLowerCase().trim();
+  const uId = String(userId || '').toLowerCase().trim();
+  const uEmail = String(userEmail || '').toLowerCase().trim();
+
+  const currentLocal = getLocal('results', []);
+  const updatedLocal = currentLocal.filter(r => {
+    const rId = String(r.id || '').toLowerCase().trim();
+    if (normId && rId && rId === normId) return false;
+
+    const rAssId = String(r.assessmentId || r.assessment_id || '').toLowerCase().trim();
+    const rTopic = String(r.topic || r.topicName || '').toLowerCase().trim();
+    const rUid = String(r.userId || r.user_id || '').toLowerCase().trim();
+    const rEmail = String(r.userEmail || r.user_email || '').toLowerCase().trim();
+
+    const matchTopic = (targetAssId && rAssId === targetAssId) || (targetTopic && rTopic === targetTopic);
+    const matchUser = (uId && rUid && uId === rUid) || (uEmail && rEmail && uEmail === rEmail);
+
+    if (matchTopic && matchUser) return false;
+
+    return true;
+  });
+
+  setLocal('results', updatedLocal);
+
+  try {
+    await query('DELETE FROM results WHERE id = $1 OR (assessment_id = $2 AND (user_id = $3 OR user_email = $4))', [id, assessmentId || id, userId || '', userEmail || '']);
+  } catch (err) {
+    console.warn('Cloud delete result fallback:', err.message);
+  }
+
+  window.dispatchEvent(new Event('nexus-data-updated'));
+  window.dispatchEvent(new Event('storage'));
 };
 
 // ── Users ─────────────────────────────────────────────────────────────────────
