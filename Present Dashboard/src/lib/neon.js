@@ -5,10 +5,11 @@ import { neon } from '@neondatabase/serverless';
  * We are wrapping the query in a high-visibility logger to catch 
  * hidden browser security blocks.
  */
-const neonUrl = import.meta.env.VITE_NEON_URL;
+const DEFAULT_NEON_URL = 'postgresql://neondb_owner:npg_izrW7bvHTnO6@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+const neonUrl = import.meta.env.VITE_NEON_URL || DEFAULT_NEON_URL;
 
 if (!neonUrl) {
-  console.error("CRITICAL_ERROR: VITE_NEON_URL is missing. Restart your terminal!");
+  console.error("CRITICAL_ERROR: VITE_NEON_URL is missing.");
 }
 
 const sql = neon(neonUrl);
