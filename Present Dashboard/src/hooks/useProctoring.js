@@ -337,6 +337,13 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isExamActive]);
 
+  // Only allow dismissing warnings 1, 2 & 3 — not the final violation
+  const dismissWarning = useCallback(() => {
+    if (warningCountRef.current < 4) {
+      setIsWarningModalOpen(false);
+    }
+  }, []);
+
   const attachVideoRef = useCallback((node) => {
     videoRef.current = node;
     if (node && stream) {
