@@ -178,33 +178,49 @@ const Aptitude = () => {
     };
 
     window.addEventListener('nexus-data-updated', handleUpdate);
-    return () => window.removeEventListener('nexus-data-updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('nexus-data-updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, []);
 
   const getTopicResult = (topicParam) => {
     if (!allResults || !allResults.length || !topicParam) return null;
-    const targetId = typeof topicParam === 'object' ? String(topicParam.id || '').toLowerCase() : String(topicParam || '').toLowerCase();
-    const targetTopic = typeof topicParam === 'object' ? String(topicParam.topic || topicParam.title || '').toLowerCase() : String(topicParam || '').toLowerCase();
+    const targetId = typeof topicParam === 'object' ? String(topicParam.id || '').toLowerCase().trim() : String(topicParam || '').toLowerCase().trim();
+    const targetTopic = typeof topicParam === 'object' ? String(topicParam.topic || topicParam.title || '').toLowerCase().trim() : String(topicParam || '').toLowerCase().trim();
 
-    return allResults.find(r => {
-      const rAssessmentId = String(r.assessmentId || r.assessment_id || '').toLowerCase();
-      const rTopic = String(r.topic || r.topicName || '').toLowerCase();
+    // 1. Filter all results matching this assessment topic ID or title
+    const topicMatches = allResults.filter(r => {
+      const rAssessmentId = String(r.assessmentId || r.assessment_id || '').toLowerCase().trim();
+      const rTopic = String(r.topic || r.topicName || '').toLowerCase().trim();
 
-      const matchTopic = (targetId && rAssessmentId === targetId) ||
-                         (targetTopic && rTopic === targetTopic) ||
-                         (targetTopic && rAssessmentId === targetTopic) ||
-                         (targetId && rTopic === targetId);
-
-      if (!matchTopic) return false;
-      if (!user) return true;
-
-      const rUid = String(r.userId || r.user_id || '').toLowerCase();
-      const uId = String(user.id || '').toLowerCase();
-      const uEmail = String(user.email || '').toLowerCase();
-      const rEmail = String(r.userEmail || r.user_email || '').toLowerCase();
-
-      return (uId && rUid && uId === rUid) || (uEmail && rEmail && uEmail === rEmail);
+      return (targetId && rAssessmentId === targetId) ||
+             (targetTopic && rTopic === targetTopic) ||
+             (targetTopic && rAssessmentId === targetTopic) ||
+             (targetId && rTopic === targetId);
     });
+
+    if (!topicMatches || topicMatches.length === 0) return null;
+
+    // 2. If user exists, find exact user match
+    if (user) {
+      const uId = String(user.id || '').toLowerCase().trim();
+      const uEmail = String(user.email || '').toLowerCase().trim();
+
+      const userMatch = topicMatches.find(r => {
+        const rUid = String(r.userId || r.user_id || '').toLowerCase().trim();
+        const rEmail = String(r.userEmail || r.user_email || '').toLowerCase().trim();
+        return (uId && rUid && uId === rUid) ||
+               (uEmail && rEmail && uEmail === rEmail) ||
+               (uId && rEmail && uId === rEmail);
+      });
+
+      if (userMatch) return userMatch;
+    }
+
+    // 3. Device fallback: return most recent completed result for this topic
+    return topicMatches[0];
   };
 
   const topicsForCategory = (category) => {
