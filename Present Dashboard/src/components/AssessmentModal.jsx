@@ -228,6 +228,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
     hasMic,
     videoRef,
     attachVideoRef,
+    isFaceDetected,
     retryMedia,
     stopAndGetRecording,
   } = useProctoring({
@@ -403,10 +404,11 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                 minHeight: '58px',
                 borderRadius: '12px',
                 overflow: 'hidden',
-                border: '2px solid rgba(168,85,247,0.8)',
-                boxShadow: '0 4px 20px rgba(168,85,247,0.35)',
+                border: isFaceDetected !== false ? '2px solid rgba(168,85,247,0.8)' : '2px solid #ef4444',
+                boxShadow: isFaceDetected !== false ? '0 4px 20px rgba(168,85,247,0.35)' : '0 4px 20px rgba(239,68,68,0.5)',
                 background: '#0b0f19',
-                position: 'relative'
+                position: 'relative',
+                transition: 'border 0.3s ease, box-shadow 0.3s ease'
               }}>
                 <video
                   ref={attachVideoRef || videoRef}
@@ -416,15 +418,19 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                   onLoadedData={(e) => e.target.play().catch(() => {})}
                   style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)' }}
                 />
-                {/* Camera Label */}
+                {/* Camera Label & Face Recognition Status */}
                 <div style={{
                   position: 'absolute', top: '4px', left: '4px',
                   display: 'flex', alignItems: 'center', gap: '4px',
-                  background: 'rgba(0,0,0,0.7)', borderRadius: '4px', padding: '2px 6px',
-                  backdropFilter: 'blur(4px)'
+                  background: isFaceDetected !== false ? 'rgba(0,0,0,0.7)' : 'rgba(239,68,68,0.9)',
+                  borderRadius: '4px', padding: '2px 6px',
+                  backdropFilter: 'blur(4px)',
+                  transition: 'background 0.3s ease'
                 }}>
-                  <Camera size={9} style={{ color: '#10b981' }} />
-                  <span style={{ fontSize: '8px', fontWeight: 900, color: '#10b981', letterSpacing: '0.06em' }}>LIVE</span>
+                  <Camera size={9} style={{ color: isFaceDetected !== false ? '#10b981' : '#ffffff' }} />
+                  <span style={{ fontSize: '8px', fontWeight: 900, color: isFaceDetected !== false ? '#10b981' : '#ffffff', letterSpacing: '0.06em' }}>
+                    {isFaceDetected !== false ? 'LIVE' : 'NO FACE'}
+                  </span>
                 </div>
               </div>
               {/* Microphone Audio Level Bar */}
