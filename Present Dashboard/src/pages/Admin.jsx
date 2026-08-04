@@ -1941,7 +1941,7 @@ const Admin = () => {
                                 <span style={{ fontSize: '11px', fontWeight: 900, color: '#c084fc', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                   📹 Live Proctoring Session Recording (Video + Audio)
                                 </span>
-                                <a href={r.proctorVideo} download={`proctor_${r.userName || 'user'}_${r.topic || 'exam'}.webm`} style={{ fontSize: '11px', fontWeight: 800, color: '#c084fc', textDecoration: 'none', background: 'rgba(168,85,247,0.2)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(168,85,247,0.4)' }}>
+                                <a href={r.proctorVideo} download={`proctor_${(r.userName || 'user').replace(/[^a-zA-Z0-9]/g, '_')}_${(r.topic || 'exam').replace(/[^a-zA-Z0-9]/g, '_')}.${r.proctorVideo?.startsWith('data:video/mp4') ? 'mp4' : 'webm'}`} style={{ fontSize: '11px', fontWeight: 800, color: '#c084fc', textDecoration: 'none', background: 'rgba(168,85,247,0.2)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(168,85,247,0.4)' }}>
                                   ⬇ Download
                                 </a>
                               </div>
