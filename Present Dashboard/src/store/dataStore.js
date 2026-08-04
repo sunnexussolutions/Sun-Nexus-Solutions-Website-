@@ -275,7 +275,7 @@ export const deleteAssessment = async (id) => {
 
 // ── Results ───────────────────────────────────────────────────────────────────
 export const getResults = async (userId) => {
-  const local = getLocal('results');
+  const local = getLocal('results', []);
   try {
     const sql = userId ? 'SELECT * FROM results WHERE user_id = $1 ORDER BY submitted_at DESC' : 'SELECT * FROM results ORDER BY submitted_at DESC';
     const params = userId ? [userId] : [];
@@ -290,8 +290,23 @@ export const getResults = async (userId) => {
         proctorVideo: r.proctor_video || r.proctorVideo || null,
         answers: typeof r.answers === 'string' ? JSON.parse(r.answers) : (r.answers || {})
       }));
-      setLocal('results', mapped, true);
-      return mapped;
+
+      // Merge cloud results with local results so recent submissions are never lost
+      const mergedMap = new Map();
+      mapped.forEach(item => {
+        const key = item.id || `${item.assessmentId || item.topic}_${item.userId || item.userEmail}`;
+        mergedMap.set(key, item);
+      });
+      local.forEach(item => {
+        const key = item.id || `${item.assessmentId || item.topic}_${item.userId || item.userEmail}`;
+        if (!mergedMap.has(key)) {
+          mergedMap.set(key, item);
+        }
+      });
+
+      const merged = Array.from(mergedMap.values());
+      setLocal('results', merged, true);
+      return merged;
     }
   } catch (err) {
     console.warn("Using local results fallback", err);

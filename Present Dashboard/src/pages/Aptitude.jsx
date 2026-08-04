@@ -181,16 +181,28 @@ const Aptitude = () => {
     return () => window.removeEventListener('nexus-data-updated', handleUpdate);
   }, []);
 
-  const getTopicResult = (topicId) => {
-    if (!allResults || !allResults.length) return null;
+  const getTopicResult = (topicParam) => {
+    if (!allResults || !allResults.length || !topicParam) return null;
+    const targetId = typeof topicParam === 'object' ? String(topicParam.id || '').toLowerCase() : String(topicParam || '').toLowerCase();
+    const targetTopic = typeof topicParam === 'object' ? String(topicParam.topic || topicParam.title || '').toLowerCase() : String(topicParam || '').toLowerCase();
+
     return allResults.find(r => {
-      const matchTopic = String(r.assessmentId || r.assessment_id) === String(topicId);
+      const rAssessmentId = String(r.assessmentId || r.assessment_id || '').toLowerCase();
+      const rTopic = String(r.topic || r.topicName || '').toLowerCase();
+
+      const matchTopic = (targetId && rAssessmentId === targetId) ||
+                         (targetTopic && rTopic === targetTopic) ||
+                         (targetTopic && rAssessmentId === targetTopic) ||
+                         (targetId && rTopic === targetId);
+
       if (!matchTopic) return false;
       if (!user) return true;
+
       const rUid = String(r.userId || r.user_id || '').toLowerCase();
       const uId = String(user.id || '').toLowerCase();
       const uEmail = String(user.email || '').toLowerCase();
       const rEmail = String(r.userEmail || r.user_email || '').toLowerCase();
+
       return (uId && rUid && uId === rUid) || (uEmail && rEmail && uEmail === rEmail);
     });
   };
@@ -387,7 +399,7 @@ const Aptitude = () => {
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px', marginBottom: '36px' }}>
               {currentCategoryTopics.map((topicItem, idx) => {
-                const res = getTopicResult(topicItem.id);
+                const res = getTopicResult(topicItem);
                 const isCompleted = !!res;
                 const qCount = topicItem.questions ? topicItem.questions.length : 20;
                 const timeLimit = topicItem.timeLimit || 20;
