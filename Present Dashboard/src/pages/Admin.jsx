@@ -1928,7 +1928,7 @@ const Admin = () => {
                                     <Eye size={14} /> Inspect
                                   </button>
                                 )}
-                                <button onClick={async () => { if (confirm(`Revoke submission for "${r.userName || r.userEmail}" on "${r.topic}"?`)) { await deleteResult(r.id); await refresh(); } }}
+                                <button onClick={async () => { if (confirm(`Revoke submission for "${r.userName || r.userEmail}" on "${r.topic}"?`)) { await deleteResult(r.id, r.assessmentId, r.topic, r.userId, r.userEmail); await refresh(); } }}
                                   style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                   <Trash2 size={14} /> Revoke
                                 </button>

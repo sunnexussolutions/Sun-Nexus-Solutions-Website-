@@ -216,11 +216,12 @@ const Aptitude = () => {
                (uId && rEmail && uId === rEmail);
       });
 
-      if (userMatch) return userMatch;
+      // If user's submission was deleted, return null to immediately display "START TEST"
+      return userMatch || null;
     }
 
-    // 3. Device fallback: return most recent completed result for this topic
-    return topicMatches[0];
+    // 3. Guest / Anonymous fallback
+    return topicMatches[0] || null;
   };
 
   const topicsForCategory = (category) => {
