@@ -407,7 +407,7 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     };
   }, [isExamActive, hasCamera, stream, triggerViolation]);
 
-  // Tab switch, Android Gemini / AI Assistant, window blur & overlay security event listeners
+  // Anti-AI Security Protections: Copy/Paste Blocker, AI Shortcut Detector & Extension Overlay Observer
   useEffect(() => {
     if (!isExamActive) return;
 
@@ -418,7 +418,7 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
         if (isAndroid) {
           triggerViolation('Gemini AI Assistant or background app switch detected on Android device!');
         } else {
-          triggerViolation('Tab switch or window minimization detected!');
+          triggerViolation('Tab switch or window minimization detected! Using AI tools or external tabs is prohibited.');
         }
       }
     };
@@ -427,7 +427,7 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
       if (isAndroid) {
         triggerViolation('Gemini AI Assistant overlay or focus loss detected on Android phone!');
       } else {
-        triggerViolation('Focus loss detected! Do not click outside the exam window.');
+        triggerViolation('Focus loss detected! Do not switch windows or use external AI applications.');
       }
     };
 
@@ -457,11 +457,83 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
       }
     };
 
+    // Prevent Copy/Cut/Paste & Right-Click Context Menu (prevents sending questions to AI tools)
+    const handleCopyCutPaste = (e) => {
+      e.preventDefault();
+      triggerViolation('Copying or pasting text for AI tools (ChatGPT, Gemini, Claude) is strictly prohibited!');
+    };
+
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+      triggerViolation('Right-click context menu disabled to prevent AI tool text extraction!');
+    };
+
+    // Detect AI & DevTools keyboard shortcuts (Ctrl+C, Ctrl+V, F12, Ctrl+Shift+I, Alt+Space, etc.)
+    const handleKeyDown = (e) => {
+      const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+      const key = e.key ? e.key.toLowerCase() : '';
+
+      // Block Copy / Cut / Paste / Select All for AI prompt extraction
+      if (isCmdOrCtrl && ['c', 'v', 'x', 'a', 'u', 's', 'p'].includes(key)) {
+        e.preventDefault();
+        triggerViolation(`Shortcut Ctrl+${key.toUpperCase()} blocked! Copying exam content for AI assistance is prohibited.`);
+        return;
+      }
+
+      // Block F12, DevTools & AI Sidebar Shortcuts (Ctrl+Shift+I, Ctrl+Shift+J, Alt+Space)
+      if (
+        e.keyCode === 123 || // F12
+        (isCmdOrCtrl && e.shiftKey && ['i', 'j', 'c', 'e', 'm', 'k'].includes(key)) ||
+        (e.altKey && e.code === 'Space') || // AI floating panel shortcut
+        (isCmdOrCtrl && key === 'space')
+      ) {
+        e.preventDefault();
+        triggerViolation('DevTools or AI Tool keyboard shortcut detected! Using AI extensions is forbidden.');
+        return;
+      }
+    };
+
+    // Scan DOM for injected AI extension widgets (e.g. Monica AI, Sider, ChatGPT overlay, Copilot, Merlin)
+    let aiObserver = null;
+    try {
+      aiObserver = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          for (const node of m.addedNodes) {
+            if (node.nodeType === 1) { // Element node
+              const elStr = (node.id || '') + ' ' + (node.className || '') + ' ' + (node.tagName || '');
+              const lowerStr = elStr.toLowerCase();
+              if (
+                lowerStr.includes('chatgpt') ||
+                lowerStr.includes('copilot') ||
+                lowerStr.includes('monica') ||
+                lowerStr.includes('sider') ||
+                lowerStr.includes('merlin') ||
+                lowerStr.includes('ai-sidebar') ||
+                lowerStr.includes('ai-assistant')
+              ) {
+                try { node.remove(); } catch {}
+                triggerViolation('AI Browser Extension or floating assistant widget detected! Please disable AI extensions.');
+                return;
+              }
+            }
+          }
+        }
+      });
+      aiObserver.observe(document.body, { childList: true, subtree: true });
+    } catch (obsErr) {
+      console.warn('MutationObserver setup warning:', obsErr);
+    }
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('blur', handleWindowBlur);
     window.addEventListener('pagehide', handlePageHide);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('copy', handleCopyCutPaste);
+    document.addEventListener('cut', handleCopyCutPaste);
+    document.addEventListener('paste', handleCopyCutPaste);
+    document.addEventListener('contextmenu', handleContextMenu);
+    window.addEventListener('keydown', handleKeyDown, true);
 
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleViewportResize);
@@ -473,6 +545,12 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
       window.removeEventListener('pagehide', handlePageHide);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('copy', handleCopyCutPaste);
+      document.removeEventListener('cut', handleCopyCutPaste);
+      document.removeEventListener('paste', handleCopyCutPaste);
+      document.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('keydown', handleKeyDown, true);
+      if (aiObserver) aiObserver.disconnect();
       if (window.visualViewport) {
         window.visualViewport.removeEventListener('resize', handleViewportResize);
       }
