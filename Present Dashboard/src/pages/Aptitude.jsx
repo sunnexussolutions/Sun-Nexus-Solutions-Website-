@@ -182,8 +182,17 @@ const Aptitude = () => {
   }, []);
 
   const getTopicResult = (topicId) => {
-    if (!allResults || !user) return null;
-    return allResults.find(r => r.assessmentId === topicId && r.userId === user.id);
+    if (!allResults || !allResults.length) return null;
+    return allResults.find(r => {
+      const matchTopic = String(r.assessmentId || r.assessment_id) === String(topicId);
+      if (!matchTopic) return false;
+      if (!user) return true;
+      const rUid = String(r.userId || r.user_id || '').toLowerCase();
+      const uId = String(user.id || '').toLowerCase();
+      const uEmail = String(user.email || '').toLowerCase();
+      const rEmail = String(r.userEmail || r.user_email || '').toLowerCase();
+      return (uId && rUid && uId === rUid) || (uEmail && rEmail && uEmail === rEmail);
+    });
   };
 
   const topicsForCategory = (category) => {

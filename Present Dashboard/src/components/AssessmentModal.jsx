@@ -268,7 +268,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
       answers: ans,
       userEmail: user?.email || 'guest',
       userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.username || 'Guest',
-      userId: user?.id,
+      userId: user?.id || user?.email || 'guest',
       proctorVideo: recordedVideo || null,
       warningCount,
     };

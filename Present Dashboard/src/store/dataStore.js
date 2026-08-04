@@ -283,10 +283,10 @@ export const getResults = async (userId) => {
     if (cloud) {
       const mapped = cloud.map(r => ({
         ...r,
-        userId: r.user_id,
-        userEmail: r.user_email,
-        assessmentId: r.assessment_id,
-        submittedAt: r.submitted_at,
+        userId: r.user_id || r.userId || r.user_email || r.userEmail,
+        userEmail: r.user_email || r.userEmail,
+        assessmentId: r.assessment_id || r.assessmentId,
+        submittedAt: r.submitted_at || r.submittedAt,
         proctorVideo: r.proctor_video || r.proctorVideo || null,
         answers: typeof r.answers === 'string' ? JSON.parse(r.answers) : (r.answers || {})
       }));
