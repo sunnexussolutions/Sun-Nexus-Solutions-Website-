@@ -337,13 +337,25 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isExamActive]);
 
-  // Only allow dismissing warnings 1, 2 & 3 — not the final violation
-  const dismissWarning = useCallback(() => {
-    if (warningCountRef.current < 4) {
-      setIsWarningModalOpen(false);
+  const attachVideoRef = useCallback((node) => {
+    videoRef.current = node;
+    if (node && stream) {
+      if (node.srcObject !== stream) {
+        node.srcObject = stream;
+      }
+      node.play().catch(e => console.warn('Video element play error on mount:', e));
     }
-    // On 4th violation, modal stays open until countdown fires
-  }, []);
+  }, [stream]);
+
+  // Reactive stream attachment whenever stream or hasCamera changes
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      if (videoRef.current.srcObject !== stream) {
+        videoRef.current.srcObject = stream;
+      }
+      videoRef.current.play().catch(e => console.warn('Video element play error on update:', e));
+    }
+  }, [stream, hasCamera]);
 
   return {
     warningCount,
@@ -355,6 +367,8 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     hasCamera,
     hasMic,
     videoRef,
+    attachVideoRef,
+    stream,
     retryMedia: initMedia,
     isRecording,
     stopAndGetRecording,

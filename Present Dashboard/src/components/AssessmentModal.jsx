@@ -227,6 +227,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
     hasCamera,
     hasMic,
     videoRef,
+    attachVideoRef,
     retryMedia,
     stopAndGetRecording,
   } = useProctoring({
@@ -381,13 +382,13 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
             position: 'relative',
           }}
         >
-          {/* ── PROCTOR PIP: Live Webcam + Audio Meter ── */}
+          {/* ── PROCTOR PIP: Live Webcam + Audio Meter (Responsive for all screens) ── */}
           {phase === 'quiz' && !submitted && hasCamera && (
             <div style={{
               position: 'absolute',
               bottom: '12px',
               right: '12px',
-              zIndex: 10,
+              zIndex: 30,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-end',
@@ -396,37 +397,41 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
             }}>
               {/* Live Video PIP Box */}
               <div style={{
-                width: '96px',
-                height: '72px',
-                borderRadius: '10px',
+                width: 'min(110px, 24vw)',
+                height: 'min(82px, 18vw)',
+                minWidth: '78px',
+                minHeight: '58px',
+                borderRadius: '12px',
                 overflow: 'hidden',
-                border: '2px solid rgba(99,102,241,0.6)',
-                boxShadow: '0 4px 16px rgba(99,102,241,0.25)',
-                background: '#0f172a',
+                border: '2px solid rgba(168,85,247,0.8)',
+                boxShadow: '0 4px 20px rgba(168,85,247,0.35)',
+                background: '#0b0f19',
                 position: 'relative'
               }}>
                 <video
-                  ref={videoRef}
+                  ref={attachVideoRef || videoRef}
                   autoPlay
                   muted
                   playsInline
+                  onLoadedData={(e) => e.target.play().catch(() => {})}
                   style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)' }}
                 />
                 {/* Camera Label */}
                 <div style={{
-                  position: 'absolute', top: '3px', left: '3px',
-                  display: 'flex', alignItems: 'center', gap: '3px',
-                  background: 'rgba(0,0,0,0.55)', borderRadius: '4px', padding: '1px 5px'
+                  position: 'absolute', top: '4px', left: '4px',
+                  display: 'flex', alignItems: 'center', gap: '4px',
+                  background: 'rgba(0,0,0,0.7)', borderRadius: '4px', padding: '2px 6px',
+                  backdropFilter: 'blur(4px)'
                 }}>
-                  <Camera size={8} style={{ color: '#6ee7b7' }} />
-                  <span style={{ fontSize: '7px', fontWeight: 800, color: '#6ee7b7', letterSpacing: '0.05em' }}>LIVE</span>
+                  <Camera size={9} style={{ color: '#10b981' }} />
+                  <span style={{ fontSize: '8px', fontWeight: 900, color: '#10b981', letterSpacing: '0.06em' }}>LIVE</span>
                 </div>
               </div>
               {/* Microphone Audio Level Bar */}
               {hasMic && (
-                <div style={{ width: '96px', display: 'flex', alignItems: 'center', gap: '5px', pointerEvents: 'none' }}>
-                  <Mic size={9} style={{ color: '#a78bfa', flexShrink: 0 }} />
-                  <div style={{ flex: 1, height: '5px', background: 'rgba(148,163,184,0.25)', borderRadius: '999px', overflow: 'hidden' }}>
+                <div style={{ width: 'min(110px, 24vw)', minWidth: '78px', display: 'flex', alignItems: 'center', gap: '5px', pointerEvents: 'none' }}>
+                  <Mic size={9} style={{ color: '#c084fc', flexShrink: 0 }} />
+                  <div style={{ flex: 1, height: '5px', background: 'rgba(255,255,255,0.15)', borderRadius: '999px', overflow: 'hidden' }}>
                     <div style={{
                       height: '100%',
                       width: `${audioLevel}%`,
