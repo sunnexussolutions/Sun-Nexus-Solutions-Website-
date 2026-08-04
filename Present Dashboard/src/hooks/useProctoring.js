@@ -240,12 +240,20 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
       // Start MediaRecorder for live proctoring audio & video session
       if (typeof MediaRecorder !== 'undefined') {
         try {
-          let mimeType = 'video/webm;codecs=vp8,opus';
-          if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm';
-          if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/mp4';
-          if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = '';
+          let mimeType = '';
+          if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
+            mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
+          } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+            mimeType = 'video/mp4';
+          } else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) {
+            mimeType = 'video/webm;codecs=h264';
+          } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
+            mimeType = 'video/webm;codecs=vp8,opus';
+          } else if (MediaRecorder.isTypeSupported('video/webm')) {
+            mimeType = 'video/webm';
+          }
 
-          const opts = mimeType ? { mimeType, videoBitsPerSecond: 300000 } : {};
+          const opts = mimeType ? { mimeType, videoBitsPerSecond: 400000 } : {};
           const recorder = new MediaRecorder(combinedStream, opts);
           recordedChunksRef.current = [];
 
