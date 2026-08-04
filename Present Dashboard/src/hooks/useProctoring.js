@@ -174,6 +174,9 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
       };
 
       try {
+        if (recorder.state === 'recording') {
+          recorder.requestData(); // Flush all pending audio and video frames
+        }
         recorder.stop();
         setIsRecording(false);
       } catch (err) {
@@ -189,10 +192,13 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
     let videoTrack = null;
     let audioTrack = null;
 
+    const vConstraints = { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24 }, facingMode: 'user' };
+    const aConstraints = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+
     try {
       combinedStream = await safeGetUserMedia({
-        video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: 'user' },
-        audio: true
+        video: vConstraints,
+        audio: aConstraints
       });
       setHasCamera(true);
       setHasMic(true);
@@ -201,9 +207,7 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
 
       // Attempt Video separately
       try {
-        const vStream = await safeGetUserMedia({
-          video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: 'user' }
-        });
+        const vStream = await safeGetUserMedia({ video: vConstraints });
         videoTrack = vStream.getVideoTracks()[0];
         setHasCamera(true);
       } catch (vErr) {
@@ -213,7 +217,7 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
 
       // Attempt Audio separately
       try {
-        const aStream = await safeGetUserMedia({ audio: true });
+        const aStream = await safeGetUserMedia({ audio: aConstraints });
         audioTrack = aStream.getAudioTracks()[0];
         setHasMic(true);
       } catch (aErr) {
@@ -240,20 +244,23 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
       // Start MediaRecorder for live proctoring audio & video session
       if (typeof MediaRecorder !== 'undefined') {
         try {
+          const types = [
+            'video/webm;codecs=vp9,opus',
+            'video/webm;codecs=vp8,opus',
+            'video/webm;codecs=h264,opus',
+            'video/webm',
+            'video/mp4;codecs=avc1,mp4a.40.2',
+            'video/mp4'
+          ];
           let mimeType = '';
-          if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
-            mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
-          } else if (MediaRecorder.isTypeSupported('video/mp4')) {
-            mimeType = 'video/mp4';
-          } else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) {
-            mimeType = 'video/webm;codecs=h264';
-          } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
-            mimeType = 'video/webm;codecs=vp8,opus';
-          } else if (MediaRecorder.isTypeSupported('video/webm')) {
-            mimeType = 'video/webm';
+          for (const t of types) {
+            if (MediaRecorder.isTypeSupported(t)) {
+              mimeType = t;
+              break;
+            }
           }
 
-          const opts = mimeType ? { mimeType, videoBitsPerSecond: 400000 } : {};
+          const opts = mimeType ? { mimeType, videoBitsPerSecond: 500000, audioBitsPerSecond: 128000 } : {};
           const recorder = new MediaRecorder(combinedStream, opts);
           recordedChunksRef.current = [];
 
@@ -263,10 +270,10 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
             }
           };
 
-          recorder.start(1000);
+          recorder.start(500); // Flush chunks every 500ms
           mediaRecorderRef.current = recorder;
           setIsRecording(true);
-          console.log('📹 Live proctoring MediaRecorder started successfully.');
+          console.log(`📹 Live proctoring MediaRecorder started (${mimeType || 'default'}).`);
         } catch (recErr) {
           console.warn('MediaRecorder failed to initialize:', recErr);
         }
@@ -278,6 +285,9 @@ export const useProctoring = ({ isExamActive, onAutoSubmit }) => {
           const AudioCtx = window.AudioContext || window.webkitAudioContext;
           if (AudioCtx) {
             const audioCtx = new AudioCtx();
+            if (audioCtx.state === 'suspended') {
+              audioCtx.resume();
+            }
             audioContextRef.current = audioCtx;
             const source = audioCtx.createMediaStreamSource(combinedStream);
             const analyser = audioCtx.createAnalyser();
