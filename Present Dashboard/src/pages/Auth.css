@@ -490,3 +490,86 @@
   .card-title { font-size: 21px; }
   .btn-login { padding: 13px; font-size: 14px; }
 }
+
+/* ── Forgot Password & OTP Flow ── */
+.otp-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0 16px;
+}
+
+.otp-box-input {
+  width: 48px;
+  height: 54px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: #ffffff;
+  color: var(--text-dark);
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.otp-box-input:focus {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 4px rgba(99, 91, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.timer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(99, 91, 255, 0.08);
+  color: var(--purple);
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.pw-strength-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+  margin: 10px 0 14px;
+}
+
+.pw-strength-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.pw-req-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  margin-bottom: 18px;
+  font-size: 12px;
+}
+
+.pw-req-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.pw-req-item.met {
+  color: #10b981;
+}
+
+@media (max-width: 480px) {
+  .otp-container { gap: 6px; }
+  .otp-box-input { width: 40px; height: 48px; font-size: 18px; border-radius: 10px; }
+  .pw-req-list { grid-template-columns: 1fr; }
+}
+

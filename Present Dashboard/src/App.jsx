@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import Aptitude from './pages/Aptitude';
 import DSA from './pages/DSA';
+import Projects from './pages/Projects';
 import Profile from './pages/Profile';
 import Learning from './pages/Learning';
 import Auth from './pages/Auth';
@@ -152,7 +153,7 @@ function App() {
           {activePage === 'domains' && <UnderProgress page="Domains" onReturn={() => handleNavigate('dashboard')} />}
           {(activePage === 'dsa' || activePage.startsWith('dsa-')) && <DSA activePage={activePage} setActivePage={handleNavigate} />}
           {activePage === 'aptitude' && <Aptitude />}
-          {activePage === 'projects' && <UnderProgress page="Projects" onReturn={() => handleNavigate('dashboard')} />}
+          {activePage === 'projects' && <Projects />}
           {activePage === 'council' && <UnderProgress page="Council" onReturn={() => handleNavigate('dashboard')} />}
           {activePage === 'profile' && <Profile />}
           {activePage === 'admin' && (user?.isAdmin ? <Admin /> : <UnderProgress page="Admin" onReturn={() => handleNavigate('dashboard')} />)}

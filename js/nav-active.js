@@ -1,12 +1,12 @@
 /* ════════════════════════════════════════════════════
    SUN NEXUS SOLUTIONS — GLOBAL NAVIGATION LOGIC
-   Handles: Active states, Mobile Toggle (Authoritative)
-   Version 3.0 — Unified & Conflict-Free Protocol
+   Handles: Active states, Dropdown menus, Mobile Toggle
+   Version 3.1 — Unified & Dropdown-Enabled Protocol
    ════════════════════════════════════════════════════ */
 
 function initNexusNavigation() {
-    // ── 1. Active Page Protocol ─────────────────────────────────────────────
-    const navItems = document.querySelectorAll('.nav-links li');
+    // ── 1. Active Page & Dropdown Protocol ─────────────────────────────────
+    const navItems = document.querySelectorAll('.nav-links > li');
     if (navItems.length > 0) {
         const path = window.location.pathname;
         const currentPage = path.split('/').pop() || 'index.html';
@@ -14,22 +14,59 @@ function initNexusNavigation() {
         navItems.forEach(li => {
             if (li.classList.contains('nav-theme-toggle')) return;
             
-            const link = li.querySelector('a');
-            if (!link) return;
+            const links = li.querySelectorAll('a');
+            let isItemActive = false;
             
-            const href = link.getAttribute('href');
-            li.classList.remove('active');
-            
-            if (href === currentPage || 
-                (currentPage === '' && href === 'index.html') ||
-                (currentPage === 'index.html' && href === 'index.html') ||
-                (href && currentPage !== '' && href.includes(currentPage))) {
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage || 
+                    (currentPage === '' && href === 'index.html') ||
+                    (currentPage === 'index.html' && href === 'index.html') ||
+                    (href && currentPage !== '' && href.includes(currentPage))) {
+                    isItemActive = true;
+                    link.classList.add('sub-active');
+                } else {
+                    link.classList.remove('sub-active');
+                }
+            });
+
+            if (isItemActive) {
                 li.classList.add('active');
+            } else {
+                li.classList.remove('active');
             }
         });
     }
 
-    // ── 2. Mobile Menu Toggle Protocol (Authoritative Engine) ───────────────
+    // ── 2. Dropdown Hover & Touch Protocol with Graceful Delay ───────────────
+    const dropdowns = document.querySelectorAll('.nav-dropdown');
+    dropdowns.forEach(dropdown => {
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        let closeTimer = null;
+
+        dropdown.addEventListener('mouseenter', () => {
+            if (closeTimer) clearTimeout(closeTimer);
+            dropdown.classList.add('open');
+        });
+
+        dropdown.addEventListener('mouseleave', () => {
+            if (closeTimer) clearTimeout(closeTimer);
+            closeTimer = setTimeout(() => {
+                dropdown.classList.remove('open');
+            }, 150); // 220ms smooth & responsive delay time before closing dropdown
+        });
+
+        if (toggle) {
+            toggle.addEventListener('click', (e) => {
+                if (window.innerWidth <= 992) {
+                    // On mobile, click toggles sub-menu
+                    dropdown.classList.toggle('open');
+                }
+            });
+        }
+    });
+
+    // ── 3. Mobile Menu Toggle Protocol (Authoritative Engine) ───────────────
     const oldToggle = document.getElementById('menuToggle');
     const navLinks = document.getElementById('navLinks');
     
@@ -60,8 +97,8 @@ function initNexusNavigation() {
             toggleMenu();
         });
 
-        // Close menu when clicking navigation links
-        navLinks.querySelectorAll('a').forEach(link => {
+        // Close menu when clicking navigation links (except dropdown triggers)
+        navLinks.querySelectorAll('a:not(.dropdown-toggle)').forEach(link => {
             link.addEventListener('click', () => {
                 toggleMenu(true);
             });

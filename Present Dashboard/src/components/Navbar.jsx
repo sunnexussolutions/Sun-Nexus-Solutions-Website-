@@ -102,7 +102,7 @@ const Navbar = ({ toggleSidebar, setActivePage, isDesktop }) => {
       style: { width: size, height: size, borderRadius: "50%", backgroundColor: "#7b5cff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize, color: "#fff", flexShrink: 0, overflow: "hidden" }
     }, user?.avatar?.length > 5
       ? React.createElement("img", { src: user.avatar, alt: "User", style: { width: "100%", height: "100%", objectFit: "cover" } })
-      : (user?.firstName?.[0] || user?.username?.[0] || "N").toUpperCase()
+      : (user?.name || user?.fullName || user?.firstName || user?.username || "N").charAt(0).toUpperCase()
     )
   );
 
@@ -246,7 +246,7 @@ const Navbar = ({ toggleSidebar, setActivePage, isDesktop }) => {
             <AvatarCircle size={38} fontSize={15} />
             <div className="hidden lg-block" style={{ textAlign: 'left' }}>
               <span style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: nameColor, lineHeight: 1.2, whiteSpace: 'nowrap' }}>
-                {user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : (user?.username || 'Nexus Admin')}
+                {user?.name || user?.fullName || (user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : (user?.username || 'Nexus Admin'))}
               </span>
               <span style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: '#7b5cff', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '1px', whiteSpace: 'nowrap' }}>
                 {user?.isAdmin ? 'Platform Admin' : 'Verified Member'}

@@ -227,9 +227,84 @@ export const AuthProvider = ({ children }) => {
   const login = async (identifier, password) => {
     setLoading(true);
     const cleanId = (identifier || '').trim().toLowerCase();
+    const getApiBaseUrl = () => (['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:') ? 'http://localhost:3000' : '';
 
     try {
-      // 1. Admin Master Bypass
+      const res = await fetch(`${getApiBaseUrl()}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: cleanId, password })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success && data.user) {
+        let localMatch = {};
+        try {
+          const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+          const m = localUsers.find(u => u.id === data.user.id || (u.email && data.user.email && u.email.toLowerCase() === data.user.email.toLowerCase()));
+          if (m) localMatch = m;
+        } catch (e) {}
+
+        const u = {
+          ...data.user,
+          ...localMatch,
+          firstName: data.user.firstName || data.user.first_name || localMatch.firstName || data.user.name?.split(' ')[0] || 'User',
+          lastName: data.user.lastName || data.user.last_name || localMatch.lastName || '',
+          name: data.user.name || `${data.user.firstName || ''} ${data.user.lastName || ''}`.trim() || 'Nexus User',
+          avatar: localMatch.avatar || data.user.avatar || '',
+          banner: localMatch.banner || data.user.banner || '',
+          skills: localMatch.skills || data.user.skills,
+          projects: localMatch.projects || data.user.projects,
+          isAdmin: !!(data.user.isAdmin || data.user.is_admin || localMatch.isAdmin),
+          status: 'active',
+          joinedAt: data.user.joinedAt || data.user.joined_at || localMatch.joinedAt || new Date().toISOString()
+        };
+
+        const processed = await applyStreakToUser(u);
+        setUser(processed);
+        setIsAuthenticated(true);
+        localStorage.setItem('nexus_user', JSON.stringify(processed));
+
+        try {
+          const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+          const idx = localUsers.findIndex(usr => usr.id === processed.id || usr.email === processed.email);
+          if (idx !== -1) localUsers[idx] = { ...localUsers[idx], ...processed };
+          else localUsers.push(processed);
+          localStorage.setItem('nexus_users', JSON.stringify(localUsers));
+        } catch (e) {}
+
+        setLoading(false);
+        return { success: true, user: processed };
+      }
+
+      if (res.status === 403 && data.message?.includes('pending')) {
+        setLoading(false);
+        return { success: false, pending: true, error: data.message };
+      }
+
+      if (data.isLocked) {
+        setLoading(false);
+        return {
+          success: false,
+          isLocked: true,
+          lockedUntil: data.lockedUntil,
+          remainingSeconds: data.remainingSeconds,
+          attemptsRemaining: 0,
+          error: data.message || 'Too many incorrect attempts. Login temporarily locked.'
+        };
+      }
+
+      setLoading(false);
+      return {
+        success: false,
+        isLocked: false,
+        attemptsRemaining: data.attemptsRemaining,
+        error: data.message || 'Incorrect email or password.'
+      };
+    } catch (err) {
+      console.warn("REST login endpoint unreachable, attempting direct database/local fallback:", err.message);
+
+      // Fallback 1: Admin Master Bypass
       if ((cleanId === 'admin@nexus.com' || cleanId === 'admin') && (password === 'admin123' || password === 'admin')) {
         let savedAdmin = {};
         try {
@@ -257,111 +332,55 @@ export const AuthProvider = ({ children }) => {
         setUser(adminUser);
         setIsAuthenticated(true);
         localStorage.setItem('nexus_user', JSON.stringify(adminUser));
-
-        try {
-          const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
-          const idx = localUsers.findIndex(u => u.id === 'admin_master' || u.email === 'admin@nexus.com');
-          if (idx !== -1) localUsers[idx] = { ...localUsers[idx], ...adminUser };
-          else localUsers.push(adminUser);
-          localStorage.setItem('nexus_users', JSON.stringify(localUsers));
-        } catch (e) {}
-
         setLoading(false);
-        return { success: true };
+        return { success: true, user: adminUser };
       }
 
-      // 2. Try Cloud Hub Database (Neon PostgreSQL)
-      let found = null;
+      // Fallback 2: Check Cloud Hub DB (Neon PostgreSQL) directly or LocalStorage
       try {
-        const cloud = await query('SELECT * FROM profiles WHERE LOWER(email) = $1 OR LOWER(username) = $2', [cleanId, cleanId]);
-        if (cloud && cloud.length > 0) {
-          found = cloud[0];
-        }
-      } catch (cloudErr) {
-        console.warn("Cloud login check failed:", cloudErr.message);
-      }
-
-      // Local storage fallback for local users
-      if (!found) {
+        let found = null;
         try {
-          const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
-          found = localUsers.find(u => 
-            (u.email && u.email.toLowerCase() === cleanId) || 
-            (u.username && u.username.toLowerCase() === cleanId)
-          );
+          const cloud = await query('SELECT * FROM profiles WHERE LOWER(email) = $1 OR LOWER(username) = $2', [cleanId, cleanId]);
+          if (cloud && cloud.length > 0) found = cloud[0];
         } catch (e) {}
-      }
 
-      if (found) {
-        // Always use the DB status (most up-to-date), fall back to found.status
-        const currentStatus = found.status || 'active';
-
-        if (currentStatus === 'pending') {
-          const pendingUser = {
-            ...found,
-            firstName: found.first_name || found.firstName || found.name?.split(' ')[0],
-            lastName: found.last_name || found.lastName,
-            isAdmin: false,
-            status: 'pending'
-          };
-          setUser(pendingUser);
-          setIsAuthenticated(true);
-          localStorage.setItem('nexus_user', JSON.stringify(pendingUser));
-          setLoading(false);
-          return { success: false, pending: true, error: 'You are registered and waiting for Admin approval...' };
+        if (!found) {
+          try {
+            const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
+            found = localUsers.find(u => 
+              (u.email && u.email.toLowerCase() === cleanId) || 
+              (u.username && u.username.toLowerCase() === cleanId)
+            );
+          } catch (e) {}
         }
 
-        if (found.password === password || !found.password) {
-          if (currentStatus === 'suspended' || currentStatus === 'banned') {
+        if (found) {
+          const currentStatus = found.status || 'active';
+          if (currentStatus === 'pending') {
             setLoading(false);
-            return { success: false, error: 'Account has been suspended. Please contact support.' };
+            return { success: false, pending: true, error: 'You are registered and waiting for Admin approval...' };
           }
-
-          let localMatch = {};
-          try {
-            const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
-            const m = localUsers.find(u => u.id === found.id || (u.email && found.email && u.email.toLowerCase() === found.email.toLowerCase()));
-            if (m) localMatch = m;
-          } catch (e) {}
-
-          const u = {
-            ...found,
-            ...localMatch,
-            firstName: found.first_name || found.firstName || localMatch.firstName || found.name?.split(' ')[0],
-            lastName: found.last_name || found.lastName || localMatch.lastName,
-            avatar: localMatch.avatar || found.avatar || '',
-            banner: localMatch.banner || found.banner || '',
-            skills: localMatch.skills || found.skills,
-            projects: localMatch.projects || found.projects,
-            isAdmin: !!(found.is_admin || found.isAdmin || localMatch.isAdmin),
-            status: 'active',
-            joinedAt: found.joined_at || found.joinedAt || localMatch.joinedAt
-          };
-
-          const processed = await applyStreakToUser(u);
-          setUser(processed);
-          setIsAuthenticated(true);
-          localStorage.setItem('nexus_user', JSON.stringify(processed));
-
-          try {
-            const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
-            const idx = localUsers.findIndex(usr => usr.id === processed.id || usr.email === processed.email);
-            if (idx !== -1) localUsers[idx] = { ...localUsers[idx], ...processed };
-            else localUsers.push(processed);
-            localStorage.setItem('nexus_users', JSON.stringify(localUsers));
-          } catch (e) {}
-
-          setLoading(false);
-          return { success: true };
+          if (found.password === password || !found.password) {
+            const u = {
+              ...found,
+              firstName: found.first_name || found.firstName || found.name?.split(' ')[0] || 'User',
+              lastName: found.last_name || found.lastName || '',
+              isAdmin: !!(found.is_admin || found.isAdmin),
+              status: 'active',
+              joinedAt: found.joined_at || found.joinedAt || new Date().toISOString()
+            };
+            const processed = await applyStreakToUser(u);
+            setUser(processed);
+            setIsAuthenticated(true);
+            localStorage.setItem('nexus_user', JSON.stringify(processed));
+            setLoading(false);
+            return { success: true, user: processed };
+          }
         }
-      }
+      } catch (fbErr) {}
 
       setLoading(false);
-      return { success: false, error: 'Identity check failed. Please verify your email/username and password.' };
-    } catch (err) {
-      console.error("LOGIN_ERROR:", err);
-      setLoading(false);
-      return { success: false, error: 'Authentication error occurred. Please try again.' };
+      return { success: false, error: 'Incorrect email or password.' };
     }
   };
 
@@ -427,12 +446,29 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateProfile = async (updates) => {
-    if (!user) return;
-    const updated = { ...user, ...updates };
+    if (!user) return { success: false, error: 'No user session' };
+
+    const getApiBaseUrl = () => {
+      const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
+      return isLocal ? 'http://localhost:3000' : '';
+    };
+
+    const targetName = updates.name || updates.fullName || (updates.firstName ? `${updates.firstName} ${updates.lastName || ''}`.trim() : user.name);
+
+    const updated = { 
+      ...user, 
+      ...updates,
+      name: targetName,
+      fullName: targetName,
+      firstName: updates.firstName || user.firstName || (targetName ? targetName.split(' ')[0] : ''),
+      lastName: updates.lastName || user.lastName || (targetName ? targetName.split(' ').slice(1).join(' ') : ''),
+    };
+
+    // 1. Immediate Optimistic Update
     setUser(updated);
     localStorage.setItem('nexus_user', JSON.stringify(updated));
 
-    // Update or Insert in local users array for persistent local storage across logouts
+    // Update local users storage
     try {
       const localUsers = JSON.parse(localStorage.getItem('nexus_users') || '[]');
       const targetId = updated.id;
@@ -449,78 +485,67 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('nexus_users', JSON.stringify(localUsers));
     } catch (e) {}
 
+    window.dispatchEvent(new Event('nexus-user-updated'));
     window.dispatchEvent(new Event('nexus-data-updated'));
 
-    // Sync ALL profile fields to DB using COALESCE so we only overwrite what's provided
+    // 2. REST API & Neon DB Update
     try {
-      await query(`
-        UPDATE profiles 
-        SET 
-          first_name        = COALESCE($1,  first_name),
-          last_name         = COALESCE($2,  last_name),
-          headline          = COALESCE($3,  headline),
-          avatar            = COALESCE($4,  avatar),
-          location          = COALESCE($5,  location),
-          banner            = COALESCE($6,  banner),
-          skills            = COALESCE($7,  skills),
-          projects          = COALESCE($8,  projects),
-          name              = COALESCE($9,  name),
-          phone             = COALESCE($10, phone),
-          dob               = COALESCE($11, dob),
-          gender            = COALESCE($12, gender),
-          university        = COALESCE($13, university),
-          branch            = COALESCE($14, branch),
-          specialization    = COALESCE($15, specialization),
-          year              = COALESCE($16, year),
-          division          = COALESCE($17, division),
-          prn_number        = COALESCE($18, prn_number),
-          selected_domain   = COALESCE($19, selected_domain),
-          experience_level  = COALESCE($20, experience_level),
-          bio               = COALESCE($21, bio),
-          github_url        = COALESCE($22, github_url),
-          linkedin_url      = COALESCE($23, linkedin_url),
-          portfolio_url     = COALESCE($24, portfolio_url),
-          username          = COALESCE($25, username),
-          graduation_year   = COALESCE($26, graduation_year),
-          cgpa              = COALESCE($27, cgpa)
-        WHERE id = $28
-      `, [
-        updates.firstName || null,
-        updates.lastName  || null,
-        updates.headline  || null,
-        updates.avatar    || null,
-        updates.location  || null,
-        updates.banner    || null,
-        updates.skills    ? JSON.stringify(updates.skills)   : null,
-        updates.projects  ? JSON.stringify(updates.projects) : null,
-        updates.name      || null,
-        updates.phone     || updates.mobileNumber || null,
-        updates.dob       || null,
-        updates.gender    || null,
-        updates.university       || null,
-        updates.branch           || null,
-        updates.specialization   || null,
-        updates.year             || null,
-        updates.division         || null,
-        updates.prnNumber        || null,
-        updates.selectedDomain   || null,
-        updates.experienceLevel  || null,
-        updates.bio              || null,
-        updates.githubUrl        || null,
-        updates.linkedinUrl      || null,
-        updates.portfolioUrl     || null,
-        updates.username         || null,
-        updates.graduationYear   || null,
-        updates.cgpa             || null,
-        user.id
-      ]);
+      const res = await fetch(`${getApiBaseUrl()}/api/users/${user.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': String(user.id || user.email || ''),
+          'x-user-role': user.isAdmin ? 'admin' : 'member'
+        },
+        body: JSON.stringify(updates)
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.user) {
+          const u = data.user;
+          const cloudUpdated = {
+            ...updated,
+            ...u,
+            firstName:       u.first_name       || updated.firstName,
+            lastName:        u.last_name        || updated.lastName,
+            name:            u.name             || updated.name,
+            avatar:          u.avatar           !== undefined ? u.avatar : updated.avatar,
+            banner:          u.banner           || updated.banner,
+            skills:          typeof u.skills === 'string' ? JSON.parse(u.skills) : (u.skills || updated.skills),
+            phone:           u.phone            || updated.phone,
+            mobileNumber:    u.phone            || updated.mobileNumber,
+            dob:             u.dob              || updated.dob,
+            gender:          u.gender           || updated.gender,
+            university:      u.university       || updated.university,
+            branch:          u.branch           || updated.branch,
+            specialization:  u.specialization   || updated.specialization,
+            year:            u.year             || updated.year,
+            division:        u.division         || updated.division,
+            prnNumber:       u.prn_number       || updated.prnNumber,
+            selectedDomain:  u.selected_domain  || updated.selectedDomain,
+            experienceLevel: u.experience_level || updated.experienceLevel,
+            bio:             u.bio              !== undefined ? u.bio : updated.bio,
+            githubUrl:       u.github_url       || updated.githubUrl,
+            linkedinUrl:     u.linkedin_url     || updated.linkedinUrl,
+            portfolioUrl:    u.portfolio_url    || updated.portfolioUrl,
+            username:        u.username         || updated.username,
+            location:        u.location         || updated.location,
+            headline:        u.headline         || updated.headline,
+            graduationYear:  u.graduation_year  || updated.graduationYear,
+            cgpa:            u.cgpa             || updated.cgpa,
+          };
+          setUser(cloudUpdated);
+          localStorage.setItem('nexus_user', JSON.stringify(cloudUpdated));
+        }
+      }
     } catch (err) {
-      // DB columns may not all exist yet — this is a graceful fallback
-      console.warn("DB_SYNC partial error (some columns may not exist yet):", err.message);
+      console.warn("DB profile sync fallback:", err.message);
     }
 
+    window.dispatchEvent(new Event('nexus-user-updated'));
     window.dispatchEvent(new Event('nexus-data-updated'));
-    return { success: true };
+    return { success: true, user: updated };
   };
 
   const loginWithGoogle = async (googleData) => {

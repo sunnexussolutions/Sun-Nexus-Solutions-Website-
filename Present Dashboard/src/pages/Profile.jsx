@@ -11,7 +11,9 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
-import { getProjects, getResults, getDSASolutions } from '../store/dataStore';
+import { useProjects } from '../contexts/ProjectContext';
+import { getResults, getDSASolutions } from '../store/dataStore';
+import { MASTER_PROJECTS, isUserInProjectTeam, getStoredTeamIdentity, setStoredTeamIdentity, parseTeamMembers } from '../utils/projectsData';
 import { calculateUserStats } from '../utils/analytics';
 
 // SVG Tech Logos renderer supporting extensive tech stack library + smart fallback
@@ -1308,6 +1310,7 @@ export default function Profile() {
   });
 
   const [profileData, setProfileData] = useState(() => buildProfileData(user));
+  const { myProjects, myProjectStats, setActiveProjectModal } = useProjects();
 
   const [draftProfile, setDraftProfile] = useState({ ...profileData });
   const [uploading, setUploading] = useState({ avatar: false, banner: false });
@@ -1342,6 +1345,21 @@ export default function Profile() {
     window.addEventListener('nexus-data-updated', fetchStats);
     return () => { cancelled = true; window.removeEventListener('nexus-data-updated', fetchStats); };
   }, [user]);
+
+  const [selectedTeamMemberIdentity, setSelectedTeamMemberIdentity] = useState(() => getStoredTeamIdentity());
+
+  // Extract all available team member names from MASTER_PROJECTS
+  const availableTeamMembers = useMemo(() => {
+    return Array.from(new Set(
+      MASTER_PROJECTS.flatMap(p => parseTeamMembers(p.team || p.teamMembers || p.team_members).map(m => m.name)).filter(Boolean)
+    )).sort();
+  }, []);
+
+  // Projects where this user is attributed as a team member
+  const userTeamProjects = useMemo(() => {
+    if (!user) return [];
+    return MASTER_PROJECTS.filter(p => isUserInProjectTeam(user, p, selectedTeamMemberIdentity));
+  }, [user, selectedTeamMemberIdentity]);
 
   // Computed stat values
   const aptitudeStats = useMemo(() => calculateUserStats(aptitudeResults), [aptitudeResults]);
@@ -1386,6 +1404,55 @@ export default function Profile() {
       });
     }
 
+    // ── Project Activity (from centralized ProjectContext) ─────────────────────
+    (myProjects || []).forEach(p => {
+      const dateStr = p.updatedAt || p.createdAt
+        ? new Date(p.updatedAt || p.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric' })
+        : 'Recently';
+
+      if (p.status === 'completed') {
+        list.push({
+          id: `act-proj-done-${p.id}`,
+          title: '🎯 Project Completed',
+          desc: p.title || 'Untitled Project',
+          time: dateStr,
+          icon: Layers,
+          bg: '#dcfce7',
+          color: '#16a34a'
+        });
+      } else if (p.status === 'in_progress' || p.status === 'ongoing') {
+        list.push({
+          id: `act-proj-wip-${p.id}`,
+          title: '🚀 Project In Progress',
+          desc: p.title || 'Untitled Project',
+          time: dateStr,
+          icon: Layers,
+          bg: '#eff6ff',
+          color: '#6366f1'
+        });
+      } else if (p.status === 'planning') {
+        list.push({
+          id: `act-proj-plan-${p.id}`,
+          title: '📋 Project Planning',
+          desc: p.title || 'Untitled Project',
+          time: dateStr,
+          icon: Layers,
+          bg: '#fff7ed',
+          color: '#f59e0b'
+        });
+      } else {
+        list.push({
+          id: `act-proj-${p.id}`,
+          title: '📁 Assigned to Project',
+          desc: p.title || 'Untitled Project',
+          time: dateStr,
+          icon: Layers,
+          bg: '#f3e8ff',
+          color: '#8b5cf6'
+        });
+      }
+    });
+
     // DSA Submissions
     (dsaSolutions || []).forEach(s => {
       list.push({
@@ -1424,7 +1491,8 @@ export default function Profile() {
     });
 
     return list;
-  }, [profileData.lastUpdated, profileData.joined, dsaSolutions, aptitudeResults]);
+  }, [profileData.lastUpdated, profileData.joined, dsaSolutions, aptitudeResults, myProjects]);
+
 
   // Dynamic Recent Achievements constructed from real user milestones
   const achievementsList = useMemo(() => {
@@ -1483,10 +1551,7 @@ export default function Profile() {
 
   // 1. Update local profileData state IMMEDIATELY (instant UI update, no waiting for DB)
   // 2. Sync to DB + user context in the background via updateProfile
-  const handleSaveFullProfile = (formData) => {
-    // ── STEP 1: Immediate optimistic update ───────────────────────────────────
-    // This runs synchronously. The profile view will show the new data the
-    // instant the user clicks "Continue" in the success modal.
+  const handleSaveFullProfile = async (formData) => {
     const updatedProfile = {
       ...profileData,
       name:            formData.fullName            || profileData.name,
@@ -1518,78 +1583,42 @@ export default function Profile() {
       lastUpdated:     'Just now'
     };
 
-    // Apply to React state immediately — guarantees instant render
     setProfileData(updatedProfile);
 
-    // Also persist to localStorage immediately so it survives a refresh
     try {
-      const raw = localStorage.getItem('nexus_user');
-      const saved = raw ? JSON.parse(raw) : {};
-      localStorage.setItem('nexus_user', JSON.stringify({
-        ...saved,
-        name:            updatedProfile.name,
-        fullName:        formData.fullName,
-        username:        updatedProfile.username,
-        email:           updatedProfile.email,
+      await updateProfile({
+        name:            formData.fullName || formData.name,
+        fullName:        formData.fullName || formData.name,
+        username:        formData.username,
+        email:           formData.email,
         phone:           formData.mobileNumber,
         mobileNumber:    formData.mobileNumber,
-        dob:             updatedProfile.dob,
-        gender:          updatedProfile.gender,
+        dob:             formData.dob,
+        gender:          formData.gender,
         location:        formData.location,
         address:         formData.location,
-        university:      updatedProfile.university,
-        branch:          updatedProfile.branch,
-        specialization:  updatedProfile.specialization,
-        year:            updatedProfile.year,
-        division:        updatedProfile.division,
-        prnNumber:       updatedProfile.prnNumber,
-        selectedDomain:  updatedProfile.selectedDomain,
-        experienceLevel: updatedProfile.experienceLevel,
-        bio:             updatedProfile.bio,
-        githubUrl:       updatedProfile.githubUrl,
-        linkedinUrl:     updatedProfile.linkedinUrl,
-        portfolioUrl:    updatedProfile.portfolioUrl,
-        graduationYear:  updatedProfile.graduationYear,
-        cgpa:            updatedProfile.cgpa,
-        headline:        updatedProfile.headline,
-        avatar:          updatedProfile.avatar,
-        skills:          updatedProfile.skills,
-      }));
-    } catch (e) {}
-
-    // ── STEP 2: Background DB + user-context sync (fire and forget) ───────────
-    // Does NOT block the UI. Errors are caught silently since local state is
-    // already updated and localStorage is already saved.
-    updateProfile({
-      name:            formData.fullName,
-      fullName:        formData.fullName,
-      username:        formData.username,
-      email:           formData.email,
-      phone:           formData.mobileNumber,
-      mobileNumber:    formData.mobileNumber,
-      dob:             formData.dob,
-      gender:          formData.gender,
-      location:        formData.location,
-      address:         formData.location,
-      university:      formData.university,
-      branch:          formData.branch,
-      specialization:  formData.specialization,
-      year:            formData.year,
-      division:        formData.division,
-      prnNumber:       formData.prnNumber,
-      selectedDomain:  formData.selectedDomain,
-      skills:          formData.skills,
-      experienceLevel: formData.experienceLevel,
-      bio:             formData.bio,
-      githubUrl:       formData.githubUrl,
-      linkedinUrl:     formData.linkedinUrl,
-      portfolioUrl:    formData.portfolioUrl,
-      graduationYear:  formData.graduationYear,
-      cgpa:            formData.cgpa,
-      avatar:          formData.avatar || profileData.avatar,
-      headline:        formData.selectedDomain || formData.branch || 'Full Stack Developer',
-      lastUpdated:     'Just now'
-    }).catch(err => console.warn('Background profile sync error (UI already updated):', err));
+        university:      formData.university,
+        branch:          formData.branch,
+        specialization:  formData.specialization,
+        year:            formData.year,
+        division:        formData.division,
+        prnNumber:       formData.prnNumber,
+        selectedDomain:  formData.selectedDomain,
+        domain:          formData.selectedDomain,
+        skills:          formData.skills,
+        experienceLevel: formData.experienceLevel,
+        bio:             formData.bio,
+        githubUrl:       formData.githubUrl,
+        linkedinUrl:     formData.linkedinUrl,
+        portfolioUrl:    formData.portfolioUrl,
+        graduationYear:  formData.graduationYear,
+        cgpa:            formData.cgpa,
+        avatar:          formData.avatar || profileData.avatar,
+        headline:        formData.selectedDomain || formData.branch || 'Full Stack Developer',
+      });
+    } catch (err) {
+      console.warn('Profile sync error:', err.message);
+    }
   };
 
   useEffect(() => {
@@ -1605,16 +1634,8 @@ export default function Profile() {
     }
   }, [user]);
 
-  // Load official projects from dataStore
-  useEffect(() => {
-    if (user?.id) {
-      getProjects(user.id).then(official => {
-        if (official && official.length > 0) {
-          setProfileData(prev => ({ ...prev, projects: official }));
-        }
-      });
-    }
-  }, [user?.id]);
+
+
 
   // Image Upload handler (Permanent Base64 Data URL)
   const handleImageUpload = async (e, type) => {
@@ -1672,9 +1693,16 @@ export default function Profile() {
     try {
       await updateProfile({
         name: draftProfile.name,
+        fullName: draftProfile.name,
         headline: draftProfile.headline,
         location: draftProfile.location,
         skills: draftProfile.skills,
+        bio: draftProfile.bio,
+        githubUrl: draftProfile.githubUrl,
+        linkedinUrl: draftProfile.linkedinUrl,
+        portfolioUrl: draftProfile.portfolioUrl,
+        phone: draftProfile.phone,
+        avatar: draftProfile.avatar,
       });
       setProfileData({ ...draftProfile });
       setIsEditModalOpen(false);
@@ -2184,6 +2212,107 @@ export default function Profile() {
                     ) : <span style={{ fontSize: '12.5px', color: isDark ? '#64748b' : '#94a3b8' }}>Not set</span>}
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Card 4: My Projects & Contributions (Dynamic Master Source Sync) */}
+            <div style={{ ...cardStyle, padding: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Layers size={18} style={{ color: '#7b5cff' }} />
+                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+                    🚀 My Projects ({myProjects.length})
+                  </h3>
+                </div>
+
+                {/* Project Counts Badges */}
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '10px', backgroundColor: 'rgba(34,197,94,0.15)', color: '#22c55e' }}>
+                    {myProjectStats.completed} Completed
+                  </span>
+                  <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '10px', backgroundColor: 'rgba(99,102,241,0.15)', color: '#6366f1' }}>
+                    {myProjectStats.inProgress} In Progress
+                  </span>
+                  {myProjectStats.planning > 0 && (
+                    <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '10px', backgroundColor: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
+                      {myProjectStats.planning} Planning
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Dynamic Projects Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+                {myProjects.length > 0 ? (
+                  myProjects.map(proj => {
+                    const statusLabel = proj.status === 'completed' ? 'Completed' : (proj.status === 'planning' ? 'Planning' : 'In Progress');
+                    const statusColor = proj.status === 'completed' ? '#22c55e' : (proj.status === 'planning' ? '#f59e0b' : '#6366f1');
+                    const statusBg = proj.status === 'completed' ? 'rgba(34,197,94,0.15)' : (proj.status === 'planning' ? 'rgba(245,158,11,0.15)' : 'rgba(99,102,241,0.15)');
+
+                    return (
+                      <div key={proj.id || proj.title} style={{ padding: '18px', borderRadius: '18px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '12px' }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <span style={{ fontSize: '10px', fontWeight: 900, color: '#7b5cff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                              {proj.category || 'Advanced'} Project
+                            </span>
+                            <span style={{ fontSize: '10.5px', fontWeight: 800, padding: '2px 8px', borderRadius: '8px', backgroundColor: statusBg, color: statusColor }}>
+                              {statusLabel}
+                            </span>
+                          </div>
+
+                          <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 6px 0', lineHeight: 1.3 }}>
+                            {proj.title}
+                          </h4>
+                          <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: '0 0 10px 0', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                            {proj.description || proj.desc || proj.summary}
+                          </p>
+
+                          {/* Completion Progress Bar */}
+                          <div style={{ marginTop: '8px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10.5px', fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b', marginBottom: '4px' }}>
+                              <span>Completion</span>
+                              <span style={{ color: statusColor, fontWeight: 900 }}>{proj.completion || 0}%</span>
+                            </div>
+                            <div style={{ width: '100%', height: '6px', borderRadius: '8px', backgroundColor: isDark ? '#1e293b' : '#e2e8f0', overflow: 'hidden' }}>
+                              <div style={{ width: `${proj.completion || 0}%`, height: '100%', backgroundColor: statusColor, borderRadius: '8px' }} />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* View Button */}
+                        <div style={{ paddingTop: '10px', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: '11px', color: isDark ? '#64748b' : '#94a3b8', fontWeight: 600 }}>
+                            {proj.updatedAt ? new Date(proj.updatedAt).toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Recently'}
+                          </span>
+                          <button
+                            onClick={() => setActiveProjectModal(proj)}
+                            style={{
+                              padding: '6px 14px',
+                              borderRadius: '10px',
+                              border: '1px solid #7b5cff',
+                              backgroundColor: 'transparent',
+                              color: '#7b5cff',
+                              fontSize: '12px',
+                              fontWeight: 800,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}
+                          >
+                            <span>View</span>
+                            <span>→</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div style={{ padding: '24px', textAlign: 'center', color: isDark ? '#64748b' : '#94a3b8', fontSize: '13px', gridColumn: '1 / -1' }}>
+                    No projects found for your profile yet. Create a project from the Projects page to showcase your work!
+                  </div>
+                )}
               </div>
             </div>
           </div>

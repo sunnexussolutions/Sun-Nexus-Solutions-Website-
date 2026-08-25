@@ -1,5 +1,6 @@
 import { query } from '../lib/neon';
 import { getYearWeek, getWeekDiff } from '../contexts/AuthContext';
+import { parseTeamMembers, safeJsonParse } from '../utils/projectsData';
 
 // Helper for local management
 const getLocal = (key, fallback = []) => {
@@ -26,69 +27,289 @@ const getBaseUrl = () => {
   return isLocal ? 'http://localhost:3000' : '';
 };
 
-const fetchApi = async (endpoint, method = 'GET', body = null) => {
+// Read the currently-authenticated user from localStorage and return
+// the auth headers the Express server uses for role-based access control.
+const getAuthHeaders = (overrideUser = null) => {
+  try {
+    const raw = localStorage.getItem('nexus_user') || localStorage.getItem('user');
+    const u = overrideUser || (raw ? JSON.parse(raw) : null);
+
+    if (!u) {
+      return {
+        'x-user-id': 'admin_master',
+        'x-user-email': 'admin@nexus.com',
+        'x-user-name': 'nexus admin',
+        'x-user-role': 'admin'
+      };
+    }
+
+    const isAdmin = isUserAdmin(u);
+    return {
+      'x-user-id':    String(u.id || u.email || 'user_anon'),
+      'x-user-email': String(u.email || 'admin@nexus.com').toLowerCase(),
+      'x-user-name':  String(u.name || u.username || 'admin').toLowerCase(),
+      'x-user-role':  isAdmin ? 'admin' : 'member'
+    };
+  } catch {
+    return {
+      'x-user-id': 'admin_master',
+      'x-user-email': 'admin@nexus.com',
+      'x-user-name': 'nexus admin',
+      'x-user-role': 'admin'
+    };
+  }
+};
+
+const fetchApi = async (endpoint, method = 'GET', body = null, overrideUser = null) => {
   const url = `${getBaseUrl()}${endpoint}`;
   const options = {
     method,
-    headers: { 'Content-Type': 'application/json' }
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(overrideUser)
+    }
   };
   if (body) options.body = JSON.stringify(body);
-  
+
   const response = await fetch(url, options);
-  if (!response.ok) throw new Error(`API_ERROR: ${response.status}`);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
   return await response.json();
 };
 
-// ── Projects (System-wide) ───────────────────────────────────────────────────
-export const getProjects = async (userId) => {
-  const local = getLocal('system_projects');
+// ── Projects Data Management ──────────────────────────────────────────────────
+// user param is optional — if passed, auth headers are taken from it directly
+// (useful when called from ProjectContext before localStorage is populated).
+export const getProjects = async (user = null) => {
+  const local = getLocal('system_projects', []);
   try {
-    const sql = userId ? 'SELECT * FROM projects WHERE user_id = $1 ORDER BY created_at DESC' : 'SELECT * FROM projects ORDER BY created_at DESC';
-    const params = userId ? [userId] : [];
-    const cloud = await query(sql, params);
-    if (cloud) {
-      const mapped = cloud.map(p => ({
-        ...p,
-        desc: p.description,
-        tech: typeof p.tech === 'string' ? JSON.parse(p.tech) : (p.tech || []),
-        team: typeof p.team === 'string' ? JSON.parse(p.team) : (p.team || []),
-        createdAt: p.created_at
+    const res = await fetchApi('/api/projects', 'GET', null, user);
+    // Server sends { success, projects, role } — support both 'projects' and 'data' keys
+    const projectsArray = res?.projects || res?.data;
+    if (res && res.success && Array.isArray(projectsArray)) {
+      const mapped = projectsArray.map(p => ({
+        id: p.id,
+        ownerId: p.owner_id || p.ownerId || 'user_anon',
+        ownerName: p.owner_name || p.ownerName || 'Member',
+        title: p.title || 'Untitled Project',
+        summary: p.summary || p.card_summary || p.cardSummary || '',
+        cardSummary: p.summary || p.card_summary || p.cardSummary || '',
+        description: p.description || p.desc || '',
+        desc: p.description || p.desc || '',
+        status: p.status || 'in_progress', // 'completed', 'in_progress', 'planning', 'archived'
+        priority: p.priority || 'medium',
+        domain: p.domain || 'Engineering',
+        thumbnail: p.thumbnail || '',
+        screenshots: safeJsonParse(p.screenshots, []),
+        documents: safeJsonParse(p.documents, []),
+        github: p.github || p.github_url || p.githubUrl || '',
+        githubUrl: p.github_url || p.github || '',
+        liveDemo: p.live_demo || p.live_demo_url || p.live || '',
+        liveDemoUrl: p.live_demo_url || p.live_demo || p.live || '',
+        live: p.live_demo || p.live || '',
+        techStack: safeJsonParse(p.tech_stack || p.techStack || p.tech, []),
+        tech: safeJsonParse(p.tech_stack || p.techStack || p.tech, []),
+        completion: Number(p.completion || p.completion_percentage) || 0,
+        completionPercentage: Number(p.completion_percentage || p.completion) || 0,
+        category: p.category || 'Advanced',
+        visibility: p.visibility || 'public',
+        teamMembers: parseTeamMembers(p.team_members || p.teamMembers || p.team),
+        team: parseTeamMembers(p.team_members || p.teamMembers || p.team),
+        role: p.role || 'Contributor',
+        startDate: p.start_date || p.startDate || '',
+        completionDate: p.completion_date || p.completionDate || '',
+        challenges: p.challenges || '',
+        futureImprovements: p.future_improvements || p.futureImprovements || '',
+        features: safeJsonParse(p.features, []),
+        architecture: p.architecture || '',
+        likes: Number(p.likes) || 0,
+        views: Number(p.views) || 0,
+        comments: safeJsonParse(p.comments, []),
+        createdAt: p.created_at || p.createdAt || new Date().toISOString(),
+        updatedAt: p.updated_at || p.updatedAt || new Date().toISOString(),
+        deletedAt: p.deleted_at || p.deletedAt || null
       }));
       setLocal('system_projects', mapped, true);
       return mapped;
     }
   } catch (err) {
-    console.warn("Using local projects fallback");
+    console.warn("Using local projects fallback:", err.message);
   }
-  return local;
+  return local.map(p => ({
+    ...p,
+    teamMembers: parseTeamMembers(p.team_members || p.teamMembers || p.team),
+    team: parseTeamMembers(p.team_members || p.teamMembers || p.team)
+  }));
 };
 
 export const addProject = async (p) => {
-  const id = crypto.randomUUID();
-  const newP = { ...p, id, created_at: new Date().toISOString() };
-  setLocal('system_projects', [...getLocal('system_projects'), newP]);
+  const id = p.id || `proj_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+  const now = new Date().toISOString();
+  const parsedTeam = parseTeamMembers(p.teamMembers || p.team || p.team_members);
 
-  await query(`
-    INSERT INTO projects (id, title, description, status, tech, github, live, team, color, user_id)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-  `, [id, p.title, p.desc, p.status, JSON.stringify(p.tech || []), p.github, p.live, JSON.stringify(p.team || []), p.color, p.userId || null]);
-  
+  const newP = {
+    ...p,
+    id,
+    ownerId: p.ownerId || 'user_anon',
+    ownerName: isNexusAdmin(p.ownerName || p.owner_name) ? '' : (p.ownerName || p.owner_name || ''),
+    title: p.title || 'Untitled Project',
+    teamMembers: parsedTeam,
+    team: parsedTeam,
+    createdAt: now,
+    updatedAt: now
+  };
+
+  // Optimistic local update
+  const currentLocal = getLocal('system_projects', []);
+  setLocal('system_projects', [newP, ...currentLocal]);
+
+  try {
+    await fetchApi('/api/projects', 'POST', {
+      ...newP,
+      teamMembers: parsedTeam,
+      team: parsedTeam
+    });
+    // Dispatch AFTER server confirms — prevents stale-data race
+    window.dispatchEvent(new Event('nexus-projects-updated'));
+    window.dispatchEvent(new Event('nexus-data-updated'));
+  } catch (err) {
+    console.warn('API add project warning:', err.message);
+    // Still dispatch so UI stays consistent with localStorage
+    window.dispatchEvent(new Event('nexus-projects-updated'));
+  }
+
   return newP;
 };
 
 export const updateProject = async (p) => {
-  setLocal('system_projects', getLocal('system_projects').map(item => item.id === p.id ? { ...item, ...p } : item));
-  await query(`
-    UPDATE projects 
-    SET title = $1, description = $2, status = $3, tech = $4, github = $5, live = $6, team = $7, color = $8, user_id = $9
-    WHERE id = $10
-  `, [p.title, p.desc, p.status, JSON.stringify(p.tech || []), p.github, p.live, JSON.stringify(p.team || []), p.color, p.userId || null, p.id]);
+  const now = new Date().toISOString();
+  const parsedTeam = p.teamMembers || p.team || p.team_members
+    ? parseTeamMembers(p.teamMembers || p.team || p.team_members)
+    : undefined;
+
+  // Optimistic local update
+  const currentLocal = getLocal('system_projects', []);
+  const updatedLocal = currentLocal.map(item =>
+    String(item.id) === String(p.id)
+      ? { ...item, ...p, ...(parsedTeam ? { teamMembers: parsedTeam, team: parsedTeam } : {}), updatedAt: now }
+      : item
+  );
+  setLocal('system_projects', updatedLocal);
+  try {
+    localStorage.setItem('nexus_projects_updated', String(Date.now()));
+  } catch (e) {}
+
+  try {
+    await fetchApi(`/api/projects/${p.id}`, 'PATCH', {
+      ...p,
+      ...(parsedTeam ? { teamMembers: parsedTeam, team: parsedTeam } : {})
+    });
+    try {
+      localStorage.setItem('nexus_projects_updated', String(Date.now()));
+    } catch (e) {}
+    window.dispatchEvent(new Event('nexus-projects-updated'));
+    window.dispatchEvent(new Event('nexus-data-updated'));
+  } catch (err) {
+    console.warn('API update project warning:', err.message);
+    throw err;
+  }
 };
 
-export const deleteProject = async (id) => {
-  setLocal('system_projects', getLocal('system_projects').filter(p => p.id !== id));
-  await query('DELETE FROM projects WHERE id = $1', [id]);
+
+export const getDeletedIds = () => {
+  try {
+    return new Set(JSON.parse(localStorage.getItem('nexus_deleted_project_ids') || '[]'));
+  } catch {
+    return new Set();
+  }
 };
+
+export const addDeletedId = (id, title = '') => {
+  try {
+    const ids = Array.from(getDeletedIds());
+    const normId = String(id || '').toLowerCase().trim();
+    if (normId && !ids.includes(normId)) ids.push(normId);
+
+    if (title) {
+      const rawTitle = String(title).toLowerCase().trim();
+      if (rawTitle && !ids.includes(rawTitle)) ids.push(rawTitle);
+      const normTitle = rawTitle.replace(/[^a-z0-9]/g, '');
+      if (normTitle && !ids.includes(normTitle)) ids.push(normTitle);
+    }
+
+    localStorage.setItem('nexus_deleted_project_ids', JSON.stringify(ids));
+  } catch (e) {}
+};
+
+export const logProjectAction = async (action, projectId, details = '') => {
+  try {
+    const logs = getLocal('audit_logs', []);
+    const newLog = {
+      id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+      action,
+      projectId,
+      details,
+      timestamp: new Date().toISOString()
+    };
+    setLocal('audit_logs', [newLog, ...logs].slice(0, 200), true);
+    await fetchApi('/api/audit-logs', 'POST', { action, projectId, details });
+  } catch (e) {}
+};
+
+export const deleteProject = async (id, isHardDelete = false, projectTitle = '') => {
+  const normId = String(id || '').toLowerCase().trim();
+  addDeletedId(normId, projectTitle);
+
+  // Optimistic local update
+  const currentLocal = getLocal('system_projects', []);
+  const target = currentLocal.find(p => String(p.id).toLowerCase().trim() === normId);
+  if (target && target.title) {
+    addDeletedId(normId, target.title);
+  }
+
+  setLocal('system_projects', currentLocal.filter(p => {
+    const pId = String(p.id || '').toLowerCase().trim();
+    const pTitle = String(p.title || '').toLowerCase().trim();
+    return pId !== normId && pTitle !== String(projectTitle).toLowerCase().trim();
+  }));
+
+  logProjectAction('DELETE_PROJECT', id, `Project ${id} deleted`);
+
+  try {
+    await fetchApi(`/api/projects/${id}?hard=true`, 'DELETE');
+  } catch (err) {
+    console.warn('API delete project warning:', err.message);
+  } finally {
+    try {
+      localStorage.setItem('nexus_projects_updated', String(Date.now()));
+    } catch (e) {}
+    window.dispatchEvent(new Event('nexus-projects-updated'));
+    window.dispatchEvent(new Event('nexus-data-updated'));
+  }
+};
+
+export const archiveProject = async (id, isArchived = true) => {
+  const newStatus = isArchived ? 'archived' : 'in_progress';
+  // Optimistic local update
+  const currentLocal = getLocal('system_projects', []);
+  const updatedLocal = currentLocal.map(p =>
+    String(p.id) === String(id) ? { ...p, status: newStatus, updatedAt: new Date().toISOString() } : p
+  );
+  setLocal('system_projects', updatedLocal);
+  logProjectAction(isArchived ? 'ARCHIVE_PROJECT' : 'UNARCHIVE_PROJECT', id, `Status set to ${newStatus}`);
+
+  try {
+    await fetchApi(`/api/projects/${id}`, 'PATCH', { status: newStatus });
+    // Dispatch AFTER server confirms
+    window.dispatchEvent(new Event('nexus-projects-updated'));
+    window.dispatchEvent(new Event('nexus-data-updated'));
+  } catch (err) {
+    console.warn('API archive project warning:', err.message);
+    window.dispatchEvent(new Event('nexus-projects-updated'));
+  }
+};
+
 
 // ── Assessments ───────────────────────────────────────────────────────────────
 export const DEFAULT_ASSESSMENTS = [
@@ -723,8 +944,37 @@ export const getHomeContent = async () => {
 export const saveHomeContent = async (content) => {
   setLocal('home_content', content);
   localStorage.setItem('nexus_home_content', JSON.stringify(content));
+
+  // Sync to stat_cards as well
+  try {
+    const rawStat = localStorage.getItem('nexus_stat_cards');
+    let statMap = rawStat ? JSON.parse(rawStat) : { ...DEFAULT_STAT_CARDS };
+    if (content.hero) {
+      if (content.hero.badge1Number && statMap['home_hero_active_students']) statMap['home_hero_active_students'].value = content.hero.badge1Number;
+      if (content.hero.badge1Label && statMap['home_hero_active_students']) statMap['home_hero_active_students'].label = content.hero.badge1Label;
+      if (content.hero.badge2Number && statMap['home_hero_expert_mentors']) statMap['home_hero_expert_mentors'].value = content.hero.badge2Number;
+      if (content.hero.badge2Label && statMap['home_hero_expert_mentors']) statMap['home_hero_expert_mentors'].label = content.hero.badge2Label;
+    }
+    if (Array.isArray(content.stats)) {
+      const keys = ['home_row_domains', 'home_row_projects', 'home_row_events', 'home_row_possibilities'];
+      content.stats.forEach((st, i) => {
+        if (keys[i] && statMap[keys[i]]) {
+          if (st.value) statMap[keys[i]].value = st.value;
+          if (st.label) statMap[keys[i]].label = st.label;
+        }
+      });
+    }
+    setLocal('stat_cards', statMap, true);
+    localStorage.setItem('nexus_stat_cards', JSON.stringify(statMap));
+  } catch (e) {}
+
   window.dispatchEvent(new Event('nexus-data-updated'));
-  window.dispatchEvent(new StorageEvent('storage', { key: 'nexus_home_content', newValue: JSON.stringify(content) }));
+  window.dispatchEvent(new Event('nexus-stat-cards-updated'));
+  try {
+    window.dispatchEvent(new StorageEvent('storage', { key: 'nexus_home_content', newValue: JSON.stringify(content) }));
+    window.dispatchEvent(new StorageEvent('storage', { key: 'nexus_stat_cards', newValue: localStorage.getItem('nexus_stat_cards') }));
+  } catch (e) {}
+
   try {
     await query(`
       INSERT INTO site_content (key, data, updated_at)
@@ -990,7 +1240,6 @@ export const updateDSASolution = async (id, updates) => {
 export const deleteDSASolution = async (id) => {
   const all = getLocal('dsa_solutions', []);
   const target = all.find(s => s.id === id);
-  // Record penalty for streak calculation
   if (target) {
     const keys = [target.memberId, target.memberEmail].filter(Boolean);
     keys.forEach(k => {
@@ -1006,5 +1255,167 @@ export const deleteDSASolution = async (id) => {
     await query('DELETE FROM dsa_solutions WHERE id=$1', [id]);
   } catch (err) { console.warn('DSA solution delete DB fallback:', err.message); }
 };
+
+export const getRegisteredUsers = async () => {
+  const local = getLocal('users', []);
+  try {
+    const cloud = await query('SELECT id, name, email, role, status FROM profiles ORDER BY name ASC');
+    if (cloud && cloud.length > 0) {
+      setLocal('users', cloud, true);
+      return cloud;
+    }
+  } catch (err) {
+    console.warn("Using local users fallback", err.message);
+  }
+  return local;
+};
+
+// ── Stat Cards Management (Admin → All Website Pages) ──────────────────────────
+export const DEFAULT_STAT_CARDS = {
+  'home_hero_active_students': { card_key: 'home_hero_active_students', value: '10K+', label: 'Active Students', page: 'Home', category: 'Hero Badges', order_index: 1 },
+  'home_hero_expert_mentors': { card_key: 'home_hero_expert_mentors', value: '200+', label: 'Expert Mentors', page: 'Home', category: 'Hero Badges', order_index: 2 },
+  'home_row_domains': { card_key: 'home_row_domains', value: '50+', label: 'Domains', page: 'Home', category: 'Hero Stats Row', order_index: 3 },
+  'home_row_projects': { card_key: 'home_row_projects', value: '1K+', label: 'Projects Published', page: 'Home', category: 'Hero Stats Row', order_index: 4 },
+  'home_row_events': { card_key: 'home_row_events', value: '100+', label: 'Events Organized', page: 'Home', category: 'Hero Stats Row', order_index: 5 },
+  'home_row_possibilities': { card_key: 'home_row_possibilities', value: '∞', label: 'Possibilities', page: 'Home', category: 'Hero Stats Row', order_index: 6 },
+
+  'mentor_batch_title': { card_key: 'mentor_batch_title', value: 'Batch: 1', label: 'Batch Title', page: 'Mentorship', category: 'Batch Info', order_index: 1 },
+  'mentor_batch_dates': { card_key: 'mentor_batch_dates', value: 'November 2025 - January 2026', label: 'Batch Dates', page: 'Mentorship', category: 'Batch Info', order_index: 2 },
+  'mentor_stat_events_registered': { card_key: 'mentor_stat_events_registered', value: '150+', label: 'Members Registered for Events', page: 'Mentorship', category: 'Membership Stats', order_index: 3 },
+  'mentor_stat_spot_registrations': { card_key: 'mentor_stat_spot_registrations', value: '80+', label: 'Spot Registrations', page: 'Mentorship', category: 'Membership Stats', order_index: 4 },
+  'mentor_stat_events_attended': { card_key: 'mentor_stat_events_attended', value: '200+', label: 'Members Attended Events', page: 'Mentorship', category: 'Membership Stats', order_index: 5 },
+  'mentor_stat_mentorship_registered': { card_key: 'mentor_stat_mentorship_registered', value: '80+', label: 'Members Registered for Mentorship', page: 'Mentorship', category: 'Membership Stats', order_index: 6 },
+
+  'event_karmasiddhi_registered': { card_key: 'event_karmasiddhi_registered', value: '120 Members', label: 'REGISTERED', page: 'Events', category: 'Karmasiddhi Event', order_index: 1 },
+  'event_karmasiddhi_attended': { card_key: 'event_karmasiddhi_attended', value: '100 Members', label: 'ATTENDED', page: 'Events', category: 'Karmasiddhi Event', order_index: 2 },
+  'event_karmasiddhi_duration': { card_key: 'event_karmasiddhi_duration', value: '10:00 AM - 12:00 PM', label: 'DURATION', page: 'Events', category: 'Karmasiddhi Event', order_index: 3 },
+  'event_ainexus_registered': { card_key: 'event_ainexus_registered', value: '110 Members', label: 'REGISTERED', page: 'Events', category: 'AI Nexus Event', order_index: 4 },
+  'event_ainexus_attended': { card_key: 'event_ainexus_attended', value: '100 Members', label: 'ATTENDED', page: 'Events', category: 'AI Nexus Event', order_index: 5 },
+  'event_ainexus_duration': { card_key: 'event_ainexus_duration', value: 'Full Day Event', label: 'DURATION', page: 'Events', category: 'AI Nexus Event', order_index: 6 },
+
+  'dash_active_members': { card_key: 'dash_active_members', value: '100+', label: 'Active Members', page: 'Dashboard', category: 'Hub Metrics', order_index: 1 },
+  'dash_projects_done': { card_key: 'dash_projects_done', value: '50+', label: 'Projects Done', page: 'Dashboard', category: 'Hub Metrics', order_index: 2 },
+  'dash_tech_domains': { card_key: 'dash_tech_domains', value: '10+', label: 'Tech Domains', page: 'Dashboard', category: 'Hub Metrics', order_index: 3 }
+};
+
+export const getStatCards = async () => {
+  const local = getLocal('stat_cards', DEFAULT_STAT_CARDS);
+  try {
+    const cloud = await query('SELECT card_key, page, category, label, value, subtext, icon, order_index FROM site_stat_cards ORDER BY order_index ASC');
+    if (cloud && Array.isArray(cloud) && cloud.length > 0) {
+      const cardsMap = { ...DEFAULT_STAT_CARDS };
+      cloud.forEach(r => {
+        cardsMap[r.card_key] = {
+          card_key: r.card_key,
+          page: r.page,
+          category: r.category,
+          label: r.label,
+          value: r.value,
+          subtext: r.subtext || '',
+          icon: r.icon || '',
+          order_index: r.order_index || 0
+        };
+      });
+      setLocal('stat_cards', cardsMap, true);
+      localStorage.setItem('nexus_stat_cards', JSON.stringify(cardsMap));
+      return cardsMap;
+    }
+  } catch (err) {
+    console.warn('Using local stat cards fallback:', err.message);
+  }
+
+  try {
+    const res = await fetchApi('/api/stat-cards', 'GET');
+    if (res && res.success && res.cards) {
+      setLocal('stat_cards', res.cards, true);
+      localStorage.setItem('nexus_stat_cards', JSON.stringify(res.cards));
+      return res.cards;
+    }
+  } catch (err) {}
+
+  return local;
+};
+
+export const saveStatCards = async (cardsMap) => {
+  setLocal('stat_cards', cardsMap);
+  localStorage.setItem('nexus_stat_cards', JSON.stringify(cardsMap));
+
+  // Sync to home content as well so home.js stays in sync
+  try {
+    const rawHome = localStorage.getItem('nexus_home_content') || localStorage.getItem('nexus_home_data');
+    let homeObj = rawHome ? JSON.parse(rawHome) : { ...DEFAULT_HOME_CONTENT };
+    if (!homeObj.hero) homeObj.hero = {};
+    if (cardsMap['home_hero_active_students']) {
+      homeObj.hero.badge1Number = cardsMap['home_hero_active_students'].value;
+      if (cardsMap['home_hero_active_students'].label) homeObj.hero.badge1Label = cardsMap['home_hero_active_students'].label;
+    }
+    if (cardsMap['home_hero_expert_mentors']) {
+      homeObj.hero.badge2Number = cardsMap['home_hero_expert_mentors'].value;
+      if (cardsMap['home_hero_expert_mentors'].label) homeObj.hero.badge2Label = cardsMap['home_hero_expert_mentors'].label;
+    }
+
+    if (!Array.isArray(homeObj.stats)) homeObj.stats = [];
+    const statKeys = ['home_row_domains', 'home_row_projects', 'home_row_events', 'home_row_possibilities'];
+    statKeys.forEach((key, idx) => {
+      if (cardsMap[key]) {
+        if (!homeObj.stats[idx]) homeObj.stats[idx] = {};
+        homeObj.stats[idx].value = cardsMap[key].value;
+        if (cardsMap[key].label) homeObj.stats[idx].label = cardsMap[key].label;
+      }
+    });
+
+    setLocal('home_content', homeObj, true);
+    localStorage.setItem('nexus_home_content', JSON.stringify(homeObj));
+  } catch (e) {}
+
+  // Direct Neon DB sync
+  try {
+    await query(`
+      CREATE TABLE IF NOT EXISTS site_stat_cards (
+          card_key TEXT PRIMARY KEY,
+          page TEXT NOT NULL,
+          category TEXT,
+          label TEXT NOT NULL,
+          value TEXT NOT NULL,
+          subtext TEXT,
+          icon TEXT,
+          order_index INT DEFAULT 0,
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    for (const [key, card] of Object.entries(cardsMap)) {
+      await query(`
+        INSERT INTO site_stat_cards (card_key, page, category, label, value, subtext, icon, order_index, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+        ON CONFLICT (card_key) DO UPDATE SET
+            label = EXCLUDED.label,
+            value = EXCLUDED.value,
+            subtext = EXCLUDED.subtext,
+            page = EXCLUDED.page,
+            category = EXCLUDED.category,
+            icon = EXCLUDED.icon,
+            order_index = EXCLUDED.order_index,
+            updated_at = NOW()
+      `, [key, card.page || 'General', card.category || '', card.label || '', card.value || '', card.subtext || '', card.icon || '', card.order_index || 0]);
+    }
+  } catch (err) {
+    console.warn('Stat cards direct DB sync warning:', err.message);
+  }
+
+  try {
+    await fetchApi('/api/stat-cards', 'PUT', { cards: cardsMap });
+  } catch (err) {}
+
+  window.dispatchEvent(new Event('nexus-stat-cards-updated'));
+  window.dispatchEvent(new Event('nexus-data-updated'));
+  try {
+    window.dispatchEvent(new StorageEvent('storage', { key: 'nexus_stat_cards', newValue: JSON.stringify(cardsMap) }));
+  } catch (e) {}
+
+  return cardsMap;
+};
+
+
 
 

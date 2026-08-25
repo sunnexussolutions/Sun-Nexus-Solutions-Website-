@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { AuthProvider } from './contexts/AuthContext'
+import { ProjectProvider } from './contexts/ProjectContext'
 import App from './App'
 import ErrorBoundary from './components/ErrorBoundary'
 import { StatusBar, Style } from '@capacitor/status-bar'
@@ -23,7 +24,9 @@ createRoot(document.getElementById('root')).render(
     <ErrorBoundary>
       <ThemeProvider>
         <AuthProvider>
-          <App />
+          <ProjectProvider>
+            <App />
+          </ProjectProvider>
         </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>

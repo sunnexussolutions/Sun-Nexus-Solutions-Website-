@@ -35,7 +35,31 @@
         <li><a href="project.html">Projects</a></li>
         <li><a href="events.html">Events</a></li>
         <li><a href="mentor-ship.html">Mentorship</a></li>
-        <li><a href="contact.html">Contact</a></li>
+        <li class="nav-dropdown">
+          <a href="contact.html" class="dropdown-toggle">
+            Contact Us <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="contact.html">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <span>Contact Form</span>
+              </a>
+            </li>
+            <li>
+              <a href="joining.html">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                <span>Joining Form</span>
+              </a>
+            </li>
+            <li>
+              <a href="requirements.html">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Requirements Form</span>
+              </a>
+            </li>
+          </ul>
+        </li>
       </ul>
 
       <div class="nav-actions">
@@ -185,8 +209,8 @@
                     <div class="stat-item">
                         <div class="stat-icon icon-purple">🕒</div>
                         <div class="stat-info">
-                            <span class="stat-label stat-label-purple">DURATION</span>
-                            <span class="stat-val">10:00 AM - 12:00 PM</span>
+                            <span class="stat-label stat-label-purple" data-stat-label-key="event_karmasiddhi_duration">DURATION</span>
+                            <span class="stat-val" data-stat-key="event_karmasiddhi_duration">10:00 AM - 12:00 PM</span>
                         </div>
                     </div>
                 </div>
@@ -195,15 +219,15 @@
                     <div class="stat-item">
                         <div class="stat-icon icon-orange">👥</div>
                         <div class="stat-info">
-                            <span class="stat-label stat-label-blue">REGISTERED</span>
-                            <span class="stat-val">120 Members</span>
+                            <span class="stat-label stat-label-blue" data-stat-label-key="event_karmasiddhi_registered">REGISTERED</span>
+                            <span class="stat-val" data-stat-key="event_karmasiddhi_registered">120 Members</span>
                         </div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-icon icon-pink">👤<span class="sub-check">✔</span></div>
                         <div class="stat-info">
-                            <span class="stat-label stat-label-pink">ATTENDED</span>
-                            <span class="stat-val">100 Members</span>
+                            <span class="stat-label stat-label-pink" data-stat-label-key="event_karmasiddhi_attended">ATTENDED</span>
+                            <span class="stat-val" data-stat-key="event_karmasiddhi_attended">100 Members</span>
                         </div>
                     </div>
                 </div>
@@ -290,8 +314,8 @@
                     <div class="stat-item">
                         <div class="stat-icon icon-purple">🕒</div>
                         <div class="stat-info">
-                            <span class="stat-label stat-label-purple">DURATION</span>
-                            <span class="stat-val">Full Day Event</span>
+                            <span class="stat-label stat-label-purple" data-stat-label-key="event_ainexus_duration">DURATION</span>
+                            <span class="stat-val" data-stat-key="event_ainexus_duration">Full Day Event</span>
                         </div>
                     </div>
                 </div>
@@ -300,15 +324,15 @@
                     <div class="stat-item">
                         <div class="stat-icon icon-orange">👥</div>
                         <div class="stat-info">
-                            <span class="stat-label stat-label-blue">REGISTERED</span>
-                            <span class="stat-val">110 Members</span>
+                            <span class="stat-label stat-label-blue" data-stat-label-key="event_ainexus_registered">REGISTERED</span>
+                            <span class="stat-val" data-stat-key="event_ainexus_registered">110 Members</span>
                         </div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-icon icon-pink">👤<span class="sub-check">✔</span></div>
                         <div class="stat-info">
-                            <span class="stat-label stat-label-pink">ATTENDED</span>
-                            <span class="stat-val">100 Members</span>
+                            <span class="stat-label stat-label-pink" data-stat-label-key="event_ainexus_attended">ATTENDED</span>
+                            <span class="stat-val" data-stat-key="event_ainexus_attended">100 Members</span>
                         </div>
                     </div>
                 </div>
@@ -343,8 +367,7 @@
     </script>
   </main>
   
-  <!-- Join Nexus CTA -->
-  <!-- Ready to Forge the Future CTA Section -->
+  <!-- Ready to Forge the Future CTA Section (Commented Out)
   <section class="nexus-cta-section">
     <div class="nexus-cta-card">
       <div class="cta-content">
@@ -371,6 +394,7 @@
       </div>
     </div>
   </section>
+  -->
 
   <footer class="footer">
     <div class="footer-grid">
@@ -444,6 +468,7 @@
     </div>
   </footer>
 
+    <script src="js/stat-cards.js"></script>
     <script src="js/nav-active.js"></script>
 </body>
 </html>

@@ -121,14 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (content.hero.joinBtnLink) joinBtn.setAttribute('href', content.hero.joinBtnLink);
             }
 
-            const badges = document.querySelectorAll('.hero-badge-card');
-            if (badges.length >= 2) {
-                if (content.hero.badge1Number) badges[0].querySelector('.badge-number').textContent = content.hero.badge1Number;
-                if (content.hero.badge1Label) badges[0].querySelector('.badge-label').textContent = content.hero.badge1Label;
-                if (content.hero.badge2Number) badges[1].querySelector('.badge-number').textContent = content.hero.badge2Number;
-                if (content.hero.badge2Label) badges[1].querySelector('.badge-label').textContent = content.hero.badge2Label;
-            }
-
             const heroCard = document.querySelector('.hero-image-card');
             if (heroCard) {
                 const images = Array.isArray(content.hero.carouselImages) && content.hero.carouselImages.length > 0 
@@ -158,19 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 initHeroCarousel();
             }
-        }
-
-        // Stats Row
-        if (Array.isArray(content.stats)) {
-            const statCards = document.querySelectorAll('.hero-stats-row .stat-grid-card');
-            content.stats.forEach((stat, idx) => {
-                if (statCards[idx]) {
-                    const valEl = statCards[idx].querySelector('.stat-val');
-                    const lblEl = statCards[idx].querySelector('.stat-lbl');
-                    if (valEl && stat.value) valEl.textContent = stat.value;
-                    if (lblEl && stat.label) lblEl.textContent = stat.label;
-                }
-            });
         }
 
         // Core Values
@@ -240,6 +219,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const wSub = document.querySelector('.why-subtext');
             if (wSub && content.whyNexus.subtext) wSub.textContent = content.whyNexus.subtext;
+        }
+
+        // Re-apply stat cards manager overrides to prevent overwriting
+        if (window.NexusStatCards && typeof window.NexusStatCards.load === 'function') {
+            window.NexusStatCards.load();
         }
     };
 
