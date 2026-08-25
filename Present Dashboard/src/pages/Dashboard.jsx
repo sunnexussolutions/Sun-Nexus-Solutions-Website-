@@ -3,9 +3,11 @@ import { motion } from 'framer-motion';
 import { 
   Trophy, Flame, Target, Zap, TrendingUp, Activity,
   ArrowUpRight, Award, Clock, Calendar, Star, BrainCircuit,
-  BarChart3, MessageSquare, ChevronDown, ArrowRight, CheckCircle, ShieldAlert, Sparkles
+  BarChart3, MessageSquare, ChevronDown, ArrowRight, CheckCircle, ShieldAlert, Sparkles,
+  Rocket, Layers
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useProjects } from '../contexts/ProjectContext';
 import { getResults } from '../store/dataStore';
 import { UserPerformanceGraph } from '../components/AnalyticsCharts';
 import { prepareUserChartData, calculateUserStats } from '../utils/analytics';
@@ -80,6 +82,7 @@ const clampNumber = (min, max) => `clamp(${min}px, 2vw + ${min}px, ${max}px)`;
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { projectStats, myProjects } = useProjects();
   const [results, setResults] = React.useState([]);
 
   // Dynamically resolve user's true first name across all profile variants
@@ -178,6 +181,54 @@ const Dashboard = () => {
   const recentAssms = [...results]
     .sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))
     .slice(0, 4);
+
+  // Unified recent activity: project events + aptitude results, sorted by date
+  const recentActivity = useMemo(() => {
+    const items = [];
+
+    // Project events from centralized context
+    (myProjects || []).forEach(p => {
+      const ts = p.updatedAt || p.createdAt;
+      if (!ts) return;
+      const statusLabel =
+        p.status === 'completed' ? '🎯 Project Completed' :
+        p.status === 'planning'  ? '📋 Project Planning' :
+        '🚀 Project Active';
+      const statusColor =
+        p.status === 'completed' ? '#22c55e' :
+        p.status === 'planning'  ? '#f59e0b' :
+        '#6366f1';
+      const statusBg =
+        p.status === 'completed' ? 'rgba(34,197,94,0.12)' :
+        p.status === 'planning'  ? 'rgba(245,158,11,0.12)' :
+        'rgba(99,102,241,0.12)';
+      const completion = Number(p.completion || p.completionPercentage) || 0;
+      items.push({
+        _type: 'project',
+        id: `proj-${p.id}`,
+        title: statusLabel,
+        topic: p.title || 'Untitled Project',
+        category: p.domain || p.category || 'Project',
+        submittedAt: ts,
+        percentage: completion,
+        scoreColor: statusColor,
+        scoreBg: statusBg,
+        scoreBorder: statusColor.replace(')', ', 0.35)').replace('rgb', 'rgba').replace('#', 'rgba(').replace('rgba(', 'rgba(').replace(statusColor, statusColor),
+        label: p.status === 'completed' ? 'DONE' : p.status === 'planning' ? 'PLAN' : 'WIP'
+      });
+    });
+
+    // Aptitude results
+    (results || []).forEach(r => {
+      items.push({ _type: 'aptitude', ...r, id: r.id || `apt-${Math.random()}` });
+    });
+
+    // Sort by date descending, take top 5
+    return items
+      .sort((a, b) => new Date(b.submittedAt || b.submitted_at || 0) - new Date(a.submittedAt || a.submitted_at || 0))
+      .slice(0, 5);
+  }, [myProjects, results]);
+
 
   return (
     <div
@@ -565,6 +616,8 @@ const Dashboard = () => {
           <StatCard icon={TrendingUp} label="Avg Accuracy" value={`${stats.avg}%`} color="#10b981" glowColor="#10b981" delay={0.2} />
           <StatCard icon={Target} label="Assessments" value={stats.count} color="#3b82f6" glowColor="#3b82f6" delay={0.3} />
           <StatCard icon={Award} label="Best Score" value={`${stats.best}%`} color="#f97316" glowColor="#f97316" delay={0.4} />
+          <StatCard icon={Rocket} label="System Projects" value={projectStats.total} color="#6366f1" glowColor="#6366f1" delay={0.5} />
+          <StatCard icon={Layers} label="My Projects" value={myProjects.length} color="#06b6d4" glowColor="#06b6d4" delay={0.6} />
         </div>
       </div>
 
@@ -884,7 +937,7 @@ const Dashboard = () => {
             </div>
 
             <div className="flex-1 flex flex-col" style={{ marginTop: '16px' }}>
-              {recentAssms.length === 0 ? (
+              {recentActivity.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center gap-4">
                   <div
                     className="flex items-center justify-center"
@@ -904,7 +957,91 @@ const Dashboard = () => {
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
-                  {recentAssms.map((res, i) => {
+                  {recentActivity.map((res, i) => {
+                    // Project-type row
+                    if (res._type === 'project') {
+                      const scoreColor  = res.scoreColor  || '#6366f1';
+                      const scoreBg     = res.scoreBg     || 'rgba(99,102,241,0.12)';
+                      const scoreBorder = res.scoreBorder || 'rgba(99,102,241,0.35)';
+                      const dateStr = res.submittedAt
+                        ? new Date(res.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                        : '—';
+
+                      return (
+                        <div
+                          key={res.id || i}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: '12px 16px',
+                            borderRadius: '16px',
+                            background: 'var(--item-row-bg, rgba(255,255,255,0.025))',
+                            border: '1px solid var(--card-border, rgba(255,255,255,0.07))',
+                            transition: 'all 0.22s ease',
+                            cursor: 'default',
+                          }}
+                          onMouseEnter={e => {
+                            e.currentTarget.style.background = scoreBg;
+                            e.currentTarget.style.borderColor = scoreBorder;
+                            e.currentTarget.style.boxShadow = `0 4px 18px ${scoreColor}22`;
+                          }}
+                          onMouseLeave={e => {
+                            e.currentTarget.style.background = 'var(--item-row-bg, rgba(255,255,255,0.025))';
+                            e.currentTarget.style.borderColor = 'var(--card-border, rgba(255,255,255,0.07))';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                            <div style={{
+                              width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0,
+                              background: scoreBg,
+                              border: `1.5px solid ${scoreBorder}`,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                              <Rocket size={16} style={{ color: scoreColor }} strokeWidth={2.5} />
+                            </div>
+                            <div style={{ minWidth: 0 }}>
+                              <p style={{
+                                fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)',
+                                margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                                maxWidth: '140px'
+                              }}>
+                                {res.topic}
+                              </p>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
+                                <span style={{
+                                  fontSize: '9px', fontWeight: 800, textTransform: 'uppercase',
+                                  letterSpacing: '0.07em', color: scoreColor,
+                                  background: scoreBg, border: `1px solid ${scoreBorder}`,
+                                  padding: '1px 6px', borderRadius: '4px',
+                                }}>
+                                  {res.category}
+                                </span>
+                                <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-muted, #64748b)' }}>
+                                  {dateStr}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                            <div style={{
+                              display: 'flex', flexDirection: 'column', alignItems: 'center',
+                              padding: '5px 12px', borderRadius: '10px',
+                              background: scoreBg, border: `1.5px solid ${scoreBorder}`,
+                              boxShadow: `0 2px 10px ${scoreColor}22`,
+                            }}>
+                              <span style={{ fontSize: '14px', fontWeight: 900, color: scoreColor, lineHeight: 1 }}>
+                                {res.percentage}%
+                              </span>
+                              <span style={{ fontSize: '8px', fontWeight: 800, color: scoreColor, letterSpacing: '0.08em', opacity: 0.8, marginTop: '2px' }}>
+                                {res.label}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // Aptitude-type row (original style)
                     const pct = res.percentage ?? 0;
                     const isPassing = pct >= 80;
                     const isMid = pct >= 60 && pct < 80;
@@ -919,7 +1056,7 @@ const Dashboard = () => {
 
                     return (
                       <div
-                        key={i}
+                        key={res.id || i}
                         style={{
                           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                           padding: '12px 16px',
@@ -1001,6 +1138,7 @@ const Dashboard = () => {
                   })}
                 </div>
               )}
+
             </div>
             </motion.div>
         </div>

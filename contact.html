@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact — Sun Nexus Solutions</title>
+  <title>Contact Us — Sun Nexus Solutions</title>
 
   <!-- External Resources -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- Core Theme -->
   <link rel="stylesheet" href="css/nexus-theme.css" />
@@ -17,9 +17,6 @@
   <script src="Nexus Dashboard Anti/assets/js/theme-engine.js"></script>
 
   <style>
-    /* ══════════════════════════════════════════════════════════════
-       HERO SECTION WITH FLOATING BADGES & DIVIDER
-       ══════════════════════════════════════════════════════════════ */
     .contact-hero {
       padding: 140px 20px 60px;
       text-align: center;
@@ -64,30 +61,22 @@
       position: relative;
       z-index: 2;
     }
-
-    /* Floating Glowing Circle Icons in Hero */
     .hero-float-badge {
       position: absolute;
-      width: 60px;
-      height: 60px;
+      width: 60px; height: 60px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.2rem;
-      color: #fff !important;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; color: #fff !important;
       z-index: 3;
       animation: floatBadge 6s ease-in-out infinite;
     }
     .badge-left {
-      top: 55%;
-      left: 10%;
+      top: 55%; left: 10%;
       background: linear-gradient(135deg, #00f2fe, #0284c7);
       box-shadow: 0 0 30px rgba(0, 242, 254, 0.4), 0 10px 25px rgba(0, 0, 0, 0.3);
     }
     .badge-right {
-      top: 65%;
-      right: 10%;
+      top: 65%; right: 10%;
       background: linear-gradient(135deg, #38bdf8, #0284c7);
       box-shadow: 0 0 30px rgba(56, 189, 248, 0.4), 0 10px 25px rgba(0, 0, 0, 0.3);
       animation-delay: -3s;
@@ -96,431 +85,107 @@
       0%, 100% { transform: translateY(0) rotate(0deg); }
       50% { transform: translateY(-14px) rotate(6deg); }
     }
-
-    /* ══════════════════════════════════════════════════════════════
-       MAIN CONTACT GRID (FORM CARD & MAP CARD)
-       ══════════════════════════════════════════════════════════════ */
     .contact-container {
-      max-width: 1200px;
-      margin: 40px auto 60px;
-      padding: 0 20px;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 60px 20px 80px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1.35fr 0.85fr;
       gap: 40px;
-      position: relative;
-      z-index: 2;
     }
-    .contact-form-card,
-    .contact-map-card {
+    .contact-form-card, .contact-map-card {
       background: var(--bg-card);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      border-radius: var(--radius-xl);
-      padding: 44px;
-      box-shadow: var(--shadow-lg);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid var(--border-color);
+      border-radius: 28px;
+      padding: 40px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
     }
-    .contact-form-card {
-      border: 1.5px solid rgba(0, 242, 254, 0.28);
-      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 242, 254, 0.12);
-    }
-    .contact-map-card {
-      border: 1.5px solid rgba(168, 85, 247, 0.28);
-      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(168, 85, 247, 0.12);
-      height: 100%;
-    }
-    [data-theme="light"] .contact-form-card {
-      background: #ffffff !important;
-      border: 1.5px solid rgba(2, 132, 199, 0.35) !important;
-      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08), 0 0 25px rgba(2, 132, 199, 0.1) !important;
-    }
-    [data-theme="light"] .contact-map-card {
-      background: #ffffff !important;
-      border: 1.5px solid rgba(168, 85, 247, 0.35) !important;
-      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08), 0 0 25px rgba(168, 85, 247, 0.1) !important;
-    }
-
-    /* Form Rows with Icon Boxes matching reference */
     .form-row-nexus {
       display: flex;
+      align-items: flex-start;
       gap: 16px;
-      align-items: center;
       margin-bottom: 22px;
     }
     .field-icon-box {
-      width: 50px;
-      height: 50px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.7rem;
-      color: #00f2fe;
+      width: 50px; height: 50px;
+      border-radius: 14px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent-primary);
       flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      margin-top: 26px;
     }
-    [data-theme="light"] .field-icon-box {
-      background: #f1f5f9;
-      border: 1.5px solid rgba(2, 132, 199, 0.3);
-      color: #0284c7;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-    }
-    .field-input-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
+    .field-icon-box.icon-top { margin-top: 0; }
+    .field-input-col { flex: 1; }
     .field-input-col label {
       display: block;
       font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--text-secondary);
+      font-weight: 700;
+      color: var(--text-primary);
       margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
     }
     .form-control-nexus {
       width: 100%;
-      background-color: var(--bg-secondary) !important;
-      border: 1px solid var(--border-color) !important;
-      border-radius: var(--radius-md);
-      padding: 14px 18px;
-      color: var(--text-primary) !important;
-      font-size: 1.55rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 18px;
+      color: var(--text-primary);
+      font-size: 1.35rem;
       outline: none;
-      transition: all 0.3s;
+      transition: all 0.3s ease;
     }
-    [data-theme="light"] .form-control-nexus {
-      background-color: #f8fafc !important;
-      border-color: #cbd5e1 !important;
-      color: #0f172a !important;
+    textarea.form-control-nexus {
+      resize: vertical;
+      min-height: 120px;
     }
     .form-control-nexus:focus {
-      border-color: #00f2fe !important;
-      box-shadow: 0 0 18px rgba(0, 242, 254, 0.25) !important;
+      border-color: #00f2fe;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
     }
-    [data-theme="light"] .form-control-nexus:focus {
-      border-color: #0284c7 !important;
-      box-shadow: 0 0 18px rgba(2, 132, 199, 0.2) !important;
-    }
-    select.form-control-nexus {
-      padding-right: 42px !important;
-      appearance: none !important;
-      -webkit-appearance: none !important;
-      -moz-appearance: none !important;
-      cursor: pointer !important;
-      background: var(--bg-secondary) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%2300f2fe' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 14px center / 18px 18px !important;
-      background-color: var(--bg-secondary) !important;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%2300f2fe' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-      background-repeat: no-repeat !important;
-      background-position: right 14px center !important;
-      background-size: 18px 18px !important;
-    }
-    [data-theme="light"] select.form-control-nexus {
-      background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%230284c7' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 14px center / 18px 18px !important;
-      background-color: #f8fafc !important;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%230284c7' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-      background-repeat: no-repeat !important;
-      background-position: right 14px center !important;
-      background-size: 18px 18px !important;
-    }
-    .form-control-nexus option {
-      background-color: #0f172a !important;
-      color: #ffffff !important;
-      padding: 12px;
-    }
-    [data-theme="light"] .form-control-nexus option {
-      background-color: #ffffff !important;
-      color: #0f172a !important;
-    }
-
-    /* Submit Button Pill Gradient */
     .btn-nexus-contact {
       width: 100%;
-      margin-top: 14px;
-      background: linear-gradient(90deg, #6366f1, #00f2fe);
-      color: #ffffff;
-      font-size: 1.7rem;
-      font-weight: 800;
-      padding: 16px 32px;
+      padding: 16px;
+      border-radius: 14px;
       border: none;
-      border-radius: 50px;
+      background: linear-gradient(135deg, #00f2fe 0%, #0284c7 100%);
+      color: #fff;
+      font-size: 1.5rem;
+      font-weight: 800;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      box-shadow: 0 10px 30px rgba(0, 242, 254, 0.3), 0 4px 15px rgba(99, 102, 241, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 242, 254, 0.35);
+      transition: all 0.3s ease;
+      margin-top: 10px;
     }
     .btn-nexus-contact:hover {
-      transform: translateY(-3px) scale(1.01);
-      box-shadow: 0 15px 40px rgba(0, 242, 254, 0.5), 0 6px 20px rgba(99, 102, 241, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(0, 242, 254, 0.5);
     }
-    [data-theme="light"] .btn-nexus-contact {
-      background: linear-gradient(90deg, #4f46e5, #0284c7) !important;
-      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.25) !important;
-    }
-
-    /* ══════════════════════════════════════════════════════════════
-       MAP & CONTACT INFO CARD
-       ══════════════════════════════════════════════════════════════ */
     .map-frame {
-      width: 100%;
-      height: 360px;
-      border-radius: 18px;
+      width: 100%; height: 320px;
+      border-radius: 20px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      margin-bottom: 30px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    }
-    .map-frame iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      filter: grayscale(0.85) invert(0.9) contrast(1.25);
-    }
-    [data-theme="light"] .map-frame iframe {
-      filter: none;
-    }
-    .contact-info-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-    .contact-info-item {
-      display: flex;
-      gap: 18px;
-      align-items: center;
-    }
-    .contact-info-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      flex-shrink: 0;
-      transition: transform 0.3s;
-    }
-    .contact-info-item:hover .contact-info-icon {
-      transform: scale(1.08) rotate(3deg);
-    }
-    .icon-box-cyan {
-      background: rgba(0, 242, 254, 0.15);
-      border: 1px solid rgba(0, 242, 254, 0.35);
-      color: #00f2fe;
-      box-shadow: 0 0 18px rgba(0, 242, 254, 0.2);
-    }
-    [data-theme="light"] .icon-box-cyan {
-      background: rgba(2, 132, 199, 0.12);
-      border-color: #0284c7;
-      color: #0284c7;
-    }
-    .icon-box-purple {
-      background: rgba(168, 85, 247, 0.15);
-      border: 1px solid rgba(168, 85, 247, 0.35);
-      color: #c084fc;
-      box-shadow: 0 0 18px rgba(168, 85, 247, 0.2);
-    }
-    [data-theme="light"] .icon-box-purple {
-      background: rgba(147, 51, 234, 0.12);
-      border-color: #9333ea;
-      color: #9333ea;
-    }
-    .icon-box-blue {
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      color: #38bdf8;
-      box-shadow: 0 0 18px rgba(56, 189, 248, 0.2);
-    }
-    [data-theme="light"] .icon-box-blue {
-      background: rgba(37, 99, 235, 0.12);
-      border-color: #2563eb;
-      color: #2563eb;
-    }
-    .contact-info-content h4 {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      margin-bottom: 3px;
-    }
-    .contact-info-content p {
-      font-size: 1.5rem;
-      color: var(--text-secondary);
-      line-height: 1.4;
-      margin: 0;
-    }
-
-    /* ══════════════════════════════════════════════════════════════
-       4 FEATURE PILLARS BENEATH THE CARDS
-       ══════════════════════════════════════════════════════════════ */
-    .contact-pillars-section {
-      max-width: 1200px;
-      margin: 0 auto 100px;
-      padding: 0 20px;
-      position: relative;
-      z-index: 2;
-    }
-    .contact-pillars-grid {
-      background: var(--bg-card);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius-xl);
-      padding: 38px 40px;
-      box-shadow: var(--shadow-lg);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
+      margin-bottom: 30px;
     }
-    [data-theme="light"] .contact-pillars-grid {
-      background: #ffffff !important;
-      border: 1.5px solid rgba(2, 132, 199, 0.35) !important;
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.06), 0 0 20px rgba(2, 132, 199, 0.08) !important;
+    .map-frame iframe { width: 100%; height: 100%; border: 0; }
+    .contact-info-list { display: flex; flex-direction: column; gap: 20px; }
+    .contact-info-item { display: flex; align-items: center; gap: 16px; }
+    .contact-info-icon {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; flex-shrink: 0;
     }
-    .pillar-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      flex: 1;
-      gap: 14px;
-    }
-    .pillar-icon-circle {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.1rem;
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .pillar-item:hover .pillar-icon-circle {
-      transform: scale(1.12) translateY(-4px);
-    }
-    .circle-cyan {
-      background: rgba(0, 242, 254, 0.15);
-      border: 1px solid rgba(0, 242, 254, 0.35);
-      color: #00f2fe;
-      box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
-    }
-    [data-theme="light"] .circle-cyan {
-      background: rgba(2, 132, 199, 0.12);
-      border-color: #0284c7;
-      color: #0284c7;
-    }
-    .circle-purple {
-      background: rgba(168, 85, 247, 0.15);
-      border: 1px solid rgba(168, 85, 247, 0.35);
-      color: #c084fc;
-      box-shadow: 0 0 20px rgba(168, 85, 247, 0.25);
-    }
-    [data-theme="light"] .circle-purple {
-      background: rgba(147, 51, 234, 0.12);
-      border-color: #9333ea;
-      color: #9333ea;
-    }
-    .circle-blue {
-      background: rgba(59, 130, 246, 0.15);
-      border: 1px solid rgba(59, 130, 246, 0.35);
-      color: #60a5fa;
-      box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
-    }
-    [data-theme="light"] .circle-blue {
-      background: rgba(37, 99, 235, 0.12);
-      border-color: #2563eb;
-      color: #2563eb;
-    }
-    .circle-green {
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      color: #34d399;
-      box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
-    }
-    [data-theme="light"] .circle-green {
-      background: rgba(5, 150, 105, 0.12);
-      border-color: #059669;
-      color: #059669;
-    }
-    .pillar-text h4 {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-    }
-    .pillar-text p {
-      font-size: 1.4rem;
-      color: var(--text-secondary);
-      line-height: 1.4;
-      margin: 0;
-    }
-    .pillar-divider {
-      width: 1px;
-      height: 64px;
-      background: linear-gradient(180deg, transparent, var(--border-color), transparent);
-      flex-shrink: 0;
-    }
+    .icon-box-cyan { background: linear-gradient(135deg, #00f2fe, #0284c7); }
+    .icon-box-purple { background: linear-gradient(135deg, #a855f7, #7e22ce); }
+    .icon-box-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .contact-info-content h4 { font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin: 0 0 2px; }
+    .contact-info-content p { font-size: 1.25rem; color: var(--text-secondary); margin: 0; }
 
-    /* ══════════════════════════════════════════════════════════════
-       RESPONSIVE BREAKPOINTS (320px to 1920px)
-       ══════════════════════════════════════════════════════════════ */
-    @media (max-width: 1024px) {
-      .contact-container {
-        gap: 30px;
-      }
-      .contact-form-card,
-      .contact-map-card {
-        padding: 34px;
-      }
-      .badge-left { left: 8%; }
-      .badge-right { right: 8%; }
-    }
     @media (max-width: 992px) {
-      .contact-container {
-        grid-template-columns: 1fr;
-        margin-top: 30px;
-      }
-      .contact-pillars-grid {
-        flex-direction: column;
-        gap: 32px;
-        padding: 36px 24px;
-      }
-      .pillar-divider {
-        width: 80%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, var(--border-color), transparent);
-      }
-      .hero-float-badge { width: 50px; height: 50px; font-size: 1.7rem; }
-      .badge-left { top: 18%; left: 6%; }
-      .badge-right { top: 62%; right: 6%; }
-    }
-    @media (max-width: 576px) {
-      .contact-hero { padding: 110px 15px 40px; }
-      .contact-hero h1 { font-size: 3.2rem; }
-      .contact-hero .subtitle { font-size: 1.55rem; }
-      .contact-form-card,
-      .contact-map-card { padding: 26px 18px; }
-      .form-row-nexus { gap: 12px; margin-bottom: 18px; }
-      .field-icon-box { width: 44px; height: 44px; font-size: 1.5rem; }
-      .field-input-col label { font-size: 1.1rem; }
-      .form-control-nexus { font-size: 1.45rem; padding: 12px 14px; }
-      .map-frame { height: 280px; }
-      .contact-info-icon { width: 42px; height: 42px; font-size: 1.5rem; }
-      .contact-info-content h4 { font-size: 1.35rem; }
-      .contact-info-content p { font-size: 1.35rem; }
+      .contact-container { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -531,8 +196,7 @@
       <div class="logo">
         <a href="index.html">
           <div class="nav-logo-wrap">
-            <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png"
-                 alt="Sun Nexus Logo" class="nav-logo" />
+            <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png" alt="Sun Nexus Logo" class="nav-logo" />
           </div>
         </a>
         <span class="brand-name">Sun Nexus Solutions</span>
@@ -544,7 +208,31 @@
         <li><a href="project.html">Projects</a></li>
         <li><a href="events.html">Events</a></li>
         <li><a href="mentor-ship.html">Mentorship</a></li>
-        <li><a href="contact.html" class="active">Contact</a></li>
+        <li class="nav-dropdown">
+          <a href="contact.html" class="dropdown-toggle">
+            Contact Us <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="contact.html">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <span>Contact Form</span>
+              </a>
+            </li>
+            <li>
+              <a href="joining.html">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                <span>Joining Form</span>
+              </a>
+            </li>
+            <li>
+              <a href="requirements.html">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Requirements Form</span>
+              </a>
+            </li>
+          </ul>
+        </li>
       </ul>
 
       <div class="nav-actions">
@@ -569,26 +257,35 @@
       <div class="hero-float-badge badge-right">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
       </div>
-      <h1 class="gradient-text">INITIATE CONTACT</h1>
-      <p class="subtitle">Join the ecosystem. Let's build the future together.</p>
+      <h1 class="gradient-text">CONTACT US</h1>
+      <p class="subtitle">Have a question, feedback, or inquiry? Send us a message and our team will get back to you promptly.</p>
       <div class="hero-divider"></div>
     </section>
 
     <div class="contact-container">
-      <!-- Left Card: Registration Form -->
-      <div class="contact-form-card animate__animated animate__fadeInLeft">
-        <form action="api/contact.php" method="POST" id="nexusContactForm">
-          
+      <!-- Left Card: General Contact Form -->
+      <div class="contact-form-card animate__animated animate__fadeInLeft" id="contact-form">
+        <div class="form-header-badge" style="display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-subtle);">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #00f2fe, #0284c7); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4); flex-shrink: 0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          </div>
+          <div>
+            <h3 style="font-size: 1.7rem; font-weight: 800; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">NEXUS CONTACT FORM</h3>
+            <p style="font-size: 1.25rem; color: var(--text-secondary); margin: 3px 0 0 0;">Fill in your details below to get in touch with Sun Nexus Solutions</p>
+          </div>
+        </div>
+
+        <form id="nexusContactForm">
           <div class="form-row-nexus">
-            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+            <div class="field-icon-box icon-top"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
             <div class="field-input-col">
               <label>Full Identity</label>
-              <input type="text" name="name" class="form-control-nexus" placeholder="Enter your name" required>
+              <input type="text" name="name" class="form-control-nexus" placeholder="Enter your full name" required>
             </div>
           </div>
 
           <div class="form-row-nexus">
-            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div>
+            <div class="field-icon-box icon-top"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div>
             <div class="field-input-col">
               <label>Digital Address (Email)</label>
               <input type="email" name="email" class="form-control-nexus" placeholder="name@example.com" required>
@@ -596,7 +293,7 @@
           </div>
 
           <div class="form-row-nexus">
-            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div>
+            <div class="field-icon-box icon-top"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div>
             <div class="field-input-col">
               <label>Mobile Number</label>
               <input type="tel" name="mobile" class="form-control-nexus" placeholder="+91 98765 43210" required>
@@ -604,224 +301,35 @@
           </div>
 
           <div class="form-row-nexus">
-            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg></div>
+            <div class="field-icon-box icon-top"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
             <div class="field-input-col">
-              <label>PRN Number</label>
-              <input type="text" name="prn" id="prn" class="form-control-nexus" placeholder="Enter your PRN Number" required>
-            </div>
-          </div>
-
-          <div class="form-row-nexus">
-            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
-            <div class="field-input-col">
-              <label>Division</label>
-              <input type="text" name="division" id="division" class="form-control-nexus" placeholder="e.g. A, B, C or Div 1" required>
-            </div>
-          </div>
-
-          <div class="form-row-nexus">
-            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg></div>
-            <div class="field-input-col">
-              <label>Academic Year</label>
-              <select name="academic_year" id="academic_year" class="form-control-nexus" required>
-                <option value="" disabled selected>Select your year</option>
-                <option value="1st Year">1st Year</option>
-                <option value="2nd Year">2nd Year</option>
-                <option value="3rd Year">3rd Year</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-row-nexus">
-            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
-            <div class="field-input-col">
-              <label>Graduation Year</label>
-              <select name="graduation_year" class="form-control-nexus" required>
-                <option value="" disabled selected>Select graduation year</option>
-                <option value="2030">2030</option>
-                <option value="2029">2029</option>
-                <option value="2028">2028</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-row-nexus">
-            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></div>
-            <div class="field-input-col">
-              <label>Branch</label>
-              <select name="branch" id="branch" class="form-control-nexus" required>
-                <option value="" disabled selected>Select your branch</option>
-                <option value="CSE">CSE</option>
+              <label>Subject / Purpose of Contact</label>
+              <select name="subject" class="form-control-nexus" required>
+                <option value="" disabled selected>Select subject</option>
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Partnership & Collaboration">Partnership & Collaboration</option>
+                <option value="Mentorship & Training">Mentorship & Training</option>
+                <option value="Technical Support">Technical Support</option>
+                <option value="Feedback">Feedback</option>
                 <option value="Other">Other</option>
               </select>
             </div>
           </div>
 
-          <!-- Specify Branch (Conditional for Other) -->
-          <div id="other-branch-container" class="form-row-nexus" style="display: none;">
-            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg></div>
+          <div class="form-row-nexus">
+            <div class="field-icon-box icon-top"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
             <div class="field-input-col">
-              <label>Specify Branch</label>
-              <input type="text" name="other_branch" class="form-control-nexus" placeholder="e.g. Mechanical, Civil, EEE">
+              <label>Your Message</label>
+              <textarea name="message" class="form-control-nexus" placeholder="Type your message or query here..." rows="4" required></textarea>
             </div>
           </div>
-
-          <!-- Specialization (Conditional for CSE) -->
-          <div id="specialization-container" class="form-row-nexus" style="display: none;">
-            <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg></div>
-            <div class="field-input-col">
-              <label>Specialization</label>
-              <select name="specialization" class="form-control-nexus">
-                <option value="" disabled selected>Select specialization</option>
-                <option value="AIML">AIML</option>
-                <option value="Cyber Security">Cyber Security</option>
-                <option value="Cloud Computing">Cloud Computing</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Dynamic Content Based on Year -->
-          <div id="dynamic-year-content"></div>
 
           <button type="submit" id="submitBtn" class="btn-nexus-contact">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px; display: inline-block;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Complete Registration
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px; display: inline-block;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Send Contact Message
           </button>
         </form>
 
         <script>
-          const academicYearSelect = document.getElementById('academic_year');
-          const branchSelect = document.getElementById('branch');
-          const otherBranchContainer = document.getElementById('other-branch-container');
-          const specContainer = document.getElementById('specialization-container');
-          const dynamicContainer = document.getElementById('dynamic-year-content');
-
-          // Branch logic
-          branchSelect.addEventListener('change', function() {
-            otherBranchContainer.style.display = this.value === 'Other' ? 'flex' : 'none';
-            specContainer.style.display = this.value === 'CSE' ? 'flex' : 'none';
-          });
-
-          // Year logic
-          academicYearSelect.addEventListener('change', function() {
-            const year = this.value;
-            let html = '';
-
-            if (year === '1st Year') {
-              html = `
-                <div class="form-row-nexus">
-                  <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
-                  <div class="field-input-col">
-                    <label>Technical Skills (Optional)</label>
-                    <input type="text" name="skills" class="form-control-nexus" placeholder="e.g. Python, HTML, CSS">
-                  </div>
-                </div>
-                <div class="form-row-nexus">
-                  <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div>
-                  <div class="field-input-col">
-                    <label>Primary Domain</label>
-                    <select name="domain" class="form-control-nexus" required>
-                      <option value="" disabled selected>Select domain</option>
-                      <option value="AIML">AIML</option>
-                      <option value="Web Development">Web Development</option>
-                      <option value="Cyber Security">Cyber Security</option>
-                      <option value="Data Analyst">Data Analyst</option>
-                    </select>
-                  </div>
-                </div>
-              `;
-            } else if (year === '2nd Year' || year === '3rd Year') {
-              const isRequired = (year === '3rd Year') ? 'required' : '';
-              html = `
-                <div class="form-row-nexus">
-                  <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
-                  <div class="field-input-col">
-                    <label>Technical Skills</label>
-                    <input type="text" name="skills" class="form-control-nexus" placeholder="e.g. JavaScript, Java, React" required>
-                  </div>
-                </div>
-                <div class="form-row-nexus">
-                  <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></div>
-                  <div class="field-input-col">
-                    <label>Project Details ${year === '2nd Year' ? '(Optional)' : '(Required)'}</label>
-                    <input type="text" name="projects" class="form-control-nexus" placeholder="Link or description of your best project" ${isRequired}>
-                  </div>
-                </div>
-                
-                <div class="social-links-list" style="display: flex; flex-direction: column; width: 100%;">
-                  <div class="form-row-nexus">
-                    <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></div>
-                    <div class="field-input-col">
-                      <label>GitHub (Required)</label>
-                      <input type="url" name="github" class="form-control-nexus" placeholder="https://github.com/..." required>
-                    </div>
-                  </div>
-                  <div class="form-row-nexus">
-                    <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></div>
-                    <div class="field-input-col">
-                      <label>LinkedIn (Required)</label>
-                      <input type="url" name="linkedin" class="form-control-nexus" placeholder="https://linkedin.com/in/..." required>
-                    </div>
-                  </div>
-                  <div class="form-row-nexus">
-                    <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
-                    <div class="field-input-col">
-                      <label>CodeChef (Optional)</label>
-                      <input type="url" name="codechef" class="form-control-nexus" placeholder="Profile URL">
-                    </div>
-                  </div>
-                  <div class="form-row-nexus">
-                    <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg></div>
-                    <div class="field-input-col">
-                      <label>HackerRank (Optional)</label>
-                      <input type="url" name="hackerrank" class="form-control-nexus" placeholder="Profile URL">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-row-nexus">
-                  <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div>
-                  <div class="field-input-col">
-                    <label>Primary Domain</label>
-                    <select name="domain" id="domain-select" class="form-control-nexus" required>
-                      <option value="" disabled selected>Select domain</option>
-                      <option value="Full Stack Web Development">Full Stack Web Development</option>
-                      <option value="App Development">App Development</option>
-                      <option value="ML">ML</option>
-                      <option value="Data Analyst">Data Analyst</option>
-                      <option value="Cloud Computing">Cloud Computing</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div id="language-container" class="form-row-nexus" style="display: none;">
-                  <div class="field-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>
-                  <div class="field-input-col">
-                    <label>Languages / Tech Stack</label>
-                    <select name="languages" class="form-control-nexus">
-                      <option value="" disabled selected>Select stack</option>
-                      <option value="React.js">React.js</option>
-                      <option value="Node.js">Node.js</option>
-                      <option value="Both">React.js & Node.js</option>
-                    </select>
-                  </div>
-                </div>
-              `;
-            }
-
-            dynamicContainer.innerHTML = html;
-
-            // Re-attach domain logic if exists
-            const domainSelect = document.getElementById('domain-select');
-            if (domainSelect) {
-              domainSelect.addEventListener('change', function() {
-                const langContainer = document.getElementById('language-container');
-                if (langContainer) {
-                  langContainer.style.display = this.value === 'Full Stack Web Development' ? 'flex' : 'none';
-                }
-              });
-            }
-          });
-
           document.getElementById('nexusContactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const form = e.target;
@@ -829,7 +337,7 @@
             const originalBtnText = btn.innerHTML;
             
             btn.disabled = true;
-            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px; display: inline-block; animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg> Transmitting...';
+            btn.innerHTML = 'Sending Message...';
             btn.style.opacity = '0.7';
 
             const formData = new FormData(form);
@@ -838,61 +346,32 @@
             try {
               const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
               const baseUrl = isLocal ? 'http://localhost:3000' : '';
-              const response = await fetch(`${baseUrl}/api/contact`, {
+              const response = await fetch(`${baseUrl}/api/contact-message`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
               });
 
               if (!response.ok) {
-                if (response.status === 405) {
-                  if (isLocal) {
-                    alert('❌ Static Server Detected (HTTP 405 Method Not Allowed):\n\nThe contact form attempted to submit to a local static web server instead of the Node backend.\n\nTo submit forms locally, please verify that your local Node server is running on port 3000 by executing:\nnode server.js');
-                    return;
-                  } else {
-                    alert('⚠️ Cloud Hub Error (HTTP 405 Method Not Allowed):\n\nThis hosting provider only serves static files and does not execute serverless backend API endpoints.');
-                    return;
-                  }
-                }
                 const errText = await response.text().catch(() => '');
-                alert(`❌ Server Error (${response.status} ${response.statusText}): ${errText || 'Please check server logs for details.'}`);
+                alert(`❌ Server Error (${response.status}): ${errText || 'Failed to send message.'}`);
                 return;
               }
 
-              const text = await response.text();
-              console.log('Raw Response:', text);
-              
-              let result;
-              try {
-                result = JSON.parse(text);
-              } catch (e) {
-                console.error('JSON Parse Error:', e);
-                alert('❌ Protocol Mismatch: The server sent a non-JSON response. Ensure node server.js is running and returning valid JSON.');
-                return;
-              }
-
+              const result = await response.json();
               if (result.success) {
-                alert('🏆 ' + result.message);
+                alert('✉️ ' + result.message);
                 form.reset();
-                dynamicContainer.innerHTML = '';
-                specContainer.style.display = 'none';
-                otherBranchContainer.style.display = 'none';
               } else {
                 alert('⚠️ ' + result.message);
               }
             } catch (err) {
               console.error("Submission Error:", err);
-              const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
-              if (!isLocal) {
-                 alert('Cloud Hub Error: ' + err.message + '\n\nProtocol Tip: Ensure your "api/" folder is deployed and Neon DB URL is set.');
-              } else {
-                 alert('❌ Connection Protocol Failed: Could not connect to local backend server at http://localhost:3000.\n\nPlease verify your local Node server is running on port 3000 by opening a terminal and running:\nnode server.js');
-              }
+              alert('❌ Connection Error: Could not connect to backend server.');
             } finally {
-              if (!btn.disabled) {
-                btn.innerHTML = originalBtnText;
-                btn.style.opacity = '1';
-              }
+              btn.disabled = false;
+              btn.innerHTML = originalBtnText;
+              btn.style.opacity = '1';
             }
           });
         </script>
@@ -931,43 +410,6 @@
         </div>
       </div>
     </div>
-
-    <!-- 4 Feature Pillars Banner Section -->
-    <section class="contact-pillars-section animate__animated animate__fadeInUp">
-      <div class="contact-pillars-grid">
-        <div class="pillar-item">
-          <div class="pillar-icon-circle circle-cyan"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
-          <div class="pillar-text">
-            <h4>All-in-One Access</h4>
-            <p>Everything in one place</p>
-          </div>
-        </div>
-        <div class="pillar-divider"></div>
-        <div class="pillar-item">
-          <div class="pillar-icon-circle circle-purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
-          <div class="pillar-text">
-            <h4>Track & Learn</h4>
-            <p>Stay on top of your progress</p>
-          </div>
-        </div>
-        <div class="pillar-divider"></div>
-        <div class="pillar-item">
-          <div class="pillar-icon-circle circle-blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
-          <div class="pillar-text">
-            <h4>Build & Innovate</h4>
-            <p>Work on real-world projects</p>
-          </div>
-        </div>
-        <div class="pillar-divider"></div>
-        <div class="pillar-item">
-          <div class="pillar-icon-circle circle-green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
-          <div class="pillar-text">
-            <h4>Secure & Private</h4>
-            <p>Your data, always protected</p>
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer class="footer">
@@ -980,18 +422,6 @@
           <span class="footer-logo-name">Sun Nexus Solutions</span>
         </a>
         <p class="footer-tagline">Empowering students with real-world tech skills, projects, and mentorship at Sandip University, Nashik.</p>
-        <div class="footer-socials">
-          <a href="https://www.linkedin.com/company/sunnexussolutions/" class="footer-social-btn" target="_blank"><span class="icon">💼</span> LinkedIn</a>
-          <a href="https://www.instagram.com/sun_nexus_solutions/" class="footer-social-btn" target="_blank"><span class="icon">📸</span> Instagram</a>
-          <a href="https://github.com/sunnexussolutions" class="footer-social-btn" target="_blank"><span class="icon">🐙</span> GitHub</a>
-        </div>
-        <div class="footer-newsletter">
-          <p>📬 Stay in the loop with our latest updates</p>
-          <div class="footer-newsletter-row">
-            <input type="email" placeholder="Enter your email..." aria-label="Newsletter email">
-            <button type="button">Subscribe</button>
-          </div>
-        </div>
       </div>
       <div class="footer-col">
         <div class="footer-col-title">Platform</div>
@@ -1004,13 +434,11 @@
         </ul>
       </div>
       <div class="footer-col">
-        <div class="footer-col-title">Resources</div>
+        <div class="footer-col-title">Forms</div>
         <ul>
-          <li><a href="https://sun-nexus-solutions-website-urs3.vercel.app/">Dashboard</a></li>
-          <li><a href="Nexus Dashboard Anti/courses.html">Courses</a></li>
-          <li><a href="Nexus Dashboard Anti/leaderboard.html">Leaderboard</a></li>
-          <li><a href="Nexus Dashboard Anti/quiz.html">Quizzes</a></li>
-          <li><a href="Nexus Dashboard Anti/certificate.html">Certificates</a></li>
+          <li><a href="contact.html">Contact Form</a></li>
+          <li><a href="joining.html">Joining Form</a></li>
+          <li><a href="requirements.html">Requirements Form</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -1021,18 +449,13 @@
         </div>
         <div class="footer-contact-item">
           <span class="footer-contact-icon">📍</span>
-          <div class="footer-contact-text">O - Building, <br> Room No: F - 110,<br>Sandip University, Nashik</div>
-        </div>
-        <div class="footer-contact-item">
-          <span class="footer-contact-icon">🕐</span>
-          <div class="footer-contact-text">Mon – Sat, 8 AM – 5 PM IST</div>
+          <div class="footer-contact-text">O - Building, Room No: F - 110, Sandip University, Nashik</div>
         </div>
       </div>
     </div>
     <div class="footer-bottom">
       <div class="footer-bottom-inner">
         <p class="footer-bottom-copy">© 2025 <span>Sun Nexus Solutions</span>. All Rights Reserved.</p>
-        <div class="footer-badge"><span>●</span> Active Platform</div>
       </div>
     </div>
   </footer>

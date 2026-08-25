@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Requirements — Sun Nexus Solutions</title>
+
+  <!-- External Resources -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Core Theme & Requirements Styles -->
+  <link rel="stylesheet" href="css/nexus-theme.css" />
+  <link rel="stylesheet" href="css/requirements.css" />
+  <link rel="stylesheet" href="Nexus Dashboard Anti/assets/css/theme-toggle.css" />
+  <script src="Nexus Dashboard Anti/assets/js/theme-engine.js"></script>
+</head>
+
+<body>
+  <!-- Header & Navigation -->
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <a href="index.html">
+          <div class="nav-logo-wrap">
+            <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png"
+                 alt="Sun Nexus Logo" class="nav-logo" />
+          </div>
+        </a>
+        <span class="brand-name">Sun Nexus Solutions</span>
+      </div>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about-us.html">About Us</a></li>
+        <li><a href="project.html">Projects</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="mentor-ship.html">Mentorship</a></li>
+        <li class="nav-dropdown">
+          <a href="contact.html" class="dropdown-toggle">
+            Contact Us <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="contact.html">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <span>Contact Form</span>
+              </a>
+            </li>
+            <li>
+              <a href="joining.html">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                <span>Joining Form</span>
+              </a>
+            </li>
+            <li>
+              <a href="requirements.html">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Requirements Form</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Theme">
+          <div class="toggle-glow"></div>
+          <div class="toggle-knob">
+            <span class="sun-icon">☀️</span>
+            <span class="moon-icon">🌙</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="menu-toggle" id="menuToggle">☰</div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero Section (Identical Structure to Contact Page) -->
+    <section class="req-hero">
+      <div class="hero-float-badge badge-left">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+      </div>
+      <div class="hero-float-badge badge-right">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+      </div>
+      <h1 class="gradient-text">PROJECT REQUIREMENT FORM</h1>
+      <p class="subtitle">Specify your website requirements. Let's build the future together.</p>
+      <div class="hero-divider"></div>
+    </section>
+
+    <!-- Requirement Form Container -->
+    <div class="req-container">
+      <div class="req-form-sheet animate__animated animate__fadeInUp">
+
+        <!-- Interactive Step Progress Bar -->
+        <div class="req-steps-bar animate__animated animate__fadeInDown">
+          <div class="req-step active" data-step="1">
+            <div class="step-num">01</div>
+            <div class="step-info"><span class="step-title">Client Info</span><span class="step-sub">Contact Details</span></div>
+          </div>
+          <div class="step-line"></div>
+          <div class="req-step" data-step="2">
+            <div class="step-num">02</div>
+            <div class="step-info"><span class="step-title">Business & Specs</span><span class="step-sub">Project Scope</span></div>
+          </div>
+          <div class="step-line"></div>
+          <div class="req-step" data-step="3">
+            <div class="step-num">03</div>
+            <div class="step-info"><span class="step-title">Features & Scope</span><span class="step-sub">Design & Tech</span></div>
+          </div>
+          <div class="step-line"></div>
+          <div class="req-step" data-step="4">
+            <div class="step-num">04</div>
+            <div class="step-info"><span class="step-title">Timeline & Budget</span><span class="step-sub">Domain & Terms</span></div>
+          </div>
+          <div class="step-line"></div>
+          <div class="req-step" data-step="5">
+            <div class="step-num">05</div>
+            <div class="step-info"><span class="step-title">Authorization</span><span class="step-sub">Sign & Submit</span></div>
+          </div>
+        </div>
+
+        <form id="nexusRequirementsForm">
+          <div class="req-grid-main">
+            
+            <!-- LEFT COLUMN (Sections 01 - 05) -->
+            <div class="req-column">
+              
+              <!-- 01. CLIENT INFORMATION -->
+              <div class="req-card">
+                <div class="req-section-header">
+                  <div class="req-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  </div>
+                  <div class="req-section-title">01. CLIENT INFORMATION</div>
+                </div>
+
+                <div class="req-row-2 req-group">
+                  <div>
+                    <label class="req-label">Full Name / Organization Name <span class="req-required">*</span></label>
+                    <input type="text" name="client_name" class="req-input" placeholder="Enter your name or organization name" required />
+                  </div>
+                  <div>
+                    <label class="req-label">Contact Person <span class="req-required">*</span></label>
+                    <input type="text" name="contact_person" class="req-input" placeholder="Enter contact person name" required />
+                  </div>
+                </div>
+
+                <div class="req-row-2 req-group">
+                  <div>
+                    <label class="req-label">Email Address <span class="req-required">*</span></label>
+                    <input type="email" name="email" class="req-input" placeholder="Enter your email address" required />
+                  </div>
+                  <div>
+                    <label class="req-label">Phone Number <span class="req-required">*</span></label>
+                    <input type="tel" name="phone" class="req-input" placeholder="Enter your phone number" required />
+                  </div>
+                </div>
+
+                <div class="req-row-2 req-group">
+                  <div>
+                    <label class="req-label">WhatsApp Number</label>
+                    <div class="req-input-icon-wrap">
+                      <svg class="req-input-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.758.459 3.474 1.33 4.982l-1.413 5.161 5.284-1.385a9.947 9.947 0 0 0 4.789 1.226h.004c5.506 0 9.99-4.478 9.99-9.985 0-2.668-1.039-5.176-2.926-7.062a9.914 9.914 0 0 0-7.068-2.921zm5.828 14.283c-.244.686-1.42 1.309-1.961 1.391-.497.076-1.139.11-1.838-.114-1.378-.44-3.085-1.464-4.364-2.744-1.28-1.28-2.304-2.986-2.744-4.364-.224-.699-.19-1.341-.114-1.838.082-.541.705-1.717 1.391-1.961.225-.08.455-.062.646.038.2.105 1.096 1.488 1.189 1.62.093.132.122.285.042.455-.08.17-.197.35-.357.513-.16.163-.337.288-.475.433-.146.154-.3.32-.132.61.168.29.749 1.235 1.606 1.998 1.103.982 2.033 1.287 2.323 1.455.29.168.456.14.61-.032.145-.138.27-.315.433-.475.163-.16.343-.277.513-.357.17-.08.323-.051.455.042.132.093 1.515.989 1.62 1.189.1.191.118.421.038.646z"/></svg>
+                      <input type="tel" name="whatsapp" class="req-input" placeholder="Enter WhatsApp number" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="req-label">Address</label>
+                    <input type="text" name="address" class="req-input" placeholder="Enter your address" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- 02. BUSINESS INFORMATION -->
+              <div class="req-card">
+                <div class="req-section-header">
+                  <div class="req-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                  </div>
+                  <div class="req-section-title">02. BUSINESS INFORMATION</div>
+                </div>
+
+                <div class="req-row-2 req-group">
+                  <div>
+                    <label class="req-label">Business / Organization Type <span class="req-required">*</span></label>
+                    <select name="business_type" class="req-select" required>
+                      <option value="" disabled selected>Select your business type</option>
+                      <option value="Startup">Startup</option>
+                      <option value="E-Commerce">E-Commerce</option>
+                      <option value="Educational Institute">Educational Institute</option>
+                      <option value="Corporate / Enterprise">Corporate / Enterprise</option>
+                      <option value="Agency / Services">Agency / Services</option>
+                      <option value="Non-Profit">Non-Profit / NGO</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="req-label">Business / Organization Name <span class="req-required">*</span></label>
+                    <input type="text" name="business_name" class="req-input" placeholder="Enter your business name" required />
+                  </div>
+                </div>
+
+                <div class="req-row-2 req-group">
+                  <div>
+                    <label class="req-label">Website / Social Media (If any)</label>
+                    <input type="text" name="website_social" class="req-input" placeholder="Enter existing website or social media link" />
+                  </div>
+                  <div>
+                    <label class="req-label">Years in Business</label>
+                    <input type="text" name="years_in_business" class="req-input" placeholder="Enter years in business" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- 03. PROJECT INFORMATION -->
+              <div class="req-card">
+                <div class="req-section-header">
+                  <div class="req-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                  </div>
+                  <div class="req-section-title">03. PROJECT INFORMATION</div>
+                </div>
+
+                <div class="req-row-2 req-group">
+                  <div>
+                    <label class="req-label">Project Title / Website Name <span class="req-required">*</span></label>
+                    <input type="text" name="project_title" class="req-input" placeholder="Enter your website or project title" required />
+                  </div>
+                  <div>
+                    <label class="req-label">Purpose of Website <span class="req-required">*</span></label>
+                    <select name="purpose_of_website" class="req-select" required>
+                      <option value="" disabled selected>Select the main purpose</option>
+                      <option value="Brand Awareness">Brand Awareness</option>
+                      <option value="Lead Generation">Lead Generation</option>
+                      <option value="Online Store / Sales">Online Store / Sales</option>
+                      <option value="Educational Portal">Educational Portal</option>
+                      <option value="SaaS Platform">SaaS Platform</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="req-group">
+                  <label class="req-label">Brief Description About Your Business / Project <span class="req-required">*</span></label>
+                  <textarea name="business_description" class="req-textarea" placeholder="Describe your business, services, target audience and goals..." required></textarea>
+                </div>
+              </div>
+
+              <!-- 04. WEBSITE REQUIREMENTS -->
+              <div class="req-card">
+                <div class="req-section-header">
+                  <div class="req-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                  </div>
+                  <div class="req-section-title">04. WEBSITE REQUIREMENTS</div>
+                </div>
+
+                <div class="req-group">
+                  <label class="req-label">What type of website do you need? <span class="req-required">*</span></label>
+                  <div class="req-checkbox-grid">
+                    <label class="req-checkbox-label"><input type="checkbox" name="website_type" value="Business Website" class="req-checkbox" /> <span>Business Website</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="website_type" value="E-Commerce Website" class="req-checkbox" /> <span>E-Commerce Website</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="website_type" value="Portfolio Website" class="req-checkbox" /> <span>Portfolio Website</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="website_type" value="Blog / News Website" class="req-checkbox" /> <span>Blog / News Website</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="website_type" value="School / College Website" class="req-checkbox" /> <span>School / College Website</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="website_type" value="Landing Page" class="req-checkbox" /> <span>Landing Page</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="website_type" value="Web Application" class="req-checkbox" /> <span>Web Application</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="website_type" value="Other" class="req-checkbox" /> <span>Other: <input type="text" name="website_type_other" class="req-other-input" /></span></label>
+                  </div>
+                </div>
+
+                <div class="req-group" style="margin-top: 16px;">
+                  <label class="req-label">Do you have any reference websites? (If yes, please share links)</label>
+                  <input type="text" name="reference_links" class="req-input" placeholder="Enter reference website links (comma separated)" />
+                </div>
+              </div>
+
+              <!-- 05. FEATURES & FUNCTIONALITY -->
+              <div class="req-card">
+                <div class="req-section-header">
+                  <div class="req-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  </div>
+                  <div class="req-section-title">05. FEATURES & FUNCTIONALITY</div>
+                </div>
+
+                <div class="req-group">
+                  <label class="req-label">Select the features you need in your website:</label>
+                  <div class="req-checkbox-grid">
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Home Page" class="req-checkbox" /> <span>Home Page</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="About Us" class="req-checkbox" /> <span>About Us</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Services / Products" class="req-checkbox" /> <span>Services / Products</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Gallery / Portfolio" class="req-checkbox" /> <span>Gallery / Portfolio</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Blog / News" class="req-checkbox" /> <span>Blog / News</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Contact Us" class="req-checkbox" /> <span>Contact Us</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="FAQ" class="req-checkbox" /> <span>FAQ</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Testimonial / Reviews" class="req-checkbox" /> <span>Testimonial / Reviews</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Team / Our Team" class="req-checkbox" /> <span>Team / Our Team</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Pricing / Plans" class="req-checkbox" /> <span>Pricing / Plans</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Login / Register" class="req-checkbox" /> <span>Login / Register</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="User Dashboard" class="req-checkbox" /> <span>User Dashboard</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Admin Panel" class="req-checkbox" /> <span>Admin Panel</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Booking / Appointment" class="req-checkbox" /> <span>Booking / Appointment</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Payment Gateway" class="req-checkbox" /> <span>Payment Gateway</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Search / Filter" class="req-checkbox" /> <span>Search / Filter</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Live Chat / WhatsApp" class="req-checkbox" /> <span>Live Chat / WhatsApp</span></label>
+                    <label class="req-checkbox-label"><input type="checkbox" name="features" value="Newsletter Subscription" class="req-checkbox" /> <span>Newsletter Subscription</span></label>
+                  </div>
+                </div>
+
+                <div class="req-group" style="margin-top: 14px;">
+                  <label class="req-label">Other Features</label>
+                  <input type="text" name="other_features" class="req-input" placeholder="Please specify other features" />
+                </div>
+              </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN (Sections 06 - 10) -->
+            <div class="req-column">
+
+              <!-- 06. DESIGN PREFERENCE -->
+              <div class="req-card">
+                <div class="req-section-header">
+                  <div class="req-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.7-.75 1.7-1.68 0-.44-.17-.86-.46-1.18-.3-.32-.46-.74-.46-1.18 0-.93.75-1.68 1.68-1.68H16c3.31 0 6-2.69 6-6 0-4.96-4.49-9-10-9z"></path></svg>
+                  </div>
+                  <div class="req-section-title">06. DESIGN PREFERENCE</div>
+                </div>
+
+                <div class="req-group">
+                  <label class="req-label">Do you have any design preference? <span class="req-required">*</span></label>
+                  <div class="req-radio-group">
+                    <label class="req-radio-label">
+                      <input type="radio" name="design_preference" value="Yes, I have a design in mind" class="req-radio" required />
+                      <span>Yes, I have a design in mind</span>
+                    </label>
+                    <label class="req-radio-label">
+                      <input type="radio" name="design_preference" value="No, I need suggestions from your team" class="req-radio" required />
+                      <span>No, I need suggestions from your team</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="req-row-2 req-group" style="margin-top: 16px;">
+                  <div>
+                    <label class="req-label">Color Preference (If any)</label>
+                    <input type="text" name="color_preference" class="req-input" placeholder="Enter preferred colors" />
+                  </div>
+                  <div>
+                    <label class="req-label">Do you have a logo?</label>
+                    <div class="req-radio-group">
+                      <label class="req-radio-label"><input type="radio" name="has_logo" value="Yes" class="req-radio" /> <span>Yes</span></label>
+                      <label class="req-radio-label"><input type="radio" name="has_logo" value="No" class="req-radio" /> <span>No</span></label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="req-group">
+                  <label class="req-label">Will you provide content?</label>
+                  <div class="req-radio-group">
+                    <label class="req-radio-label"><input type="radio" name="will_provide_content" value="Yes, I will provide" class="req-radio" /> <span>Yes, I will provide</span></label>
+                    <label class="req-radio-label"><input type="radio" name="will_provide_content" value="No, I need content support" class="req-radio" /> <span>No, I need content support</span></label>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 07. CONTENT REQUIREMENT -->
+              <div class="req-card">
+                <div class="req-section-header">
+                  <div class="req-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M12 18v-6"></path><path d="M9 15h6"></path></svg>
+                  </div>
+                  <div class="req-section-title">07. CONTENT REQUIREMENT</div>
+                </div>
+
+                <div class="req-group">
+                  <label class="req-label">Content will be provided by:</label>
+                  <div class="req-radio-group">
+                    <label class="req-radio-label"><input type="radio" name="content_provider" value="Client" class="req-radio" /> <span>Client</span></label>
+                    <label class="req-radio-label"><input type="radio" name="content_provider" value="Our Team (Additional Charges)" class="req-radio" /> <span>Our Team (Additional Charges)</span></label>
+                    <label class="req-radio-label"><input type="radio" name="content_provider" value="Partial (Client + Our Team)" class="req-radio" /> <span>Partial (Client + Our Team)</span></label>
+                  </div>
+                </div>
+
+                <div class="req-group" style="margin-top: 16px;">
+                  <label class="req-label">Pages / Section Required:</label>
+                  <textarea name="pages_required" class="req-textarea" placeholder="Please list the pages or sections you want in your website..."></textarea>
+                  <div class="req-subnote">Example: Home, About, Services, Gallery, Contact, Blog etc.</div>
+                </div>
+              </div>
+
+              <!-- 08. TIMELINE & DEADLINE -->
+              <div class="req-card">
+                <div class="req-section-header">
+                  <div class="req-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  </div>
+                  <div class="req-section-title">08. TIMELINE & DEADLINE</div>
+                </div>
+
+                <div class="req-row-2 req-group">
+                  <div>
+                    <label class="req-label">Expected Project Start Date <span class="req-required">*</span></label>
+                    <div class="req-date-wrap">
+                      <input type="date" name="start_date" class="req-input" required />
+                      <svg class="req-date-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="req-label">Expected Deadline <span class="req-required">*</span></label>
+                    <div class="req-date-wrap">
+                      <input type="date" name="expected_deadline" class="req-input" required />
+                      <svg class="req-date-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="req-group">
+                  <label class="req-label">Is there any fixed deadline?</label>
+                  <div class="req-radio-group">
+                    <label class="req-radio-label"><input type="radio" name="fixed_deadline" value="Yes" class="req-radio" /> <span>Yes</span></label>
+                    <label class="req-radio-label"><input type="radio" name="fixed_deadline" value="No" class="req-radio" /> <span>No</span></label>
+                  </div>
+                </div>
+
+                <div class="req-group" style="margin-top: 14px;">
+                  <label class="req-label">If yes, please specify</label>
+                  <textarea name="fixed_deadline_details" class="req-textarea" style="min-height: 70px;" placeholder="Please mention the deadline or reason..."></textarea>
+                </div>
+              </div>
+
+              <!-- 09. BUDGET & INFRASTRUCTURE -->
+              <div class="req-card">
+                <div class="req-section-header">
+                  <div class="req-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                  </div>
+                  <div class="req-section-title">09. BUDGET & INFRASTRUCTURE</div>
+                </div>
+
+                <div class="req-group">
+                  <label class="req-label">Estimated Budget Range <span class="req-required">*</span></label>
+                  <select name="budget_range" class="req-select" required>
+                    <option value="" disabled selected>Select budget range</option>
+                    <option value="₹10,000 - ₹25,000">₹10,000 - ₹25,000</option>
+                    <option value="₹25,000 - ₹50,000">₹25,000 - ₹50,000</option>
+                    <option value="₹50,000 - ₹1,00,000">₹50,000 - ₹1,00,000</option>
+                    <option value="₹1,00,000+">₹1,00,000+</option>
+                    <option value="Custom Quote">Custom Quote / Enterprise</option>
+                  </select>
+                </div>
+
+                <div class="req-group" style="margin-top: 18px;">
+                  <div class="req-row-2" style="align-items: center; margin-bottom: 12px;">
+                    <span class="req-label" style="margin-bottom:0;">Domain Name?</span>
+                    <div class="req-radio-group">
+                      <label class="req-radio-label"><input type="radio" name="has_domain" value="Yes" class="req-radio" /> <span>Yes</span></label>
+                      <label class="req-radio-label"><input type="radio" name="has_domain" value="No" class="req-radio" /> <span>No</span></label>
+                    </div>
+                  </div>
+
+                  <div class="req-row-2" style="align-items: center; margin-bottom: 12px;">
+                    <span class="req-label" style="margin-bottom:0;">Hosting Server?</span>
+                    <div class="req-radio-group">
+                      <label class="req-radio-label"><input type="radio" name="has_hosting" value="Yes" class="req-radio" /> <span>Yes</span></label>
+                      <label class="req-radio-label"><input type="radio" name="has_hosting" value="No" class="req-radio" /> <span>No</span></label>
+                    </div>
+                  </div>
+
+                  <div class="req-row-2" style="align-items: center;">
+                    <span class="req-label" style="margin-bottom:0;">Domain/Hosting Support?</span>
+                    <div class="req-radio-group">
+                      <label class="req-radio-label"><input type="radio" name="need_domain_hosting_help" value="Yes" class="req-radio" /> <span>Yes</span></label>
+                      <label class="req-radio-label"><input type="radio" name="need_domain_hosting_help" value="No" class="req-radio" /> <span>No</span></label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 10. ADDITIONAL NOTES & CHECKLIST -->
+              <div class="req-card">
+                <div class="req-section-header">
+                  <div class="req-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                  </div>
+                  <div class="req-section-title">10. ADDITIONAL NOTES & CHECKLIST</div>
+                </div>
+
+                <div class="req-group">
+                  <label class="req-label">Additional Notes / Special Requests</label>
+                  <textarea name="additional_notes" class="req-textarea" style="min-height: 85px;" placeholder="Any other requirements, ideas or notes..."></textarea>
+                </div>
+
+                <div class="req-checklist-card" style="margin-top: 18px;">
+                  <div class="req-checklist-header">
+                    <div class="req-checklist-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    </div>
+                    <div class="req-checklist-title">SUBMISSION CHECKLIST</div>
+                  </div>
+
+                  <div class="req-checklist-items">
+                    <label class="req-checklist-item">
+                      <input type="checkbox" name="chk_correct" class="req-checkbox" checked required />
+                      <span>I confirm that all the above information is correct.</span>
+                    </label>
+                    <label class="req-checklist-item">
+                      <input type="checkbox" name="chk_non_final" class="req-checkbox" checked required />
+                      <span>I understand that this form is not a final agreement.</span>
+                    </label>
+                    <label class="req-checklist-item">
+                      <input type="checkbox" name="chk_terms" class="req-checkbox" checked required />
+                      <span>I agree to the Terms & Conditions of Sun Nexus Solutions.</span>
+                    </label>
+                    <label class="req-checklist-item">
+                      <input type="checkbox" name="chk_updates" class="req-checkbox" checked />
+                      <span>I want to receive updates on my project via email / WhatsApp.</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- AUTHORIZATION (FULL WIDTH BOTTOM) -->
+            <div class="req-auth-card">
+              <div class="req-section-header">
+                <div class="req-icon-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <div class="req-section-title">AUTHORIZATION</div>
+              </div>
+
+              <div class="req-auth-grid">
+                <div class="req-auth-text">
+                  I hereby confirm that the information provided above is true to the best of my knowledge and I authorize Sun Nexus Solutions to contact me regarding my website request.
+                </div>
+
+                <div>
+                  <label class="req-label">Client Signature Upload <span class="req-required">*</span></label>
+                  <div class="req-sig-upload-box" id="sigUploadBox">
+                    <input type="file" id="sigFileInput" name="client_signature_file" accept="image/png, image/jpeg, image/jpg, image/svg+xml, image/webp" class="req-sig-file-input" required />
+                    
+                    <!-- Dropzone View -->
+                    <div class="req-sig-dropzone" id="sigDropzone">
+                      <div class="sig-upload-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                      </div>
+                      <div class="sig-upload-title">Upload Signature File</div>
+                      <div class="sig-upload-sub">Click or Drag & Drop Image (PNG, JPG, SVG)</div>
+                    </div>
+
+                    <!-- Uploaded Image Preview View -->
+                    <div class="req-sig-preview-wrap" id="sigPreviewWrap" style="display: none;">
+                      <div class="sig-preview-img-box">
+                        <img id="sigPreviewImg" src="" alt="Uploaded Signature Preview" />
+                      </div>
+                      <div class="sig-preview-info">
+                        <span class="sig-file-name" id="sigFileName">signature.png</span>
+                        <button type="button" class="req-sig-remove-btn" id="removeSigBtn">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="req-label">Date <span class="req-required">*</span></label>
+                  <div class="req-date-wrap">
+                    <input type="date" name="authorization_date" class="req-input" required />
+                    <svg class="req-date-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Trust & Security Banner -->
+              <div class="req-trust-banner">
+                <div class="trust-item"><span class="trust-icon">🔒</span> <span>256-Bit SSL Encrypted Submission</span></div>
+                <div class="trust-dot">•</div>
+                <div class="trust-item"><span class="trust-icon">⚡</span> <span>Direct Team Dispatch</span></div>
+                <div class="trust-dot">•</div>
+                <div class="trust-item"><span class="trust-icon">🛡️</span> <span>NDA & Privacy Guaranteed</span></div>
+              </div>
+
+              <!-- Action Bar -->
+              <div class="req-actions-bar">
+                <button type="reset" class="req-reset-btn">Reset Form</button>
+                <button type="submit" class="req-submit-btn">
+                  <span>Submit Requirement Form</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer (Identical to Contact Page Footer) -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="footer-logo">
+          <div class="footer-logo-wrap">
+            <img src="https://res.cloudinary.com/dseg9nty3/image/upload/v1784890597/7975077779d60f44fd5ccc4a43a38b32c8a7693eb2b3aeb58b2e475a8cf2279b_d1te0e.png" alt="Sun Nexus Logo" class="footer-logo-img" />
+          </div>
+          <span class="footer-logo-name">Sun Nexus Solutions</span>
+        </a>
+        <p class="footer-tagline">Empowering students with real-world tech skills, projects, and mentorship at Sandip University, Nashik.</p>
+        <div class="footer-socials">
+          <a href="https://www.linkedin.com/company/sunnexussolutions/" class="footer-social-btn" target="_blank"><span class="icon">💼</span> LinkedIn</a>
+          <a href="https://www.instagram.com/sun_nexus_solutions/" class="footer-social-btn" target="_blank"><span class="icon">📸</span> Instagram</a>
+          <a href="https://github.com/sunnexussolutions" class="footer-social-btn" target="_blank"><span class="icon">🐙</span> GitHub</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <p class="footer-bottom-copy">© 2025 <span>Sun Nexus Solutions</span>. All Rights Reserved.</p>
+        <div class="footer-badge"><span>●</span> Active Platform</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/nav-active.js"></script>
+  <script src="js/requirements.js"></script>
+</body>
+</html>

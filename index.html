@@ -44,12 +44,36 @@
       </div>
 
       <ul class="nav-links" id="navLinks">
-        <li class="active"><a href="index.html">Home</a></li>
+        <li><a href="index.html">Home</a></li>
         <li><a href="about-us.html">About Us</a></li>
         <li><a href="project.html">Projects</a></li>
         <li><a href="events.html">Events</a></li>
         <li><a href="mentor-ship.html">Mentorship</a></li>
-        <li><a href="contact.html">Contact</a></li>
+        <li class="nav-dropdown">
+          <a href="contact.html" class="dropdown-toggle">
+            Contact Us <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="contact.html">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <span>Contact Form</span>
+              </a>
+            </li>
+            <li>
+              <a href="joining.html">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                <span>Joining Form</span>
+              </a>
+            </li>
+            <li>
+              <a href="requirements.html">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Requirements Form</span>
+              </a>
+            </li>
+          </ul>
+        </li>
       </ul>
 
       <div class="nav-actions">
@@ -98,8 +122,8 @@
                 </svg>
               </div>
               <div class="hero-card-details">
-                <span class="badge-number">10K+</span>
-                <span class="badge-label">Active Students</span>
+                <span class="badge-number" data-stat-key="home_hero_active_students">10K+</span>
+                <span class="badge-label" data-stat-label-key="home_hero_active_students">Active Students</span>
               </div>
             </div>
             <div class="hero-badge-card">
@@ -111,8 +135,8 @@
                 </svg>
               </div>
               <div class="hero-card-details">
-                <span class="badge-number">200+</span>
-                <span class="badge-label">Expert Mentors</span>
+                <span class="badge-number" data-stat-key="home_hero_expert_mentors">200+</span>
+                <span class="badge-label" data-stat-label-key="home_hero_expert_mentors">Expert Mentors</span>
               </div>
             </div>
           </div>
@@ -151,8 +175,8 @@
               <path d="M12 3C14.5 6 15.5 9 15.5 12C15.5 15 14.5 18 12 21C9.5 18 8.5 15 8.5 12C8.5 9 9.5 6 12 3Z" stroke="currentColor" stroke-width="2" />
             </svg>
           </div>
-          <span class="stat-val">50+</span>
-          <span class="stat-lbl">Domains</span>
+          <span class="stat-val" data-stat-key="home_row_domains">50+</span>
+          <span class="stat-lbl" data-stat-label-key="home_row_domains">Domains</span>
         </div>
         <div class="stat-grid-card">
           <div class="stat-icon-wrap cyan">
@@ -161,8 +185,8 @@
               <path d="M14 4L10 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             </svg>
           </div>
-          <span class="stat-val">1K+</span>
-          <span class="stat-lbl">Projects Published</span>
+          <span class="stat-val" data-stat-key="home_row_projects">1K+</span>
+          <span class="stat-lbl" data-stat-label-key="home_row_projects">Projects Published</span>
         </div>
         <div class="stat-grid-card">
           <div class="stat-icon-wrap blue">
@@ -172,8 +196,8 @@
               <path d="M9 15L11 17L15 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </div>
-          <span class="stat-val">100+</span>
-          <span class="stat-lbl">Events Organized</span>
+          <span class="stat-val" data-stat-key="home_row_events">100+</span>
+          <span class="stat-lbl" data-stat-label-key="home_row_events">Events Organized</span>
         </div>
         <div class="stat-grid-card">
           <div class="stat-icon-wrap purple">
@@ -182,8 +206,8 @@
               <path d="M8.5 14C10 14 11.2 13 12 11.8C12.8 13 14 14 15.5 14C17.7 14 19.5 12.2 19.5 10C19.5 7.8 17.7 6 15.5 6C14 6 12.8 7 12 8.2C11.2 7 10 6 8.5 6C6.3 6 4.5 7.8 4.5 10C4.5 12.2 6.3 14 8.5 14Z" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <span class="stat-val">∞</span>
-          <span class="stat-lbl">Possibilities</span>
+          <span class="stat-val" data-stat-key="home_row_possibilities">∞</span>
+          <span class="stat-lbl" data-stat-label-key="home_row_possibilities">Possibilities</span>
         </div>
       </div>
     </section>
@@ -341,7 +365,7 @@
       </div>
   </main>
 
-  <!-- Ready to Forge the Future CTA Section -->
+  <!-- Ready to Forge the Future CTA Section (Commented Out)
   <section class="nexus-cta-section">
     <div class="nexus-cta-card">
       <div class="cta-content">
@@ -368,6 +392,7 @@
       </div>
     </div>
   </section>
+  -->
 
   <!-- ════════════════════════════════════════════════════
        FOOTER SECTION
@@ -550,6 +575,7 @@
     </div>
   </div>
 
+  <script src="js/stat-cards.js"></script>
   <script src="js/nav-active.js"></script>
   <script src="js/home.js"></script>
 </body>
