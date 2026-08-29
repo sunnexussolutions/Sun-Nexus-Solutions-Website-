@@ -5,7 +5,7 @@ import {
   Plus, Trash2, Eye, X, Save, ChevronDown, ChevronUp,
   BarChart3, FileText, Send, Star, Zap, Calendar, TrendingUp,
   User, Layers, Code2, Code, Database, Palette, Server, Smartphone, Cloud,
-  Rocket, ArrowRight, GitBranch, Link as LinkIcon,
+  Rocket, ArrowRight, GitBranch, Link as LinkIcon, MapPin, Target, Globe, ExternalLink,
   Phone, CreditCard, GraduationCap, Building2, Briefcase, Folder, Edit3, Lock, Check, MoreVertical
 } from 'lucide-react';
 import {
@@ -15,12 +15,14 @@ import {
   getNotifications, addNotification, deleteNotification,
   getProjects, addProject, updateProject, deleteProject,
   getHiringSubmissions, deleteHiringSubmission, updateHiringSubmission, getDomains,
+  getProjectRequirements, deleteProjectRequirement, updateProjectRequirementStatus,
   getHomeContent, saveHomeContent, DEFAULT_HOME_CONTENT,
   getStatCards, saveStatCards, DEFAULT_STAT_CARDS,
   getDSATopics, getDSAProblems,
   addDSATopic, updateDSATopic, deleteDSATopic,
   addDSAProblem, updateDSAProblem, deleteDSAProblem,
   getDSASolutions, updateDSASolutionStatus, deleteDSASolution,
+  getAlumni, addAlumnus, updateAlumnus, deleteAlumnus,
 } from '../store/dataStore';
 import AdminDSATab from './AdminDSATab';
 import Projects from './Projects';
@@ -42,10 +44,10 @@ const TABS = [
   { id: 'submissions',   label: 'Submissions',   icon: FileText },
   { id: 'domains',       label: 'Domains',       icon: Layers },
   { id: 'projects',      label: 'Projects',      icon: Rocket },
+  { id: 'alumni',        label: 'Alumni',        icon: GraduationCap },
   { id: 'users',         label: 'Users',         icon: Users },
   { id: 'discussions',   label: 'Discussions',   icon: MessageSquare },
-  { id: 'notifications', label: 'Notifications', icon: Bell },
-  { id: 'hiring',        label: 'Hiring',        icon: ShieldCheck },
+  { id: 'inquiries',     label: 'Inquiries',     icon: ShieldCheck },
 ];
 
 const CATEGORIES = ['Quantitative', 'Logical Reasoning', 'Verbal Ability'];
@@ -502,8 +504,20 @@ const Admin = () => {
   const [editingDiscussionId, setEditingDiscussionId] = useState(null);
   const [editingNotificationId, setEditingNotificationId] = useState(null);
   const [editingDomainId, setEditingDomainId] = useState(null);
-  const [editingProjectId, setEditingProjectId] = useState(null);
   const [projectSubTab, setProjectSubTab] = useState('view'); // 'view' | 'manage'
+  const [hiringSubTab, setHiringSubTab] = useState('hiring'); // 'hiring' | 'freelance'
+  const [requirements, setRequirements] = useState([]);
+  const [reqSearch, setReqSearch] = useState('');
+  const [reqStatusFilter, setReqStatusFilter] = useState('ALL');
+  const [selectedReqDetail, setSelectedReqDetail] = useState(null);
+  const [expandedReqIds, setExpandedReqIds] = useState({});
+
+  const toggleExpandReq = (id) => {
+    setExpandedReqIds(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   // DSA state
   const [dsaTopics, setDsaTopics] = useState([]);
@@ -526,6 +540,67 @@ const Admin = () => {
   const [subStatusFilter, setSubStatusFilter] = useState('ALL');
   const [selectedSubDetail, setSelectedSubDetail] = useState(null);
   const [dsaSolutions, setDsaSolutions] = useState([]);
+
+  // ── ALUMNI MANAGEMENT STATE ──
+  const [alumniList, setAlumniList] = useState([]);
+  const [alumniLoading, setAlumniLoading] = useState(false);
+  const [alumniSearch, setAlumniSearch] = useState('');
+  const [alumniBatchFilter, setAlumniBatchFilter] = useState('All Batches');
+  const [showAlumniModal, setShowAlumniModal] = useState(false);
+  const [editingAlumnus, setEditingAlumnus] = useState(null);
+  const [alumniForm, setAlumniForm] = useState({
+    name: '', profile_image: '', batch: '2024', is_leader: false,
+    leadership_role: '', current_role: '', company: '', location: '',
+    country: 'India', skills: '', linkedin_url: '', github_url: '',
+    portfolio_url: '', bio: '', is_active: true
+  });
+
+  const loadAlumniData = async () => {
+    try {
+      setAlumniLoading(true);
+      const data = await getAlumni({ include_inactive: true });
+      setAlumniList(data || []);
+    } catch (e) {
+      console.error('Failed to load alumni:', e);
+    } finally {
+      setAlumniLoading(false);
+    }
+  };
+
+  const handleSaveAlumnus = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingAlumnus) {
+        await updateAlumnus(editingAlumnus.id, alumniForm);
+      } else {
+        await addAlumnus(alumniForm);
+      }
+      setShowAlumniModal(false);
+      setEditingAlumnus(null);
+      await loadAlumniData();
+    } catch (err) {
+      alert('Error saving alumnus: ' + err.message);
+    }
+  };
+
+  const handleDeleteAlumnus = async (id) => {
+    if (!confirm('Are you sure you want to delete this alumnus?')) return;
+    try {
+      await deleteAlumnus(id);
+      await loadAlumniData();
+    } catch (err) {
+      alert('Error deleting alumnus: ' + err.message);
+    }
+  };
+
+  const handleToggleAlumnusActive = async (alumnus) => {
+    try {
+      await updateAlumnus(alumnus.id, { is_active: !alumnus.is_active });
+      await loadAlumniData();
+    } catch (err) {
+      alert('Error toggling status: ' + err.message);
+    }
+  };
 
   // Dynamic Topic Proficiency Stats calculated from results
   const topicProficiencyStats = React.useMemo(() => {
@@ -685,15 +760,16 @@ const Admin = () => {
   const refresh = React.useCallback(async () => {
     setLoading(true);
     try {
-      const [a, u, r, d, n, s, p, doms, hc, dt, dp, sc] = await Promise.all([
+      const [a, u, r, d, n, s, p, doms, hc, dt, dp, sc, reqs] = await Promise.all([
         getAssessments(), getUsers(), getResults(),
         getDiscussions(), getNotifications(), getHiringSubmissions(),
         getProjects(), getDomains(), getHomeContent(),
-        getDSATopics(), getDSAProblems(), getStatCards()
+        getDSATopics(), getDSAProblems(), getStatCards(),
+        getProjectRequirements()
       ]);
       setAssessments(a); setUsers(u); setResults(r);
       setDiscussions(d); setNotifications(n); setSubmissions(s);
-      setProjects(p); setDomains(doms);
+      setProjects(p); setDomains(doms); setRequirements(reqs || []);
       setDsaTopics(dt || []); setDsaProblems(dp || []);
       
       let mergedCards = sc || DEFAULT_STAT_CARDS;
@@ -729,7 +805,16 @@ const Admin = () => {
 
   useEffect(() => {
     refresh();
+    if (tab === 'alumni') {
+      loadAlumniData();
+    }
   }, [refresh, tab]);
+
+  useEffect(() => {
+    if ((tab === 'inquiries' || tab === 'hiring') && hiringSubTab === 'freelance') {
+      getProjectRequirements().then(reqs => setRequirements(reqs || []));
+    }
+  }, [tab, hiringSubTab]);
 
   const formatDateForInput = (dateString) => {
     if (!dateString) return '';
@@ -2683,8 +2768,8 @@ const Admin = () => {
       </div>
     )}
 
-    {/* ── HIRING CONTROL CENTER ── */}
-    {tab === 'hiring' && (() => {
+    {/* ── SUBMISSIONS CONTROL CENTER ── */}
+    {tab === 'submissions' && (() => {
       const filteredResults = results.filter(r => {
         const queryStr = (subSearch || '').toLowerCase();
         const matchesSearch = !queryStr || 
@@ -2894,94 +2979,2132 @@ const Admin = () => {
       );
     })()}
 
-    {/* ── HIRING SUBMISSIONS ── */}
-    {tab === 'hiring' && (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>Hiring Protocol</h3>
-            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Manage core team candidate submissions</p>
+    {/* ── INQUIRIES & FREELANCE SUBMISSIONS ── */}
+    {(tab === 'inquiries' || tab === 'hiring') && (() => {
+      const filteredRequirements = requirements.filter(r => {
+        const queryStr = (reqSearch || '').toLowerCase();
+        const matchesSearch = !queryStr ||
+          (r.clientName || '').toLowerCase().includes(queryStr) ||
+          (r.businessName || '').toLowerCase().includes(queryStr) ||
+          (r.projectTitle || '').toLowerCase().includes(queryStr) ||
+          (r.email || '').toLowerCase().includes(queryStr);
+        
+        const matchesStatus = reqStatusFilter === 'ALL' || (r.status || 'pending') === reqStatusFilter;
+        return matchesSearch && matchesStatus;
+      });
+
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Header & Sub-Tab Bar */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>Inquiries & Ingestion Control</h3>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Manage student joining inquiries & client freelance website requirements</p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', background: 'var(--bg-secondary)', padding: '4px', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
+                <button
+                  onClick={() => setHiringSubTab('hiring')}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '9px',
+                    border: 'none',
+                    fontSize: '13px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    background: hiringSubTab === 'hiring' ? 'var(--accent-gradient)' : 'transparent',
+                    color: hiringSubTab === 'hiring' ? '#ffffff' : 'var(--text-muted)',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  👥 Joining Inquiries ({submissions.length})
+                </button>
+                <button
+                  onClick={() => setHiringSubTab('freelance')}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '9px',
+                    border: 'none',
+                    fontSize: '13px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    background: hiringSubTab === 'freelance' ? 'var(--accent-gradient)' : 'transparent',
+                    color: hiringSubTab === 'freelance' ? '#ffffff' : 'var(--text-muted)',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  💼 Freelance Inquiries ({requirements.length})
+                </button>
+              </div>
+
+              <button onClick={refresh} style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                Sync Inquiries
+              </button>
+            </div>
           </div>
-          <button onClick={refresh} style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
-            Sync Submissions
-          </button>
-        </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {submissions.length === 0 ? (
-            <Card><p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No candidate submissions yet.</p></Card>
-          ) : (
-            submissions.map(s => (
-              <Card key={s.id} style={{ position: 'relative' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                  <div>
-                    <h4 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)', marginBottom: '4px' }}>{s.name}</h4>
-                    <p style={{ fontSize: '13px', color: 'var(--accent-primary)', fontWeight: 600 }}>{s.email}</p>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 800, padding: '4px 12px', borderRadius: '8px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
-                      {s.academicYear} | {s.branch}{s.division && s.division !== 'N/A' ? ` | Div ${s.division}` : ''}
-                    </span>
-                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Graduation: {s.graduationYear}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl bg-black/20 border border-white/5 mb-4">
-                  <div>
-                    <h5 style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Candidate & Technical Profile</h5>
-                    <p style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
-                      <strong>📱 Mobile:</strong>{' '}
-                      <span style={{ color: (s.mobile && s.mobile !== 'N/A') ? '#10b981' : 'var(--text-muted)', fontWeight: 700 }}>
-                        {s.mobile && s.mobile !== 'N/A' ? s.mobile : 'Not Provided'}
-                      </span>
-                    </p>
-                    <p style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
-                      <strong>🆔 PRN Number:</strong>{' '}
-                      <span style={{ color: (s.prn && s.prn !== 'N/A') ? '#38bdf8' : 'var(--text-muted)', fontWeight: 700 }}>
-                        {s.prn && s.prn !== 'N/A' ? s.prn : 'Not Provided'}
-                      </span>
-                    </p>
-                    <p style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
-                      <strong>🏫 Division:</strong>{' '}
-                      <span style={{ color: (s.division && s.division !== 'N/A') ? '#ec4899' : 'var(--text-muted)', fontWeight: 700 }}>
-                        {s.division && s.division !== 'N/A' ? s.division : 'Not Provided'}
-                      </span>
-                    </p>
-                    <p style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>Domain:</strong> {s.domain}</p>
-                    {s.specialization && <p style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>Specialization:</strong> {s.specialization}</p>}
-                    {s.languages && <p style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>Stack:</strong> {s.languages}</p>}
-                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '8px' }}><strong>Skills:</strong> {s.skills}</p>
-                  </div>
-                  <div>
-                    <h5 style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Portfolios & Proof</h5>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px' }}>
-                      {s.github && <a href={s.github} target="_blank" rel="noreferrer" style={{ padding: '6px 12px', borderRadius: '8px', background: '#24292e', color: 'white', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>GitHub</a>}
-                      {s.linkedin && <a href={s.linkedin} target="_blank" rel="noreferrer" style={{ padding: '6px 12px', borderRadius: '8px', background: '#0077b5', color: 'white', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>LinkedIn</a>}
-                      {s.codechef && <a href={s.codechef} target="_blank" rel="noreferrer" style={{ padding: '6px 12px', borderRadius: '8px', background: '#5b4638', color: 'white', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>CodeChef</a>}
-                      {s.hackerrank && <a href={s.hackerrank} target="_blank" rel="noreferrer" style={{ padding: '6px 12px', borderRadius: '8px', background: '#2ec866', color: 'white', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>HackerRank</a>}
+          {/* 1. JOINING INQUIRIES SUB TAB */}
+          {hiringSubTab === 'hiring' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {submissions.length === 0 ? (
+                <Card><p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No student joining inquiries yet.</p></Card>
+              ) : (
+                submissions.map(s => (
+                  <Card key={s.id} style={{ position: 'relative' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                      <div>
+                        <h4 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)', marginBottom: '4px' }}>{s.name}</h4>
+                        <p style={{ fontSize: '13px', color: 'var(--accent-primary)', fontWeight: 600 }}>{s.email}</p>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 800, padding: '4px 12px', borderRadius: '8px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
+                          {s.academicYear} | {s.branch}{s.division && s.division !== 'N/A' ? ` | Div ${s.division}` : ''}
+                        </span>
+                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Graduation: {s.graduationYear}</p>
+                      </div>
                     </div>
-                    {s.projects && (
-                      <div style={{ marginTop: '12px' }}>
-                        <h6 style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)' }}>Project:</h6>
-                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{s.projects}</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl bg-black/20 border border-white/5 mb-4">
+                      <div>
+                        <h5 style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Candidate & Technical Profile</h5>
+                        <p style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                          <strong>📱 Mobile:</strong>{' '}
+                          <span style={{ color: (s.mobile && s.mobile !== 'N/A') ? '#10b981' : 'var(--text-muted)', fontWeight: 700 }}>
+                            {s.mobile && s.mobile !== 'N/A' ? s.mobile : 'Not Provided'}
+                          </span>
+                        </p>
+                        <p style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                          <strong>🆔 PRN Number:</strong>{' '}
+                          <span style={{ color: (s.prn && s.prn !== 'N/A') ? '#38bdf8' : 'var(--text-muted)', fontWeight: 700 }}>
+                            {s.prn && s.prn !== 'N/A' ? s.prn : 'Not Provided'}
+                          </span>
+                        </p>
+                        <p style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                          <strong>🏫 Division:</strong>{' '}
+                          <span style={{ color: (s.division && s.division !== 'N/A') ? '#ec4899' : 'var(--text-muted)', fontWeight: 700 }}>
+                            {s.division && s.division !== 'N/A' ? s.division : 'Not Provided'}
+                          </span>
+                        </p>
+                        <p style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>Domain:</strong> {s.domain}</p>
+                        {s.specialization && <p style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>Specialization:</strong> {s.specialization}</p>}
+                        {s.languages && <p style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>Stack:</strong> {s.languages}</p>}
+                        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '8px' }}><strong>Skills:</strong> {s.skills}</p>
+                      </div>
+                      <div>
+                        <h5 style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Portfolios & Proof</h5>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px' }}>
+                          {s.github && <a href={s.github} target="_blank" rel="noreferrer" style={{ padding: '6px 12px', borderRadius: '8px', background: '#24292e', color: 'white', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>GitHub</a>}
+                          {s.linkedin && <a href={s.linkedin} target="_blank" rel="noreferrer" style={{ padding: '6px 12px', borderRadius: '8px', background: '#0077b5', color: 'white', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>LinkedIn</a>}
+                          {s.codechef && <a href={s.codechef} target="_blank" rel="noreferrer" style={{ padding: '6px 12px', borderRadius: '8px', background: '#5b4638', color: 'white', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>CodeChef</a>}
+                          {s.hackerrank && <a href={s.hackerrank} target="_blank" rel="noreferrer" style={{ padding: '6px 12px', borderRadius: '8px', background: '#2ec866', color: 'white', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>HackerRank</a>}
+                        </div>
+                        {s.projects && (
+                          <div style={{ marginTop: '12px' }}>
+                            <h6 style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)' }}>Project:</h6>
+                            <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{s.projects}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Submitted: {new Date(s.createdAt).toLocaleString()}</span>
+                      <button onClick={() => { if(confirm('Revoke this candidate submission?')) { deleteHiringSubmission(s.id); refresh(); } }}
+                        style={{ padding: '8px 14px', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                        Revoke Submission
+                      </button>
+                    </div>
+                  </Card>
+                ))
+              )}
+            </div>
+          )}
+
+          {/* 2. FREELANCE REQUIREMENTS SUB TAB */}
+          {hiringSubTab === 'freelance' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Metrics Header Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <Card style={{ padding: '16px 20px', background: 'var(--bg-secondary)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total Inquiries</p>
+                      <h4 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--text-primary)', margin: '4px 0 0 0' }}>{requirements.length}</h4>
+                    </div>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Briefcase size={20} />
+                    </div>
+                  </div>
+                </Card>
+
+                <Card style={{ padding: '16px 20px', background: 'var(--bg-secondary)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Pending Review</p>
+                      <h4 style={{ fontSize: '24px', fontWeight: 900, color: '#f59e0b', margin: '4px 0 0 0' }}>
+                        {requirements.filter(r => (r.status || 'pending') === 'pending').length}
+                      </h4>
+                    </div>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Zap size={20} />
+                    </div>
+                  </div>
+                </Card>
+
+                <Card style={{ padding: '16px 20px', background: 'var(--bg-secondary)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>In Progress</p>
+                      <h4 style={{ fontSize: '24px', fontWeight: 900, color: '#4A90C2', margin: '4px 0 0 0' }}>
+                        {requirements.filter(r => r.status === 'in_progress').length}
+                      </h4>
+                    </div>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(40, 114, 161, 0.15)', color: '#4A90C2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Rocket size={20} />
+                    </div>
+                  </div>
+                </Card>
+
+                <Card style={{ padding: '16px 20px', background: 'var(--bg-secondary)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Completed</p>
+                      <h4 style={{ fontSize: '24px', fontWeight: 900, color: '#22c55e', margin: '4px 0 0 0' }}>
+                        {requirements.filter(r => r.status === 'completed').length}
+                      </h4>
+                    </div>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Check size={20} />
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Filters */}
+              <Card style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <input 
+                  type="text" 
+                  placeholder="Search by client name, business name, project title, or email..." 
+                  value={reqSearch} 
+                  onChange={e => setReqSearch(e.target.value)} 
+                  style={{ flex: 1, minWidth: '240px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-strong)', borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none' }}
+                />
+                <select 
+                  value={reqStatusFilter} 
+                  onChange={e => setReqStatusFilter(e.target.value)}
+                  style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-strong)', borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', cursor: 'pointer' }}
+                >
+                  <option value="ALL">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </Card>
+
+              {/* Freelance Cards List */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {filteredRequirements.length === 0 ? (
+                  <Card><p style={{ textAlign: 'center', color: 'var(--text-muted)', margin: '1rem 0' }}>No project requirements match your search/filter.</p></Card>
+                ) : (
+                  filteredRequirements.map(req => {
+                    const st = req.status || 'pending';
+                    const statusColor = st === 'completed' ? '#22c55e' : st === 'in_progress' ? '#4A90C2' : '#f59e0b';
+                    const isExpanded = !!expandedReqIds[req.id];
+
+                    return (
+                      <Card 
+                        key={req.id} 
+                        style={{ 
+                          position: 'relative', 
+                          borderRadius: '16px',
+                          border: '1px solid var(--border-subtle, #e2e8f0)',
+                          background: 'var(--card-bg, #ffffff)',
+                          padding: '20px 24px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
+                        }}
+                        onClick={() => toggleExpandReq(req.id)}
+                      >
+                        {/* Summary Header (Always Visible) */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, minWidth: '260px' }}>
+                            {/* Blue Avatar Box */}
+                            <div style={{
+                              width: '48px',
+                              height: '48px',
+                              borderRadius: '12px',
+                              background: '#2872A1',
+                              color: '#ffffff',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '24px',
+                              fontWeight: 800,
+                              flexShrink: 0,
+                              boxShadow: '0 4px 12px rgba(40, 114, 161, 0.25)'
+                            }}>
+                              {req.projectTitle ? req.projectTitle.trim().charAt(0).toUpperCase() : 'B'}
+                            </div>
+
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                                <h4 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary, #0f172a)', margin: 0, letterSpacing: '-0.01em' }}>
+                                  {req.projectTitle}
+                                </h4>
+                                <span style={{
+                                  fontSize: '11px',
+                                  fontWeight: 700,
+                                  padding: '3px 8px',
+                                  borderRadius: '6px',
+                                  background: 'rgba(40, 114, 161, 0.15)',
+                                  color: '#2872A1',
+                                  display: 'inline-block'
+                                }}>
+                                  {req.budgetRange}
+                                </span>
+                              </div>
+                              <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 500, margin: '4px 0 0 0' }}>
+                                Client: <span style={{ color: '#2872A1', fontWeight: 600 }}>{req.clientName} {req.contactPerson ? `(${req.contactPerson})` : ''}</span> • <span style={{ color: '#2872A1', fontWeight: 600 }}>{req.email}</span>
+                              </p>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }} onClick={e => e.stopPropagation()}>
+                            <select
+                              value={st}
+                              onChange={async (e) => {
+                                await updateProjectRequirementStatus(req.id, e.target.value);
+                                refresh();
+                              }}
+                              style={{
+                                background: st === 'completed' ? '#f0fdf4' : st === 'in_progress' ? '#ecfeff' : '#fffbeb',
+                                color: st === 'completed' ? '#16a34a' : st === 'in_progress' ? '#2872A1' : '#d97706',
+                                border: 'none',
+                                borderRadius: '8px',
+                                padding: '8px 14px',
+                                fontSize: '11px',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                outline: 'none',
+                                appearance: 'none',
+                                WebkitAppearance: 'none',
+                                MozAppearance: 'none',
+                                letterSpacing: '0.04em',
+                                textAlign: 'center'
+                              }}
+                            >
+                              <option value="pending" style={{ background: '#0f172a', color: '#f59e0b' }}>STATUS: PENDING</option>
+                              <option value="in_progress" style={{ background: '#0f172a', color: '#4A90C2' }}>STATUS: IN PROGRESS</option>
+                              <option value="completed" style={{ background: '#0f172a', color: '#22c55e' }}>STATUS: COMPLETED</option>
+                            </select>
+
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleExpandReq(req.id);
+                              }}
+                              style={{
+                                background: 'var(--bg-tertiary, #f1f5f9)',
+                                border: '1px solid var(--border-subtle, #e2e8f0)',
+                                color: '#64748b',
+                                borderRadius: '8px',
+                                width: '34px',
+                                height: '34px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                              }}
+                              title={isExpanded ? "Collapse details" : "Expand details dropdown"}
+                            >
+                              <ChevronDown 
+                                size={16} 
+                                style={{
+                                  transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.25s ease'
+                                }} 
+                              />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Expandable Details Section (Reveals on Click) */}
+                        <AnimatePresence>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                              animate={{ opacity: 1, height: 'auto', marginTop: 18 }}
+                              exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              style={{ overflow: 'hidden', cursor: 'default' }}
+                              onClick={e => e.stopPropagation()}
+                            >
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                {/* Two Column Grid */}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+                                  {/* Left: Contact & Business Info */}
+                                  <div style={{
+                                    background: 'var(--card-bg, #ffffff)',
+                                    border: '1px solid var(--border-subtle, #e2e8f0)',
+                                    borderRadius: '12px',
+                                    padding: '18px 20px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '12px'
+                                  }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#2563eb', fontSize: '11.5px', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                                      <div style={{ width: '22px', height: '22px', borderRadius: '6px', background: 'rgba(37, 99, 235, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <FileText size={13} color="#2563eb" />
+                                      </div>
+                                      CONTACT & BUSINESS INFO
+                                    </div>
+
+                                    <div style={{ fontSize: '13px', color: 'var(--text-primary, #334155)', lineHeight: 1.6, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                      <div><span style={{ marginRight: '6px' }}>🏢</span><strong>Business:</strong> {req.businessName} ({req.businessType || 'Startup'})</div>
+                                      <div><span style={{ marginRight: '6px' }}>💬</span><strong>Phone / WhatsApp:</strong> {req.phone} {req.whatsapp ? `/ WA: ${req.whatsapp}` : `/ WA: ${req.phone}`}</div>
+                                      <div><span style={{ marginRight: '6px' }}>📍</span><strong>Address:</strong> {req.address}</div>
+                                      <div><span style={{ marginRight: '6px' }}>🎯</span><strong>Purpose:</strong> {req.purposeOfWebsite}</div>
+                                      <div><span style={{ marginRight: '6px' }}>🌐</span><strong>Website Type:</strong> {req.websiteType}</div>
+                                      {req.referenceLinks && req.referenceLinks !== 'N/A' && (
+                                        <div><span style={{ marginRight: '6px' }}>🔗</span><strong>References:</strong> <span style={{ wordBreak: 'break-all' }}>{req.referenceLinks}</span></div>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Right: Scope, Timeline & Tech Specs */}
+                                  <div style={{
+                                    background: 'var(--card-bg, #ffffff)',
+                                    border: '1px solid var(--border-subtle, #e2e8f0)',
+                                    borderRadius: '12px',
+                                    padding: '18px 20px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '12px'
+                                  }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#2563eb', fontSize: '11.5px', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                                      <div style={{ width: '22px', height: '22px', borderRadius: '6px', background: 'rgba(37, 99, 235, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Layers size={13} color="#2563eb" />
+                                      </div>
+                                      SCOPE, TIMELINE & TECH SPECS
+                                    </div>
+
+                                    <div style={{ fontSize: '13px', color: 'var(--text-primary, #334155)', lineHeight: 1.6, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                      <div><span style={{ marginRight: '6px' }}>⭐</span><strong>Features:</strong> {req.features || 'Home Page, About Us, Services / Products, Gallery / Portfolio, Blog / News, Contact Us, FAQ, Testimonial / Reviews, Team / Our Team, Pricing / Plans, Login / Register, User Dashboard, Admin Panel, Booking / Appointment, Payment Gateway, Search / Filter, Live Chat / WhatsApp'}</div>
+                                      {req.otherFeatures && <div><strong>Other Features:</strong> {req.otherFeatures}</div>}
+                                      <div><span style={{ marginRight: '6px' }}>🎨</span><strong>Design Pref:</strong> {req.designPreference || 'No, I need suggestions from your team'} (Colors: {req.colorPreference || 'Tech theme'})</div>
+                                      <div><span style={{ marginRight: '6px' }}>📅</span><strong>Timeline:</strong> Start {req.startDate} → Deadline {req.expectedDeadline}</div>
+                                      <div><span style={{ marginRight: '6px' }}>🗄️</span><strong>Infrastructure:</strong> Domain: {req.hasDomain || 'Yes'} | Hosting: {req.hasHosting || 'No'} | Support: {req.needDomainHostingHelp || 'Yes'}</div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Description Box */}
+                                <div style={{
+                                  background: 'var(--card-bg, #ffffff)',
+                                  border: '1px solid var(--border-subtle, #e2e8f0)',
+                                  borderRadius: '10px',
+                                  padding: '14px 18px'
+                                }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#2563eb', fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', marginBottom: '6px' }}>
+                                    <FileText size={13} color="#2563eb" />
+                                    PROJECT / BUSINESS DESCRIPTION
+                                  </div>
+                                  <p style={{ fontSize: '13px', color: 'var(--text-primary, #334155)', margin: 0, lineHeight: 1.5 }}>
+                                    {req.businessDescription || 'About Education'}
+                                  </p>
+                                </div>
+
+                                {/* Additional Notes Box */}
+                                {req.additionalNotes && (
+                                  <div style={{
+                                    background: '#fffaf5',
+                                    border: '1px solid #fed7aa',
+                                    borderRadius: '10px',
+                                    padding: '14px 18px'
+                                  }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ea580c', fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', marginBottom: '6px' }}>
+                                      <FileText size={13} color="#ea580c" />
+                                      ADDITIONAL CLIENT NOTES
+                                    </div>
+                                    <p style={{ fontSize: '13px', color: '#475569', margin: 0, lineHeight: 1.5 }}>
+                                      {req.additionalNotes}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Footer Bar */}
+                                <div style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  flexWrap: 'wrap',
+                                  gap: '12px',
+                                  paddingTop: '12px',
+                                  borderTop: '1px solid var(--border-subtle, #f1f5f9)'
+                                }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#64748b' }}>
+                                    <Calendar size={14} color="#64748b" />
+                                    <span>
+                                      Submitted: {new Date(req.createdAt).toLocaleString('en-GB', {
+                                        day: 'numeric',
+                                        month: 'numeric',
+                                        year: 'numeric',
+                                        hour: 'numeric',
+                                        minute: 'numeric',
+                                        second: 'numeric',
+                                        hour12: true
+                                      })}
+                                    </span>
+                                    {req.clientSignature && req.clientSignature.startsWith('data:image') && (
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: '10px' }}>
+                                        <span style={{ fontSize: '11px', fontWeight: 700, color: '#10b981' }}>✍️ Signature Verified</span>
+                                        <img src={req.clientSignature} alt="Client Signature" style={{ height: '24px', maxWidth: '80px', objectFit: 'contain', background: '#ffffff', padding: '2px 4px', borderRadius: '4px' }} />
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <button
+                                    onClick={() => {
+                                      if (confirm('Delete this project requirement submission?')) {
+                                        deleteProjectRequirement(req.id);
+                                        refresh();
+                                      }
+                                    }}
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '6px',
+                                      padding: '6px 14px',
+                                      borderRadius: '8px',
+                                      background: 'transparent',
+                                      color: '#ef4444',
+                                      border: '1.5px solid rgba(239, 68, 68, 0.4)',
+                                      fontWeight: 700,
+                                      fontSize: '12px',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.2s ease'
+                                    }}
+                                    onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.06)'}
+                                    onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+                                  >
+                                    <Trash2 size={13} color="#ef4444" />
+                                    Delete Ingestion
+                                  </button>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </Card>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    })()}
+
+    {/* ── ALUMNI DIRECTORY & MANAGEMENT TAB ── */}
+    {tab === 'alumni' && (() => {
+      const uniqueBatches = Array.from(new Set(alumniList.map(a => a.batch))).sort((a, b) => b.localeCompare(a));
+      
+      const filteredAlumni = alumniList.filter(a => {
+        const query = alumniSearch.toLowerCase();
+        const matchesSearch = !query ||
+          (a.name || '').toLowerCase().includes(query) ||
+          (a.current_role || '').toLowerCase().includes(query) ||
+          (a.company || '').toLowerCase().includes(query) ||
+          (a.skills || '').toLowerCase().includes(query) ||
+          (a.location || '').toLowerCase().includes(query);
+
+        const matchesBatch = alumniBatchFilter === 'All Batches' || a.batch === alumniBatchFilter;
+        return matchesSearch && matchesBatch;
+      });
+
+      const leaderCount = alumniList.filter(a => a.is_leader).length;
+      const activeCount = alumniList.filter(a => a.is_active !== false).length;
+
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {/* Header & Controls */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <h3 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <GraduationCap size={26} color="var(--accent-primary, #6366f1)" />
+                Alumni Network & Directory
+                <span style={{ fontSize: '12px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--accent-primary)', padding: '3px 10px', borderRadius: '12px', fontWeight: 800 }}>
+                  {alumniList.length} Total
+                </span>
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                Manage verified alumni profiles, leadership distinctions, batch assignments, and public showcase data
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <button
+                onClick={loadAlumniData}
+                style={{
+                  padding: '9px 16px',
+                  borderRadius: '10px',
+                  background: 'var(--bg-secondary)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-subtle)',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                ↻ Sync Alumni
+              </button>
+
+              <button
+                onClick={() => {
+                  setEditingAlumnus(null);
+                  setAlumniForm({
+                    name: '', profile_image: '', batch: '2024', is_leader: false,
+                    leadership_role: '', current_role: '', company: '', location: '',
+                    country: 'India', skills: '', linkedin_url: '', github_url: '',
+                    portfolio_url: '', bio: '', is_active: true
+                  });
+                  setShowAlumniModal(true);
+                }}
+                style={{
+                  padding: '9px 18px',
+                  borderRadius: '10px',
+                  background: 'var(--accent-gradient, linear-gradient(135deg, #6366f1, #4f46e5))',
+                  color: '#ffffff',
+                  border: 'none',
+                  fontWeight: 800,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 4px 14px rgba(99, 102, 241, 0.3)'
+                }}
+              >
+                <Plus size={16} /> Add Alumnus
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Metrics */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+            <Card style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1' }}>
+                <GraduationCap size={22} />
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Active Directory</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)' }}>{activeCount}</div>
+              </div>
+            </Card>
+
+            <Card style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(234, 179, 8, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#eab308' }}>
+                <Star size={22} />
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Batch Leaders</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)' }}>{leaderCount}</div>
+              </div>
+            </Card>
+
+            <Card style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981' }}>
+                <Building2 size={22} />
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Recorded Batches</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)' }}>{uniqueBatches.length}</div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Search & Filter Bar */}
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1', minWidth: '240px', position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="Search alumni by name, role, company, skills..."
+                value={alumniSearch}
+                onChange={(e) => setAlumniSearch(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-secondary)',
+                  color: 'var(--text-primary)',
+                  fontSize: '13px'
+                }}
+              />
+            </div>
+
+            <select
+              value={alumniBatchFilter}
+              onChange={(e) => setAlumniBatchFilter(e.target.value)}
+              style={{
+                padding: '10px 14px',
+                borderRadius: '10px',
+                border: '1px solid var(--border-subtle)',
+                background: 'var(--bg-secondary)',
+                color: 'var(--text-primary)',
+                fontSize: '13px',
+                fontWeight: 600
+              }}
+            >
+              <option value="All Batches">All Batches</option>
+              {uniqueBatches.map(b => (
+                <option key={b} value={b}>Batch of {b}</option>
+              ))}
+            </select>
+
+            {(alumniSearch || alumniBatchFilter !== 'All Batches') && (
+              <button
+                onClick={() => { setAlumniSearch(''); setAlumniBatchFilter('All Batches'); }}
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'transparent',
+                  color: 'var(--text-muted)',
+                  fontSize: '13px',
+                  cursor: 'pointer'
+                }}
+              >
+                Reset Filters
+              </button>
+            )}
+          </div>
+
+          {/* Alumni Grid / List */}
+          {alumniLoading ? (
+            <Card style={{ textAlign: 'center', padding: '40px' }}>
+              <p style={{ color: 'var(--text-muted)' }}>Loading alumni records...</p>
+            </Card>
+          ) : filteredAlumni.length === 0 ? (
+            <Card style={{ textAlign: 'center', padding: '40px' }}>
+              <GraduationCap size={40} color="var(--text-muted)" style={{ margin: '0 auto 12px', opacity: 0.5 }} />
+              <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>No alumni matching your filter</h4>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>Try modifying search keywords or adding a new record.</p>
+            </Card>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+              {filteredAlumni.map(alumnus => (
+                <Card
+                  key={alumnus.id}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    position: 'relative',
+                    borderLeft: alumnus.is_leader ? '4px solid #eab308' : '1px solid var(--border-subtle)',
+                    opacity: alumnus.is_active === false ? 0.6 : 1
+                  }}
+                >
+                  <div>
+                    {/* Top Row: Avatar, Name, Batch */}
+                    <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: '12px' }}>
+                      <div
+                        style={{
+                          width: '52px',
+                          height: '52px',
+                          borderRadius: '50%',
+                          overflow: 'hidden',
+                          background: 'rgba(99, 102, 241, 0.1)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          border: '2px solid var(--border-subtle)'
+                        }}
+                      >
+                        {alumnus.profile_image ? (
+                          <img
+                            src={alumnus.profile_image}
+                            alt={alumnus.name}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.style.display = 'none';
+                              e.target.parentElement.innerHTML = `<span style="font-size:14px; font-weight:800; color:var(--accent-primary);">${alumnus.name.substring(0, 2).toUpperCase()}</span>`;
+                            }}
+                          />
+                        ) : (
+                          <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--accent-primary)' }}>
+                            {alumnus.name.substring(0, 2).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                          <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {alumnus.name}
+                          </h4>
+                          <span style={{ fontSize: '11px', fontWeight: 800, padding: '2px 8px', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--accent-primary)', flexShrink: 0 }}>
+                            '{alumnus.batch}
+                          </span>
+                        </div>
+
+                        {alumnus.is_leader && (
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: 800, color: '#d97706', marginTop: '2px' }}>
+                            ⭐ {alumnus.leadership_role || 'Batch Leader'}
+                          </div>
+                        )}
+
+                        <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '4px' }}>
+                          {alumnus.current_role} @ <strong style={{ color: 'var(--accent-primary)' }}>{alumnus.company}</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Metadata: Location, Skills */}
+                    {alumnus.location && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                        <MapPin size={12} /> {alumnus.location} {alumnus.country ? `(${alumnus.country})` : ''}
+                      </div>
+                    )}
+
+                    {alumnus.skills && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '12px' }}>
+                        {alumnus.skills.split(',').slice(0, 3).map((s, i) => (
+                          <span key={i} style={{ fontSize: '10px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', background: 'var(--bg-primary)', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' }}>
+                            {s.trim()}
+                          </span>
+                        ))}
+                        {alumnus.skills.split(',').length > 3 && (
+                          <span style={{ fontSize: '10px', color: 'var(--text-muted)', alignSelf: 'center' }}>
+                            +{alumnus.skills.split(',').length - 3}
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
+
+                  {/* Actions Footer */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-subtle)', paddingTop: '12px', marginTop: '6px' }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {alumnus.linkedin_url && (
+                        <a href={alumnus.linkedin_url} target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5' }} title="LinkedIn">
+                          <ExternalLink size={14} />
+                        </a>
+                      )}
+                      {alumnus.github_url && (
+                        <a href={alumnus.github_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-muted)' }} title="GitHub">
+                          <GitBranch size={14} />
+                        </a>
+                      )}
+                      <span
+                        onClick={() => handleToggleAlumnusActive(alumnus)}
+                        style={{
+                          fontSize: '10px',
+                          fontWeight: 800,
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          background: alumnus.is_active !== false ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                          color: alumnus.is_active !== false ? '#10b981' : '#ef4444'
+                        }}
+                        title="Click to toggle visibility"
+                      >
+                        {alumnus.is_active !== false ? '● Public' : '○ Hidden'}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button
+                        onClick={() => {
+                          setEditingAlumnus(alumnus);
+                          setAlumniForm({
+                            name: alumnus.name || '',
+                            profile_image: alumnus.profile_image || '',
+                            batch: alumnus.batch || '2024',
+                            is_leader: alumnus.is_leader === true || alumnus.is_leader === 'true',
+                            leadership_role: alumnus.leadership_role || '',
+                            current_role: alumnus.current_role || '',
+                            company: alumnus.company || '',
+                            location: alumnus.location || '',
+                            country: alumnus.country || 'India',
+                            skills: alumnus.skills || '',
+                            linkedin_url: alumnus.linkedin_url || '',
+                            github_url: alumnus.github_url || '',
+                            portfolio_url: alumnus.portfolio_url || '',
+                            bio: alumnus.bio || '',
+                            is_active: alumnus.is_active !== false
+                          });
+                          setShowAlumniModal(true);
+                        }}
+                        style={{
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          background: 'rgba(99, 102, 241, 0.1)',
+                          color: 'var(--accent-primary)',
+                          border: 'none',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Edit3 size={12} style={{ display: 'inline', marginRight: '4px' }} /> Edit
+                      </button>
+
+                      <button
+                        onClick={() => handleDeleteAlumnus(alumnus.id)}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          background: 'rgba(239, 68, 68, 0.1)',
+                          color: '#ef4444',
+                          border: 'none',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* ADD / EDIT ALUMNUS FULL-SCREEN MODAL */}
+          <AnimatePresence>
+            {showAlumniModal && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.15 }}
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  width: '100%',
+                  height: '100vh',
+                  background: 'var(--bg-primary, #F3F7FB)',
+                  color: 'var(--text-primary)',
+                  zIndex: 99999,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflow: 'hidden',
+                  boxSizing: 'border-box'
+                }}
+              >
+                {/* Responsive alumni modal styles */}
+                <style>{`
+                  .alumni-form-grid {
+                    display: grid;
+                    grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+                    gap: 16px;
+                    align-items: start;
+                    width: 100%;
+                    max-width: 100%;
+                    box-sizing: border-box;
+                  }
+                  .alumni-left-col {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 14px;
+                    min-width: 0;
+                    width: 100%;
+                  }
+                  .alumni-right-col {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 14px;
+                    min-width: 0;
+                    width: 100%;
+                  }
+                  .alumni-field-grid-2 {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 14px;
+                    width: 100%;
+                    box-sizing: border-box;
+                  }
+                  .alumni-field-grid-3 {
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 14px;
+                    width: 100%;
+                    box-sizing: border-box;
+                  }
+                  .alumni-card {
+                    background: var(--bg-secondary, #ffffff);
+                    border-radius: 12px;
+                    border: 1px solid var(--border-subtle, #CBDDE9);
+                    padding: 16px 18px;
+                    box-shadow: 0 2px 10px rgba(40,114,161,0.04);
+                    width: 100%;
+                    max-width: 100%;
+                    min-width: 0;
+                    box-sizing: border-box;
+                  }
+                  .alumni-input {
+                    width: 100%;
+                    max-width: 100%;
+                    min-width: 0;
+                    box-sizing: border-box;
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 1px solid var(--border-subtle, #CBDDE9);
+                    background: var(--bg-primary, #F3F7FB);
+                    color: var(--text-primary);
+                    font-size: 12.5px;
+                    outline: none;
+                  }
+                  .alumni-batch-pills {
+                    display: flex;
+                    gap: 4px;
+                    flex-wrap: wrap;
+                    width: 100%;
+                  }
+                  .alumni-header-inner {
+                    max-width: 1400px;
+                    width: 100%;
+                    margin: 0 auto;
+                    padding: 0 18px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    box-sizing: border-box;
+                  }
+                  .alumni-header-title { font-size: 1rem; }
+                  .alumni-header-badge { display: inline-flex; }
+                  /* Tablet: 768px and below */
+                  @media (max-width: 900px) {
+                    .alumni-form-grid {
+                      grid-template-columns: minmax(0, 1fr);
+                    }
+                    .alumni-left-col {
+                      position: static !important;
+                    }
+                  }
+                  /* Mobile: 600px and below */
+                  @media (max-width: 600px) {
+                    .alumni-field-grid-2 {
+                      grid-template-columns: minmax(0, 1fr);
+                    }
+                    .alumni-field-grid-3 {
+                      grid-template-columns: minmax(0, 1fr);
+                    }
+                    .alumni-card {
+                      padding: 12px 12px;
+                    }
+                    .alumni-header-inner {
+                      padding: 0 12px;
+                      gap: 6px;
+                    }
+                    .alumni-header-title { font-size: 0.85rem; }
+                    .alumni-header-badge { display: none; }
+                  }
+                  /* Very small: 480px and below */
+                  @media (max-width: 480px) {
+                    .alumni-header-inner {
+                      padding: 0 8px;
+                    }
+                  }
+                `}</style>
+                {/* ── STICKY TOP APP BAR ── */}
+                <div
+                  style={{
+                    height: '54px',
+                    background: 'var(--bg-secondary, #ffffff)',
+                    borderBottom: '1px solid var(--border-subtle, #CBDDE9)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexShrink: 0,
+                    zIndex: 20,
+                    boxShadow: '0 1px 6px rgba(0,0,0,0.02)'
+                  }}
+                >
+                  <div className="alumni-header-inner">
+
+                    {/* Left: Close/Back & Titles */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowAlumniModal(false)}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          background: 'var(--bg-primary, #F3F7FB)',
+                          border: '1px solid var(--border-subtle, #CBDDE9)',
+                          color: 'var(--text-primary)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                        title="Close (Esc)"
+                      >
+                        <X size={16} />
+                      </button>
+
+                      <div style={{ width: '1px', height: '22px', background: 'var(--border-subtle, #CBDDE9)' }} />
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <h2
+                          style={{
+                            fontSize: '1rem',
+                            fontWeight: 800,
+                            margin: 0,
+                            color: 'var(--text-primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                        >
+                          <GraduationCap size={17} color="var(--accent-primary, #2872A1)" />
+                          {editingAlumnus ? `Edit: ${alumniForm.name || 'Alumnus'}` : 'Add New Alumnus'}
+                        </h2>
+
+                        <span
+                          style={{
+                            fontSize: '10.5px',
+                            fontWeight: 700,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '2px 7px',
+                            borderRadius: '10px',
+                            background: alumniForm.is_active ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+                            color: alumniForm.is_active ? '#16a34a' : '#ef4444'
+                          }}
+                        >
+                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: alumniForm.is_active ? '#16a34a' : '#ef4444' }} />
+                          {alumniForm.is_active ? 'Public' : 'Hidden'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right: Action Buttons */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowAlumniModal(false)}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: '8px',
+                          border: '1px solid var(--border-subtle, #CBDDE9)',
+                          background: 'transparent',
+                          color: 'var(--text-secondary, #475569)',
+                          fontWeight: 700,
+                          fontSize: '12.5px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleSaveAlumnus}
+                        style={{
+                          padding: '6px 18px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          background: 'var(--accent-gradient, linear-gradient(135deg, #2872A1, #4A90C2))',
+                          color: '#ffffff',
+                          fontWeight: 800,
+                          fontSize: '12.5px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          boxShadow: '0 2px 8px rgba(40, 114, 161, 0.25)'
+                        }}
+                      >
+                        <Save size={14} />
+                        {editingAlumnus ? 'Save' : 'Publish'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Submitted: {new Date(s.createdAt).toLocaleString()}</span>
-                  <button onClick={() => { if(confirm('Revoke this candidate submission?')) { deleteHiringSubmission(s.id); refresh(); } }}
-                    style={{ padding: '8px 14px', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
-                    Revoke Submission
-                  </button>
+                {/* ── MAIN SCROLLABLE BODY ── */}
+                <div
+                  style={{
+                    flex: 1,
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    padding: '16px 18px 48px 18px',
+                    background: 'var(--bg-primary, #F3F7FB)',
+                    boxSizing: 'border-box',
+                    width: '100%'
+                  }}
+                >
+                  <form
+                    onSubmit={handleSaveAlumnus}
+                    style={{
+                      maxWidth: '1400px',
+                      width: '100%',
+                      margin: '0 auto',
+                      boxSizing: 'border-box'
+                    }}
+                    className="alumni-form-grid"
+                  >
+                    {/* ════════════════════════════════════════════════════════
+                        LEFT COLUMN: LIVE PREVIEW & SETTINGS
+                    ════════════════════════════════════════════════════════ */}
+                    <div className="alumni-left-col" style={{ position: 'sticky', top: 0 }}>
+                      
+                      {/* Live Preview Card Replica */}
+                      <div
+                        style={{
+                          background: 'var(--bg-secondary, #ffffff)',
+                          borderRadius: '12px',
+                          border: '1px solid var(--border-subtle, #CBDDE9)',
+                          padding: '14px',
+                          boxShadow: '0 2px 10px rgba(40, 114, 161, 0.04)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                          <span style={{ fontSize: '10.5px', fontWeight: 800, color: 'var(--accent-primary, #2872A1)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                            Card Preview
+                          </span>
+                          <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                            Public Live Look
+                          </span>
+                        </div>
+
+                        {/* Public Card Simulated Box */}
+                        <div
+                          style={{
+                            background: 'var(--card-bg, #ffffff)',
+                            borderRadius: '10px',
+                            border: alumniForm.is_leader ? '2px solid #eab308' : '1px solid var(--border-subtle, #CBDDE9)',
+                            boxShadow: '0 2px 8px rgba(13, 27, 42, 0.04)',
+                            overflow: 'hidden',
+                            position: 'relative',
+                            textAlign: 'center'
+                          }}
+                        >
+                          {/* Banner Header Accent */}
+                          <div
+                            style={{
+                              height: '34px',
+                              background: alumniForm.is_leader
+                                ? 'linear-gradient(135deg, rgba(234, 179, 8, 0.18) 0%, rgba(202, 138, 4, 0.06) 100%)'
+                                : 'linear-gradient(135deg, rgba(40, 114, 161, 0.12) 0%, rgba(74, 144, 194, 0.04) 100%)',
+                              borderBottom: '1px solid var(--border-subtle, #CBDDE9)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '0 10px'
+                            }}
+                          >
+                            <span style={{ fontSize: '10px', fontWeight: 800, color: alumniForm.is_leader ? '#ca8a04' : 'var(--accent-primary, #2872A1)', textTransform: 'uppercase' }}>
+                              {alumniForm.is_leader ? '⭐ Leader' : `Batch of ${alumniForm.batch || '2024'}`}
+                            </span>
+                            {alumniForm.is_leader && alumniForm.leadership_role && (
+                              <span style={{ fontSize: '9.5px', fontWeight: 700, padding: '1px 5px', borderRadius: '3px', background: '#eab308', color: '#000' }}>
+                                {alumniForm.leadership_role}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Avatar Circle */}
+                          <div style={{ padding: '0 12px 12px 12px', marginTop: '-18px' }}>
+                            <div
+                              style={{
+                                width: '60px',
+                                height: '60px',
+                                borderRadius: '50%',
+                                overflow: 'hidden',
+                                background: 'var(--bg-secondary, #ffffff)',
+                                margin: '0 auto 8px auto',
+                                border: '2.5px solid var(--bg-secondary, #ffffff)',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              {alumniForm.profile_image ? (
+                                <img
+                                  src={alumniForm.profile_image}
+                                  alt={alumniForm.name || 'Alumnus'}
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.style.display = 'none';
+                                    e.target.parentElement.innerHTML = `<span style="font-size: 16px; font-weight: 900; color: var(--accent-primary, #2872A1);">${(alumniForm.name || 'NX').substring(0, 2).toUpperCase()}</span>`;
+                                  }}
+                                />
+                              ) : (
+                                <span style={{ fontSize: '16px', fontWeight: 900, color: 'var(--accent-primary, #2872A1)' }}>
+                                  {(alumniForm.name || 'NX').substring(0, 2).toUpperCase()}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Name */}
+                            <h4 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>
+                              {alumniForm.name || 'Alumnus Name'}
+                            </h4>
+
+                            {/* Role & Company */}
+                            <div style={{ fontSize: '11.5px', fontWeight: 700, color: 'var(--nexus-primary, #2872A1)', margin: '0 0 4px 0' }}>
+                              {alumniForm.current_role || 'Role'} {alumniForm.company ? `@ ${alumniForm.company}` : ''}
+                            </div>
+
+                            {/* Location */}
+                            <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                              📍 {alumniForm.location || 'Location'} {alumniForm.country ? `(${alumniForm.country})` : ''}
+                            </div>
+
+                            {/* Skills */}
+                            {alumniForm.skills && (
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', justifyContent: 'center', marginBottom: '8px' }}>
+                                {alumniForm.skills.split(',').slice(0, 3).map((s, idx) => (
+                                  <span key={idx} style={{ fontSize: '9.5px', fontWeight: 600, padding: '1.5px 5px', borderRadius: '4px', background: 'rgba(40, 114, 161, 0.08)', color: 'var(--accent-primary, #2872A1)' }}>
+                                    {s.trim()}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Bio */}
+                            {alumniForm.bio && (
+                              <p style={{ fontSize: '11px', color: 'var(--text-secondary)', fontStyle: 'italic', margin: '0 0 8px 0', lineHeight: 1.3, maxHeight: '36px', overflow: 'hidden' }}>
+                                "{alumniForm.bio}"
+                              </p>
+                            )}
+
+                            {/* Social Icons row */}
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', paddingTop: '6px', borderTop: '1px solid var(--border-subtle, #CBDDE9)' }}>
+                              {alumniForm.linkedin_url && (
+                                <div style={{ width: '24px', height: '24px', borderRadius: '5px', background: 'rgba(0, 119, 181, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0077b5' }} title="LinkedIn">
+                                  <ExternalLink size={11} />
+                                </div>
+                              )}
+                              {alumniForm.github_url && (
+                                <div style={{ width: '24px', height: '24px', borderRadius: '5px', background: 'rgba(13, 27, 42, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-primary)' }} title="GitHub">
+                                  <GitBranch size={11} />
+                                </div>
+                              )}
+                              {alumniForm.portfolio_url && (
+                                <div style={{ width: '24px', height: '24px', borderRadius: '5px', background: 'rgba(40, 114, 161, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary, #2872A1)' }} title="Portfolio">
+                                  <Globe size={11} />
+                                </div>
+                              )}
+                              {!alumniForm.linkedin_url && !alumniForm.github_url && !alumniForm.portfolio_url && (
+                                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>No links</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Directory Status & Leader Toggle Card */}
+                      <div
+                        style={{
+                          background: 'var(--bg-secondary, #ffffff)',
+                          borderRadius: '12px',
+                          border: '1px solid var(--border-subtle, #CBDDE9)',
+                          padding: '14px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '10px',
+                          boxShadow: '0 2px 10px rgba(40, 114, 161, 0.04)'
+                        }}
+                      >
+                        <div style={{ fontSize: '10.5px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                          Visibility & Priority
+                        </div>
+
+                        {/* Public Visibility Toggle */}
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '8px 10px',
+                            borderRadius: '8px',
+                            background: 'var(--bg-primary, #F3F7FB)',
+                            border: '1px solid var(--border-subtle, #CBDDE9)'
+                          }}
+                        >
+                          <div>
+                            <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>Public Visibility</div>
+                            <div style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>Show on public alumni page</div>
+                          </div>
+
+                          <button
+                            type="button"
+                            role="switch"
+                            aria-checked={alumniForm.is_active}
+                            onClick={() => setAlumniForm({ ...alumniForm, is_active: !alumniForm.is_active })}
+                            style={{
+                              width: '38px',
+                              height: '22px',
+                              borderRadius: '11px',
+                              background: alumniForm.is_active ? '#22c55e' : 'var(--border-subtle, #CBDDE9)',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '2px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              transition: 'background 0.15s ease',
+                              outline: 'none'
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: '18px',
+                                height: '18px',
+                                borderRadius: '50%',
+                                background: '#ffffff',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                                transform: alumniForm.is_active ? 'translateX(16px)' : 'translateX(0px)',
+                                transition: 'transform 0.15s ease'
+                              }}
+                            />
+                          </button>
+                        </div>
+
+                        {/* Leader Distinction Toggle */}
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '6px',
+                            padding: '8px 10px',
+                            borderRadius: '8px',
+                            background: 'var(--bg-primary, #F3F7FB)',
+                            border: alumniForm.is_leader ? '1.5px solid #eab308' : '1px solid var(--border-subtle, #CBDDE9)'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div>
+                              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                ⭐ Batch Leader
+                              </div>
+                              <div style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>Pin to top with badge</div>
+                            </div>
+
+                            <button
+                              type="button"
+                              role="switch"
+                              aria-checked={alumniForm.is_leader}
+                              onClick={() => setAlumniForm({ ...alumniForm, is_leader: !alumniForm.is_leader })}
+                              style={{
+                                width: '38px',
+                                height: '22px',
+                                borderRadius: '11px',
+                                background: alumniForm.is_leader ? '#eab308' : 'var(--border-subtle, #CBDDE9)',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '2px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                transition: 'background 0.15s ease',
+                                outline: 'none'
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: '18px',
+                                  height: '18px',
+                                  borderRadius: '50%',
+                                  background: '#ffffff',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                                  transform: alumniForm.is_leader ? 'translateX(16px)' : 'translateX(0px)',
+                                  transition: 'transform 0.15s ease'
+                                }}
+                              />
+                            </button>
+                          </div>
+
+                          {alumniForm.is_leader && (
+                            <div style={{ marginTop: '2px' }}>
+                              <input
+                                type="text"
+                                value={alumniForm.leadership_role}
+                                onChange={e => setAlumniForm({ ...alumniForm, leadership_role: e.target.value })}
+                                placeholder="Role (e.g. Batch Leader, Tech Lead)"
+                                style={{
+                                  width: '100%',
+                                  padding: '6px 10px',
+                                  borderRadius: '6px',
+                                  border: '1px solid var(--border-subtle, #CBDDE9)',
+                                  background: 'var(--bg-secondary, #ffffff)',
+                                  color: 'var(--text-primary)',
+                                  fontSize: '12px',
+                                  outline: 'none'
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Display Priority Stepper */}
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '8px 10px',
+                            borderRadius: '8px',
+                            background: 'var(--bg-primary, #F3F7FB)',
+                            border: '1px solid var(--border-subtle, #CBDDE9)'
+                          }}
+                        >
+                          <div>
+                            <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>Priority Order</div>
+                            <div style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>Lower = higher on list</div>
+                          </div>
+                          <input
+                            type="number"
+                            value={alumniForm.display_order || 0}
+                            onChange={e => setAlumniForm({ ...alumniForm, display_order: parseInt(e.target.value) || 0 })}
+                            style={{
+                              width: '56px',
+                              padding: '5px 8px',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-subtle, #CBDDE9)',
+                              background: 'var(--bg-secondary, #ffffff)',
+                              color: 'var(--text-primary)',
+                              fontSize: '12px',
+                              fontWeight: 700,
+                              textAlign: 'center',
+                              outline: 'none'
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Photo Presets Card */}
+                      <div
+                        style={{
+                          background: 'var(--bg-secondary, #ffffff)',
+                          borderRadius: '12px',
+                          border: '1px solid var(--border-subtle, #CBDDE9)',
+                          padding: '12px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '8px',
+                          boxShadow: '0 2px 10px rgba(40, 114, 161, 0.04)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: '10.5px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                            Photo Presets
+                          </span>
+                          <span style={{ fontSize: '9.5px', color: 'var(--text-muted)' }}>1-Click</span>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(36px, 1fr))', gap: '6px' }}>
+                          {[
+                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+                            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400',
+                            'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400',
+                            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400',
+                            'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400',
+                            'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400'
+                          ].map((imgUrl, i) => (
+                            <img
+                              key={i}
+                              src={imgUrl}
+                              alt={`Preset ${i + 1}`}
+                              onClick={() => setAlumniForm({ ...alumniForm, profile_image: imgUrl })}
+                              style={{
+                                width: '100%',
+                                aspectRatio: '1',
+                                borderRadius: '6px',
+                                objectFit: 'cover',
+                                cursor: 'pointer',
+                                border: alumniForm.profile_image === imgUrl ? '2px solid var(--accent-primary, #2872A1)' : '1px solid var(--border-subtle, #CBDDE9)',
+                                opacity: alumniForm.profile_image === imgUrl ? 1 : 0.7,
+                                transform: alumniForm.profile_image === imgUrl ? 'scale(1.05)' : 'scale(1)',
+                                transition: 'all 0.15s ease'
+                              }}
+                              title="Apply photo preset"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ════════════════════════════════════════════════════════
+                        RIGHT MAIN FORM AREA: CATEGORIZED CARDS
+                    ════════════════════════════════════════════════════════ */}
+                    <div className="alumni-right-col">
+                      
+                      {/* Section 1: Personal & Academic Details */}
+                      <div className="alumni-card">
+                        {/* Section Header */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid var(--border-subtle, #CBDDE9)' }}>
+                          <div
+                            style={{
+                              width: '26px',
+                              height: '26px',
+                              borderRadius: '6px',
+                              background: 'rgba(40, 114, 161, 0.12)',
+                              color: 'var(--accent-primary, #2872A1)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '11px',
+                              fontWeight: 900
+                            }}
+                          >
+                            01
+                          </div>
+                          <div>
+                            <h3 style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                              Personal & Academic Identity
+                            </h3>
+                            <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
+                              Full name, graduation cohort year, and profile avatar
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Fields Grid */}
+                        <div className="alumni-field-grid-2" style={{ marginBottom: '12px' }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'var(--text-secondary, #334155)', marginBottom: '4px' }}>
+                              Full Name <span style={{ color: '#ef4444' }}>*</span>
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={alumniForm.name}
+                              onChange={e => setAlumniForm({ ...alumniForm, name: e.target.value })}
+                              placeholder="e.g. Arjun Sharma"
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-subtle, #CBDDE9)',
+                                background: 'var(--bg-primary, #F3F7FB)',
+                                color: 'var(--text-primary)',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                outline: 'none'
+                              }}
+                            />
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'var(--text-secondary, #334155)', marginBottom: '4px' }}>
+                              Batch Graduation Year <span style={{ color: '#ef4444' }}>*</span>
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={alumniForm.batch}
+                              onChange={e => setAlumniForm({ ...alumniForm, batch: e.target.value })}
+                              placeholder="e.g. 2024"
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-subtle, #CBDDE9)',
+                                background: 'var(--bg-primary, #F3F7FB)',
+                                color: 'var(--text-primary)',
+                                fontSize: '13px',
+                                fontWeight: 700,
+                                outline: 'none',
+                                marginBottom: '6px'
+                              }}
+                            />
+                            {/* Horizontal Quick Batch Pills */}
+                            <div className="alumni-batch-pills">
+                              {['2025', '2024', '2023', '2022', '2021', '2020', '2019'].map(bYear => (
+                                <button
+                                  key={bYear}
+                                  type="button"
+                                  onClick={() => setAlumniForm({ ...alumniForm, batch: bYear })}
+                                  style={{
+                                    padding: '2px 7px',
+                                    borderRadius: '5px',
+                                    border: alumniForm.batch === bYear ? '1px solid var(--accent-primary, #2872A1)' : '1px solid var(--border-subtle, #CBDDE9)',
+                                    background: alumniForm.batch === bYear ? 'rgba(40, 114, 161, 0.12)' : 'var(--bg-primary, #F3F7FB)',
+                                    color: alumniForm.batch === bYear ? 'var(--accent-primary, #2872A1)' : 'var(--text-muted)',
+                                    fontSize: '10.5px',
+                                    fontWeight: 700,
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  {bYear}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Photo URL */}
+                        <div>
+                          <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'var(--text-secondary, #334155)', marginBottom: '4px' }}>
+                            Profile Photo Image URL
+                          </label>
+                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            <input
+                              type="url"
+                              value={alumniForm.profile_image}
+                              onChange={e => setAlumniForm({ ...alumniForm, profile_image: e.target.value })}
+                              placeholder="https://images.unsplash.com/... or direct image URL"
+                              style={{
+                                flex: 1,
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-subtle, #CBDDE9)',
+                                background: 'var(--bg-primary, #F3F7FB)',
+                                color: 'var(--text-primary)',
+                                fontSize: '12.5px',
+                                outline: 'none'
+                              }}
+                            />
+                            {alumniForm.profile_image && (
+                              <button
+                                type="button"
+                                onClick={() => setAlumniForm({ ...alumniForm, profile_image: '' })}
+                                style={{
+                                  padding: '8px 12px',
+                                  borderRadius: '8px',
+                                  border: '1px solid var(--border-subtle, #CBDDE9)',
+                                  background: 'var(--bg-primary, #F3F7FB)',
+                                  color: 'var(--text-muted)',
+                                  fontSize: '11.5px',
+                                  fontWeight: 700,
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                Clear
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Section 2: Career & Workplace Details */}
+                      <div className="alumni-card">
+                        {/* Section Header */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid var(--border-subtle, #CBDDE9)' }}>
+                          <div
+                            style={{
+                              width: '26px',
+                              height: '26px',
+                              borderRadius: '6px',
+                              background: 'rgba(16, 185, 129, 0.12)',
+                              color: '#10b981',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '11px',
+                              fontWeight: 900
+                            }}
+                          >
+                            02
+                          </div>
+                          <div>
+                            <h3 style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                              Career & Placement
+                            </h3>
+                            <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
+                              Current job role, company name, city and country placement
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Fields Grid */}
+                        <div className="alumni-field-grid-2" style={{ marginBottom: '12px' }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'var(--text-secondary, #334155)', marginBottom: '4px' }}>
+                              Designation / Role <span style={{ color: '#ef4444' }}>*</span>
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={alumniForm.current_role}
+                              onChange={e => setAlumniForm({ ...alumniForm, current_role: e.target.value })}
+                              placeholder="e.g. Software Engineer, SDE II"
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-subtle, #CBDDE9)',
+                                background: 'var(--bg-primary, #F3F7FB)',
+                                color: 'var(--text-primary)',
+                                fontSize: '12.5px',
+                                outline: 'none'
+                              }}
+                            />
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'var(--text-secondary, #334155)', marginBottom: '4px' }}>
+                              Company / Organization <span style={{ color: '#ef4444' }}>*</span>
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={alumniForm.company}
+                              onChange={e => setAlumniForm({ ...alumniForm, company: e.target.value })}
+                              placeholder="e.g. Google, Microsoft, Amazon"
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-subtle, #CBDDE9)',
+                                background: 'var(--bg-primary, #F3F7FB)',
+                                color: 'var(--text-primary)',
+                                fontSize: '12.5px',
+                                outline: 'none'
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="alumni-field-grid-2">
+                          <div>
+                            <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'var(--text-secondary, #334155)', marginBottom: '4px' }}>
+                              City / Region
+                            </label>
+                            <input
+                              type="text"
+                              value={alumniForm.location}
+                              onChange={e => setAlumniForm({ ...alumniForm, location: e.target.value })}
+                              placeholder="e.g. Bengaluru, India or SF, CA"
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-subtle, #CBDDE9)',
+                                background: 'var(--bg-primary, #F3F7FB)',
+                                color: 'var(--text-primary)',
+                                fontSize: '12.5px',
+                                outline: 'none'
+                              }}
+                            />
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'var(--text-secondary, #334155)', marginBottom: '4px' }}>
+                              Country
+                            </label>
+                            <input
+                              type="text"
+                              value={alumniForm.country}
+                              onChange={e => setAlumniForm({ ...alumniForm, country: e.target.value })}
+                              placeholder="e.g. India, United States, Singapore"
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-subtle, #CBDDE9)',
+                                background: 'var(--bg-primary, #F3F7FB)',
+                                color: 'var(--text-primary)',
+                                fontSize: '12.5px',
+                                outline: 'none'
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Section 3: Skills & Career Story */}
+                      <div className="alumni-card">
+                        {/* Section Header */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid var(--border-subtle, #CBDDE9)' }}>
+                          <div
+                            style={{
+                              width: '26px',
+                              height: '26px',
+                              borderRadius: '6px',
+                              background: 'rgba(234, 179, 8, 0.12)',
+                              color: '#ca8a04',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '11px',
+                              fontWeight: 900
+                            }}
+                          >
+                            03
+                          </div>
+                          <div>
+                            <h3 style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                              Skills & Journey Story
+                            </h3>
+                            <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
+                              Core technical competencies and personal testimonial
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Skills */}
+                        <div style={{ marginBottom: '12px' }}>
+                          <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'var(--text-secondary, #334155)', marginBottom: '4px' }}>
+                            Core Skills (Comma-separated)
+                          </label>
+                          <input
+                            type="text"
+                            value={alumniForm.skills}
+                            onChange={e => setAlumniForm({ ...alumniForm, skills: e.target.value })}
+                            placeholder="e.g. Distributed Systems, Kubernetes, React, Python, AWS"
+                            style={{
+                              width: '100%',
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              border: '1px solid var(--border-subtle, #CBDDE9)',
+                              background: 'var(--bg-primary, #F3F7FB)',
+                              color: 'var(--text-primary)',
+                              fontSize: '12.5px',
+                              outline: 'none'
+                            }}
+                          />
+                          {alumniForm.skills && (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px' }}>
+                              {alumniForm.skills.split(',').filter(Boolean).map((s, idx) => (
+                                <span
+                                  key={idx}
+                                  style={{
+                                    fontSize: '10px',
+                                    fontWeight: 700,
+                                    padding: '2px 6px',
+                                    borderRadius: '4px',
+                                    background: 'rgba(40, 114, 161, 0.08)',
+                                    color: 'var(--accent-primary, #2872A1)',
+                                    border: '1px solid rgba(40, 114, 161, 0.15)'
+                                  }}
+                                >
+                                  ✓ {s.trim()}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Bio */}
+                        <div>
+                          <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'var(--text-secondary, #334155)', marginBottom: '4px' }}>
+                            Short Bio / Journey Testimonial
+                          </label>
+                          <textarea
+                            rows="2"
+                            value={alumniForm.bio}
+                            onChange={e => setAlumniForm({ ...alumniForm, bio: e.target.value })}
+                            placeholder="Brief summary of their career growth and advice..."
+                            style={{
+                              width: '100%',
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              border: '1px solid var(--border-subtle, #CBDDE9)',
+                              background: 'var(--bg-primary, #F3F7FB)',
+                              color: 'var(--text-primary)',
+                              fontSize: '12.5px',
+                              resize: 'vertical',
+                              outline: 'none'
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Section 4: Professional & Social Profiles */}
+                      <div className="alumni-card">
+                        {/* Section Header */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid var(--border-subtle, #CBDDE9)' }}>
+                          <div
+                            style={{
+                              width: '26px',
+                              height: '26px',
+                              borderRadius: '6px',
+                              background: 'rgba(6, 182, 212, 0.12)',
+                              color: '#06b6d4',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '11px',
+                              fontWeight: 900
+                            }}
+                          >
+                            04
+                          </div>
+                          <div>
+                            <h3 style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                              Online Profiles & Socials
+                            </h3>
+                            <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
+                              Public LinkedIn, GitHub, and personal portfolio links
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="alumni-field-grid-3">
+                          {/* LinkedIn */}
+                          <div>
+                            <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'var(--text-secondary, #334155)', marginBottom: '4px' }}>
+                              LinkedIn URL
+                            </label>
+                            <input
+                              type="url"
+                              value={alumniForm.linkedin_url}
+                              onChange={e => setAlumniForm({ ...alumniForm, linkedin_url: e.target.value })}
+                              placeholder="https://linkedin.com/in/..."
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-subtle, #CBDDE9)',
+                                background: 'var(--bg-primary, #F3F7FB)',
+                                color: 'var(--text-primary)',
+                                fontSize: '12.5px',
+                                outline: 'none'
+                              }}
+                            />
+                          </div>
+
+                          {/* GitHub */}
+                          <div>
+                            <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'var(--text-secondary, #334155)', marginBottom: '4px' }}>
+                              GitHub URL
+                            </label>
+                            <input
+                              type="url"
+                              value={alumniForm.github_url}
+                              onChange={e => setAlumniForm({ ...alumniForm, github_url: e.target.value })}
+                              placeholder="https://github.com/..."
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-subtle, #CBDDE9)',
+                                background: 'var(--bg-primary, #F3F7FB)',
+                                color: 'var(--text-primary)',
+                                fontSize: '12.5px',
+                                outline: 'none'
+                              }}
+                            />
+                          </div>
+
+                          {/* Portfolio */}
+                          <div>
+                            <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'var(--text-secondary, #334155)', marginBottom: '4px' }}>
+                              Portfolio Website
+                            </label>
+                            <input
+                              type="url"
+                              value={alumniForm.portfolio_url}
+                              onChange={e => setAlumniForm({ ...alumniForm, portfolio_url: e.target.value })}
+                              placeholder="https://yourportfolio.dev"
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-subtle, #CBDDE9)',
+                                background: 'var(--bg-primary, #F3F7FB)',
+                                color: 'var(--text-primary)',
+                                fontSize: '12.5px',
+                                outline: 'none'
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
                 </div>
-              </Card>
-            ))
-          )}
+
+                {/* ── STICKY BOTTOM ACTION FOOTER ── */}
+                <div
+                  style={{
+                    height: '50px',
+                    background: 'var(--bg-secondary, #ffffff)',
+                    borderTop: '1px solid var(--border-subtle, #CBDDE9)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexShrink: 0,
+                    boxShadow: '0 -1px 6px rgba(0,0,0,0.02)'
+                  }}
+                >
+                  <div
+                    style={{
+                      maxWidth: '1400px',
+                      width: '100%',
+                      margin: '0 auto',
+                      padding: '0 18px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '12px'
+                    }}
+                  >
+                    <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                      ✨ Changes update database immediately and reflect in real time on public alumni page.
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowAlumniModal(false)}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: '8px',
+                          border: '1px solid var(--border-subtle, #CBDDE9)',
+                          background: 'transparent',
+                          color: 'var(--text-secondary, #475569)',
+                          fontWeight: 700,
+                          fontSize: '12.5px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Discard
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleSaveAlumnus}
+                        style={{
+                          padding: '6px 18px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          background: 'var(--accent-gradient, linear-gradient(135deg, #2872A1, #4A90C2))',
+                          color: '#ffffff',
+                          fontWeight: 800,
+                          fontSize: '12.5px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          boxShadow: '0 2px 8px rgba(40, 114, 161, 0.25)'
+                        }}
+                      >
+                        <Save size={14} />
+                        {editingAlumnus ? 'Save Changes' : 'Publish Alumnus'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </div>
-    )}
+      );
+    })()}
     </div>
   );
 };

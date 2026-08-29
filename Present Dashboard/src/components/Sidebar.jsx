@@ -43,8 +43,8 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
         minWidth: '260px',
         maxWidth: '260px',
         height: '100vh',
-        backgroundColor: isDark ? '#0d0f1a' : '#ffffff',
-        borderRight: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
+        backgroundColor: isDark ? '#0B1F33' : '#ffffff',
+        borderRight: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9'}`,
         position: 'fixed',
         top: 0,
         left: 0,
@@ -60,6 +60,7 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
         transform: sidebarTranslate,
         boxSizing: 'border-box',
         overflow: 'hidden',
+        fontFamily: "'Poppins', sans-serif"
       }}
     >
 
@@ -74,12 +75,12 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                 height: '42px',
                 minWidth: '42px',
                 minHeight: '42px',
-                borderRadius: '12px',
-                border: isDark ? '1px solid rgba(123, 92, 255, 0.45)' : '1px solid rgba(123, 92, 255, 0.25)',
+                borderRadius: '10px',
+                border: isDark ? '1px solid rgba(40, 114, 161, 0.45)' : '1px solid #CBDDE9',
                 background: isDark
-                  ? 'linear-gradient(135deg, rgba(123, 92, 255, 0.22) 0%, rgba(15, 23, 42, 0.85) 100%)'
+                  ? '#0E2740'
                   : '#ffffff',
-                boxShadow: isDark ? '0 0 16px rgba(123, 92, 255, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.05)',
+                boxShadow: isDark ? '0 0 12px rgba(40, 114, 161, 0.25)' : '0 2px 6px rgba(13, 27, 42, 0.04)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -97,16 +98,15 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                   width: '100%',
                   height: '100%',
                   objectFit: 'contain',
-                  objectPosition: 'center',
-                  filter: isDark ? 'brightness(1.1) drop-shadow(0 0 4px rgba(123, 92, 255, 0.4))' : 'none'
+                  objectPosition: 'center'
                 }}
               />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <span style={{ fontSize: '17px', fontWeight: 900, letterSpacing: '-0.02em', color: isDark ? '#f8fafc' : '#0f172a', lineHeight: 1.1 }}>
+              <span style={{ fontSize: '16.5px', fontWeight: 800, letterSpacing: '-0.02em', color: isDark ? '#F3F7FB' : '#0D1B2A', lineHeight: 1.1 }}>
                 Sun Nexus
               </span>
-              <span style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.12em', color: '#7b5cff', textTransform: 'uppercase', marginTop: '2px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', color: isDark ? '#4A90C2' : '#2872A1', textTransform: 'uppercase', marginTop: '2px' }}>
                 Solutions
               </span>
             </div>
@@ -124,8 +124,8 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                 height: '32px',
                 borderRadius: '8px',
                 border: 'none',
-                backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                color: isDark ? '#94a3b8' : '#64748b',
+                backgroundColor: isDark ? 'rgba(203, 221, 233, 0.1)' : '#F3F7FB',
+                color: isDark ? '#CBDDE9' : '#0D1B2A',
                 cursor: 'pointer'
               }}
             >
@@ -135,7 +135,7 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
         </div>
 
         {/* Navigation Stack (Scrollable) */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minHeight: 0, overflowY: 'auto', width: '100%', alignSelf: 'stretch', boxSizing: 'border-box', paddingRight: '2px' }}>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1, minHeight: 0, overflowY: 'auto', width: '100%', alignSelf: 'stretch', boxSizing: 'border-box', paddingRight: '2px' }}>
           {allItems.map((item) => {
             const IconComp = item.icon;
             const isActive = activePage === item.id || (item.subItems && item.subItems.some(sub => sub.id === activePage)) || (item.id === 'dsa' && activePage.startsWith('dsa'));
@@ -156,34 +156,36 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '12px 16px',
-                    minHeight: '48px',
-                    borderRadius: '14px',
-                    fontSize: '15px',
-                    fontWeight: isActive ? 700 : 600,
-                    border: 'none',
+                    padding: '11px 14px',
+                    minHeight: '46px',
+                    borderRadius: '10px',
+                    fontSize: '14px',
+                    fontWeight: isActive ? 600 : 500,
+                    border: isActive
+                      ? (isDark ? '1px solid rgba(74, 144, 194, 0.4)' : '1px solid #CBDDE9')
+                      : '1px solid transparent',
                     cursor: 'pointer',
                     boxSizing: 'border-box',
                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     whiteSpace: 'nowrap',
                     background: isActive
-                      ? (isDark ? 'rgba(139, 92, 246, 0.16)' : '#f3e8ff')
+                      ? (isDark ? 'rgba(40, 114, 161, 0.25)' : '#F3F7FB')
                       : 'transparent',
                     color: isActive
-                      ? (isDark ? '#c4b5fd' : '#6d28d9')
-                      : (isDark ? '#cbd5e1' : '#1e1b4b'),
-                    boxShadow: 'none',
+                      ? (isDark ? '#CBDDE9' : '#2872A1')
+                      : (isDark ? '#8EA6BC' : '#0D1B2A'),
+                    boxShadow: isActive && !isDark ? '0 1px 3px rgba(13, 27, 42, 0.04)' : 'none',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                    <div style={{ width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                    <div style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <IconComp
-                        size={22}
-                        strokeWidth={2.2}
+                        size={20}
+                        strokeWidth={2}
                         style={{
                           color: isActive
-                            ? (isDark ? '#c4b5fd' : '#6d28d9')
-                            : (isDark ? '#94a3b8' : '#1e1b4b'),
+                            ? (isDark ? '#4A90C2' : '#2872A1')
+                            : (isDark ? '#8EA6BC' : '#0D1B2A'),
                           flexShrink: 0,
                           transition: 'color 0.2s ease',
                         }}
@@ -198,7 +200,7 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                     <ChevronDown
                       size={14}
                       style={{
-                        color: isActive ? (isDark ? '#c4b5fd' : '#6d28d9') : (isDark ? '#94a3b8' : '#475569'),
+                        color: isActive ? (isDark ? '#CBDDE9' : '#2872A1') : (isDark ? '#8EA6BC' : '#64748B'),
                         transform: isDsaExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
                         transition: 'transform 0.2s ease'
                       }}
@@ -208,16 +210,16 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                   {item.badge && (
                     <span
                       style={{
-                        padding: '2px 10px',
-                        borderRadius: '8px',
-                        backgroundColor: isDark ? 'rgba(139, 92, 246, 0.15)' : '#ffffff',
-                        color: isDark ? '#c4b5fd' : '#7c3aed',
-                        border: `1.5px solid ${isDark ? '#8b5cf6' : '#a78bfa'}`,
-                        fontSize: '11.5px',
-                        fontWeight: 700,
+                        padding: '2px 8px',
+                        borderRadius: '6px',
+                        backgroundColor: isDark ? 'rgba(40, 114, 161, 0.25)' : '#FFFFFF',
+                        color: isDark ? '#CBDDE9' : '#2872A1',
+                        border: `1px solid ${isDark ? '#4A90C2' : '#CBDDE9'}`,
+                        fontSize: '11px',
+                        fontWeight: 600,
                         flexShrink: 0,
                         marginLeft: '8px',
-                        letterSpacing: '-0.01em',
+                        letterSpacing: '0.02em',
                         lineHeight: '1.2'
                       }}
                     >
@@ -227,7 +229,7 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                 </button>
 
                 {item.subItems && isDsaExpanded && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '40px', marginTop: '2px', marginBottom: '4px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '36px', marginTop: '2px', marginBottom: '4px' }}>
                     {item.subItems.map((sub) => {
                       const isSubActive = activePage === sub.id || (activePage === 'dsa' && sub.id === 'dsa-overview');
                       return (
@@ -240,18 +242,18 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                             display: 'flex',
                             alignItems: 'center',
                             gap: '8px',
-                            padding: '7px 12px',
-                            borderRadius: '8px',
+                            padding: '6px 10px',
+                            borderRadius: '6px',
                             fontSize: '13px',
-                            fontWeight: isSubActive ? 700 : 500,
+                            fontWeight: isSubActive ? 600 : 400,
                             border: 'none',
                             cursor: 'pointer',
-                            background: isSubActive ? (isDark ? 'rgba(123, 92, 255, 0.2)' : 'rgba(123, 92, 255, 0.12)') : 'transparent',
-                            color: isSubActive ? '#7b5cff' : (isDark ? '#94a3b8' : '#64748b'),
+                            background: isSubActive ? (isDark ? 'rgba(40, 114, 161, 0.25)' : '#F3F7FB') : 'transparent',
+                            color: isSubActive ? (isDark ? '#CBDDE9' : '#2872A1') : (isDark ? '#8EA6BC' : '#64748B'),
                             textAlign: 'left'
                           }}
                         >
-                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: isSubActive ? '#7b5cff' : (isDark ? '#64748b' : '#94a3b8') }} />
+                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: isSubActive ? '#2872A1' : (isDark ? '#8EA6BC' : '#CBDDE9') }} />
                           <span>{sub.label}</span>
                         </button>
                       );
@@ -264,7 +266,7 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
         </nav>
 
         {/* Sidebar Bottom Footer Section */}
-        <div style={{ paddingTop: '0.75rem', borderTop: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', alignSelf: 'stretch', boxSizing: 'border-box', flexShrink: 0, marginTop: 'auto' }}>
+        <div style={{ paddingTop: '0.75rem', borderTop: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9'}`, display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', alignSelf: 'stretch', boxSizing: 'border-box', flexShrink: 0, marginTop: 'auto' }}>
           {/* User Profile Badge Card */}
           <div
             onClick={() => {
@@ -272,14 +274,14 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
             }}
             style={{
               padding: '10px 12px',
-              borderRadius: '14px',
-              border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
-              backgroundColor: isDark ? '#121625' : '#ffffff',
+              borderRadius: '10px',
+              border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9'}`,
+              backgroundColor: isDark ? '#0E2740' : '#F3F7FB',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              boxShadow: '0 1px 3px rgba(13, 27, 42, 0.04)',
               width: '100%',
               boxSizing: 'border-box',
             }}
@@ -287,19 +289,19 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
               <div
                 style={{
-                  width: '36px',
-                  height: '36px',
+                  width: '34px',
+                  height: '34px',
                   borderRadius: '50%',
-                  backgroundColor: '#7b5cff',
+                  backgroundColor: '#2872A1',
                   color: '#ffffff',
-                  fontWeight: 800,
-                  fontSize: '14px',
+                  fontWeight: 700,
+                  fontSize: '13px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
                   overflow: 'hidden',
-                  boxShadow: '0 2px 8px rgba(123, 92, 255, 0.3)',
+                  boxShadow: '0 2px 6px rgba(40, 114, 161, 0.25)',
                 }}
               >
                 {user?.avatar?.length > 5 ? (
@@ -309,10 +311,10 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                 )}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left', minWidth: 0, flex: 1 }}>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <span style={{ fontSize: '13px', fontWeight: 600, color: isDark ? '#F3F7FB' : '#0D1B2A', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {user?.name || user?.fullName || (user?.firstName ? `${user.firstName} ${user.lastName || ''}` : (user?.username || 'Nexus Admin'))}
                 </span>
-                <span style={{ fontSize: '9.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: isDark ? '#a78bfa' : '#7b5cff' }}>
+                <span style={{ fontSize: '9.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: isDark ? '#4A90C2' : '#2872A1' }}>
                   {isAdmin ? 'PLATFORM ADMIN' : 'VERIFIED MEMBER'}
                 </span>
               </div>
@@ -327,9 +329,9 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '32px',
-                height: '32px',
-                borderRadius: '8px',
+                width: '30px',
+                height: '30px',
+                borderRadius: '6px',
                 border: 'none',
                 backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2',
                 color: '#ef4444',
@@ -339,12 +341,12 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                 transition: 'all 0.2s ease',
               }}
             >
-              <LogOut size={16} />
+              <LogOut size={15} />
             </button>
           </div>
 
           {/* Light / Dark Segmented Switcher */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '3px', borderRadius: '12px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', gap: '3px', width: '100%', boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '3px', borderRadius: '8px', border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9'}`, backgroundColor: isDark ? '#0B1F33' : '#FFFFFF', gap: '3px', width: '100%', boxSizing: 'border-box' }}>
             <button
               onClick={() => {
                 if (isDark) toggleTheme();
@@ -356,18 +358,18 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                 justifyContent: 'center',
                 gap: '6px',
                 padding: '6px 12px',
-                borderRadius: '9px',
+                borderRadius: '6px',
                 fontSize: '12px',
-                fontWeight: 600,
-                backgroundColor: !isDark ? '#ffffff' : 'transparent',
-                color: !isDark ? '#7b5cff' : '#64748b',
-                border: !isDark ? '1px solid #e2e8f0' : 'none',
-                boxShadow: !isDark ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
+                fontWeight: 500,
+                backgroundColor: !isDark ? '#F3F7FB' : 'transparent',
+                color: !isDark ? '#2872A1' : '#8EA6BC',
+                border: !isDark ? '1px solid #CBDDE9' : 'none',
+                boxShadow: !isDark ? '0 1px 3px rgba(13, 27, 42, 0.04)' : 'none',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
               }}
             >
-              <Sun size={14} style={{ color: !isDark ? '#7b5cff' : '#64748b' }} />
+              <Sun size={14} style={{ color: !isDark ? '#2872A1' : '#8EA6BC' }} />
               <span>Light</span>
             </button>
             <button
@@ -381,18 +383,18 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                 justifyContent: 'center',
                 gap: '6px',
                 padding: '6px 12px',
-                borderRadius: '9px',
+                borderRadius: '6px',
                 fontSize: '12px',
-                fontWeight: 600,
-                backgroundColor: isDark ? '#1e293b' : 'transparent',
-                color: isDark ? '#a78bfa' : '#64748b',
-                border: isDark ? '1px solid #334155' : 'none',
-                boxShadow: isDark ? '0 1px 4px rgba(0,0,0,0.2)' : 'none',
+                fontWeight: 500,
+                backgroundColor: isDark ? '#0E2740' : 'transparent',
+                color: isDark ? '#4A90C2' : '#64748B',
+                border: isDark ? '1px solid rgba(203, 221, 233, 0.2)' : 'none',
+                boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.2)' : 'none',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
               }}
             >
-              <Moon size={14} style={{ color: isDark ? '#a78bfa' : '#64748b' }} />
+              <Moon size={14} style={{ color: isDark ? '#4A90C2' : '#64748B' }} />
               <span>Dark</span>
             </button>
           </div>

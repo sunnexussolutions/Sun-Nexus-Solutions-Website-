@@ -20,7 +20,13 @@ export const query = async (queryString, params = []) => {
   try {
     const results = await sql.query(queryString, params);
     console.log("✅ CLOUD_RESPONSE_RECEIVED");
-    return results;
+    if (results && Array.isArray(results.rows)) {
+      return results.rows;
+    }
+    if (Array.isArray(results)) {
+      return results;
+    }
+    return results || [];
   } catch (error) {
     // If we hit a "Failed to fetch", it's usually a CORS or Network issue
     if (error.message.includes('fetch')) {

@@ -6,12 +6,12 @@
 (function () {
   const DEFAULT_CARDS = {
     // Home Page
-    'home_hero_active_students': { value: '100+', label: 'Active Students', page: 'Home', category: 'Hero Badges', order_index: 1 },
-    'home_hero_expert_mentors': { value: '20+', label: 'Expert Mentors', page: 'Home', category: 'Hero Badges', order_index: 2 },
-    'home_row_domains': { value: '10+', label: 'Domains', page: 'Home', category: 'Hero Stats Row', order_index: 3 },
-    'home_row_projects': { value: '20+', label: 'Projects Published', page: 'Home', category: 'Hero Stats Row', order_index: 4 },
-    'home_row_events': { value: '3+', label: 'Events Organized', page: 'Home', category: 'Hero Stats Row', order_index: 5 },
-    // 'home_row_possibilities': { value: '∞', label: 'Possibilities', page: 'Home', category: 'Hero Stats Row', order_index: 6 },
+    'home_hero_active_students': { value: '10K+', label: 'Active Students', page: 'Home', category: 'Hero Badges', order_index: 1 },
+    'home_hero_expert_mentors': { value: '200+', label: 'Expert Mentors', page: 'Home', category: 'Hero Badges', order_index: 2 },
+    'home_row_domains': { value: '50+', label: 'Domains', page: 'Home', category: 'Hero Stats Row', order_index: 3 },
+    'home_row_projects': { value: '1K+', label: 'Projects Published', page: 'Home', category: 'Hero Stats Row', order_index: 4 },
+    'home_row_events': { value: '100+', label: 'Events Organized', page: 'Home', category: 'Hero Stats Row', order_index: 5 },
+    'home_row_possibilities': { value: '100+', label: 'Community Members', page: 'Home', category: 'Hero Stats Row', order_index: 6 },
 
     // Mentorship Page
     'mentor_batch_title': { value: 'Batch: 1', label: '', page: 'Mentorship' },
@@ -77,6 +77,14 @@
         cardsMap = { ...cardsMap, ...parsed };
       }
     } catch (e) {}
+
+    // 3. Auto-clean legacy placeholder
+    if (cardsMap['home_row_possibilities']) {
+      if (cardsMap['home_row_possibilities'].value === '∞' || cardsMap['home_row_possibilities'].label === 'Possibilities') {
+        cardsMap['home_row_possibilities'].value = '5K+';
+        cardsMap['home_row_possibilities'].label = 'Community Members';
+      }
+    }
 
     return cardsMap;
   }

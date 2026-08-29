@@ -868,6 +868,190 @@ export const updateHiringSubmission = async (id, updates) => {
   }
 };
 
+// ── Project Requirements (Freelance) Store Methods ────────────────────────────
+export const getProjectRequirements = async () => {
+  console.log("📂 INITIATING_SYNC: Freelancing Table (Neon DB)...");
+  try {
+    await query(`
+      CREATE TABLE IF NOT EXISTS freelancing (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          client_name TEXT,
+          contact_person TEXT,
+          email TEXT,
+          phone TEXT,
+          whatsapp TEXT,
+          address TEXT,
+          business_type TEXT,
+          business_name TEXT,
+          website_social TEXT,
+          years_in_business TEXT,
+          project_title TEXT,
+          purpose_of_website TEXT,
+          business_description TEXT,
+          website_type TEXT,
+          reference_links TEXT,
+          features TEXT,
+          other_features TEXT,
+          design_preference TEXT,
+          color_preference TEXT,
+          has_logo TEXT,
+          will_provide_content TEXT,
+          content_provider TEXT,
+          pages_required TEXT,
+          start_date TEXT,
+          expected_deadline TEXT,
+          fixed_deadline TEXT,
+          fixed_deadline_details TEXT,
+          budget_range TEXT,
+          has_domain TEXT,
+          has_hosting TEXT,
+          need_domain_hosting_help TEXT,
+          additional_notes TEXT,
+          client_signature TEXT,
+          authorization_date TEXT,
+          status TEXT DEFAULT 'pending',
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    const rawCloud = await query('SELECT * FROM freelancing ORDER BY created_at DESC');
+    const cloud = Array.isArray(rawCloud) ? rawCloud : (rawCloud && Array.isArray(rawCloud.rows) ? rawCloud.rows : []);
+
+    // Sync any local offline submissions to database
+    const local = getLocal('project_requirements') || [];
+    const cloudEmailsOrIds = new Set(cloud.map(c => (c.email || '') + '_' + (c.project_title || '')));
+    
+    for (const item of local) {
+      const key = (item.email || '') + '_' + (item.projectTitle || item.project_title || '');
+      if (item.email && !cloudEmailsOrIds.has(key)) {
+        try {
+          await query(`
+            INSERT INTO freelancing (
+              client_name, contact_person, email, phone, whatsapp, address,
+              business_type, business_name, website_social, years_in_business,
+              project_title, purpose_of_website, business_description,
+              website_type, reference_links, features, other_features,
+              design_preference, color_preference, has_logo, will_provide_content,
+              content_provider, pages_required, start_date, expected_deadline,
+              fixed_deadline, fixed_deadline_details, budget_range,
+              has_domain, has_hosting, need_domain_hosting_help,
+              additional_notes, client_signature, authorization_date, status
+            ) VALUES (
+              $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+              $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
+              $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
+              $31, $32, $33, $34, 'pending'
+            )
+          `, [
+            item.clientName || item.client_name || 'N/A',
+            item.contactPerson || item.contact_person || 'N/A',
+            item.email || 'N/A',
+            item.phone || 'N/A',
+            item.whatsapp || '',
+            item.address || '',
+            item.businessType || item.business_type || 'N/A',
+            item.businessName || item.business_name || 'N/A',
+            item.websiteSocial || item.website_social || '',
+            item.yearsInBusiness || item.years_in_business || '',
+            item.projectTitle || item.project_title || 'Untitled Project',
+            item.purposeOfWebsite || item.purpose_of_website || 'N/A',
+            item.businessDescription || item.business_description || '',
+            Array.isArray(item.websiteType) ? item.websiteType.join(', ') : (item.websiteType || item.website_type || 'N/A'),
+            item.referenceLinks || item.reference_links || '',
+            Array.isArray(item.features) ? item.features.join(', ') : (item.features || 'N/A'),
+            item.otherFeatures || item.other_features || '',
+            item.designPreference || item.design_preference || 'N/A',
+            item.colorPreference || item.color_preference || '',
+            item.hasLogo || item.has_logo || 'N/A',
+            item.willProvideContent || item.will_provide_content || 'N/A',
+            item.contentProvider || item.content_provider || 'N/A',
+            item.pagesRequired || item.pages_required || '',
+            item.startDate || item.start_date || 'N/A',
+            item.expectedDeadline || item.expected_deadline || 'N/A',
+            item.fixedDeadline || item.fixed_deadline || 'N/A',
+            item.fixedDeadlineDetails || item.fixed_deadline_details || '',
+            item.budgetRange || item.budget_range || 'N/A',
+            item.hasDomain || item.has_domain || 'N/A',
+            item.hasHosting || item.has_hosting || 'N/A',
+            item.needDomainHostingHelp || item.need_domain_hosting_help || 'N/A',
+            item.additionalNotes || item.additional_notes || '',
+            item.clientSignature || item.client_signature || '',
+            item.authorizationDate || item.authorization_date || new Date().toISOString().split('T')[0]
+          ]);
+        } catch (e) {
+          console.warn("Syncing local item to DB failed:", e);
+        }
+      }
+    }
+
+    const finalCloud = await query('SELECT * FROM freelancing ORDER BY created_at DESC');
+    const records = Array.isArray(finalCloud) ? finalCloud : (finalCloud && Array.isArray(finalCloud.rows) ? finalCloud.rows : cloud);
+
+    if (records && Array.isArray(records)) {
+      const mapped = records.map(r => ({
+        ...r,
+        clientName: r.client_name || 'N/A',
+        contactPerson: r.contact_person || 'N/A',
+        businessType: r.business_type || 'N/A',
+        businessName: r.business_name || 'N/A',
+        websiteSocial: r.website_social || 'N/A',
+        yearsInBusiness: r.years_in_business || 'N/A',
+        projectTitle: r.project_title || 'Untitled Project',
+        purposeOfWebsite: r.purpose_of_website || 'N/A',
+        businessDescription: r.business_description || '',
+        websiteType: r.website_type || 'N/A',
+        referenceLinks: r.reference_links || 'N/A',
+        features: r.features || 'N/A',
+        otherFeatures: r.other_features || '',
+        designPreference: r.design_preference || 'N/A',
+        colorPreference: r.color_preference || 'N/A',
+        hasLogo: r.has_logo || 'N/A',
+        willProvideContent: r.will_provide_content || 'N/A',
+        contentProvider: r.content_provider || 'N/A',
+        pagesRequired: r.pages_required || '',
+        startDate: r.start_date || 'N/A',
+        expectedDeadline: r.expected_deadline || 'N/A',
+        fixedDeadline: r.fixed_deadline || 'N/A',
+        fixedDeadlineDetails: r.fixed_deadline_details || '',
+        budgetRange: r.budget_range || 'N/A',
+        hasDomain: r.has_domain || 'N/A',
+        hasHosting: r.has_hosting || 'N/A',
+        needDomainHostingHelp: r.need_domain_hosting_help || 'N/A',
+        additionalNotes: r.additional_notes || '',
+        clientSignature: r.client_signature || '',
+        authorizationDate: r.authorization_date || '',
+        status: r.status || 'pending',
+        createdAt: r.created_at || new Date().toISOString()
+      }));
+      setLocal('project_requirements', mapped, true);
+      return mapped;
+    }
+  } catch (err) {
+    console.error("❌ SYNC_FAILURE_REQUIREMENTS:", err.message);
+  }
+  return getLocal('project_requirements');
+};
+
+export const deleteProjectRequirement = async (id) => {
+  setLocal('project_requirements', getLocal('project_requirements').filter(r => r.id !== id));
+  try {
+    await query('DELETE FROM freelancing WHERE id = $1', [id]);
+  } catch (err) {
+    console.error('Delete requirement DB failure:', err);
+  }
+};
+
+export const updateProjectRequirementStatus = async (id, status) => {
+  const current = getLocal('project_requirements');
+  const updated = current.map(r => r.id === id ? { ...r, status } : r);
+  setLocal('project_requirements', updated);
+  try {
+    await query('UPDATE freelancing SET status = $1 WHERE id = $2', [status, id]);
+  } catch (err) {
+    console.error('Update requirement status DB failure:', err);
+  }
+};
+
 // ── Home Page Content Management ──────────────────────────────────────────────
 export const DEFAULT_HOME_CONTENT = {
   hero: {
@@ -893,7 +1077,7 @@ export const DEFAULT_HOME_CONTENT = {
     { icon: "fa-globe", value: "50+", label: "Domains", color: "blue" },
     { icon: "fa-code", value: "1K+", label: "Projects Published", color: "cyan" },
     { icon: "fa-calendar-check", value: "100+", label: "Events Organized", color: "blue" },
-    { icon: "fa-infinity", value: "∞", label: "Possibilities", color: "purple" }
+    { icon: "fa-users", value: "5K+", label: "Community Members", color: "purple" }
   ],
   values: {
     title: "Driving Innovation. Building Futures.",
@@ -908,9 +1092,9 @@ export const DEFAULT_HOME_CONTENT = {
   leadership: {
     title: "Leadership Team",
     members: [
-      { id: "1", name: "B.Murali Krishna", role: "Founder & CEO", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.37.00%20AM.jpeg?updatedAt=1760072973049", linkedin: "https://www.linkedin.com/company/sunnexussolutions/", twitter: "#", facebook: "#" },
-      { id: "2", name: "B.Charitha Reddy", role: "President", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772469092/charitha_akka_grzcgc.jpg", linkedin: "https://www.linkedin.com/company/sunnexussolutions/", twitter: "#", facebook: "#" },
-      { id: "3", name: "C.Mallikarjuna Rao", role: "Vice President", image: "https://ik.imagekit.io/kofq4cdghu/IMG_20241008_135227_1_.jpg?updatedAt=1759896755572", linkedin: "https://www.linkedin.com/company/sunnexussolutions/", twitter: "#", facebook: "#" }
+      { id: "1", name: "B.Murali Krishna", role: "Founder & CEO", image: "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.37.00%20AM.jpeg?updatedAt=1760072973049", linkedin: "https://www.linkedin.com/company/sunnexussolutions/", github: "https://github.com/sunnexussolutions" },
+      { id: "2", name: "B.Charitha Reddy", role: "President", image: "https://res.cloudinary.com/dseg9nty3/image/upload/v1772469092/charitha_akka_grzcgc.jpg", linkedin: "https://www.linkedin.com/company/sunnexussolutions/", github: "https://github.com/sunnexussolutions" },
+      { id: "3", name: "C.Mallikarjuna Rao", role: "Vice President", image: "https://ik.imagekit.io/kofq4cdghu/IMG_20241008_135227_1_.jpg?updatedAt=1759896755572", linkedin: "https://www.linkedin.com/company/sunnexussolutions/", github: "https://github.com/sunnexussolutions" }
     ]
   },
   logbook: {
@@ -1277,7 +1461,7 @@ export const DEFAULT_STAT_CARDS = {
   'home_row_domains': { card_key: 'home_row_domains', value: '50+', label: 'Domains', page: 'Home', category: 'Hero Stats Row', order_index: 3 },
   'home_row_projects': { card_key: 'home_row_projects', value: '1K+', label: 'Projects Published', page: 'Home', category: 'Hero Stats Row', order_index: 4 },
   'home_row_events': { card_key: 'home_row_events', value: '100+', label: 'Events Organized', page: 'Home', category: 'Hero Stats Row', order_index: 5 },
-  'home_row_possibilities': { card_key: 'home_row_possibilities', value: '∞', label: 'Possibilities', page: 'Home', category: 'Hero Stats Row', order_index: 6 },
+  'home_row_possibilities': { card_key: 'home_row_possibilities', value: '5K+', label: 'Community Members', page: 'Home', category: 'Hero Stats Row', order_index: 6 },
 
   'mentor_batch_title': { card_key: 'mentor_batch_title', value: 'Batch: 1', label: 'Batch Title', page: 'Mentorship', category: 'Batch Info', order_index: 1 },
   'mentor_batch_dates': { card_key: 'mentor_batch_dates', value: 'November 2025 - January 2026', label: 'Batch Dates', page: 'Mentorship', category: 'Batch Info', order_index: 2 },
@@ -1414,6 +1598,124 @@ export const saveStatCards = async (cardsMap) => {
   } catch (e) {}
 
   return cardsMap;
+};
+
+// ══════════════════════════════════════════════════════════════
+// ALUMNI DATASTORE HELPERS
+// ══════════════════════════════════════════════════════════════
+export const getAlumni = async (filters = {}) => {
+  try {
+    const params = new URLSearchParams();
+    if (filters.batch && filters.batch !== 'All Batches') params.append('batch', filters.batch);
+    if (filters.company && filters.company !== 'All Companies') params.append('company', filters.company);
+    if (filters.search) params.append('search', filters.search);
+    if (filters.include_inactive) params.append('include_inactive', 'true');
+
+    const res = await fetchApi(`/api/alumni?${params.toString()}`);
+    if (res && res.success && Array.isArray(res.data)) {
+      return res.data;
+    }
+  } catch (err) {
+    console.warn('Fetch alumni dataStore fallback notice:', err.message);
+  }
+
+  // Fallback to direct DB query if available
+  try {
+    const rows = await query(`SELECT * FROM alumni ORDER BY batch DESC, is_leader DESC, display_order ASC, name ASC`);
+    if (rows && rows.length > 0) return rows;
+  } catch (e) {}
+
+  return [];
+};
+
+export const addAlumnus = async (alumnusData) => {
+  try {
+    const res = await fetchApi('/api/alumni', 'POST', alumnusData);
+    if (res && res.success) return res.data;
+  } catch (err) {
+    console.error('addAlumnus error:', err);
+  }
+
+  try {
+    const rows = await query(`
+      INSERT INTO alumni (
+        name, profile_image, batch, is_leader, leadership_role, "current_role",
+        company, location, country, skills, linkedin_url, github_url,
+        portfolio_url, bio, is_active, display_order
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      RETURNING *
+    `, [
+      alumnusData.name, alumnusData.profile_image || null, alumnusData.batch,
+      alumnusData.is_leader === true || alumnusData.is_leader === 'true',
+      alumnusData.leadership_role || null, alumnusData.current_role,
+      alumnusData.company, alumnusData.location || null, alumnusData.country || 'India',
+      alumnusData.skills || null, alumnusData.linkedin_url || null,
+      alumnusData.github_url || null, alumnusData.portfolio_url || null,
+      alumnusData.bio || null, alumnusData.is_active !== false,
+      parseInt(alumnusData.display_order) || 0
+    ]);
+    return rows[0];
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const updateAlumnus = async (id, updateData) => {
+  try {
+    const res = await fetchApi(`/api/alumni/${id}`, 'PATCH', updateData);
+    if (res && res.success) return res.data;
+  } catch (err) {
+    console.error('updateAlumnus error:', err);
+  }
+
+  try {
+    const rows = await query(`
+      UPDATE alumni SET
+        name = COALESCE($1, name),
+        profile_image = COALESCE($2, profile_image),
+        batch = COALESCE($3, batch),
+        is_leader = COALESCE($4, is_leader),
+        leadership_role = COALESCE($5, leadership_role),
+        "current_role" = COALESCE($6, "current_role"),
+        company = COALESCE($7, company),
+        location = COALESCE($8, location),
+        country = COALESCE($9, country),
+        skills = COALESCE($10, skills),
+        linkedin_url = COALESCE($11, linkedin_url),
+        github_url = COALESCE($12, github_url),
+        portfolio_url = COALESCE($13, portfolio_url),
+        bio = COALESCE($14, bio),
+        is_active = COALESCE($15, is_active),
+        display_order = COALESCE($16, display_order)
+      WHERE id = $17
+      RETURNING *
+    `, [
+      updateData.name, updateData.profile_image, updateData.batch,
+      updateData.is_leader, updateData.leadership_role, updateData.current_role,
+      updateData.company, updateData.location, updateData.country,
+      updateData.skills, updateData.linkedin_url, updateData.github_url,
+      updateData.portfolio_url, updateData.bio, updateData.is_active,
+      updateData.display_order !== undefined ? parseInt(updateData.display_order) || 0 : undefined,
+      id
+    ]);
+    return rows[0];
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const deleteAlumnus = async (id) => {
+  try {
+    await fetchApi(`/api/alumni/${id}`, 'DELETE');
+    return true;
+  } catch (err) {}
+
+  try {
+    await query(`DELETE FROM alumni WHERE id = $1`, [id]);
+    return true;
+  } catch (e) {
+    throw e;
+  }
 };
 
 

@@ -1,0 +1,319 @@
+/* --------------------------------------------------------------
+   SUN NEXUS SOLUTIONS — DARK MODE OVERRIDES
+   File: css/dark-mode.css
+   Purpose: Patch all hard-coded light values so dark mode looks
+            polished. Every rule is STRICTLY scoped to
+            [data-theme="dark"] — light mode is 100% unaffected.
+   -------------------------------------------------------------- */
+
+/* ----------------------------------------------------
+   SECTION 1: GLOBAL FORM INPUTS & CONTROLS
+   nexus-theme.css forces #FFFFFF bg on all inputs globally.
+   Remap them for dark mode.
+   ---------------------------------------------------- */
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="password"],
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] input[type="tel"],
+[data-theme="dark"] input[type="url"],
+[data-theme="dark"] select,
+[data-theme="dark"] textarea,
+[data-theme="dark"] .nexus-input {
+  background-color: #0E2740 !important;
+  border-color: rgba(203, 221, 233, 0.2) !important;
+  color: #F3F7FB !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #5C7D95 !important;
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] .nexus-input:focus {
+  border-color: #4A90C2 !important;
+  box-shadow: 0 0 0 3px rgba(74, 144, 194, 0.2) !important;
+}
+
+[data-theme="dark"] select option {
+  background: #0E2740;
+  color: #CBDDE9;
+}
+
+/* ----------------------------------------------------
+   SECTION 2: SHARED BUTTONS
+   ---------------------------------------------------- */
+[data-theme="dark"] .btn-secondary,
+[data-theme="dark"] .nexus-btn-secondary,
+[data-theme="dark"] button.secondary {
+  background-color: rgba(14, 39, 64, 0.7) !important;
+  color: #4A90C2 !important;
+  border-color: rgba(74, 144, 194, 0.4) !important;
+}
+
+[data-theme="dark"] .btn-secondary:hover,
+[data-theme="dark"] .nexus-btn-secondary:hover,
+[data-theme="dark"] button.secondary:hover {
+  background-color: rgba(40, 114, 161, 0.2) !important;
+  border-color: #4A90C2 !important;
+  color: #7DBCDF !important;
+}
+
+[data-theme="dark"] .btn-tertiary,
+[data-theme="dark"] .nexus-btn-tertiary {
+  background-color: rgba(14, 39, 64, 0.7) !important;
+  color: #CBDDE9 !important;
+  border-color: rgba(203, 221, 233, 0.2) !important;
+}
+
+[data-theme="dark"] .btn-tertiary:hover,
+[data-theme="dark"] .nexus-btn-tertiary:hover {
+  background-color: rgba(40, 114, 161, 0.15) !important;
+  border-color: #4A90C2 !important;
+  color: #4A90C2 !important;
+}
+
+[data-theme="dark"] button:disabled,
+[data-theme="dark"] .btn-disabled,
+[data-theme="dark"] .nexus-btn-disabled {
+  background-color: rgba(30, 50, 70, 0.6) !important;
+  color: #5C7D95 !important;
+  border-color: rgba(203, 221, 233, 0.12) !important;
+}
+
+/* ----------------------------------------------------
+   SECTION 3: NAVBAR
+   ---------------------------------------------------- */
+[data-theme="dark"] .navbar {
+  background: rgba(11, 31, 51, 0.92) !important;
+  border-color: rgba(203, 221, 233, 0.15) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+[data-theme="dark"] .navbar.navbar-scrolled {
+  background: rgba(7, 19, 30, 0.98) !important;
+  border-color: rgba(203, 221, 233, 0.18) !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-theme="dark"] .brand-name {
+  color: #F3F7FB !important;
+}
+
+[data-theme="dark"] .nav-dropdown .dropdown-menu {
+  background: rgba(10, 28, 46, 0.97) !important;
+  border-color: rgba(203, 221, 233, 0.18) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-theme="dark"] .nav-dropdown .dropdown-menu li a {
+  color: #CBDDE9 !important;
+}
+
+[data-theme="dark"] .nav-dropdown .dropdown-menu li a:hover {
+  background: rgba(40, 114, 161, 0.15) !important;
+  color: #7DBCDF !important;
+}
+
+@media (max-width: 768px) {
+  [data-theme="dark"] .nav-links {
+    background: rgba(7, 19, 30, 0.97) !important;
+    border-color: rgba(74, 144, 194, 0.35) !important;
+  }
+}
+
+/* ----------------------------------------------------
+   SECTION 4: FOOTER
+   ---------------------------------------------------- */
+[data-theme="dark"] .footer-logo-wrap {
+  background: rgba(14, 39, 64, 0.8) !important;
+  border-color: rgba(203, 221, 233, 0.2) !important;
+}
+
+[data-theme="dark"] .footer-social-btn {
+  background: rgba(14, 39, 64, 0.7) !important;
+  color: #CBDDE9 !important;
+  border-color: rgba(203, 221, 233, 0.2) !important;
+}
+
+[data-theme="dark"] .footer-social-btn:hover {
+  background: rgba(40, 114, 161, 0.2) !important;
+  border-color: #4A90C2 !important;
+  color: #4A90C2 !important;
+}
+
+[data-theme="dark"] .footer-newsletter {
+  background: rgba(14, 39, 64, 0.6) !important;
+  border-color: rgba(203, 221, 233, 0.18) !important;
+}
+
+[data-theme="dark"] .footer-newsletter input {
+  background: #0B1F33 !important;
+  border-color: rgba(203, 221, 233, 0.2) !important;
+  color: #CBDDE9 !important;
+}
+
+[data-theme="dark"] .footer-badge {
+  background: rgba(14, 39, 64, 0.6) !important;
+  border-color: rgba(203, 221, 233, 0.18) !important;
+  color: #CBDDE9 !important;
+}
+
+/* ----------------------------------------------------
+   SECTION 5: HOME PAGE — HERO BUTTONS & CARDS
+   ---------------------------------------------------- */
+[data-theme="dark"] .btn-join {
+  background: rgba(14, 39, 64, 0.5) !important;
+  border-color: rgba(74, 144, 194, 0.5) !important;
+  color: #4A90C2 !important;
+}
+
+[data-theme="dark"] .btn-join:hover {
+  background: rgba(40, 114, 161, 0.2) !important;
+  border-color: #4A90C2 !important;
+  color: #7DBCDF !important;
+}
+
+[data-theme="dark"] .hero-badge-card {
+  background: rgba(14, 39, 64, 0.8);
+  border-color: rgba(203, 221, 233, 0.18);
+}
+
+[data-theme="dark"] .hero-image-card {
+  background: rgba(14, 39, 64, 0.6);
+  border-color: rgba(203, 221, 233, 0.18);
+}
+
+/* ----------------------------------------------------
+   SECTION 6: HOME PAGE — LEADERSHIP
+   ---------------------------------------------------- */
+[data-theme="dark"] .leader-socials a {
+  background: rgba(14, 39, 64, 0.8) !important;
+  border-color: rgba(203, 221, 233, 0.2) !important;
+  color: #4A90C2 !important;
+}
+
+[data-theme="dark"] .leader-img-box {
+  border-color: rgba(203, 221, 233, 0.15);
+}
+
+/* ----------------------------------------------------
+   SECTION 7: HOME PAGE — LOGBOOK
+   ---------------------------------------------------- */
+[data-theme="dark"] .logbook-featured-card {
+  background: linear-gradient(135deg, rgba(11, 31, 51, 0.9) 0%, rgba(7, 19, 30, 0.85) 100%);
+  border-color: rgba(74, 144, 194, 0.35);
+}
+
+[data-theme="dark"] .logbook-featured-card:hover {
+  border-color: rgba(74, 144, 194, 0.55);
+}
+
+/* ----------------------------------------------------
+   SECTION 8: BENTO WEEK CARD
+   ---------------------------------------------------- */
+[data-theme="dark"] .bento-week-card {
+  background: rgba(14, 39, 64, 0.75);
+  border-color: rgba(203, 221, 233, 0.18);
+}
+
+/* ----------------------------------------------------
+   SECTION 9: EVENTS PAGE
+   ---------------------------------------------------- */
+[data-theme="dark"] .event-card {
+  background: rgba(14, 39, 64, 0.7);
+  border-color: rgba(203, 221, 233, 0.18);
+}
+
+[data-theme="dark"] .event-card:hover {
+  border-color: #4A90C2;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+/* ----------------------------------------------------
+   SECTION 10: MENTOR PAGE
+   ---------------------------------------------------- */
+[data-theme="dark"] .mentor-card,
+[data-theme="dark"] .mentee-card {
+  background: rgba(14, 39, 64, 0.7);
+  border-color: rgba(203, 221, 233, 0.18);
+}
+
+/* ----------------------------------------------------
+   SECTION 11: PROJECTS PAGE
+   ---------------------------------------------------- */
+[data-theme="dark"] .project-card,
+[data-theme="dark"] .resource-card {
+  background: rgba(14, 39, 64, 0.7);
+  border-color: rgba(203, 221, 233, 0.18);
+}
+
+/* ----------------------------------------------------
+   SECTION 12: REQUIREMENTS FORM
+   ---------------------------------------------------- */
+[data-theme="dark"] .req-card,
+[data-theme="dark"] .req-form-wrap,
+[data-theme="dark"] .form-card {
+  background: rgba(14, 39, 64, 0.7) !important;
+  border-color: rgba(203, 221, 233, 0.18) !important;
+}
+
+/* ----------------------------------------------------
+   SECTION 13: SHARED MODAL
+   ---------------------------------------------------- */
+[data-theme="dark"] .modal-content {
+  background: rgba(10, 28, 46, 0.98) !important;
+  border-color: rgba(203, 221, 233, 0.2) !important;
+  color: #F3F7FB !important;
+}
+
+[data-theme="dark"] .modal-content h2 {
+  color: #FFFFFF !important;
+}
+
+/* ----------------------------------------------------
+   SECTION 14: CTA & PROMO CARDS
+   ---------------------------------------------------- */
+[data-theme="dark"] .quiz-cta-card,
+[data-theme="dark"] .nexus-cta-card {
+  background: rgba(14, 39, 64, 0.75);
+  border-color: rgba(203, 221, 233, 0.18);
+}
+
+/* ----------------------------------------------------
+   SECTION 15: SCROLLBARS
+   ---------------------------------------------------- */
+[data-theme="dark"] * {
+  scrollbar-color: rgba(40, 114, 161, 0.5) rgba(7, 19, 30, 0.6);
+}
+[data-theme="dark"] *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+[data-theme="dark"] *::-webkit-scrollbar-track {
+  background: rgba(7, 19, 30, 0.6);
+  border-radius: 6px;
+}
+[data-theme="dark"] *::-webkit-scrollbar-thumb {
+  background: rgba(40, 114, 161, 0.5);
+  border-radius: 6px;
+}
+[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 144, 194, 0.7);
+}
+
+/* ----------------------------------------------------
+   SECTION 16: SELECTION & FOCUS RING
+   ---------------------------------------------------- */
+[data-theme="dark"] ::selection {
+  background: rgba(40, 114, 161, 0.4);
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] :focus-visible {
+  outline: 2px solid rgba(74, 144, 194, 0.7);
+  outline-offset: 2px;
+}

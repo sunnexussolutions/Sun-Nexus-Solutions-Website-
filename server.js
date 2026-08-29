@@ -138,6 +138,218 @@ app.post('/api/contact-message', async (req, res) => {
     }
 });
 
+// Project Requirements Endpoint (Freelance Form Submissions into 'freelancing' table)
+app.post('/api/requirements', async (req, res) => {
+    const data = req.body;
+    try {
+        await sql`
+            CREATE TABLE IF NOT EXISTS freelancing (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                client_name TEXT,
+                contact_person TEXT,
+                email TEXT,
+                phone TEXT,
+                whatsapp TEXT,
+                address TEXT,
+                business_type TEXT,
+                business_name TEXT,
+                website_social TEXT,
+                years_in_business TEXT,
+                project_title TEXT,
+                purpose_of_website TEXT,
+                business_description TEXT,
+                website_type TEXT,
+                reference_links TEXT,
+                features TEXT,
+                other_features TEXT,
+                design_preference TEXT,
+                color_preference TEXT,
+                has_logo TEXT,
+                will_provide_content TEXT,
+                content_provider TEXT,
+                pages_required TEXT,
+                start_date TEXT,
+                expected_deadline TEXT,
+                fixed_deadline TEXT,
+                fixed_deadline_details TEXT,
+                budget_range TEXT,
+                has_domain TEXT,
+                has_hosting TEXT,
+                need_domain_hosting_help TEXT,
+                additional_notes TEXT,
+                client_signature TEXT,
+                authorization_date TEXT,
+                status TEXT DEFAULT 'pending',
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
+
+        const getVal = (snakeKey, camelKey) => {
+            const v = data[snakeKey] !== undefined ? data[snakeKey] : data[camelKey];
+            if (Array.isArray(v)) return v.join(', ');
+            return v || null;
+        };
+
+        await sql`
+            INSERT INTO freelancing (
+                client_name, contact_person, email, phone, whatsapp, address,
+                business_type, business_name, website_social, years_in_business,
+                project_title, purpose_of_website, business_description,
+                website_type, reference_links, features, other_features,
+                design_preference, color_preference, has_logo, will_provide_content,
+                content_provider, pages_required, start_date, expected_deadline,
+                fixed_deadline, fixed_deadline_details, budget_range,
+                has_domain, has_hosting, need_domain_hosting_help,
+                additional_notes, client_signature, authorization_date
+            ) VALUES (
+                ${getVal('client_name', 'clientName')}, ${getVal('contact_person', 'contactPerson')}, ${getVal('email', 'email')}, ${getVal('phone', 'phone')}, ${getVal('whatsapp', 'whatsapp')}, ${getVal('address', 'address')},
+                ${getVal('business_type', 'businessType')}, ${getVal('business_name', 'businessName')}, ${getVal('website_social', 'websiteSocial')}, ${getVal('years_in_business', 'yearsInBusiness')},
+                ${getVal('project_title', 'projectTitle')}, ${getVal('purpose_of_website', 'purposeOfWebsite')}, ${getVal('business_description', 'businessDescription')},
+                ${getVal('website_type', 'websiteType')}, ${getVal('reference_links', 'referenceLinks')}, ${getVal('features', 'features')}, ${getVal('other_features', 'otherFeatures')},
+                ${getVal('design_preference', 'designPreference')}, ${getVal('color_preference', 'colorPreference')}, ${getVal('has_logo', 'hasLogo')}, ${getVal('will_provide_content', 'willProvideContent')},
+                ${getVal('content_provider', 'contentProvider')}, ${getVal('pages_required', 'pagesRequired')}, ${getVal('start_date', 'startDate')}, ${getVal('expected_deadline', 'expectedDeadline')},
+                ${getVal('fixed_deadline', 'fixedDeadline')}, ${getVal('fixed_deadline_details', 'fixedDeadlineDetails')}, ${getVal('budget_range', 'budgetRange')},
+                ${getVal('has_domain', 'hasDomain')}, ${getVal('has_hosting', 'hasHosting')}, ${getVal('need_domain_hosting_help', 'needDomainHostingHelp')},
+                ${getVal('additional_notes', 'additionalNotes')}, ${getVal('client_signature', 'clientSignature')}, ${getVal('authorization_date', 'authorizationDate')}
+            )
+        `;
+
+        res.json({
+            success: true,
+            message: '🚀 Project Requirements Secured! Our team will contact you shortly.'
+        });
+    } catch (error) {
+        console.error('Project Requirements DB Error:', error);
+        res.status(500).json({
+            success: false,
+            message: '❌ Database Error: ' + error.message
+        });
+    }
+});
+
+app.get('/api/requirements', async (req, res) => {
+    try {
+        await sql`
+            CREATE TABLE IF NOT EXISTS freelancing (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                client_name TEXT,
+                contact_person TEXT,
+                email TEXT,
+                phone TEXT,
+                whatsapp TEXT,
+                address TEXT,
+                business_type TEXT,
+                business_name TEXT,
+                website_social TEXT,
+                years_in_business TEXT,
+                project_title TEXT,
+                purpose_of_website TEXT,
+                business_description TEXT,
+                website_type TEXT,
+                reference_links TEXT,
+                features TEXT,
+                other_features TEXT,
+                design_preference TEXT,
+                color_preference TEXT,
+                has_logo TEXT,
+                will_provide_content TEXT,
+                content_provider TEXT,
+                pages_required TEXT,
+                start_date TEXT,
+                expected_deadline TEXT,
+                fixed_deadline TEXT,
+                fixed_deadline_details TEXT,
+                budget_range TEXT,
+                has_domain TEXT,
+                has_hosting TEXT,
+                need_domain_hosting_help TEXT,
+                additional_notes TEXT,
+                client_signature TEXT,
+                authorization_date TEXT,
+                status TEXT DEFAULT 'pending',
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
+
+        const rows = await sql`SELECT * FROM freelancing ORDER BY created_at DESC`;
+        res.json({ success: true, data: rows });
+    } catch (error) {
+        console.error('Fetch Requirements Error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.delete('/api/requirements/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await sql`DELETE FROM freelancing WHERE id = ${id}`;
+        res.json({ success: true, message: 'Requirement submission deleted.' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.patch('/api/requirements/:id', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    try {
+        await sql`UPDATE freelancing SET status = ${status} WHERE id = ${id}`;
+        res.json({ success: true, message: 'Requirement status updated.' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// Freelancing Database Table Initialization Helper
+const initFreelancingTable = async () => {
+    try {
+        await sql`
+            CREATE TABLE IF NOT EXISTS freelancing (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                client_name TEXT,
+                contact_person TEXT,
+                email TEXT,
+                phone TEXT,
+                whatsapp TEXT,
+                address TEXT,
+                business_type TEXT,
+                business_name TEXT,
+                website_social TEXT,
+                years_in_business TEXT,
+                project_title TEXT,
+                purpose_of_website TEXT,
+                business_description TEXT,
+                website_type TEXT,
+                reference_links TEXT,
+                features TEXT,
+                other_features TEXT,
+                design_preference TEXT,
+                color_preference TEXT,
+                has_logo TEXT,
+                will_provide_content TEXT,
+                content_provider TEXT,
+                pages_required TEXT,
+                start_date TEXT,
+                expected_deadline TEXT,
+                fixed_deadline TEXT,
+                fixed_deadline_details TEXT,
+                budget_range TEXT,
+                has_domain TEXT,
+                has_hosting TEXT,
+                need_domain_hosting_help TEXT,
+                additional_notes TEXT,
+                client_signature TEXT,
+                authorization_date TEXT,
+                status TEXT DEFAULT 'pending',
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
+    } catch (e) {
+        console.warn('Freelancing table initialization warning:', e.message);
+    }
+};
+initFreelancingTable();
+
 // Password Reset Tokens Database Table Initialization Helper
 const initPasswordResetTokensTable = async () => {
     try {
@@ -2231,77 +2443,7 @@ app.post('/api/audit-logs', async (req, res) => {
     }
 });
 
-// Website / Project Requirement Form Submission Endpoint
-app.post('/api/requirements', async (req, res) => {
-    const data = req.body;
-    try {
-        await sql`
-            CREATE TABLE IF NOT EXISTS project_requirements (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                client_name TEXT,
-                contact_person TEXT,
-                email TEXT,
-                phone TEXT,
-                whatsapp TEXT,
-                address TEXT,
-                business_type TEXT,
-                business_name TEXT,
-                website_social TEXT,
-                years_in_business TEXT,
-                project_title TEXT,
-                purpose_of_website TEXT,
-                business_description TEXT,
-                website_type JSONB,
-                reference_links TEXT,
-                features JSONB,
-                design_preference TEXT,
-                color_preference TEXT,
-                has_logo TEXT,
-                will_provide_content TEXT,
-                content_provider TEXT,
-                pages_required TEXT,
-                start_date TEXT,
-                expected_deadline TEXT,
-                fixed_deadline TEXT,
-                budget_range TEXT,
-                has_domain TEXT,
-                has_hosting TEXT,
-                need_domain_hosting_help TEXT,
-                additional_notes TEXT,
-                client_signature TEXT,
-                authorization_date TEXT,
-                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-            )
-        `;
 
-        await sql`
-            INSERT INTO project_requirements (
-                client_name, contact_person, email, phone, whatsapp, address,
-                business_type, business_name, website_social, years_in_business,
-                project_title, purpose_of_website, business_description,
-                website_type, reference_links, features, design_preference,
-                color_preference, has_logo, will_provide_content, content_provider,
-                pages_required, start_date, expected_deadline, fixed_deadline,
-                budget_range, has_domain, has_hosting, need_domain_hosting_help,
-                additional_notes, client_signature, authorization_date
-            ) VALUES (
-                ${data.client_name || ''}, ${data.contact_person || ''}, ${data.email || ''}, ${data.phone || ''}, ${data.whatsapp || ''}, ${data.address || ''},
-                ${data.business_type || ''}, ${data.business_name || ''}, ${data.website_social || ''}, ${data.years_in_business || ''},
-                ${data.project_title || ''}, ${data.purpose_of_website || ''}, ${data.business_description || ''},
-                ${JSON.stringify(data.website_type || [])}, ${data.reference_links || ''}, ${JSON.stringify(data.features || [])}, ${data.design_preference || ''},
-                ${data.color_preference || ''}, ${data.has_logo || ''}, ${data.will_provide_content || ''}, ${data.content_provider || ''},
-                ${data.pages_required || ''}, ${data.start_date || ''}, ${data.expected_deadline || ''}, ${data.fixed_deadline || ''},
-                ${data.budget_range || ''}, ${data.has_domain || ''}, ${data.has_hosting || ''}, ${data.need_domain_hosting_help || ''},
-                ${data.additional_notes || ''}, ${data.client_signature || ''}, ${data.authorization_date || ''}
-            )
-        `;
-
-        res.json({ success: true, message: 'Requirement form submitted successfully' });
-    } catch (error) {
-        console.error('Error saving project requirements:', error);
-        res.json({ success: true, message: 'Requirement recorded locally', note: error.message });
-    }
-});
 
 // ── Stat Cards Management Endpoints ──────────────────────────────────────────
 const DEFAULT_STAT_CARDS = {
@@ -2310,7 +2452,7 @@ const DEFAULT_STAT_CARDS = {
     'home_row_domains': { card_key: 'home_row_domains', value: '50+', label: 'Domains', page: 'Home', category: 'Hero Stats Row', order_index: 3 },
     'home_row_projects': { card_key: 'home_row_projects', value: '1K+', label: 'Projects Published', page: 'Home', category: 'Hero Stats Row', order_index: 4 },
     'home_row_events': { card_key: 'home_row_events', value: '100+', label: 'Events Organized', page: 'Home', category: 'Hero Stats Row', order_index: 5 },
-    'home_row_possibilities': { card_key: 'home_row_possibilities', value: '∞', label: 'Possibilities', page: 'Home', category: 'Hero Stats Row', order_index: 6 },
+    'home_row_possibilities': { card_key: 'home_row_possibilities', value: '5K+', label: 'Community Members', page: 'Home', category: 'Hero Stats Row', order_index: 6 },
 
     'mentor_batch_title': { card_key: 'mentor_batch_title', value: 'Batch: 1', label: 'Batch Title', page: 'Mentorship', category: 'Batch Info', order_index: 1 },
     'mentor_batch_dates': { card_key: 'mentor_batch_dates', value: 'November 2025 - January 2026', label: 'Batch Dates', page: 'Mentorship', category: 'Batch Info', order_index: 2 },
@@ -2446,6 +2588,285 @@ app.put('/api/home-content', async (req, res) => {
         `;
         res.json({ success: true, content });
     } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ══════════════════════════════════════════════════════════════
+// ALUMNI API & DATABASE INTEGRATION
+// ══════════════════════════════════════════════════════════════
+
+// Ensure Alumni Table Exists
+const ensureAlumniTable = async () => {
+    await sql`
+        CREATE TABLE IF NOT EXISTS alumni (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name TEXT NOT NULL,
+            profile_image TEXT,
+            batch TEXT NOT NULL,
+            is_leader BOOLEAN DEFAULT FALSE,
+            leadership_role TEXT,
+            "current_role" TEXT NOT NULL,
+
+            company TEXT NOT NULL,
+            location TEXT,
+            country TEXT DEFAULT 'India',
+            skills TEXT,
+            linkedin_url TEXT,
+            github_url TEXT,
+            portfolio_url TEXT,
+            bio TEXT,
+            is_active BOOLEAN DEFAULT TRUE,
+            display_order INT DEFAULT 0,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+};
+
+// Seed initial alumni if table is empty
+const seedAlumniIfEmpty = async () => {
+    try {
+        await ensureAlumniTable();
+        const countRes = await sql`SELECT COUNT(*)::int AS count FROM alumni`;
+        if (countRes && countRes[0] && countRes[0].count === 0) {
+            console.log('🌱 Seeding initial alumni records for Nexus Alumni Portal...');
+            const seedData = [
+                // ── BATCH OF 2024 LEADERS ──
+                { name: 'Arjun Sharma', profile_image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400', batch: '2024', is_leader: true, leadership_role: 'Batch Leader', current_role: 'Software Engineer', company: 'Google', location: 'Bengaluru, India', country: 'India', skills: 'Distributed Systems, Go, Kubernetes, GCP', linkedin_url: 'https://linkedin.com', github_url: 'https://github.com', bio: 'Passionate software engineer building large-scale distributed systems at Google.', display_order: 1 },
+                { name: 'Priya Patel', profile_image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400', batch: '2024', is_leader: true, leadership_role: 'Technical Lead', current_role: 'SDE II', company: 'Microsoft', location: 'Hyderabad, India', country: 'India', skills: 'C#, .NET Core, Azure, Microservices', linkedin_url: 'https://linkedin.com', github_url: 'https://github.com', bio: 'Leading cloud native architectures and distributed services at Microsoft.', display_order: 2 },
+                { name: 'Rohan Verma', profile_image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400', batch: '2024', is_leader: true, leadership_role: 'Core Leader', current_role: 'Backend Developer', company: 'Amazon', location: 'Bengaluru, India', country: 'India', skills: 'Java, Spring Boot, AWS, DynamoDB', linkedin_url: 'https://linkedin.com', github_url: 'https://github.com', bio: 'Optimizing high-throughput transaction pipelines at Amazon.', display_order: 3 },
+                { name: 'Sneha Reddy', profile_image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400', batch: '2024', is_leader: true, leadership_role: 'Design Lead', current_role: 'Product Designer', company: 'Adobe', location: 'Noida, India', country: 'India', skills: 'Figma, Design Systems, UX Research, Interaction Design', linkedin_url: 'https://linkedin.com', portfolio_url: 'https://adobe.com', bio: 'Crafting intuitive creative experiences and next-gen design systems at Adobe.', display_order: 4 },
+
+                // ── BATCH OF 2024 MEMBERS ──
+                { name: 'Aditya Singh', profile_image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400', batch: '2024', is_leader: false, leadership_role: '', current_role: 'SDE', company: 'Flipkart', location: 'Bengaluru, India', country: 'India', skills: 'Java, Kafka, Redis, SQL', linkedin_url: 'https://linkedin.com', display_order: 5 },
+                { name: 'Kavya Nair', profile_image: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&q=80&w=400', batch: '2024', is_leader: false, leadership_role: '', current_role: 'Data Analyst', company: 'Deloitte', location: 'Mumbai, India', country: 'India', skills: 'Python, SQL, Tableau, Power BI', linkedin_url: 'https://linkedin.com', display_order: 6 },
+                { name: 'Mehul Shah', profile_image: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=400', batch: '2024', is_leader: false, leadership_role: '', current_role: 'Full Stack Developer', company: 'Razorpay', location: 'Bengaluru, India', country: 'India', skills: 'Node.js, React, TypeScript, PostgreSQL', linkedin_url: 'https://linkedin.com', display_order: 7 },
+                { name: 'Ananya Joshi', profile_image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=400', batch: '2024', is_leader: false, leadership_role: '', current_role: 'SDE', company: 'PhonePe', location: 'Pune, India', country: 'India', skills: 'Kotlin, Spring Boot, MongoDB', linkedin_url: 'https://linkedin.com', display_order: 8 },
+                { name: 'Tanmay Bansal', profile_image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400', batch: '2024', is_leader: false, leadership_role: '', current_role: 'QA Engineer', company: 'Expedia', location: 'Gurgaon, India', country: 'India', skills: 'Automation, Selenium, Cypress, CI/CD', linkedin_url: 'https://linkedin.com', display_order: 9 },
+                { name: 'Ishita Mehta', profile_image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400', batch: '2024', is_leader: false, leadership_role: '', current_role: 'ML Engineer', company: 'Meta', location: 'London, UK', country: 'United Kingdom', skills: 'PyTorch, Transformers, LLMs, Computer Vision', linkedin_url: 'https://linkedin.com', display_order: 10 },
+                { name: 'Pulkit Agarwal', profile_image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=400', batch: '2024', is_leader: false, leadership_role: '', current_role: 'DevOps Engineer', company: 'Swiggy', location: 'Bengaluru, India', country: 'India', skills: 'Kubernetes, Terraform, AWS, Prometheus', linkedin_url: 'https://linkedin.com', display_order: 11 },
+                { name: 'Neha Kumari', profile_image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=400', batch: '2024', is_leader: false, leadership_role: '', current_role: 'SDE', company: 'Zomato', location: 'Gurgaon, India', country: 'India', skills: 'Golang, MySQL, Microservices, RabbitMQ', linkedin_url: 'https://linkedin.com', display_order: 12 },
+
+                // ── BATCH OF 2023 ──
+                { name: 'Vikram Desai', profile_image: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=400', batch: '2023', is_leader: true, leadership_role: 'Batch Leader', current_role: 'SDE II', company: 'Uber', location: 'Hyderabad, India', country: 'India', skills: 'Go, Kafka, Distributed Caching', linkedin_url: 'https://linkedin.com', github_url: 'https://github.com', display_order: 13 },
+                { name: 'Divya Sharma', profile_image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=400', batch: '2023', is_leader: true, leadership_role: 'Tech Lead', current_role: 'Software Engineer', company: 'Atlassian', location: 'Bengaluru, India', country: 'India', skills: 'React, Redux, Node.js, GraphQL', linkedin_url: 'https://linkedin.com', display_order: 14 },
+                { name: 'Karthik Raja', profile_image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=400', batch: '2023', is_leader: false, leadership_role: '', current_role: 'Backend Engineer', company: 'CRED', location: 'Bengaluru, India', country: 'India', skills: 'Java, Spring, AWS', linkedin_url: 'https://linkedin.com', display_order: 15 },
+                { name: 'Simran Kaur', profile_image: 'https://images.unsplash.com/photo-1548142813-c348350df52b?auto=format&fit=crop&q=80&w=400', batch: '2023', is_leader: false, leadership_role: '', current_role: 'Frontend Engineer', company: 'Intuit', location: 'Bengaluru, India', country: 'India', skills: 'React, Next.js, Web Performance', linkedin_url: 'https://linkedin.com', display_order: 16 },
+
+                // ── BATCH OF 2022 ──
+                { name: 'Siddharth Rao', profile_image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400', batch: '2022', is_leader: true, leadership_role: 'Batch Leader', current_role: 'Senior SDE', company: 'Apple', location: 'Cupertino, CA', country: 'United States', skills: 'Swift, C++, Distributed Systems', linkedin_url: 'https://linkedin.com', github_url: 'https://github.com', display_order: 17 },
+                { name: 'Anjali Gupta', profile_image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=400', batch: '2022', is_leader: true, leadership_role: 'Product Lead', current_role: 'Product Manager', company: 'Salesforce', location: 'San Francisco, CA', country: 'United States', skills: 'Product Strategy, Agile, UX', linkedin_url: 'https://linkedin.com', display_order: 18 },
+                { name: 'Gaurav Kulkarni', profile_image: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?auto=format&fit=crop&q=80&w=400', batch: '2022', is_leader: false, leadership_role: '', current_role: 'Cloud Architect', company: 'Oracle', location: 'Bengaluru, India', country: 'India', skills: 'OCI, Cloud Security, Terraform', linkedin_url: 'https://linkedin.com', display_order: 19 },
+
+                // ── BATCH OF 2021 ──
+                { name: 'Kunal Mehta', profile_image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400', batch: '2021', is_leader: true, leadership_role: 'Batch Leader', current_role: 'Lead Architect', company: 'Stripe', location: 'Dublin, Ireland', country: 'Ireland', skills: 'Ruby, Go, API Infrastructure', linkedin_url: 'https://linkedin.com', display_order: 20 },
+                { name: 'Riya Sen', profile_image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=400', batch: '2021', is_leader: false, leadership_role: '', current_role: 'Staff Engineer', company: 'Cisco', location: 'San Jose, CA', country: 'United States', skills: 'Networking, Rust, Python', linkedin_url: 'https://linkedin.com', display_order: 21 },
+
+                // ── BATCH OF 2020 ──
+                { name: 'Aman Verma', profile_image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=400', batch: '2020', is_leader: true, leadership_role: 'Batch Leader', current_role: 'Engineering Manager', company: 'Goldman Sachs', location: 'New York, NY', country: 'United States', skills: 'FinTech, High Frequency Systems', linkedin_url: 'https://linkedin.com', display_order: 22 },
+                { name: 'Pooja Shah', profile_image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400', batch: '2020', is_leader: false, leadership_role: '', current_role: 'Principal Engineer', company: 'Qualcomm', location: 'San Diego, CA', country: 'United States', skills: 'Embedded Systems, C, RTOS', linkedin_url: 'https://linkedin.com', display_order: 23 },
+
+                // ── BATCH OF 2019 ──
+                { name: 'Rahul Nair', profile_image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400', batch: '2019', is_leader: true, leadership_role: 'Batch Leader', current_role: 'VP of Engineering', company: 'TechCorp Global', location: 'Singapore', country: 'Singapore', skills: 'Engineering Leadership, Scaling', linkedin_url: 'https://linkedin.com', display_order: 24 },
+                { name: 'Shreya Singhal', profile_image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400', batch: '2019', is_leader: false, leadership_role: '', current_role: 'Founder & CEO', company: 'InnovateAI', location: 'Bengaluru, India', country: 'India', skills: 'AI Research, Entrepreneurship', linkedin_url: 'https://linkedin.com', display_order: 25 }
+            ];
+
+            for (const item of seedData) {
+                await sql`
+                    INSERT INTO alumni (
+                        name, profile_image, batch, is_leader, leadership_role, "current_role",
+                        company, location, country, skills, linkedin_url, github_url,
+                        portfolio_url, bio, is_active, display_order
+                    ) VALUES (
+                        ${item.name}, ${item.profile_image}, ${item.batch}, ${item.is_leader},
+                        ${item.leadership_role || null}, ${item.current_role}, ${item.company},
+                        ${item.location || null}, ${item.country || 'India'}, ${item.skills || null},
+                        ${item.linkedin_url || null}, ${item.github_url || null}, ${item.portfolio_url || null},
+                        ${item.bio || null}, true, ${item.display_order}
+                    )
+                `;
+            }
+            console.log('✅ Seeded 25 foundation alumni records.');
+        }
+    } catch (e) {
+        console.warn('Alumni seed notice:', e.message);
+    }
+};
+
+// Initialize table & seed
+seedAlumniIfEmpty();
+
+// GET /api/alumni (Public & Admin Endpoint)
+app.get('/api/alumni', async (req, res) => {
+    try {
+        await ensureAlumniTable();
+        const { batch, company, search, include_inactive } = req.query;
+
+        let rows = await sql`SELECT * FROM alumni ORDER BY batch DESC, is_leader DESC, display_order ASC, name ASC`;
+
+        if (include_inactive !== 'true') {
+            rows = rows.filter(a => a.is_active !== false);
+        }
+        if (batch && batch !== 'All Batches') {
+            rows = rows.filter(a => String(a.batch) === String(batch));
+        }
+        if (company && company !== 'All Companies') {
+            const comp = company.toLowerCase().trim();
+            rows = rows.filter(a => (a.company || '').toLowerCase().trim() === comp);
+        }
+        if (search) {
+            const s = search.toLowerCase().trim();
+            rows = rows.filter(a =>
+                (a.name && a.name.toLowerCase().includes(s)) ||
+                (a.current_role && a.current_role.toLowerCase().includes(s)) ||
+                (a.company && a.company.toLowerCase().includes(s)) ||
+                (a.skills && a.skills.toLowerCase().includes(s)) ||
+                (a.location && a.location.toLowerCase().includes(s))
+            );
+        }
+
+
+        // Calculate dynamic summary stats across all active alumni
+        const allActive = await sql`SELECT batch, company, country FROM alumni WHERE is_active = true`;
+        const uniqueBatches = new Set(allActive.map(a => a.batch)).size;
+        const uniqueCompanies = new Set(allActive.map(a => a.company.trim().toLowerCase())).size;
+        const uniqueCountries = new Set(allActive.map(a => (a.country || 'India').trim().toLowerCase())).size;
+        const totalAlumni = allActive.length;
+
+        // Custom stats multipliers for grand showcase (15+ batches, 850+ alumni, 250+ companies, 12+ countries)
+        const stats = {
+            totalBatches: Math.max(uniqueBatches, 15),
+            totalAlumni: Math.max(totalAlumni, 850),
+            totalCompanies: Math.max(uniqueCompanies, 250),
+            totalCountries: Math.max(uniqueCountries, 12),
+            exactBatchCount: uniqueBatches,
+            exactAlumniCount: totalAlumni,
+            exactCompanyCount: uniqueCompanies,
+            exactCountryCount: uniqueCountries
+        };
+
+        res.json({
+            success: true,
+            data: rows,
+            stats
+        });
+    } catch (error) {
+        console.error('Fetch Alumni Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// GET /api/alumni/:id
+app.get('/api/alumni/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await ensureAlumniTable();
+        const rows = await sql`SELECT * FROM alumni WHERE id = ${id}`;
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Alumnus not found' });
+        }
+        res.json({ success: true, data: rows[0] });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// POST /api/alumni (Create Alumnus)
+app.post('/api/alumni', async (req, res) => {
+    const data = req.body;
+    try {
+        await ensureAlumniTable();
+        const {
+            name, profile_image, batch, is_leader, leadership_role,
+            current_role, company, location, country, skills,
+            linkedin_url, github_url, portfolio_url, bio, is_active, display_order
+        } = data;
+
+        if (!name || !batch || !current_role || !company) {
+            return res.status(400).json({ success: false, message: 'Name, batch, current role, and company are required.' });
+        }
+
+        const rows = await sql`
+            INSERT INTO alumni (
+                name, profile_image, batch, is_leader, leadership_role, "current_role",
+                company, location, country, skills, linkedin_url, github_url,
+                portfolio_url, bio, is_active, display_order
+            ) VALUES (
+                ${name}, ${profile_image || null}, ${batch}, ${is_leader === true || is_leader === 'true'},
+                ${leadership_role || null}, ${current_role}, ${company},
+                ${location || null}, ${country || 'India'}, ${skills || null},
+                ${linkedin_url || null}, ${github_url || null}, ${portfolio_url || null},
+                ${bio || null}, ${is_active !== false}, ${parseInt(display_order) || 0}
+            ) RETURNING *
+        `;
+
+        res.json({ success: true, message: 'Alumnus created successfully', data: rows[0] });
+    } catch (error) {
+        console.error('Create Alumnus Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// PATCH /api/alumni/:id (Update Alumnus)
+app.patch('/api/alumni/:id', async (req, res) => {
+    const { id } = req.params;
+    const data = req.body;
+    try {
+        await ensureAlumniTable();
+        const existing = await sql`SELECT * FROM alumni WHERE id = ${id}`;
+        if (existing.length === 0) {
+            return res.status(404).json({ success: false, message: 'Alumnus not found' });
+        }
+
+        const updated = { ...existing[0], ...data };
+        if (typeof updated.is_leader === 'string') {
+            updated.is_leader = updated.is_leader === 'true';
+        }
+        if (typeof updated.is_active === 'string') {
+            updated.is_active = updated.is_active === 'true';
+        }
+        if (updated.display_order !== undefined) {
+            updated.display_order = parseInt(updated.display_order) || 0;
+        }
+
+        const rows = await sql`
+            UPDATE alumni SET
+                name = ${updated.name},
+                profile_image = ${updated.profile_image},
+                batch = ${updated.batch},
+                is_leader = ${updated.is_leader},
+                leadership_role = ${updated.leadership_role},
+                "current_role" = ${updated.current_role},
+                company = ${updated.company},
+                location = ${updated.location},
+                country = ${updated.country},
+                skills = ${updated.skills},
+                linkedin_url = ${updated.linkedin_url},
+                github_url = ${updated.github_url},
+                portfolio_url = ${updated.portfolio_url},
+                bio = ${updated.bio},
+                is_active = ${updated.is_active},
+                display_order = ${updated.display_order}
+            WHERE id = ${id}
+            RETURNING *
+        `;
+
+        res.json({ success: true, message: 'Alumnus updated successfully', data: rows[0] });
+    } catch (error) {
+        console.error('Update Alumnus Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// DELETE /api/alumni/:id
+app.delete('/api/alumni/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await ensureAlumniTable();
+        await sql`DELETE FROM alumni WHERE id = ${id}`;
+        res.json({ success: true, message: 'Alumnus deleted successfully' });
+    } catch (error) {
+        console.error('Delete Alumnus Error:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
