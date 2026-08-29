@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   Trophy, Flame, Target, Zap, TrendingUp, Activity,
   ArrowUpRight, Award, Clock, Calendar, Star, BrainCircuit,
-  BarChart3, MessageSquare, ChevronDown, ArrowRight, CheckCircle, ShieldAlert, Sparkles,
+  BarChart3, MessageSquare, ChevronDown, ArrowRight, CheckCircle, ShieldAlert, Sparkles, RefreshCw,
   Rocket, Layers
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -125,9 +125,16 @@ const Dashboard = () => {
 
   const [currentTime, setCurrentTime] = React.useState(new Date());
   const [lastSyncTime, setLastSyncTime] = React.useState(new Date());
+  const [isSyncing, setIsSyncing] = React.useState(false);
   const [timeRange, setTimeRange] = React.useState('Week');
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = React.useState(false);
   const timeDropdownRef = React.useRef(null);
+
+  const handleSyncClick = async () => {
+    setIsSyncing(true);
+    await refreshData();
+    setTimeout(() => setIsSyncing(false), 600);
+  };
 
   React.useEffect(() => {
     const handleClickOutside = (e) => {
@@ -782,11 +789,92 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 mb-6">
-              <Clock size={13} className="text-muted" />
-              <span className="text-[11px] font-bold uppercase tracking-wider text-muted">
-                SYNC: {lastSyncTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
+            <div className="flex items-center gap-3 mt-1 mb-8">
+              <div 
+                className="inline-flex items-center gap-3 px-4 py-4.5 rounded-full transition-all duration-300 shadow-sm hover:shadow-lg"
+                style={{
+                  paddingTop: '18px',
+                  paddingBottom: '18px',
+                  paddingLeft: '16px',
+                  paddingRight: '16px',
+                  background: 'var(--sync-badge-bg, rgba(255, 255, 255, 0.04))',
+                  border: '1px solid var(--sync-badge-border, rgba(255, 255, 255, 0.12))',
+                  backdropFilter: 'blur(18px)',
+                  WebkitBackdropFilter: 'blur(18px)',
+                  boxShadow: '0 6px 22px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                }}
+              >
+                {/* Live Beacon */}
+                <div className="flex items-center gap-1.5">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span 
+                      className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" 
+                      style={{ backgroundColor: '#10b981', animationDuration: '2s' }}
+                    />
+                    <span 
+                      className="relative inline-flex rounded-full h-2.5 w-2.5 shadow-[0_0_10px_#10b981]" 
+                      style={{ backgroundColor: '#10b981' }}
+                    />
+                  </span>
+                  <span 
+                    style={{ 
+                      fontSize: '11.5px', 
+                      fontWeight: 900, 
+                      letterSpacing: '0.09em', 
+                      color: '#10b981',
+                      textTransform: 'uppercase' 
+                    }}
+                  >
+                    Live
+                  </span>
+                </div>
+
+                <div style={{ width: '1px', height: '20px', background: 'var(--border-color, rgba(255,255,255,0.18))' }} />
+
+                {/* Clock & Time */}
+                <div className="flex items-center gap-1.5">
+                  <Clock size={13.5} style={{ color: 'var(--text-muted)' }} />
+                  <span 
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: 'var(--text-muted)'
+                    }}
+                  >
+                    Synced:
+                  </span>
+                  <span 
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 800,
+                      color: 'var(--text-primary)',
+                      fontVariantNumeric: 'tabular-nums',
+                      letterSpacing: '0.03em'
+                    }}
+                  >
+                    {lastSyncTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  </span>
+                </div>
+
+                {/* Interactive Refresh Button */}
+                <button
+                  type="button"
+                  onClick={handleSyncClick}
+                  disabled={isSyncing}
+                  title="Click to refresh telemetry data"
+                  className="flex items-center justify-center p-1.5 rounded-full hover:bg-white/10 active:scale-90 transition-all cursor-pointer ml-0.5"
+                  style={{
+                    color: isSyncing ? '#a855f7' : 'var(--text-muted)',
+                    background: 'transparent',
+                    border: 'none'
+                  }}
+                >
+                  <RefreshCw 
+                    size={13} 
+                    className={`transition-transform duration-500 ${isSyncing ? 'animate-spin' : 'hover:rotate-180'}`} 
+                  />
+                </button>
+              </div>
             </div>
           </div>
 

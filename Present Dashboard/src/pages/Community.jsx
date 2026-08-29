@@ -19,8 +19,8 @@ const makeCompose = () => ({
 });
 
 const REACTIONS = [
-  { id: 'zap',   icon: Zap,    label: 'Genius', color: '#00f2fe' },
-  { id: 'fire',  icon: Sparkles, label: 'Insight', color: '#4facfe' },
+  { id: 'zap',   icon: Zap,    label: 'Genius', color: '#4A90C2' },
+  { id: 'fire',  icon: Sparkles, label: 'Insight', color: '#2872A1' },
   { id: 'check', icon: CheckCircle2, label: 'Solved', color: '#34d399' },
   { id: 'idea',  icon: MessageSquare, label: 'Idea', color: '#ffa500' },
 ];

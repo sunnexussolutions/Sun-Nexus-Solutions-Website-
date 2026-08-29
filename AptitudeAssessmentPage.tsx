@@ -213,17 +213,18 @@ export default function AptitudeAssessmentPage(): any {
 
         {/* Sidebar Nav Links */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {[
-            { id: "overview", label: "Overview", icon: LayoutGrid },
-            { id: "homepage", label: "Home Page", icon: Home },
-            { id: "aptitude", label: "Assessments", icon: CheckSquare },
-            { id: "domains", label: "Domains", icon: Layers },
-            { id: "projects", label: "Projects", icon: FolderGit2 },
-            { id: "users", label: "Users", icon: Users },
-            { id: "discussions", label: "Discussions", icon: MessageSquare },
-            { id: "notifications", label: "Notifications", icon: Bell, badge: 12 },
-            { id: "hiring", label: "Hiring", icon: Briefcase },
-          ].map((item) => {
+          {(
+            [
+              { id: "overview", label: "Overview", icon: LayoutGrid },
+              { id: "homepage", label: "Home Page", icon: Home },
+              { id: "aptitude", label: "Assessments", icon: CheckSquare },
+              { id: "domains", label: "Domains", icon: Layers },
+              { id: "projects", label: "Projects", icon: FolderGit2 },
+              { id: "users", label: "Users", icon: Users },
+              { id: "discussions", label: "Discussions", icon: MessageSquare },
+              { id: "inquiries", label: "Inquiries", icon: Briefcase },
+            ] as Array<{ id: string; label: string; icon: any; badge?: string | number }>
+          ).map((item) => {
             const IconComponent = item.icon;
             const isActive = activeTab === item.id;
 

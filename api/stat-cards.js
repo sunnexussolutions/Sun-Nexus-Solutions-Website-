@@ -6,7 +6,7 @@ const DEFAULT_STAT_CARDS = {
   'home_row_domains': { card_key: 'home_row_domains', value: '50+', label: 'Domains', page: 'Home', category: 'Hero Stats Row', order_index: 3 },
   'home_row_projects': { card_key: 'home_row_projects', value: '1K+', label: 'Projects Published', page: 'Home', category: 'Hero Stats Row', order_index: 4 },
   'home_row_events': { card_key: 'home_row_events', value: '100+', label: 'Events Organized', page: 'Home', category: 'Hero Stats Row', order_index: 5 },
-  'home_row_possibilities': { card_key: 'home_row_possibilities', value: '∞', label: 'Possibilities', page: 'Home', category: 'Hero Stats Row', order_index: 6 },
+  'home_row_possibilities': { card_key: 'home_row_possibilities', value: '5K+', label: 'Community Members', page: 'Home', category: 'Hero Stats Row', order_index: 6 },
 
   'mentor_batch_title': { card_key: 'mentor_batch_title', value: 'Batch: 1', label: 'Batch Title', page: 'Mentorship', category: 'Batch Info', order_index: 1 },
   'mentor_batch_dates': { card_key: 'mentor_batch_dates', value: 'November 2025 - January 2026', label: 'Batch Dates', page: 'Mentorship', category: 'Batch Info', order_index: 2 },
