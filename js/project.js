@@ -8,6 +8,634 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   
+  // ── Default Fallback Projects (0ms Instant Render) ──
+  const DEFAULT_STATIC_PROJECTS = [
+  {
+    "id": "proj_1786354786824_o2c48t",
+    "title": "OMR Attendance System",
+    "description": "OMR Attendance System is a web-based attendance management platform designed to digitize and simplify the process of recording student attendance using OMR (Optical Mark Recognition) sheets. The system helps educational institutions reduce manual attendance work, improve accuracy, and efficiently manage attendance records.",
+    "status": "completed",
+    "tech": null,
+    "github": "https://github.com/yuvaraja01/OMR-Attendance-System-v2.git",
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-10 09:39:47.085724+00",
+    "updated_at": "2026-08-10 09:42:25.363777+00",
+    "owner_id": "admin_master",
+    "owner_name": "",
+    "owner_avatar": "",
+    "created_by": "admin_master",
+    "priority": "Medium",
+    "domain": "Engineering",
+    "thumbnail": "https://res.cloudinary.com/dseg9nty3/image/upload/v1786354661/Screenshot_2026-08-10_145915_edhxaj.png",
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": "https://github.com/yuvaraja01/OMR-Attendance-System-v2.git",
+    "live_demo": "https://omr-attendance-system-v2.vercel.app/",
+    "live_demo_url": "https://omr-attendance-system-v2.vercel.app/",
+    "tech_stack": "[\"React\",\"Node.js\",\"Tailwind CSS\"]",
+    "completion": 100,
+    "completion_percentage": 100,
+    "category": "Advanced",
+    "visibility": "public",
+    "team_members": "[{\"id\":\"Yuvaraja B\",\"name\":\"Yuvaraja B\",\"role\":\"Project Lead\",\"image\":\"\",\"email\":\"\"}]",
+    "role": "Lead Developer",
+    "start_date": "2026-08-10",
+    "completion_date": "",
+    "challenges": "Ensuring seamless real-time state synchronization.",
+    "future_improvements": "Integrating AI automated insights.",
+    "features": "[\"Realtime Data Sync\",\"Responsive Design\",\"Dark & Light Mode\"]",
+    "architecture": "Modular React Context + Node.js API with Neon Database",
+    "likes": 0,
+    "views": 5,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "OMR Attendance System is a web-based attendance management platform designed to digitize and simplify the process of recording student attendance using OMR (...",
+    "card_description": null,
+    "apk_url": null,
+    "apk": null
+  },
+  {
+    "id": "proj_1786351863931_h3zcqe",
+    "title": "Sun Nexus Solutions",
+    "description": "This website provides a comprehensive overview of Sun Nexus Solutions' offerings, including their projects, services, and team members. It features a modern design with responsive layouts to ensure optimal viewing on all devices.",
+    "status": "completed",
+    "tech": null,
+    "github": "",
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-10 08:51:04.242779+00",
+    "updated_at": "2026-08-29 16:22:11.320607+00",
+    "owner_id": "admin_master",
+    "owner_name": "",
+    "owner_avatar": "",
+    "created_by": "admin_master",
+    "priority": "Medium",
+    "domain": "Engineering",
+    "thumbnail": "",
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": "",
+    "live_demo": "",
+    "live_demo_url": "",
+    "tech_stack": "[\"React\",\"Node.js\",\"Tailwind CSS\"]",
+    "completion": 100,
+    "completion_percentage": 100,
+    "category": "Advanced",
+    "visibility": "public",
+    "team_members": "[{\"id\":\"B.Prasad\",\"name\":\"B.Prasad\",\"role\":\"Project Lead\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2012.03.03%20PM.jpeg?updatedAt=1760078322514\",\"email\":\"\"},{\"id\":\"C.Mallikarjuna Rao\",\"name\":\"C.Mallikarjuna Rao\",\"role\":\"Frontend Developer\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/IMG_20241008_135227_1_.jpg?updatedAt=1759896755572\",\"email\":\"\"},{\"id\":\"K.Raghu\",\"name\":\"K.Raghu\",\"role\":\"Frontend Developer\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-08%20at%2010.27.23%20AM.jpeg?updatedAt=1760072973601\",\"email\":\"\"},{\"id\":\"S.Poojitha\",\"name\":\"S.Poojitha\",\"role\":\"Frontend Developer\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.24.52%20AM.jpeg?updatedAt=1760072972748\",\"email\":\"\"},{\"id\":\"A.Sirisha\",\"name\":\"A.Sirisha\",\"role\":\"Frontend Developer\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-08%20at%2011.25.48%20AM.jpeg?updatedAt=1760072973509\",\"email\":\"\"},{\"id\":\"Yuvaraja B\",\"name\":\"Yuvaraja B\",\"role\":\"Backend Developer\",\"image\":\"\",\"email\":\"\"}]",
+    "role": "Lead Developer",
+    "start_date": "2026-08-10",
+    "completion_date": "",
+    "challenges": "Ensuring seamless real-time state synchronization.",
+    "future_improvements": "Integrating AI automated insights.",
+    "features": "[\"Realtime Data Sync\",\"Responsive Design\",\"Dark & Light Mode\"]",
+    "architecture": "Modular React Context + Node.js API with Neon Database",
+    "likes": 0,
+    "views": 17,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "This website provides a comprehensive overview of Sun Nexus Solutions' offerings, including their projects, services,...",
+    "card_description": null,
+    "apk_url": "",
+    "apk": ""
+  },
+  {
+    "id": "proj_hotel_tfi_website",
+    "title": "Hotel Tfi Website",
+    "description": "A website useful for booking food from Tfi Hotel in Nashik.",
+    "status": "completed",
+    "tech": null,
+    "github": "",
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-07 10:49:36.194574+00",
+    "updated_at": "2026-08-11 09:45:59.551381+00",
+    "owner_id": "user_admin",
+    "owner_name": "B.Prasad",
+    "owner_avatar": "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2012.03.03%20PM.jpeg?updatedAt=1760078322514",
+    "created_by": null,
+    "priority": "medium",
+    "domain": "Web Development",
+    "thumbnail": "",
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": "",
+    "live_demo": "",
+    "live_demo_url": "",
+    "tech_stack": "[\"HTML5\",\"CSS3\",\"JavaScript\",\"Bootstrap\"]",
+    "completion": 100,
+    "completion_percentage": 100,
+    "category": "Beginner",
+    "visibility": "public",
+    "team_members": "[{\"id\":\"B.Prasad\",\"name\":\"B.Prasad\",\"role\":\"Project Lead\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2012.03.03%20PM.jpeg?updatedAt=1760078322514\",\"email\":\"\"},{\"id\":\"C.Mallikarjuna\",\"name\":\"C.Mallikarjuna\",\"role\":\"Backend Developer\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/IMG_20241008_135227_1_.jpg?updatedAt=1759896755572\",\"email\":\"\"},{\"id\":\"K.Raghu\",\"name\":\"K.Raghu\",\"role\":\"Frontend Developer\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-08%20at%2010.27.23%20AM.jpeg?updatedAt=1760072973601\",\"email\":\"\"},{\"id\":\"S.Poojitha\",\"name\":\"S.Poojitha\",\"role\":\"Frontend Developer\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.24.52%20AM.jpeg?updatedAt=1760072972748\",\"email\":\"\"},{\"id\":\"A.Sirisha\",\"name\":\"A.Sirisha\",\"role\":\"Frontend Developer\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-08%20at%2011.25.48%20AM.jpeg?updatedAt=1760072973509\",\"email\":\"\"}]",
+    "role": "Contributor",
+    "start_date": "",
+    "completion_date": "",
+    "challenges": "",
+    "future_improvements": "",
+    "features": "[]",
+    "architecture": "",
+    "likes": 0,
+    "views": 13,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "A website useful for booking food from Tfi Hotel in Nashik.",
+    "card_description": null,
+    "apk_url": "",
+    "apk": ""
+  },
+  {
+    "id": "proj_face_expression_detector",
+    "title": "Face-Expression Detector",
+    "description": "Expression detection system that identifies and analyzes facial expressions in real-time.",
+    "status": "completed",
+    "tech": null,
+    "github": null,
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-07 10:49:35.698939+00",
+    "updated_at": "2026-08-07 10:49:35.698939+00",
+    "owner_id": "user_admin",
+    "owner_name": "B.Jaya Manideep",
+    "owner_avatar": "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.27.49%20AM.jpeg?updatedAt=1760072972669",
+    "created_by": null,
+    "priority": "medium",
+    "domain": "AI & ML",
+    "thumbnail": null,
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": null,
+    "live_demo": null,
+    "live_demo_url": null,
+    "tech_stack": "[\"Python\",\"Keras\",\"OpenCV\"]",
+    "completion": 100,
+    "completion_percentage": 0,
+    "category": "Beginner",
+    "visibility": "public",
+    "team_members": "[{\"name\":\"B.Jaya Manideep\",\"role\":\"ML Dev\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.27.49%20AM.jpeg?updatedAt=1760072972669\"},{\"name\":\"A.Vishnu Vardhan\",\"role\":\"Python Dev\",\"image\":\"https://res.cloudinary.com/dseg9nty3/image/upload/v1772771807/WhatsApp_Image_2026-03-06_at_9.53.49_AM_e4nkcd.jpg\"}]",
+    "role": null,
+    "start_date": null,
+    "completion_date": null,
+    "challenges": null,
+    "future_improvements": null,
+    "features": "[]",
+    "architecture": null,
+    "likes": 0,
+    "views": 0,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "Expression detection system that identifies and analyzes facial expressions in real-time.",
+    "card_description": null,
+    "apk_url": null,
+    "apk": null
+  },
+  {
+    "id": "proj_rooftop_restaurant",
+    "title": "Roof-Top Restaurant",
+    "description": "A modern restaurant management system for rooftop dining experiences.",
+    "status": "completed",
+    "tech": null,
+    "github": "",
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-07 10:49:35.469299+00",
+    "updated_at": "2026-08-08 09:43:38.97564+00",
+    "owner_id": "user_admin",
+    "owner_name": "B.Prasad",
+    "owner_avatar": "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2012.03.03%20PM.jpeg?updatedAt=1760078322514",
+    "created_by": null,
+    "priority": "medium",
+    "domain": "Web Development",
+    "thumbnail": "",
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": "",
+    "live_demo": "",
+    "live_demo_url": "",
+    "tech_stack": "[\"React\",\"Tailwind CSS\",\"Node.js\"]",
+    "completion": 100,
+    "completion_percentage": 100,
+    "category": "Beginner",
+    "visibility": "public",
+    "team_members": "[{\"id\":\"B.Prasad\",\"name\":\"B.Prasad\",\"role\":\"Full Stack Dev\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2012.03.03%20PM.jpeg?updatedAt=1760078322514\",\"email\":\"\"},{\"id\":\"K.Bhargava\",\"name\":\"K.Bhargava\",\"role\":\"Full Stack Dev\",\"image\":\"https://res.cloudinary.com/djw0g8duw/image/upload/v1763865310/link_img_rusktx.png\",\"email\":\"\"}]",
+    "role": "Contributor",
+    "start_date": "",
+    "completion_date": "",
+    "challenges": "",
+    "future_improvements": "",
+    "features": "[]",
+    "architecture": "",
+    "likes": 0,
+    "views": 0,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "A modern restaurant management system for rooftop dining experiences.",
+    "card_description": null,
+    "apk_url": null,
+    "apk": null
+  },
+  {
+    "id": "proj_majhali_kitchen",
+    "title": "Majhali Restaurant Kitchen",
+    "description": "Restaurant kitchen management system for efficient operations and inventory control.",
+    "status": "completed",
+    "tech": null,
+    "github": null,
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-07 10:49:35.369765+00",
+    "updated_at": "2026-08-07 10:49:35.369765+00",
+    "owner_id": "user_admin",
+    "owner_name": "A.Lokesh Reddy",
+    "owner_avatar": "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.39.51%20AM.jpeg?updatedAt=1760073049927",
+    "created_by": null,
+    "priority": "medium",
+    "domain": "Web Development",
+    "thumbnail": null,
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": null,
+    "live_demo": null,
+    "live_demo_url": null,
+    "tech_stack": "[\"HTML5\",\"CSS3\",\"JavaScript\",\"Firebase\"]",
+    "completion": 100,
+    "completion_percentage": 0,
+    "category": "Beginner",
+    "visibility": "public",
+    "team_members": "[{\"name\":\"A.Lokesh Reddy\",\"role\":\"Frontend Dev\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.39.51%20AM.jpeg?updatedAt=1760073049927\"}]",
+    "role": null,
+    "start_date": null,
+    "completion_date": null,
+    "challenges": null,
+    "future_improvements": null,
+    "features": "[]",
+    "architecture": null,
+    "likes": 0,
+    "views": 0,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "Restaurant kitchen management system for efficient operations and inventory control.",
+    "card_description": null,
+    "apk_url": null,
+    "apk": null
+  },
+  {
+    "id": "proj_resume_analyzer",
+    "title": "AI-Powered Resume Analyzer",
+    "description": "AI evaluates resumes for job fit score and provides improvement insights.",
+    "status": "completed",
+    "tech": null,
+    "github": null,
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-07 10:49:34.984837+00",
+    "updated_at": "2026-08-07 10:49:34.984837+00",
+    "owner_id": "user_admin",
+    "owner_name": "B.Murali Krishna",
+    "owner_avatar": "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.37.00%20AM.jpeg?updatedAt=1760072973049",
+    "created_by": null,
+    "priority": "medium",
+    "domain": "AI & ML",
+    "thumbnail": null,
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": null,
+    "live_demo": null,
+    "live_demo_url": null,
+    "tech_stack": "[\"Python\",\"NLP\",\"spacy\",\"Streamlit\"]",
+    "completion": 100,
+    "completion_percentage": 0,
+    "category": "Advanced",
+    "visibility": "public",
+    "team_members": "[{\"name\":\"B.Murali Krishna\",\"role\":\"ML Developer\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.37.00%20AM.jpeg?updatedAt=1760072973049\"}]",
+    "role": null,
+    "start_date": null,
+    "completion_date": null,
+    "challenges": null,
+    "future_improvements": null,
+    "features": "[]",
+    "architecture": null,
+    "likes": 0,
+    "views": 22,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "AI evaluates resumes for job fit score and provides improvement insights.",
+    "card_description": null,
+    "apk_url": null,
+    "apk": null
+  },
+  {
+    "id": "proj_crowd_shield",
+    "title": "Crowd-Sheild",
+    "description": "AI-powered crowd monitoring for public safety.",
+    "status": "completed",
+    "tech": null,
+    "github": null,
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-07 10:49:34.849207+00",
+    "updated_at": "2026-08-07 10:49:34.849207+00",
+    "owner_id": "user_admin",
+    "owner_name": "A.Lokesh Reddy",
+    "owner_avatar": "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.39.51%20AM.jpeg?updatedAt=1760073049927",
+    "created_by": null,
+    "priority": "medium",
+    "domain": "Cyber Security",
+    "thumbnail": null,
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": null,
+    "live_demo": null,
+    "live_demo_url": null,
+    "tech_stack": "[\"YOLOv8\",\"Computer Vision\",\"Python\",\"WebSockets\"]",
+    "completion": 100,
+    "completion_percentage": 0,
+    "category": "Advanced",
+    "visibility": "public",
+    "team_members": "[{\"name\":\"A.Lokesh Reddy\",\"role\":\"AI Lead\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.39.51%20AM.jpeg?updatedAt=1760073049927\"},{\"name\":\"V.Gopinadh\",\"role\":\"System Dev\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.55.20%20AM.jpeg?updatedAt=1760074230579\"}]",
+    "role": null,
+    "start_date": null,
+    "completion_date": null,
+    "challenges": null,
+    "future_improvements": null,
+    "features": "[]",
+    "architecture": null,
+    "likes": 0,
+    "views": 7,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "AI-powered crowd monitoring for public safety.",
+    "card_description": null,
+    "apk_url": null,
+    "apk": null
+  },
+  {
+    "id": "proj_timetable_management",
+    "title": "Automated Timetable Management System",
+    "description": "A smart scheduling system that generates optimized timetables for educational institutions.",
+    "status": "completed",
+    "tech": null,
+    "github": "",
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-07 10:49:34.767016+00",
+    "updated_at": "2026-08-29 13:10:49.856017+00",
+    "owner_id": "user_admin",
+    "owner_name": "A.Lokesh Reddy",
+    "owner_avatar": "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.39.51%20AM.jpeg?updatedAt=1760073049927",
+    "created_by": null,
+    "priority": "medium",
+    "domain": "Engineering",
+    "thumbnail": "",
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": "",
+    "live_demo": "",
+    "live_demo_url": "",
+    "tech_stack": "[\"Genetic Algorithm\",\"Python\",\"Django\",\"React\"]",
+    "completion": 100,
+    "completion_percentage": 100,
+    "category": "Advanced",
+    "visibility": "public",
+    "team_members": "[{\"id\":\"A.Lokesh Reddy\",\"name\":\"A.Lokesh Reddy\",\"role\":\"Project Lead\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.39.51%20AM.jpeg?updatedAt=1760073049927\",\"email\":\"\"},{\"id\":\"V.Gopinadh\",\"name\":\"V.Gopinadh\",\"role\":\"Algorithm Spec\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.55.20%20AM.jpeg?updatedAt=1760074230579\",\"email\":\"\"},{\"id\":\"Bharath Karanam\",\"name\":\"Bharath Karanam\",\"role\":\"Project Lead\",\"image\":\"\",\"email\":\"\"}]",
+    "role": "Contributor",
+    "start_date": "",
+    "completion_date": "",
+    "challenges": "",
+    "future_improvements": "",
+    "features": "[]",
+    "architecture": "",
+    "likes": 0,
+    "views": 4,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "A smart scheduling system that generates optimized timetables for educational institutions.",
+    "card_description": null,
+    "apk_url": "",
+    "apk": ""
+  },
+  {
+    "id": "proj_startup_management",
+    "title": "Startup Management System",
+    "description": "A comprehensive management system for startups to track projects, tasks, and team collaboration.",
+    "status": "completed",
+    "tech": null,
+    "github": null,
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-07 10:49:34.497087+00",
+    "updated_at": "2026-08-07 10:49:34.497087+00",
+    "owner_id": "user_admin",
+    "owner_name": "C.Varun",
+    "owner_avatar": "https://res.cloudinary.com/dseg9nty3/image/upload/v1772303456/varun.c.2_fod1hf.jpg",
+    "created_by": null,
+    "priority": "medium",
+    "domain": "Engineering",
+    "thumbnail": null,
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": null,
+    "live_demo": null,
+    "live_demo_url": null,
+    "tech_stack": "[\"React\",\"Node.js\",\"Express\",\"MongoDB\"]",
+    "completion": 100,
+    "completion_percentage": 0,
+    "category": "Advanced",
+    "visibility": "public",
+    "team_members": "[{\"name\":\"C.Varun\",\"role\":\"Full Stack Engineer\",\"image\":\"https://res.cloudinary.com/dseg9nty3/image/upload/v1772303456/varun.c.2_fod1hf.jpg\"}]",
+    "role": null,
+    "start_date": null,
+    "completion_date": null,
+    "challenges": null,
+    "future_improvements": null,
+    "features": "[]",
+    "architecture": null,
+    "likes": 0,
+    "views": 3,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "A comprehensive management system for startups to track projects, tasks, and team collaboration.",
+    "card_description": null,
+    "apk_url": null,
+    "apk": null
+  },
+  {
+    "id": "proj_exam_invigilation",
+    "title": "Exam invigilation management system",
+    "description": "An AI-based exam invigilation system to ensure academic integrity.",
+    "status": "completed",
+    "tech": null,
+    "github": null,
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-07 10:49:34.264534+00",
+    "updated_at": "2026-08-07 10:49:34.264534+00",
+    "owner_id": "user_admin",
+    "owner_name": "B.Jaya Manideep",
+    "owner_avatar": "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.27.49%20AM.jpeg?updatedAt=1760072972669",
+    "created_by": null,
+    "priority": "medium",
+    "domain": "AI & ML",
+    "thumbnail": null,
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": null,
+    "live_demo": null,
+    "live_demo_url": null,
+    "tech_stack": "[\"Python\",\"OpenCV\",\"Deep Learning\",\"Flask\"]",
+    "completion": 100,
+    "completion_percentage": 0,
+    "category": "Advanced",
+    "visibility": "public",
+    "team_members": "[{\"name\":\"B.Jaya Manideep\",\"role\":\"ML Developer\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.27.49%20AM.jpeg?updatedAt=1760072972669\"},{\"name\":\"G.Purna Reddy\",\"role\":\"Backend Dev\",\"image\":\"https://res.cloudinary.com/dseg9nty3/image/upload/v1772599133/purna_reddy_mszkgg.jpg\"}]",
+    "role": null,
+    "start_date": null,
+    "completion_date": null,
+    "challenges": null,
+    "future_improvements": null,
+    "features": "[]",
+    "architecture": null,
+    "likes": 0,
+    "views": 2,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "An AI-based exam invigilation system to ensure academic integrity.",
+    "card_description": null,
+    "apk_url": null,
+    "apk": null
+  },
+  {
+    "id": "proj_whatsapp_chatbot",
+    "title": "Whatsapp Chatbot",
+    "description": "An AI-powered chatbot integrated with WhatsApp for instant customer support and automation.",
+    "status": "completed",
+    "tech": null,
+    "github": null,
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-07 10:49:34.182132+00",
+    "updated_at": "2026-08-07 10:49:34.182132+00",
+    "owner_id": "user_admin",
+    "owner_name": "K.Girivardhan",
+    "owner_avatar": "https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.37.34%20AM.jpeg?updatedAt=1760072974650",
+    "created_by": null,
+    "priority": "medium",
+    "domain": "AI & ML",
+    "thumbnail": null,
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": null,
+    "live_demo": null,
+    "live_demo_url": null,
+    "tech_stack": "[\"Node.js\",\"WhatsApp API\",\"Python\",\"NLP\"]",
+    "completion": 100,
+    "completion_percentage": 0,
+    "category": "Advanced",
+    "visibility": "public",
+    "team_members": "[{\"name\":\"K.Girivardhan\",\"role\":\"Backend Lead\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/WhatsApp%20Image%202025-10-10%20at%2010.37.34%20AM.jpeg?updatedAt=1760072974650\"}]",
+    "role": null,
+    "start_date": null,
+    "completion_date": null,
+    "challenges": null,
+    "future_improvements": null,
+    "features": "[]",
+    "architecture": null,
+    "likes": 0,
+    "views": 1,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "An AI-powered chatbot integrated with WhatsApp for instant customer support and automation.",
+    "card_description": null,
+    "apk_url": null,
+    "apk": null
+  },
+  {
+    "id": "proj_lab_manage_system",
+    "title": "Lab Manage System",
+    "description": "AI-based lab management and resource optimization system.",
+    "status": "completed",
+    "tech": null,
+    "github": null,
+    "live": null,
+    "team": null,
+    "color": "#6366f1",
+    "user_id": null,
+    "created_at": "2026-08-07 10:49:34.100508+00",
+    "updated_at": "2026-08-07 10:49:34.100508+00",
+    "owner_id": "user_admin",
+    "owner_name": "C.Mallikarjuna Rao",
+    "owner_avatar": "https://ik.imagekit.io/kofq4cdghu/IMG_20241008_135227_1_.jpg?updatedAt=1759896755572",
+    "created_by": null,
+    "priority": "medium",
+    "domain": "Engineering",
+    "thumbnail": null,
+    "screenshots": "[]",
+    "documents": "[]",
+    "github_url": null,
+    "live_demo": null,
+    "live_demo_url": null,
+    "tech_stack": "[\"Python\",\"Django\",\"React\",\"PostgreSQL\"]",
+    "completion": 100,
+    "completion_percentage": 0,
+    "category": "Advanced",
+    "visibility": "public",
+    "team_members": "[{\"name\":\"C.Mallikarjuna Rao\",\"role\":\"Lead Developer\",\"image\":\"https://ik.imagekit.io/kofq4cdghu/IMG_20241008_135227_1_.jpg?updatedAt=1759896755572\"},{\"name\":\"N.Amrutha Varshini\",\"role\":\"ML Engineer\",\"image\":\"https://res.cloudinary.com/dseg9nty3/image/upload/v1772639381/amrutha_varshini_mgyn9n.jpg\"}]",
+    "role": null,
+    "start_date": null,
+    "completion_date": null,
+    "challenges": null,
+    "future_improvements": null,
+    "features": "[]",
+    "architecture": null,
+    "likes": 0,
+    "views": 1,
+    "deleted_at": null,
+    "display_order": 1,
+    "icon": "monitor",
+    "summary": "AI-based lab management and resource optimization system.",
+    "card_description": null,
+    "apk_url": null,
+    "apk": null
+  }
+];
+
   // ── Global Master State ──
   let allProjects = [];
   let masterProjectsMap = {};
@@ -107,121 +735,193 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // ── Fetch Projects from Central Database API ──
+  // ── Neon DB Direct Endpoint Config (Production Vercel Fallback) ──
+  const NEON_DB_URL = 'postgresql://neondb_owner:npg_izrW7bvHTnO6@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+  const NEON_SQL_ENDPOINT = 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/sql';
+
+  const fetchProjectsDirectFromNeon = async () => {
+    try {
+      const res = await fetch(NEON_SQL_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Neon-Connection-String': NEON_DB_URL
+        },
+        body: JSON.stringify({
+          query: 'SELECT * FROM projects WHERE deleted_at IS NULL ORDER BY display_order ASC, created_at DESC'
+        })
+      });
+      if (!res.ok) throw new Error(`Neon HTTP error: ${res.status}`);
+      const data = await res.json();
+      return Array.isArray(data.rows) ? data.rows : [];
+    } catch (e) {
+      console.warn("Direct Neon DB fetch fallback notice:", e.message);
+      return null;
+    }
+  };
+
+  // ── Deleted Project Set (resolved once, reused everywhere) ──
+  const deletedSet = (() => {
+    try {
+      return new Set(JSON.parse(localStorage.getItem('nexus_deleted_project_ids') || '[]'));
+    } catch {
+      return new Set();
+    }
+  })();
+
+  const isProjectDeleted = (pId, pTitle) => {
+    const idStr = String(pId || '').toLowerCase().trim();
+    const rawTitle = String(pTitle || '').toLowerCase().trim();
+    const normTitle = normalizeTitleStr(pTitle);
+    if (idStr && deletedSet.has(idStr)) return true;
+    if (rawTitle && deletedSet.has(rawTitle)) return true;
+    if (normTitle && deletedSet.has(normTitle)) return true;
+    return false;
+  };
+
+  // ── Process Raw Projects Array → allProjects state ──
+  const processRawProjects = (apiProjects) => {
+    if (!Array.isArray(apiProjects) || apiProjects.length === 0) return false;
+
+    const loadedItems = [];
+    const tempMap = {};
+
+    apiProjects.forEach(p => {
+      if (p.deleted_at || p.deletedAt) return;
+      if (isProjectDeleted(p.id, p.title)) return;
+
+      const vis = (p.visibility || 'public').toLowerCase().trim();
+      const status = (p.status || 'in_progress').toLowerCase().trim();
+
+      // Strict Filter: Exclude private, draft, pending_review, or rejected projects
+      if (vis === 'private' || vis === 'hidden') return;
+      if (['draft', 'pending_review', 'rejected'].includes(status)) return;
+
+      const name = p.title || 'Untitled Project';
+      const catRaw = (p.category || 'Advanced').toLowerCase().trim();
+      const parsedTeam = parseTeamMembers(p.team_members || p.teamMembers || p.team);
+
+      // Ongoing flag: project is ongoing if category says 'ongoing' OR status is not completed
+      const isOngoing = catRaw.includes('ongoing') || !['completed', 'done', 'finished'].includes(status);
+
+      // Difficulty category mapping
+      let diffCat = 'ADVANCED';
+      if (catRaw.includes('beginner')) diffCat = 'BEGINNER';
+      else if (catRaw.includes('intermediate')) diffCat = 'INTERMEDIATE';
+
+      const item = {
+        id: p.id,
+        title: name,
+        summary: p.summary || p.card_summary || p.cardSummary || p.description || p.desc || '',
+        details: p.description || p.desc || p.details || p.summary || '',
+        challenges: p.challenges || '',
+        futureImprovements: p.future_improvements || p.futureImprovements || '',
+        architecture: p.architecture || '',
+        features: safeJsonParseArray(p.features),
+        techStack: safeJsonParseArray(p.tech_stack || p.techStack || p.tech),
+        completion: Number(p.completion || p.completion_percentage || (status === 'completed' ? 100 : 50)),
+        visit: p.live_demo_url || p.live_demo || p.live || '',
+        github: p.github_url || p.github || '',
+        apk: p.apk_url || p.apk || p.apkUrl || '',
+        team: parsedTeam,
+        category: p.category || diffCat,
+        difficulty: diffCat,
+        status: status,
+        isOngoing: isOngoing,
+        domain: p.domain || 'Engineering',
+        thumbnail: p.thumbnail || '',
+        views: p.views || 0,
+        likes: p.likes || 0
+      };
+
+      loadedItems.push(item);
+      tempMap[name] = item;
+      if (p.id) tempMap[p.id] = item;
+    });
+
+    if (loadedItems.length > 0) {
+      allProjects = loadedItems;
+      masterProjectsMap = tempMap;
+
+      // Cache in localStorage for instant offline access
+      try {
+        localStorage.setItem('nexus_cached_public_projects', JSON.stringify(apiProjects));
+      } catch (e) {}
+
+      // Hide Loading / Error states
+      if (loadingSkeleton) loadingSkeleton.style.display = "none";
+      if (errorState) errorState.style.display = "none";
+      if (emptyState) emptyState.style.display = "none";
+
+      // Update Stats & Render Categories
+      updateStatistics();
+      renderFilteredProjects();
+      return true;
+    }
+    return false;
+  };
+
+  // ── Fetch Projects from Central Database API with Fallbacks ──
   const fetchProjects = async () => {
-    // Show Loading Skeleton on Initial Fetch
+    // ── STEP 0: Instant 0ms Render from static seed / localStorage cache ──
+    if (allProjects.length === 0) {
+      // Try localStorage cache first (most up-to-date offline copy)
+      try {
+        const cached = localStorage.getItem('nexus_cached_public_projects');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            processRawProjects(parsed);
+          }
+        }
+      } catch (e) {}
+
+      // If still empty, use the bundled static seed
+      if (allProjects.length === 0 && Array.isArray(DEFAULT_STATIC_PROJECTS) && DEFAULT_STATIC_PROJECTS.length > 0) {
+        processRawProjects(DEFAULT_STATIC_PROJECTS);
+      }
+    }
+
+    // Only show skeleton if nothing loaded yet
     if (allProjects.length === 0 && loadingSkeleton) {
       loadingSkeleton.style.display = "grid";
       if (errorState) errorState.style.display = "none";
       if (emptyState) emptyState.style.display = "none";
     }
 
-    const deletedSet = (() => {
-      try {
-        return new Set(JSON.parse(localStorage.getItem('nexus_deleted_project_ids') || '[]'));
-      } catch {
-        return new Set();
-      }
-    })();
-
-    const isProjectDeleted = (pId, pTitle) => {
-      const idStr = String(pId || '').toLowerCase().trim();
-      const rawTitle = String(pTitle || '').toLowerCase().trim();
-      const normTitle = normalizeTitleStr(pTitle);
-
-      if (idStr && deletedSet.has(idStr)) return true;
-      if (rawTitle && deletedSet.has(rawTitle)) return true;
-      if (normTitle && deletedSet.has(normTitle)) return true;
-      return false;
-    };
-
+    // ── STEP 1: Try live Neon DB direct HTTP endpoint (works on Vercel & localhost) ──
     try {
+      const directNeonRows = await fetchProjectsDirectFromNeon();
+      if (processRawProjects(directNeonRows)) return;
+    } catch (e) {
+      console.warn('Neon direct fetch failed:', e.message);
+    }
+
+    // ── STEP 2: Try local backend API (only useful when server.js on port 3000 is running) ──
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 1500);
       const response = await fetch(`${getApiBaseUrl()}/api/projects/public?_t=${Date.now()}`, {
+        signal: controller.signal,
         cache: 'no-store',
         headers: { 'Cache-Control': 'no-cache, no-store' }
-      });
+      }).catch(() => null);
+      clearTimeout(timeout);
 
-      if (response.ok) {
-        const result = await response.json();
+      if (response && response.ok) {
+        const result = await response.json().catch(() => null);
         const apiProjects = result?.projects || result?.data;
-
-        if (Array.isArray(apiProjects)) {
-          const loadedItems = [];
-          const tempMap = {};
-
-          apiProjects.forEach(p => {
-            if (p.deleted_at || p.deletedAt) return;
-            if (isProjectDeleted(p.id, p.title)) return;
-
-            const vis = (p.visibility || 'public').toLowerCase().trim();
-            const status = (p.status || 'in_progress').toLowerCase().trim();
-
-            // Strict Filter: Exclude private, draft, pending_review, or rejected projects
-            if (vis === 'private' || vis === 'hidden') return;
-            if (['draft', 'pending_review', 'rejected'].includes(status)) return;
-
-            const name = p.title || 'Untitled Project';
-            const catRaw = (p.category || 'Advanced').toLowerCase().trim();
-            const parsedTeam = parseTeamMembers(p.team_members || p.teamMembers || p.team);
-
-            // Ongoing flag: project is ongoing if category says 'ongoing' OR status is not completed
-            const isOngoing = catRaw.includes('ongoing') || !['completed', 'done', 'finished'].includes(status);
-
-            // Difficulty category mapping (exclude 'ongoing' from being treated as ADVANCED)
-            let diffCat = 'ADVANCED';
-            if (catRaw.includes('beginner')) diffCat = 'BEGINNER';
-            else if (catRaw.includes('intermediate')) diffCat = 'INTERMEDIATE';
-            else if (catRaw.includes('ongoing')) diffCat = 'ADVANCED'; // ongoing projects use their own section
-
-            const item = {
-              id: p.id,
-              title: name,
-              summary: p.summary || p.card_summary || p.cardSummary || p.description || p.desc || '',
-              details: p.description || p.desc || p.details || p.summary || '',
-              challenges: p.challenges || '',
-              futureImprovements: p.future_improvements || p.futureImprovements || '',
-              architecture: p.architecture || '',
-              features: safeJsonParseArray(p.features),
-              techStack: safeJsonParseArray(p.tech_stack || p.techStack || p.tech),
-              completion: Number(p.completion || p.completion_percentage || (status === 'completed' ? 100 : 50)),
-              visit: p.live_demo_url || p.live_demo || p.live || '',
-              github: p.github_url || p.github || '',
-              apk: p.apk_url || p.apk || p.apkUrl || '',
-              team: parsedTeam,
-              category: p.category || diffCat,
-              difficulty: diffCat,
-              status: status,
-              isOngoing: isOngoing,
-              domain: p.domain || 'Engineering',
-              thumbnail: p.thumbnail || '',
-              views: p.views || 0,
-              likes: p.likes || 0
-            };
-
-            loadedItems.push(item);
-            tempMap[name] = item;
-            if (p.id) tempMap[p.id] = item;
-          });
-
-          allProjects = loadedItems;
-          masterProjectsMap = tempMap;
-
-          // Hide Loading / Error
-          if (loadingSkeleton) loadingSkeleton.style.display = "none";
-          if (errorState) errorState.style.display = "none";
-
-          // Update Stats & Render Categories
-          updateStatistics();
-          renderFilteredProjects();
-          return;
-        }
+        if (processRawProjects(apiProjects)) return;
       }
-      throw new Error("Failed to parse projects payload");
-    } catch (err) {
-      console.warn("API load notice:", err.message);
-      if (allProjects.length === 0) {
-        if (loadingSkeleton) loadingSkeleton.style.display = "none";
-        if (errorState) errorState.style.display = "block";
-      }
+    } catch (e) {
+      // Timed out or connection refused — silently skip
+    }
+
+    // ── STEP 3: If allProjects still empty after all attempts, show error ──
+    if (allProjects.length === 0) {
+      console.warn('All project fetch methods failed.');
+      if (loadingSkeleton) loadingSkeleton.style.display = "none";
+      if (errorState) errorState.style.display = "block";
     }
   };
 

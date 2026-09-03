@@ -1106,6 +1106,18 @@ export const DEFAULT_HOME_CONTENT = {
   whyNexus: {
     title: "Why Nexus Solutions?",
     subtext: "At Nexus Solutions, we are more than just a tech club — we are a driven community of innovators, problem-solvers, and creators."
+  },
+  hiringModal: {
+    enabled: true,
+    delaySeconds: 1,
+    badgeText: "JOIN THE CORE TEAM",
+    titleLine1: "NEXUS IS",
+    titleLine2: "HIRING!",
+    description: "We're seeking the next generation of pioneers to forge the future of technology. Are you ready to build, innovate, and lead?",
+    roleTags: ["AI & ML", "Full Stack Dev"],
+    ctaBtnText: "JOIN NEXUS NOW",
+    ctaBtnLink: "contact.html",
+    teamImage: "https://res.cloudinary.com/dseg9nty3/image/upload/v1785057138/IMG-20251111-WA0041_rfg6od.jpg"
   }
 };
 

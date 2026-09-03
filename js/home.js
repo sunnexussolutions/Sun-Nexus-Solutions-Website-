@@ -220,6 +220,66 @@ document.addEventListener('DOMContentLoaded', () => {
             if (wSub && content.whyNexus.subtext) wSub.textContent = content.whyNexus.subtext;
         }
 
+        // Hiring Modal — fully driven by admin panel
+        if (content.hiringModal) {
+            const m = content.hiringModal;
+
+            // Badge text — find the text node (last child) safely
+            const badgeEl = document.querySelector('#hiringModal .hero-kicker');
+            if (badgeEl && m.badgeText) {
+                // Walk child nodes to find text node and update it
+                let updated = false;
+                badgeEl.childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                        node.textContent = ' ' + m.badgeText;
+                        updated = true;
+                    }
+                });
+                // Fallback: append text node if none found
+                if (!updated) {
+                    badgeEl.appendChild(document.createTextNode(' ' + m.badgeText));
+                }
+            }
+
+            // Title lines
+            const titleTop = document.querySelector('#hiringModal .hiring-title .title-top');
+            if (titleTop && m.titleLine1) titleTop.textContent = m.titleLine1;
+
+            const titleGrad = document.querySelector('#hiringModal .hiring-title .gradient-text');
+            if (titleGrad && m.titleLine2) titleGrad.textContent = m.titleLine2;
+
+            // Description
+            const descEl = document.querySelector('#hiringModal .hiring-text');
+            if (descEl && m.description) descEl.textContent = m.description;
+
+            // Role tags
+            const rolesEl = document.querySelector('#hiringModal .hiring-roles');
+            if (rolesEl && Array.isArray(m.roleTags) && m.roleTags.length) {
+                rolesEl.innerHTML = m.roleTags.map(tag =>
+                    `<div class="role-tag"><span class="role-dot">●</span> ${tag}</div>`
+                ).join('');
+            }
+
+            // CTA button
+            const ctaBtn = document.querySelector('#hiringModal .join-nexus-btn');
+            if (ctaBtn) {
+                if (m.ctaBtnText) {
+                    const ctaSpan = ctaBtn.querySelector('span');
+                    if (ctaSpan) ctaSpan.textContent = m.ctaBtnText;
+                }
+                if (m.ctaBtnLink) ctaBtn.setAttribute('href', m.ctaBtnLink);
+            }
+
+            // Team image
+            const teamImg = document.querySelector('#hiringModal .modal-hero-image');
+            if (teamImg && m.teamImage) {
+                teamImg.src = m.teamImage;
+            }
+
+            // Store config for the auto-show timer (handled on load)
+            window._nexusHiringConfig = m;
+        }
+
         // Re-apply stat cards manager overrides to prevent overwriting
         if (window.NexusStatCards && typeof window.NexusStatCards.load === 'function') {
             window.NexusStatCards.load();

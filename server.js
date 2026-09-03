@@ -13,9 +13,15 @@ const port = process.env.PORT || 3000;
 const dbUrl = process.env.VITE_NEON_URL || process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_izrW7bvHTnO6@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
 const sql = neon(dbUrl);
 
+import { dsaRouter, adminDsaRouter } from './routes/dsaRoutes.js';
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static('.')); // Serve static files from the root
+
+// DSA Module Endpoints (Database-backed)
+app.use('/api/dsa', dsaRouter);
+app.use('/api/admin/dsa', adminDsaRouter);
 
 // Registration Endpoint
 app.post('/api/contact', async (req, res) => {
