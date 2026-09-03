@@ -1986,3 +1986,75 @@ input[type="radio"],
   font-weight: 700;
   font-size: 20px;
 }
+
+/* ════════════════════════════════════════════════════
+   UNIVERSAL NEXUS BADGE PILL (Pill + Dot)
+   ════════════════════════════════════════════════════ */
+.hero-kicker,
+.nexus-badge-pill,
+.events-badge-pill,
+.about-badge,
+.alumni-hero-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 5px 16px !important;
+  border-radius: 9999px !important;
+  background: rgba(40, 114, 161, 0.12) !important;
+  border: 1px solid rgba(74, 144, 194, 0.28) !important;
+  color: #4A90C2 !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 16px !important;
+  box-shadow: 0 2px 8px rgba(13, 27, 42, 0.04) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  transition: all 0.25s ease !important;
+}
+
+[data-theme="light"] .hero-kicker,
+[data-theme="light"] .nexus-badge-pill,
+[data-theme="light"] .events-badge-pill,
+[data-theme="light"] .about-badge,
+[data-theme="light"] .alumni-hero-badge,
+body.light-mode .hero-kicker,
+body.light-mode .nexus-badge-pill,
+body.light-mode .events-badge-pill,
+body.light-mode .about-badge,
+body.light-mode .alumni-hero-badge {
+  background: #EFF6FB !important;
+  border: 1.5px solid #CBDDE9 !important;
+  color: #2872A1 !important;
+  box-shadow: 0 2px 8px rgba(13, 27, 42, 0.04) !important;
+}
+
+.kicker-dot,
+.about-badge-dot,
+.events-badge-dot,
+.alumni-badge-dot,
+.badge-pill-dot {
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: #4A90C2 !important;
+  box-shadow: 0 0 8px #4A90C2 !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+}
+
+[data-theme="light"] .kicker-dot,
+[data-theme="light"] .about-badge-dot,
+[data-theme="light"] .events-badge-dot,
+[data-theme="light"] .alumni-badge-dot,
+[data-theme="light"] .badge-pill-dot,
+body.light-mode .kicker-dot,
+body.light-mode .about-badge-dot,
+body.light-mode .events-badge-dot,
+body.light-mode .alumni-badge-dot,
+body.light-mode .badge-pill-dot {
+  background: #2872A1 !important;
+  box-shadow: 0 0 8px #2872A1 !important;
+}

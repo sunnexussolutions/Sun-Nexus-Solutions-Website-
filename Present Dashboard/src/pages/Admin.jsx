@@ -1643,6 +1643,117 @@ const Admin = () => {
               </div>
             </div>
           </Card>
+          {/* Hiring Modal Control */}
+          <Card>
+            <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--accent-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Bell size={18} /> Hiring Modal Popup
+            </h4>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+              This modal auto-appears when visitors land on the Home Page. Control its visibility, content, and behavior here.
+            </p>
+
+            {/* Enable / Disable Toggle */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 18px', borderRadius: '12px', background: homeContent?.hiringModal?.enabled ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)', border: `1px solid ${homeContent?.hiringModal?.enabled ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`, marginBottom: '20px', cursor: 'pointer' }} onClick={() => setHomeContent({ ...homeContent, hiringModal: { ...(homeContent.hiringModal || {}), enabled: !(homeContent?.hiringModal?.enabled ?? true) } })}>
+              <div style={{ width: '44px', height: '24px', borderRadius: '12px', background: homeContent?.hiringModal?.enabled ? '#22c55e' : '#ef4444', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                <div style={{ position: 'absolute', top: '3px', left: homeContent?.hiringModal?.enabled ? '23px' : '3px', width: '18px', height: '18px', borderRadius: '50%', background: 'white', transition: 'left 0.2s' }} />
+              </div>
+              <div>
+                <span style={{ fontSize: '13px', fontWeight: 800, color: homeContent?.hiringModal?.enabled ? '#22c55e' : '#ef4444' }}>
+                  {homeContent?.hiringModal?.enabled ? '✅ Modal Enabled — Will show on page load' : '❌ Modal Disabled — Hidden from visitors'}
+                </span>
+                <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>Click to toggle</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label style={labelStyle}>Auto-Show Delay (seconds)</label>
+                <input
+                  type="number" min="0" max="30"
+                  value={homeContent?.hiringModal?.delaySeconds ?? 1}
+                  onChange={e => setHomeContent({ ...homeContent, hiringModal: { ...(homeContent.hiringModal || {}), delaySeconds: Number(e.target.value) } })}
+                  style={{ ...inputStyle, width: '100%' }}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Badge Text (e.g. JOIN THE CORE TEAM)</label>
+                <input
+                  value={homeContent?.hiringModal?.badgeText || ''}
+                  onChange={e => setHomeContent({ ...homeContent, hiringModal: { ...(homeContent.hiringModal || {}), badgeText: e.target.value } })}
+                  style={inputStyle}
+                  placeholder="JOIN THE CORE TEAM"
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Title Line 1 (e.g. NEXUS IS)</label>
+                <input
+                  value={homeContent?.hiringModal?.titleLine1 || ''}
+                  onChange={e => setHomeContent({ ...homeContent, hiringModal: { ...(homeContent.hiringModal || {}), titleLine1: e.target.value } })}
+                  style={{ ...inputStyle, fontWeight: '800' }}
+                  placeholder="NEXUS IS"
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Title Line 2 — Gradient (e.g. HIRING!)</label>
+                <input
+                  value={homeContent?.hiringModal?.titleLine2 || ''}
+                  onChange={e => setHomeContent({ ...homeContent, hiringModal: { ...(homeContent.hiringModal || {}), titleLine2: e.target.value } })}
+                  style={{ ...inputStyle, fontWeight: '800' }}
+                  placeholder="HIRING!"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label style={labelStyle}>Modal Description Text</label>
+                <textarea
+                  value={homeContent?.hiringModal?.description || ''}
+                  onChange={e => setHomeContent({ ...homeContent, hiringModal: { ...(homeContent.hiringModal || {}), description: e.target.value } })}
+                  style={{ ...inputStyle, minHeight: '70px' }}
+                  placeholder="We're seeking the next generation of pioneers..."
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label style={labelStyle}>Role Tags (comma separated)</label>
+                <input
+                  value={(homeContent?.hiringModal?.roleTags || []).join(', ')}
+                  onChange={e => setHomeContent({ ...homeContent, hiringModal: { ...(homeContent.hiringModal || {}), roleTags: e.target.value.split(',').map(s => s.trim()).filter(Boolean) } })}
+                  style={inputStyle}
+                  placeholder="AI & ML, Full Stack Dev, Design"
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>CTA Button Text</label>
+                <input
+                  value={homeContent?.hiringModal?.ctaBtnText || ''}
+                  onChange={e => setHomeContent({ ...homeContent, hiringModal: { ...(homeContent.hiringModal || {}), ctaBtnText: e.target.value } })}
+                  style={inputStyle}
+                  placeholder="JOIN NEXUS NOW"
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>CTA Button Link URL</label>
+                <input
+                  value={homeContent?.hiringModal?.ctaBtnLink || ''}
+                  onChange={e => setHomeContent({ ...homeContent, hiringModal: { ...(homeContent.hiringModal || {}), ctaBtnLink: e.target.value } })}
+                  style={inputStyle}
+                  placeholder="contact.html"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label style={labelStyle}>Team / Illustration Image URL</label>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                  <input
+                    value={homeContent?.hiringModal?.teamImage || ''}
+                    onChange={e => setHomeContent({ ...homeContent, hiringModal: { ...(homeContent.hiringModal || {}), teamImage: e.target.value } })}
+                    style={{ ...inputStyle, flex: 1 }}
+                    placeholder="https://res.cloudinary.com/..."
+                  />
+                  {homeContent?.hiringModal?.teamImage && (
+                    <img src={homeContent.hiringModal.teamImage} alt="Preview" style={{ width: '60px', height: '60px', borderRadius: '10px', objectFit: 'cover', border: '2px solid var(--accent-primary)', flexShrink: 0 }} onError={e => { e.target.style.display = 'none'; }} />
+                  )}
+                </div>
+              </div>
+            </div>
+          </Card>
         </div>
       )}
 
