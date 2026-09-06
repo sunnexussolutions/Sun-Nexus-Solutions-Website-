@@ -246,7 +246,7 @@ const TechLogo = ({ name }) => {
       width: '18px',
       height: '18px',
       borderRadius: '5px',
-      background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)',
+      background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
       color: '#ffffff',
       display: 'flex',
       alignItems: 'center',
@@ -360,7 +360,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
   };
 
   const cardStyle = {
-    backgroundColor: isDark ? '#121625' : '#ffffff',
+    backgroundColor: isDark ? '#0E2740' : '#FFFFFF',
     border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
     borderRadius: '24px',
     padding: '18px 20px',
@@ -382,8 +382,8 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
     padding: '10px 14px 10px 38px',
     borderRadius: '12px',
     border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`,
-    backgroundColor: isDark ? '#0d0f1a' : '#ffffff',
-    color: isDark ? '#f8fafc' : '#0f172a',
+    backgroundColor: isDark ? '#0E2740' : '#FFFFFF',
+    color: isDark ? '#F3F7FB' : '#0D1B2A',
     fontSize: '13.5px',
     fontWeight: 600,
     outline: 'none',
@@ -395,14 +395,14 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
     display: 'block',
     fontSize: '12px',
     fontWeight: 700,
-    color: isDark ? '#94a3b8' : '#475569',
+    color: isDark ? '#CBDDE9' : '#415A77',
     marginBottom: '6px'
   };
 
   const iconStyle = {
     position: 'absolute',
     left: '12px',
-    color: isDark ? '#94a3b8' : '#64748b',
+    color: isDark ? '#CBDDE9' : '#415A77',
     pointerEvents: 'none'
   };
 
@@ -416,16 +416,16 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
             onClick={onClose}
             style={{
               display: 'flex', alignItems: 'center', gap: '6px', border: 'none', background: 'none',
-              color: isDark ? '#94a3b8' : '#64748b', fontSize: '13px', fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: '4px'
+              color: isDark ? '#CBDDE9' : '#415A77', fontSize: '13px', fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: '4px'
             }}
           >
             <ArrowLeft size={16} />
             <span>Back to Profile</span>
           </button>
-          <h1 style={{ fontSize: '24px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0, lineHeight: 1.2 }}>
+          <h1 style={{ fontSize: '24px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0, lineHeight: 1.2 }}>
             Edit Profile
           </h1>
-          <p style={{ fontSize: '13px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: 0 }}>
+          <p style={{ fontSize: '13px', fontWeight: 600, color: isDark ? '#CBDDE9' : '#415A77', margin: 0 }}>
             Manage your personal information and account preferences.
           </p>
         </div>
@@ -434,7 +434,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
           onClick={handleSubmit}
           style={{
             padding: '12px 24px', borderRadius: '14px',
-            background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)',
+            background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
             color: '#ffffff', fontSize: '14px', fontWeight: 800, border: 'none',
             cursor: 'pointer', boxShadow: '0 4px 16px rgba(123, 92, 255, 0.35)'
           }}
@@ -451,7 +451,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
           ...cardStyle,
           position: 'relative',
           background: isDark
-            ? 'linear-gradient(135deg, #121625 0%, #0d0f1a 100%)'
+            ? 'linear-gradient(135deg, #0E2740 0%, #0B1F33 100%)'
             : 'linear-gradient(135deg, #ffffff 0%, #fcfaff 100%)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
@@ -460,7 +460,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
               <div style={{ position: 'relative' }}>
                 <div style={{
                   width: '84px', height: '84px', borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)',
+                  background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#ffffff', fontSize: '32px', fontWeight: 900,
                   boxShadow: '0 8px 24px rgba(123, 92, 255, 0.3)',
@@ -475,7 +475,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                 <label style={{
                   position: 'absolute', bottom: '2px', right: '2px',
                   width: '28px', height: '28px', borderRadius: '50%',
-                  backgroundColor: '#ffffff', color: '#0f172a',
+                  backgroundColor: '#ffffff', color: 'var(--text-primary)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.15)', cursor: 'pointer'
                 }}>
@@ -485,10 +485,10 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
               </div>
 
               <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 4px 0' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 4px 0' }}>
                   Profile Photo
                 </h3>
-                <p style={{ fontSize: '12px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b', margin: 0 }}>
+                <p style={{ fontSize: '12px', fontWeight: 600, color: isDark ? '#CBDDE9' : '#415A77', margin: 0 }}>
                   JPG, PNG or WEBP. Max size 5MB.
                 </p>
               </div>
@@ -498,7 +498,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: 'auto' }}>
               <label style={{
                 padding: '10px 20px', borderRadius: '12px',
-                border: '1.5px solid #7b5cff', color: '#7b5cff',
+                border: '1.5px solid #2872A1', color: isDark ? '#4A90C2' : '#2872A1',
                 backgroundColor: 'transparent', fontSize: '13px', fontWeight: 800,
                 cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
               }}>
@@ -532,12 +532,12 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', marginBottom: expandedSections.personal ? '18px' : '0' }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <User size={18} style={{ color: '#7b5cff' }} />
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+                <User size={18} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>
                   Personal Information
                 </h3>
               </div>
-              <ChevronDown size={18} style={{ color: isDark ? '#94a3b8' : '#64748b', transform: expandedSections.personal ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+              <ChevronDown size={18} style={{ color: isDark ? '#CBDDE9' : '#415A77', transform: expandedSections.personal ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
             </div>
 
             {expandedSections.personal && (
@@ -654,12 +654,12 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', marginBottom: expandedSections.academic ? '18px' : '0' }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <GraduationCap size={18} style={{ color: '#7b5cff' }} />
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+                <GraduationCap size={18} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>
                   Academic Information
                 </h3>
               </div>
-              <ChevronDown size={18} style={{ color: isDark ? '#94a3b8' : '#64748b', transform: expandedSections.academic ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+              <ChevronDown size={18} style={{ color: isDark ? '#CBDDE9' : '#415A77', transform: expandedSections.academic ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
             </div>
 
             {expandedSections.academic && (
@@ -802,12 +802,12 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', marginBottom: expandedSections.professional ? '18px' : '0' }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Briefcase size={18} style={{ color: '#7b5cff' }} />
-              <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+              <Briefcase size={18} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
+              <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>
                 Professional Information
               </h3>
             </div>
-            <ChevronDown size={18} style={{ color: isDark ? '#94a3b8' : '#64748b', transform: expandedSections.professional ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+            <ChevronDown size={18} style={{ color: isDark ? '#CBDDE9' : '#415A77', transform: expandedSections.professional ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
           </div>
 
           {expandedSections.professional && (
@@ -837,8 +837,8 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                   }}>
                     {formData.skills.map((sk, idx) => (
                       <span key={idx} style={{
-                        padding: '4px 10px', borderRadius: '16px', backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
-                        color: '#7b5cff', fontSize: '12px', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '6px'
+                        padding: '4px 10px', borderRadius: '16px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB',
+                        color: isDark ? '#4A90C2' : '#2872A1', fontSize: '12px', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '6px'
                       }}>
                         {sk}
                         <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveSkill(sk)} />
@@ -850,7 +850,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                         onChange={e => setNewSkillInput(e.target.value)}
                         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddSkill(); } }}
                         placeholder="+ Add"
-                        style={{ border: 'none', background: 'transparent', outline: 'none', color: isDark ? '#f8fafc' : '#0f172a', fontSize: '12px', fontWeight: 700, width: '70px' }}
+                        style={{ border: 'none', background: 'transparent', outline: 'none', color: isDark ? '#F3F7FB' : '#0D1B2A', fontSize: '12px', fontWeight: 700, width: '70px' }}
                       />
                     </div>
                   </div>
@@ -896,7 +896,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                       onChange={e => setFormData({ ...formData, githubUrl: e.target.value })}
                       style={inputStyle}
                     />
-                    <LinkIcon size={14} style={{ position: 'absolute', right: '12px', color: isDark ? '#94a3b8' : '#64748b' }} />
+                    <LinkIcon size={14} style={{ position: 'absolute', right: '12px', color: isDark ? '#CBDDE9' : '#415A77' }} />
                   </div>
                 </div>
 
@@ -909,7 +909,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                       onChange={e => setFormData({ ...formData, linkedinUrl: e.target.value })}
                       style={inputStyle}
                     />
-                    <LinkIcon size={14} style={{ position: 'absolute', right: '12px', color: isDark ? '#94a3b8' : '#64748b' }} />
+                    <LinkIcon size={14} style={{ position: 'absolute', right: '12px', color: isDark ? '#CBDDE9' : '#415A77' }} />
                   </div>
                 </div>
 
@@ -922,7 +922,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                       onChange={e => setFormData({ ...formData, portfolioUrl: e.target.value })}
                       style={inputStyle}
                     />
-                    <LinkIcon size={14} style={{ position: 'absolute', right: '12px', color: isDark ? '#94a3b8' : '#64748b' }} />
+                    <LinkIcon size={14} style={{ position: 'absolute', right: '12px', color: isDark ? '#CBDDE9' : '#415A77' }} />
                   </div>
                 </div>
               </div>
@@ -940,12 +940,12 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', marginBottom: expandedSections.security ? '18px' : '0' }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Lock size={18} style={{ color: '#7b5cff' }} />
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+                <Lock size={18} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>
                   Security
                 </h3>
               </div>
-              <ChevronDown size={18} style={{ color: isDark ? '#94a3b8' : '#64748b', transform: expandedSections.security ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+              <ChevronDown size={18} style={{ color: isDark ? '#CBDDE9' : '#415A77', transform: expandedSections.security ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
             </div>
 
             {expandedSections.security && (
@@ -965,7 +965,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                       <button
                         type="button"
                         onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        style={{ position: 'absolute', right: '12px', border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}
+                        style={{ position: 'absolute', right: '12px', border: 'none', background: 'none', color: isDark ? '#CBDDE9' : '#415A77', cursor: 'pointer' }}
                       >
                         {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
@@ -986,7 +986,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                       <button
                         type="button"
                         onClick={() => setShowNewPassword(!showNewPassword)}
-                        style={{ position: 'absolute', right: '12px', border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}
+                        style={{ position: 'absolute', right: '12px', border: 'none', background: 'none', color: isDark ? '#CBDDE9' : '#415A77', cursor: 'pointer' }}
                       >
                         {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
@@ -1007,7 +1007,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        style={{ position: 'absolute', right: '12px', border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}
+                        style={{ position: 'absolute', right: '12px', border: 'none', background: 'none', color: isDark ? '#CBDDE9' : '#415A77', cursor: 'pointer' }}
                       >
                         {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
@@ -1021,7 +1021,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                         <div style={{ height: '6px', borderRadius: '4px', backgroundColor: '#10b981', flex: 1 }} />
                         <div style={{ height: '6px', borderRadius: '4px', backgroundColor: '#10b981', flex: 1 }} />
                         <div style={{ height: '6px', borderRadius: '4px', backgroundColor: '#10b981', flex: 1 }} />
-                        <div style={{ height: '6px', borderRadius: '4px', backgroundColor: isDark ? '#1e293b' : '#e2e8f0', flex: 1 }} />
+                        <div style={{ height: '6px', borderRadius: '4px', backgroundColor: isDark ? '#143555' : '#E2ECF4', flex: 1 }} />
                       </div>
                       <span style={{ fontSize: '12px', fontWeight: 800, color: '#10b981' }}>Strong</span>
                     </div>
@@ -1033,7 +1033,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                   onClick={() => alert('Password update feature activated')}
                   style={{
                     width: '100%', padding: '12px', borderRadius: '14px',
-                    background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)',
+                    background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
                     color: '#ffffff', fontSize: '13.5px', fontWeight: 800, border: 'none',
                     cursor: 'pointer', marginTop: '8px'
                   }}
@@ -1051,18 +1051,18 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', marginBottom: expandedSections.preferences ? '18px' : '0' }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Sliders size={18} style={{ color: '#7b5cff' }} />
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+                <Sliders size={18} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>
                   Preferences
                 </h3>
               </div>
-              <ChevronDown size={18} style={{ color: isDark ? '#94a3b8' : '#64748b', transform: expandedSections.preferences ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+              <ChevronDown size={18} style={{ color: isDark ? '#CBDDE9' : '#415A77', transform: expandedSections.preferences ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
             </div>
 
             {expandedSections.preferences && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>Theme</span>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>Theme</span>
                   <div style={{ width: '130px', minWidth: '110px' }}>
                     <select
                       value={theme}
@@ -1076,13 +1076,13 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>Email Notifications</span>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>Email Notifications</span>
                   <button
                     type="button"
                     onClick={() => setFormData(p => ({ ...p, emailNotifications: !p.emailNotifications }))}
                     style={{
                       width: '44px', height: '24px', borderRadius: '12px', border: 'none',
-                      backgroundColor: formData.emailNotifications ? '#7b5cff' : (isDark ? '#334155' : '#cbd5e1'),
+                      backgroundColor: formData.emailNotifications ? '#2872A1' : (isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'),
                       position: 'relative', cursor: 'pointer', transition: 'all 0.2s', flexShrink: 0
                     }}
                   >
@@ -1094,13 +1094,13 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>App Notifications</span>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>App Notifications</span>
                   <button
                     type="button"
                     onClick={() => setFormData(p => ({ ...p, appNotifications: !p.appNotifications }))}
                     style={{
                       width: '44px', height: '24px', borderRadius: '12px', border: 'none',
-                      backgroundColor: formData.appNotifications ? '#7b5cff' : (isDark ? '#334155' : '#cbd5e1'),
+                      backgroundColor: formData.appNotifications ? '#2872A1' : (isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'),
                       position: 'relative', cursor: 'pointer', transition: 'all 0.2s', flexShrink: 0
                     }}
                   >
@@ -1112,7 +1112,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a' }}>Language</span>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>Language</span>
                   <div style={{ width: '130px', minWidth: '110px' }}>
                     <select
                       value={formData.language}
@@ -1139,7 +1139,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
             style={{
               padding: '12px 24px', borderRadius: '14px',
               border: `1.5px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`,
-              backgroundColor: 'transparent', color: isDark ? '#cbd5e1' : '#475569',
+              backgroundColor: 'transparent', color: isDark ? '#CBDDE9' : '#415A77',
               fontSize: '14px', fontWeight: 800, cursor: 'pointer'
             }}
           >
@@ -1151,7 +1151,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
             onClick={handleSubmit}
             style={{
               padding: '12px 28px', borderRadius: '14px',
-              background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)',
+              background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
               color: '#ffffff', fontSize: '14px', fontWeight: 800, border: 'none',
               cursor: 'pointer', boxShadow: '0 4px 16px rgba(123, 92, 255, 0.35)'
             }}
@@ -1203,11 +1203,11 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
               {/* Confetti Particles */}
               <div style={{ position: 'absolute', top: '10px', left: '22%', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ec4899' }} />
               <div style={{ position: 'absolute', top: '28%', left: '16%', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#06b6d4' }} />
-              <div style={{ position: 'absolute', top: '14%', left: '38%', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#a855f7' }} />
-              <div style={{ position: 'absolute', top: '12%', right: '38%', width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#8b5cf6' }} />
+              <div style={{ position: 'absolute', top: '14%', left: '38%', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#4A90C2' }} />
+              <div style={{ position: 'absolute', top: '12%', right: '38%', width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#4A90C2' }} />
               <div style={{ position: 'absolute', top: '26%', right: '20%', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f97316' }} />
               <div style={{ position: 'absolute', top: '48%', right: '15%', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#eab308' }} />
-              <div style={{ position: 'absolute', top: '65%', right: '22%', width: '8px', height: '8px', borderRadius: '2px', backgroundColor: '#8b5cf6', transform: 'rotate(45deg)' }} />
+              <div style={{ position: 'absolute', top: '65%', right: '22%', width: '8px', height: '8px', borderRadius: '2px', backgroundColor: '#4A90C2', transform: 'rotate(45deg)' }} />
               <div style={{ position: 'absolute', top: '62%', left: '18%', width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#3b82f6' }} />
               <div style={{ position: 'absolute', top: '42%', left: '26%', width: '8px', height: '8px', backgroundColor: '#10b981', transform: 'rotate(45deg)' }} />
 
@@ -1223,7 +1223,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
             </div>
 
             {/* Modal Title */}
-            <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', margin: '0 0 10px 0', lineHeight: 1.2 }}>
+            <h3 style={{ fontSize: '20px', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 10px 0', lineHeight: 1.2 }}>
               Profile Updated Successfully!
             </h3>
 
@@ -1240,7 +1240,7 @@ function EditProfileView({ isDark, user, profileData, onSave, onClose, toggleThe
                 width: '100%',
                 padding: '14px',
                 borderRadius: '14px',
-                background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)',
+                background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
                 color: '#ffffff',
                 fontSize: '14px',
                 fontWeight: 800,
@@ -1428,7 +1428,7 @@ export default function Profile() {
           time: dateStr,
           icon: Layers,
           bg: '#eff6ff',
-          color: '#6366f1'
+          color: isDark ? '#4A90C2' : '#2872A1'
         });
       } else if (p.status === 'planning') {
         list.push({
@@ -1448,7 +1448,7 @@ export default function Profile() {
           time: dateStr,
           icon: Layers,
           bg: '#f3e8ff',
-          color: '#8b5cf6'
+          color: isDark ? '#4A90C2' : '#2872A1'
         });
       }
     });
@@ -1487,7 +1487,7 @@ export default function Profile() {
       time: profileData.joined || 'May 2026',
       icon: Sparkles,
       bg: '#f3e8ff',
-      color: '#8b5cf6'
+      color: isDark ? '#4A90C2' : '#2872A1'
     });
 
     return list;
@@ -1505,7 +1505,7 @@ export default function Profile() {
       desc: 'Joined Sun Nexus Community',
       date: profileData.joined || 'May 2026',
       icon: Sparkles,
-      bg: '#7b5cff'
+      bg: '#2872A1'
     });
 
     // Milestone 2: DSA Problems Solved
@@ -1742,7 +1742,7 @@ export default function Profile() {
   ];
 
   const cardStyle = {
-    backgroundColor: isDark ? '#0d0f1a' : '#ffffff',
+    backgroundColor: isDark ? '#0E2740' : '#FFFFFF',
     border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
     borderRadius: '28px',
     boxShadow: isDark ? '0 10px 30px rgba(0,0,0,0.4)' : '0 4px 20px rgba(0,0,0,0.03)',
@@ -1768,10 +1768,10 @@ export default function Profile() {
     <div style={{ width: '100%', maxWidth: '1240px', margin: '0 auto', padding: '0 16px 40px 16px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
       {/* ── BREADCRUMB HEADER ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, color: isDark ? '#CBDDE9' : '#415A77' }}>
         <span>Dashboard</span>
         <span>›</span>
-        <span style={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 800 }}>Profile</span>
+        <span style={{ color: isDark ? '#F3F7FB' : '#0D1B2A', fontWeight: 800 }}>Profile</span>
       </div>
 
       {/* ── TOP BANNER CARD ── */}
@@ -1780,7 +1780,7 @@ export default function Profile() {
         padding: '24px',
         position: 'relative',
         background: isDark
-          ? 'linear-gradient(135deg, #121625 0%, #0d0f1a 100%)'
+          ? 'linear-gradient(135deg, #0E2740 0%, #0B1F33 100%)'
           : 'linear-gradient(135deg, #ffffff 0%, #fcfaff 100%)',
         border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
         display: 'flex',
@@ -1791,11 +1791,11 @@ export default function Profile() {
       }}>
         {/* Subtle Isometric Hexagon SVG Background Overlay on Right */}
         <svg style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '45%', opacity: isDark ? 0.08 : 0.15, pointerEvents: 'none' }} viewBox="0 0 400 200">
-          <polygon points="200,20 240,40 240,80 200,100 160,80 160,40" fill="none" stroke="#7b5cff" strokeWidth="1.5" />
-          <polygon points="280,60 320,80 320,120 280,140 240,120 240,80" fill="none" stroke="#7b5cff" strokeWidth="1.5" />
-          <polygon points="120,60 160,80 160,120 120,140 80,120 80,80" fill="none" stroke="#7b5cff" strokeWidth="1.5" />
-          <polygon points="200,100 240,120 240,160 200,180 160,160 160,120" fill="none" stroke="#7b5cff" strokeWidth="1.5" />
-          <polygon points="360,20 400,40 400,80 360,100 320,80 320,40" fill="none" stroke="#7b5cff" strokeWidth="1.5" />
+          <polygon points="200,20 240,40 240,80 200,100 160,80 160,40" fill="none" stroke="#2872A1" strokeWidth="1.5" />
+          <polygon points="280,60 320,80 320,120 280,140 240,120 240,80" fill="none" stroke="#2872A1" strokeWidth="1.5" />
+          <polygon points="120,60 160,80 160,120 120,140 80,120 80,80" fill="none" stroke="#2872A1" strokeWidth="1.5" />
+          <polygon points="200,100 240,120 240,160 200,180 160,160 160,120" fill="none" stroke="#2872A1" strokeWidth="1.5" />
+          <polygon points="360,20 400,40 400,80 360,100 320,80 320,40" fill="none" stroke="#2872A1" strokeWidth="1.5" />
         </svg>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', zIndex: 2 }}>
@@ -1803,10 +1803,10 @@ export default function Profile() {
           <div style={{ position: 'relative' }}>
             <div style={{
               width: '100px', height: '100px', borderRadius: '50%',
-              backgroundColor: '#7b5cff', color: '#ffffff', fontSize: '38px', fontWeight: 900,
+              backgroundColor: '#2872A1', color: '#ffffff', fontSize: '38px', fontWeight: 900,
               display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
               boxShadow: '0 8px 24px rgba(123, 92, 255, 0.25)',
-              border: `3px solid ${isDark ? '#1e293b' : '#ffffff'}`
+              border: `3px solid ${isDark ? '#0E2740' : '#FFFFFF'}`
             }}>
               {profileData.avatar ? (
                 <img src={profileData.avatar} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -1816,7 +1816,7 @@ export default function Profile() {
             </div>
             <label style={{
               position: 'absolute', bottom: '2px', right: '2px', width: '28px', height: '28px',
-              borderRadius: '50%', backgroundColor: '#ffffff', color: '#0f172a',
+              borderRadius: '50%', backgroundColor: '#ffffff', color: 'var(--text-primary)',
               border: '1.5px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
             }}>
@@ -1828,23 +1828,23 @@ export default function Profile() {
           {/* User Details */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0, lineHeight: 1.1 }}>
+              <h2 style={{ fontSize: '24px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0, lineHeight: 1.1 }}>
                 {profileData.name}
               </h2>
               <span style={{
                 padding: '4px 10px', borderRadius: '999px',
                 backgroundColor: isDark ? 'rgba(123, 92, 255, 0.2)' : '#f3e8ff',
                 border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.3)' : '#e9d5ff'}`,
-                color: '#7b5cff', fontSize: '10.5px', fontWeight: 900, letterSpacing: '0.05em'
+                color: isDark ? '#4A90C2' : '#2872A1', fontSize: '10.5px', fontWeight: 900, letterSpacing: '0.05em'
               }}>
                 {user?.isAdmin ? 'PLATFORM ADMIN' : (profileData.selectedDomain || profileData.branch || 'NEXUS MEMBER').toUpperCase()}
               </span>
             </div>
-            <p style={{ fontSize: '14px', fontWeight: 700, color: '#7b5cff', margin: 0 }}>
+            <p style={{ fontSize: '14px', fontWeight: 700, color: isDark ? '#4A90C2' : '#2872A1', margin: 0 }}>
               {profileData.headline || profileData.selectedDomain || profileData.branch || 'Full Stack Developer'}
             </p>
             {profileData.bio && (
-              <p style={{ fontSize: '13px', fontWeight: 500, color: isDark ? '#94a3b8' : '#64748b', margin: 0 }}>
+              <p style={{ fontSize: '13px', fontWeight: 500, color: isDark ? '#CBDDE9' : '#415A77', margin: 0 }}>
                 {profileData.bio}
               </p>
             )}
@@ -1853,19 +1853,19 @@ export default function Profile() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '6px', flexWrap: 'wrap', fontSize: '12px', fontWeight: 600 }}>
               {profileData.location && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
-                  <MapPin size={13} style={{ color: '#7b5cff' }} />
+                  <MapPin size={13} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
                   <span>{profileData.location}</span>
                 </div>
               )}
               {profileData.email && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
-                  <AtSign size={13} style={{ color: '#7b5cff' }} />
+                  <AtSign size={13} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
                   <span>{profileData.email}</span>
                 </div>
               )}
               {profileData.phone && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(123, 92, 255, 0.12)' : '#f3e8ff', border: `1px solid ${isDark ? 'rgba(123, 92, 255, 0.25)' : '#e9d5ff'}`, color: isDark ? '#c4b5fd' : '#6b21a8' }}>
-                  <Phone size={13} style={{ color: '#7b5cff' }} />
+                  <Phone size={13} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
                   <span>{profileData.phone}</span>
                 </div>
               )}
@@ -1879,7 +1879,7 @@ export default function Profile() {
           style={{
             padding: '8px 18px', borderRadius: '12px',
             border: '1.5px solid #c084fc', backgroundColor: isDark ? 'rgba(192, 132, 252, 0.1)' : '#ffffff',
-            color: '#7b5cff', fontSize: '13px', fontWeight: 800, cursor: 'pointer',
+            color: isDark ? '#4A90C2' : '#2872A1', fontSize: '13px', fontWeight: 800, cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: '6px', zIndex: 2
           }}
         >
@@ -1897,8 +1897,8 @@ export default function Profile() {
             <ThumbsUp size={20} />
           </div>
           <div>
-            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total XP</p>
-            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>
+            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#CBDDE9' : '#415A77', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total XP</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '2px 0 0 0', lineHeight: 1 }}>
               {user?.xp ? user.xp.toLocaleString() : '0'}
             </h4>
             <p style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', margin: '3px 0 0 0' }}>↑ Lifetime XP</p>
@@ -1907,12 +1907,12 @@ export default function Profile() {
 
         {/* Stat 2: Avg Accuracy — from real aptitude results */}
         <div style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#f3e8ff', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#EFF6FB', color: isDark ? '#4A90C2' : '#2872A1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <PieChart size={20} />
           </div>
           <div>
-            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Accuracy</p>
-            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>
+            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#CBDDE9' : '#415A77', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Accuracy</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '2px 0 0 0', lineHeight: 1 }}>
               {statsLoading ? '—' : aptitudeStats.count > 0 ? `${aptitudeStats.avg}%` : 'N/A'}
             </h4>
             <p style={{ fontSize: '11px', fontWeight: 700, margin: '3px 0 0 0',
@@ -1930,8 +1930,8 @@ export default function Profile() {
             <Flame size={20} fill="#f97316" />
           </div>
           <div>
-            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Streak</p>
-            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>
+            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#CBDDE9' : '#415A77', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Streak</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '2px 0 0 0', lineHeight: 1 }}>
               {currentStreak} {currentStreak === 1 ? 'Week' : 'Weeks'}
             </h4>
             <p style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#64748b' : '#94a3b8', margin: '3px 0 0 0' }}>
@@ -1946,8 +1946,8 @@ export default function Profile() {
             <ClipboardList size={20} />
           </div>
           <div>
-            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>DSA Solved</p>
-            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>
+            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#CBDDE9' : '#415A77', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>DSA Solved</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '2px 0 0 0', lineHeight: 1 }}>
               {statsLoading ? '—' : dsaApproved.length}
             </h4>
             <p style={{ fontSize: '11px', fontWeight: 700, color: dsaThisMonth > 0 ? '#16a34a' : (isDark ? '#64748b' : '#94a3b8'), margin: '3px 0 0 0' }}>
@@ -1962,8 +1962,8 @@ export default function Profile() {
             <Award size={20} />
           </div>
           <div>
-            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#94a3b8' : '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Aptitude Tests</p>
-            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '2px 0 0 0', lineHeight: 1 }}>
+            <p style={{ fontSize: '10.5px', fontWeight: 800, color: isDark ? '#CBDDE9' : '#415A77', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Aptitude Tests</p>
+            <h4 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '2px 0 0 0', lineHeight: 1 }}>
               {statsLoading ? '—' : aptitudeStats.count}
             </h4>
             <p style={{ fontSize: '11px', fontWeight: 700, color: aptitudeStats.best > 0 ? '#16a34a' : (isDark ? '#64748b' : '#94a3b8'), margin: '3px 0 0 0' }}>
@@ -1985,13 +1985,13 @@ export default function Profile() {
               onClick={() => setActiveTab(key)}
               style={{
                 border: 'none', background: 'none', fontSize: '14px', fontWeight: isActive ? 800 : 600,
-                color: isActive ? '#7b5cff' : (isDark ? '#94a3b8' : '#64748b'), cursor: 'pointer',
+                color: isActive ? '#2872A1' : (isDark ? '#94a3b8' : '#64748b'), cursor: 'pointer',
                 paddingBottom: '8px', position: 'relative', whiteSpace: 'nowrap'
               }}
             >
               <span>{t}</span>
               {isActive && (
-                <div style={{ position: 'absolute', bottom: '-9px', left: 0, right: 0, height: '3px', backgroundColor: '#7b5cff', borderRadius: '3px 3px 0 0' }} />
+                <div style={{ position: 'absolute', bottom: '-9px', left: 0, right: 0, height: '3px', backgroundColor: '#2872A1', borderRadius: '3px 3px 0 0' }} />
               )}
             </button>
           );
@@ -2025,10 +2025,10 @@ export default function Profile() {
             <div style={{ ...cardStyle, padding: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <User size={18} style={{ color: '#7b5cff' }} />
-                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Personal Information</h3>
+                  <User size={18} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
+                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>Personal Information</h3>
                 </div>
-                <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #4A90C2', backgroundColor: 'transparent', color: isDark ? '#4A90C2' : '#2872A1', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <Edit3 size={13} />
                   <span>Edit</span>
                 </button>
@@ -2037,31 +2037,31 @@ export default function Profile() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '18px 24px' }}>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Full Name</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.name || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.name || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Username</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.username || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.username || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Email Address</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.email || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.email || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Phone Number</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.phone || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.phone || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Date of Birth</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.dob || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.dob || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Gender</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.gender || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.gender || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Address</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.address || profileData.location || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.address || profileData.location || '—'}</span>
                 </div>
               </div>
             </div>
@@ -2070,10 +2070,10 @@ export default function Profile() {
             <div style={{ ...cardStyle, padding: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <GraduationCap size={18} style={{ color: '#7b5cff' }} />
-                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Academic Information</h3>
+                  <GraduationCap size={18} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
+                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>Academic Information</h3>
                 </div>
-                <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #4A90C2', backgroundColor: 'transparent', color: isDark ? '#4A90C2' : '#2872A1', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <Edit3 size={13} />
                   <span>Edit</span>
                 </button>
@@ -2082,35 +2082,35 @@ export default function Profile() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '18px 24px' }}>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>University</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.university || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.university || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Branch</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.branch || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.branch || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Specialization</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.specialization || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.specialization || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Year</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.year || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.year || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Division</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.division || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.division || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>PRN Number</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.prnNumber || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.prnNumber || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Graduation Year</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.graduationYear || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.graduationYear || '—'}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>CGPA</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.cgpa || '—'}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.cgpa || '—'}</span>
                 </div>
               </div>
             </div>
@@ -2119,10 +2119,10 @@ export default function Profile() {
             <div style={{ ...cardStyle, padding: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Briefcase size={18} style={{ color: '#7b5cff' }} />
-                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Professional Information</h3>
+                  <Briefcase size={18} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
+                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>Professional Information</h3>
                 </div>
-                <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '6px 14px', borderRadius: '10px', border: '1px solid #4A90C2', backgroundColor: 'transparent', color: isDark ? '#4A90C2' : '#2872A1', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <Edit3 size={13} />
                   <span>Edit</span>
                 </button>
@@ -2132,11 +2132,11 @@ export default function Profile() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px' }}>
                   <div>
                     <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Selected Domain</span>
-                    <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.selectedDomain || '—'}</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.selectedDomain || '—'}</span>
                   </div>
                   <div>
                     <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Experience Level</span>
-                    <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>{profileData.experienceLevel || '—'}</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{profileData.experienceLevel || '—'}</span>
                   </div>
                 </div>
 
@@ -2145,7 +2145,7 @@ export default function Profile() {
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     {profileData.skills && profileData.skills.length > 0 ? (
                       profileData.skills.map(s => typeof s === 'string' ? s : s.name).map((sk) => (
-                        <span key={sk} style={{ padding: '5px 12px', borderRadius: '10px', backgroundColor: isDark ? '#121625' : '#f1f5f9', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, fontSize: '12px', fontWeight: 700, color: isDark ? '#cbd5e1' : '#475569' }}>
+                        <span key={sk} style={{ padding: '5px 12px', borderRadius: '10px', backgroundColor: isDark ? '#121625' : '#f1f5f9', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, fontSize: '12px', fontWeight: 700, color: isDark ? '#CBDDE9' : '#415A77' }}>
                           {sk}
                         </span>
                       ))
@@ -2157,7 +2157,7 @@ export default function Profile() {
 
                 <div>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Bio</span>
-                  <p style={{ fontSize: '13px', fontWeight: 500, color: isDark ? '#cbd5e1' : '#475569', margin: 0, lineHeight: 1.5 }}>
+                  <p style={{ fontSize: '13px', fontWeight: 500, color: isDark ? '#CBDDE9' : '#415A77', margin: 0, lineHeight: 1.5 }}>
                     {profileData.bio || 'No bio provided yet.'}
                   </p>
                 </div>
@@ -2167,7 +2167,7 @@ export default function Profile() {
                   <div style={{ minWidth: 0 }}>
                     <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>GitHub</span>
                     {profileData.githubUrl ? (
-                      <a href={profileData.githubUrl.startsWith('http') ? profileData.githubUrl : `https://${profileData.githubUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
+                      <a href={profileData.githubUrl.startsWith('http') ? profileData.githubUrl : `https://${profileData.githubUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: isDark ? '#4A90C2' : '#2872A1', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
                           {profileData.githubUrl.replace(/^https?:\/\/(www\.)?github\.com\//, 'github.com/').replace(/^https?:\/\//, '')}
                         </span>
@@ -2179,7 +2179,7 @@ export default function Profile() {
                   <div style={{ minWidth: 0 }}>
                     <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>LinkedIn</span>
                     {profileData.linkedinUrl ? (
-                      <a href={profileData.linkedinUrl.startsWith('http') ? profileData.linkedinUrl : `https://${profileData.linkedinUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
+                      <a href={profileData.linkedinUrl.startsWith('http') ? profileData.linkedinUrl : `https://${profileData.linkedinUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: isDark ? '#4A90C2' : '#2872A1', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
                           {profileData.linkedinUrl.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, 'linkedin.com/in/').replace(/^https?:\/\//, '')}
                         </span>
@@ -2191,7 +2191,7 @@ export default function Profile() {
                   <div style={{ minWidth: 0 }}>
                     <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Portfolio</span>
                     {profileData.portfolioUrl ? (
-                      <a href={profileData.portfolioUrl.startsWith('http') ? profileData.portfolioUrl : `https://${profileData.portfolioUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
+                      <a href={profileData.portfolioUrl.startsWith('http') ? profileData.portfolioUrl : `https://${profileData.portfolioUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: isDark ? '#4A90C2' : '#2872A1', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
                           {profileData.portfolioUrl.replace(/^https?:\/\//, '')}
                         </span>
@@ -2203,7 +2203,7 @@ export default function Profile() {
                   <div style={{ minWidth: 0 }}>
                     <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#64748b' : '#94a3b8', display: 'block', marginBottom: '4px' }}>Resume / Website</span>
                     {profileData.resumeUrl || profileData.portfolioUrl ? (
-                      <a href={(profileData.resumeUrl || profileData.portfolioUrl).startsWith('http') ? (profileData.resumeUrl || profileData.portfolioUrl) : `https://${profileData.resumeUrl || profileData.portfolioUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: '#7b5cff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
+                      <a href={(profileData.resumeUrl || profileData.portfolioUrl).startsWith('http') ? (profileData.resumeUrl || profileData.portfolioUrl) : `https://${profileData.resumeUrl || profileData.portfolioUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: '12.5px', fontWeight: 700, color: isDark ? '#4A90C2' : '#2872A1', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%' }}>
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '160px' }}>
                           {profileData.resumeUrl ? 'View Resume' : 'View Portfolio'}
                         </span>
@@ -2219,8 +2219,8 @@ export default function Profile() {
             <div style={{ ...cardStyle, padding: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Layers size={18} style={{ color: '#7b5cff' }} />
-                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+                  <Layers size={18} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
+                  <h3 style={{ fontSize: '16px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>
                     🚀 My Projects ({myProjects.length})
                   </h3>
                 </div>
@@ -2230,7 +2230,7 @@ export default function Profile() {
                   <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '10px', backgroundColor: 'rgba(34,197,94,0.15)', color: '#22c55e' }}>
                     {myProjectStats.completed} Completed
                   </span>
-                  <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '10px', backgroundColor: 'rgba(99,102,241,0.15)', color: '#6366f1' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '10px', backgroundColor: 'rgba(99,102,241,0.15)', color: isDark ? '#4A90C2' : '#2872A1' }}>
                     {myProjectStats.inProgress} In Progress
                   </span>
                   {myProjectStats.planning > 0 && (
@@ -2246,14 +2246,14 @@ export default function Profile() {
                 {myProjects.length > 0 ? (
                   myProjects.map(proj => {
                     const statusLabel = proj.status === 'completed' ? 'Completed' : (proj.status === 'planning' ? 'Planning' : 'In Progress');
-                    const statusColor = proj.status === 'completed' ? '#22c55e' : (proj.status === 'planning' ? '#f59e0b' : '#6366f1');
+                    const statusColor = proj.status === 'completed' ? '#22c55e' : (proj.status === 'planning' ? '#f59e0b' : '#2872A1');
                     const statusBg = proj.status === 'completed' ? 'rgba(34,197,94,0.15)' : (proj.status === 'planning' ? 'rgba(245,158,11,0.15)' : 'rgba(99,102,241,0.15)');
 
                     return (
                       <div key={proj.id || proj.title} style={{ padding: '18px', borderRadius: '18px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '12px' }}>
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span style={{ fontSize: '10px', fontWeight: 900, color: '#7b5cff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                            <span style={{ fontSize: '10px', fontWeight: 900, color: isDark ? '#4A90C2' : '#2872A1', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                               {proj.category || 'Advanced'} Project
                             </span>
                             <span style={{ fontSize: '10.5px', fontWeight: 800, padding: '2px 8px', borderRadius: '8px', backgroundColor: statusBg, color: statusColor }}>
@@ -2261,20 +2261,20 @@ export default function Profile() {
                             </span>
                           </div>
 
-                          <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 6px 0', lineHeight: 1.3 }}>
+                          <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 6px 0', lineHeight: 1.3 }}>
                             {proj.title}
                           </h4>
-                          <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: '0 0 10px 0', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          <p style={{ fontSize: '12px', color: isDark ? '#CBDDE9' : '#415A77', margin: '0 0 10px 0', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             {proj.description || proj.desc || proj.summary}
                           </p>
 
                           {/* Completion Progress Bar */}
                           <div style={{ marginTop: '8px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10.5px', fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b', marginBottom: '4px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10.5px', fontWeight: 700, color: isDark ? '#CBDDE9' : '#415A77', marginBottom: '4px' }}>
                               <span>Completion</span>
                               <span style={{ color: statusColor, fontWeight: 900 }}>{proj.completion || 0}%</span>
                             </div>
-                            <div style={{ width: '100%', height: '6px', borderRadius: '8px', backgroundColor: isDark ? '#1e293b' : '#e2e8f0', overflow: 'hidden' }}>
+                            <div style={{ width: '100%', height: '6px', borderRadius: '8px', backgroundColor: isDark ? '#143555' : '#E2ECF4', overflow: 'hidden' }}>
                               <div style={{ width: `${proj.completion || 0}%`, height: '100%', backgroundColor: statusColor, borderRadius: '8px' }} />
                             </div>
                           </div>
@@ -2290,9 +2290,9 @@ export default function Profile() {
                             style={{
                               padding: '6px 14px',
                               borderRadius: '10px',
-                              border: '1px solid #7b5cff',
+                              border: '1px solid #2872A1',
                               backgroundColor: 'transparent',
-                              color: '#7b5cff',
+                              color: isDark ? '#4A90C2' : '#2872A1',
                               fontSize: '12px',
                               fontWeight: 800,
                               cursor: 'pointer',
@@ -2322,18 +2322,18 @@ export default function Profile() {
             
             {/* Card 1: Account Information */}
             <div style={{ ...cardStyle, padding: '20px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 16px 0' }}>Account Information</h3>
+              <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 16px 0' }}>Account Information</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '12.5px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>User ID</span>
+                  <span style={{ fontWeight: 600, color: isDark ? '#CBDDE9' : '#415A77' }}>User ID</span>
                   <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>{profileData.prnNumber || user?.id?.slice(0, 12).toUpperCase() || '—'}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>Member Since</span>
+                  <span style={{ fontWeight: 600, color: isDark ? '#CBDDE9' : '#415A77' }}>Member Since</span>
                   <span style={{ fontWeight: 800, color: isDark ? '#cbd5e1' : '#334155' }}>{profileData.joined || 'May 2026'}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }}>Last Updated</span>
+                  <span style={{ fontWeight: 600, color: isDark ? '#CBDDE9' : '#415A77' }}>Last Updated</span>
                   <span style={{ fontWeight: 800, color: profileData.lastUpdated ? '#16a34a' : (isDark ? '#94a3b8' : '#64748b') }}>
                     {profileData.lastUpdated || 'N/A'}
                   </span>
@@ -2344,8 +2344,8 @@ export default function Profile() {
             {/* Card 2: Tech Stack */}
             <div style={{ ...cardStyle, padding: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Tech Stack</h3>
-                <button onClick={() => setIsTechStackModalOpen(true)} style={{ padding: '5px 12px', borderRadius: '8px', border: '1px solid #c084fc', backgroundColor: 'transparent', color: '#7b5cff', fontSize: '11.5px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>Tech Stack</h3>
+                <button onClick={() => setIsTechStackModalOpen(true)} style={{ padding: '5px 12px', borderRadius: '8px', border: '1px solid #4A90C2', backgroundColor: 'transparent', color: isDark ? '#4A90C2' : '#2872A1', fontSize: '11.5px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Edit3 size={12} />
                   <span>Edit</span>
                 </button>
@@ -2378,7 +2378,7 @@ export default function Profile() {
                           backgroundColor: isDark ? '#121625' : '#f8fafc',
                           border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: '12px', fontWeight: 900, color: '#7b5cff'
+                          fontSize: '12px', fontWeight: 900, color: isDark ? '#4A90C2' : '#2872A1'
                         }}>
                           +{rawSkills.length - 9}
                         </div>
@@ -2398,10 +2398,10 @@ export default function Profile() {
         <div style={{ ...cardStyle, padding: '28px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
             <div>
-              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>⚡ Technical Stack & Skills Matrix</h3>
-              <p style={{ fontSize: '13px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 0 0' }}>Manage and showcase your technical proficiencies</p>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>⚡ Technical Stack & Skills Matrix</h3>
+              <p style={{ fontSize: '13px', color: isDark ? '#CBDDE9' : '#415A77', margin: '4px 0 0 0' }}>Manage and showcase your technical proficiencies</p>
             </div>
-            <button onClick={() => setIsTechStackModalOpen(true)} style={{ padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button onClick={() => setIsTechStackModalOpen(true)} style={{ padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Edit3 size={15} />
               <span>Manage Skills</span>
             </button>
@@ -2412,12 +2412,12 @@ export default function Profile() {
               const name = typeof sk === 'string' ? sk : sk.name;
               return (
                 <div key={idx} style={{ padding: '16px', borderRadius: '16px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: isDark ? '#1e293b' : '#ffffff', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: isDark ? '#0E2740' : '#FFFFFF', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <TechLogo name={name} />
                   </div>
                   <div>
-                    <h4 style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{name}</h4>
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#7b5cff' }}>Active Skill</span>
+                    <h4 style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>{name}</h4>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#4A90C2' : '#2872A1' }}>Active Skill</span>
                   </div>
                 </div>
               );
@@ -2430,8 +2430,8 @@ export default function Profile() {
       {activeTab === 'activity' && (
         <div style={{ ...cardStyle, padding: '28px' }}>
           <div style={{ marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>📜 Activity Timeline & Audit Log</h3>
-            <p style={{ fontSize: '13px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 0 0' }}>Your recent platform actions and activity history</p>
+            <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>📜 Activity Timeline & Audit Log</h3>
+            <p style={{ fontSize: '13px', color: isDark ? '#CBDDE9' : '#415A77', margin: '4px 0 0 0' }}>Your recent platform actions and activity history</p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -2444,8 +2444,8 @@ export default function Profile() {
                       <IconComp size={20} />
                     </div>
                     <div>
-                      <h4 style={{ fontSize: '14.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{act.title}</h4>
-                      <p style={{ fontSize: '12.5px', color: isDark ? '#94a3b8' : '#64748b', margin: '3px 0 0 0' }}>{act.desc}</p>
+                      <h4 style={{ fontSize: '14.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>{act.title}</h4>
+                      <p style={{ fontSize: '12.5px', color: isDark ? '#CBDDE9' : '#415A77', margin: '3px 0 0 0' }}>{act.desc}</p>
                     </div>
                   </div>
                   <span style={{ fontSize: '12px', fontWeight: 700, color: act.color }}>{act.time}</span>
@@ -2460,8 +2460,8 @@ export default function Profile() {
       {activeTab === 'achievements' && (
         <div style={{ ...cardStyle, padding: '28px' }}>
           <div style={{ marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>🏆 Earned Achievements & Milestones</h3>
-            <p style={{ fontSize: '13px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 0 0' }}>Platform milestones and earned activity badges</p>
+            <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>🏆 Earned Achievements & Milestones</h3>
+            <p style={{ fontSize: '13px', color: isDark ? '#CBDDE9' : '#415A77', margin: '4px 0 0 0' }}>Platform milestones and earned activity badges</p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '18px' }}>
@@ -2473,9 +2473,9 @@ export default function Profile() {
                     <IconComp size={22} fill="#ffffff" />
                   </div>
                   <div>
-                    <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{ach.title}</h4>
-                    <p style={{ fontSize: '12.5px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 8px 0' }}>{ach.desc}</p>
-                    <span style={{ fontSize: '11px', fontWeight: 800, color: '#7b5cff', padding: '3px 10px', borderRadius: '12px', backgroundColor: isDark ? '#1e293b' : '#f1f5f9' }}>{ach.date}</span>
+                    <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>{ach.title}</h4>
+                    <p style={{ fontSize: '12.5px', color: isDark ? '#CBDDE9' : '#415A77', margin: '4px 0 8px 0' }}>{ach.desc}</p>
+                    <span style={{ fontSize: '11px', fontWeight: 800, color: isDark ? '#4A90C2' : '#2872A1', padding: '3px 10px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB' }}>{ach.date}</span>
                   </div>
                 </div>
               );
@@ -2488,27 +2488,27 @@ export default function Profile() {
       {activeTab === 'settings' && (
         <div style={{ ...cardStyle, padding: '28px' }}>
           <div style={{ marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>⚙️ Account & Profile Preferences</h3>
-            <p style={{ fontSize: '13px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 0 0' }}>Customize your account settings and preferences</p>
+            <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>⚙️ Account & Profile Preferences</h3>
+            <p style={{ fontSize: '13px', color: isDark ? '#CBDDE9' : '#415A77', margin: '4px 0 0 0' }}>Customize your account settings and preferences</p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div style={{ padding: '20px', borderRadius: '16px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Edit Full Profile</h4>
-                <p style={{ fontSize: '12.5px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 0 0' }}>Update personal, academic, and professional information</p>
+                <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>Edit Full Profile</h4>
+                <p style={{ fontSize: '12.5px', color: isDark ? '#CBDDE9' : '#415A77', margin: '4px 0 0 0' }}>Update personal, academic, and professional information</p>
               </div>
-              <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
+              <button onClick={() => { setDraftProfile({ ...profileData }); setIsEditModalOpen(true); }} style={{ padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
                 Open Profile Editor
               </button>
             </div>
 
             <div style={{ padding: '20px', borderRadius: '16px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Theme Mode</h4>
-                <p style={{ fontSize: '12.5px', color: isDark ? '#94a3b8' : '#64748b', margin: '4px 0 0 0' }}>Currently active: {isDark ? 'Dark Mode 🌙' : 'Light Mode ☀️'}</p>
+                <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>Theme Mode</h4>
+                <p style={{ fontSize: '12.5px', color: isDark ? '#CBDDE9' : '#415A77', margin: '4px 0 0 0' }}>Currently active: {isDark ? 'Dark Mode 🌙' : 'Light Mode ☀️'}</p>
               </div>
-              <button onClick={toggleTheme} style={{ padding: '10px 20px', borderRadius: '12px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, backgroundColor: isDark ? '#1e293b' : '#ffffff', color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
+              <button onClick={toggleTheme} style={{ padding: '10px 20px', borderRadius: '12px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, backgroundColor: isDark ? '#0E2740' : '#FFFFFF', color: isDark ? '#F3F7FB' : '#0D1B2A', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
                 Switch Theme Mode
               </button>
             </div>
@@ -2533,30 +2533,30 @@ export default function Profile() {
       {/* Edit Profile Modal */}
       {isEditModalOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', borderRadius: '24px', maxWidth: '520px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ backgroundColor: isDark ? '#0E2740' : '#FFFFFF', borderRadius: '24px', maxWidth: '520px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Edit Profile Details</h3>
-              <button onClick={() => setIsEditModalOpen(false)} style={{ border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}><X size={20} /></button>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>Edit Profile Details</h3>
+              <button onClick={() => setIsEditModalOpen(false)} style={{ border: 'none', background: 'none', color: isDark ? '#CBDDE9' : '#415A77', cursor: 'pointer' }}><X size={20} /></button>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b', display: 'block', marginBottom: '6px' }}>Display Name</label>
-                <input value={draftProfile.name} onChange={e => setDraftProfile({ ...draftProfile, name: e.target.value })} style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, backgroundColor: isDark ? '#0d0f1a' : '#ffffff', color: isDark ? '#f8fafc' : '#0f172a', fontSize: '14px', outline: 'none' }} />
+                <label style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#CBDDE9' : '#415A77', display: 'block', marginBottom: '6px' }}>Display Name</label>
+                <input value={draftProfile.name} onChange={e => setDraftProfile({ ...draftProfile, name: e.target.value })} style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, backgroundColor: isDark ? '#0E2740' : '#FFFFFF', color: isDark ? '#F3F7FB' : '#0D1B2A', fontSize: '14px', outline: 'none' }} />
               </div>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b', display: 'block', marginBottom: '6px' }}>Role / Headline</label>
-                <input value={draftProfile.headline} onChange={e => setDraftProfile({ ...draftProfile, headline: e.target.value })} style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, backgroundColor: isDark ? '#0d0f1a' : '#ffffff', color: isDark ? '#f8fafc' : '#0f172a', fontSize: '14px', outline: 'none' }} />
+                <label style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#CBDDE9' : '#415A77', display: 'block', marginBottom: '6px' }}>Role / Headline</label>
+                <input value={draftProfile.headline} onChange={e => setDraftProfile({ ...draftProfile, headline: e.target.value })} style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, backgroundColor: isDark ? '#0E2740' : '#FFFFFF', color: isDark ? '#F3F7FB' : '#0D1B2A', fontSize: '14px', outline: 'none' }} />
               </div>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b', display: 'block', marginBottom: '6px' }}>Location</label>
-                <input value={draftProfile.location} onChange={e => setDraftProfile({ ...draftProfile, location: e.target.value })} style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, backgroundColor: isDark ? '#0d0f1a' : '#ffffff', color: isDark ? '#f8fafc' : '#0f172a', fontSize: '14px', outline: 'none' }} />
+                <label style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#CBDDE9' : '#415A77', display: 'block', marginBottom: '6px' }}>Location</label>
+                <input value={draftProfile.location} onChange={e => setDraftProfile({ ...draftProfile, location: e.target.value })} style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, backgroundColor: isDark ? '#0E2740' : '#FFFFFF', color: isDark ? '#F3F7FB' : '#0D1B2A', fontSize: '14px', outline: 'none' }} />
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
-              <button onClick={() => setIsEditModalOpen(false)} style={{ padding: '10px 18px', borderRadius: '12px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, background: 'none', color: isDark ? '#94a3b8' : '#64748b', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={handleSaveProfile} style={{ padding: '10px 24px', borderRadius: '12px', background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>Save Changes</button>
+              <button onClick={() => setIsEditModalOpen(false)} style={{ padding: '10px 18px', borderRadius: '12px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, background: 'none', color: isDark ? '#CBDDE9' : '#415A77', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={handleSaveProfile} style={{ padding: '10px 24px', borderRadius: '12px', background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>Save Changes</button>
             </div>
           </div>
         </div>
@@ -2565,16 +2565,16 @@ export default function Profile() {
       {/* Manage Tech Stack Modal */}
       {isTechStackModalOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', borderRadius: '24px', maxWidth: '520px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ backgroundColor: isDark ? '#0E2740' : '#FFFFFF', borderRadius: '24px', maxWidth: '520px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>Manage Tech Stack</h3>
-              <button onClick={() => setIsTechStackModalOpen(false)} style={{ border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}><X size={20} /></button>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>Manage Tech Stack</h3>
+              <button onClick={() => setIsTechStackModalOpen(false)} style={{ border: 'none', background: 'none', color: isDark ? '#CBDDE9' : '#415A77', cursor: 'pointer' }}><X size={20} /></button>
             </div>
 
             {/* Add new skill */}
             <div style={{ display: 'flex', gap: '8px' }}>
-              <input value={newSkillName} onChange={e => setNewSkillName(e.target.value)} placeholder="e.g. Next.js, Rust, Go..." style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, backgroundColor: isDark ? '#0d0f1a' : '#ffffff', color: isDark ? '#f8fafc' : '#0f172a', fontSize: '13.5px', outline: 'none' }} />
-              <button onClick={handleAddSkill} style={{ padding: '10px 16px', borderRadius: '10px', background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <input value={newSkillName} onChange={e => setNewSkillName(e.target.value)} placeholder="e.g. Next.js, Rust, Go..." style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', border: `1px solid ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}`, backgroundColor: isDark ? '#0E2740' : '#FFFFFF', color: isDark ? '#F3F7FB' : '#0D1B2A', fontSize: '13.5px', outline: 'none' }} />
+              <button onClick={handleAddSkill} style={{ padding: '10px 16px', borderRadius: '10px', background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <Plus size={16} /> Add
               </button>
             </div>
@@ -2594,7 +2594,7 @@ export default function Profile() {
             </div>
 
             <div style={{ textAlign: 'right', marginTop: '10px' }}>
-              <button onClick={() => setIsTechStackModalOpen(false)} style={{ padding: '10px 24px', borderRadius: '12px', background: 'linear-gradient(135deg, #7b5cff 0%, #4f46e5 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>Done</button>
+              <button onClick={() => setIsTechStackModalOpen(false)} style={{ padding: '10px 24px', borderRadius: '12px', background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>Done</button>
             </div>
           </div>
         </div>
@@ -2603,22 +2603,22 @@ export default function Profile() {
       {/* Projects Items Modal */}
       {isProjectsModalOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', borderRadius: '24px', maxWidth: '600px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '80vh', overflow: 'hidden' }}>
+          <div style={{ backgroundColor: isDark ? '#0E2740' : '#FFFFFF', borderRadius: '24px', maxWidth: '600px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '80vh', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0, textTransform: 'capitalize' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0, textTransform: 'capitalize' }}>
                 {selectedProjectType === 'completed' ? '🏆 Completed Projects' : '⚡ Ongoing Developments'}
               </h3>
-              <button onClick={() => setIsProjectsModalOpen(false)} style={{ border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}><X size={20} /></button>
+              <button onClick={() => setIsProjectsModalOpen(false)} style={{ border: 'none', background: 'none', color: isDark ? '#CBDDE9' : '#415A77', cursor: 'pointer' }}><X size={20} /></button>
             </div>
 
             <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px', paddingRight: '4px' }}>
               {(selectedProjectType === 'completed' ? completedProjects : ongoingProjects).length === 0 ? (
-                <p style={{ textAlign: 'center', color: isDark ? '#94a3b8' : '#64748b', padding: '20px', fontStyle: 'italic' }}>No projects found in this category.</p>
+                <p style={{ textAlign: 'center', color: isDark ? '#CBDDE9' : '#415A77', padding: '20px', fontStyle: 'italic' }}>No projects found in this category.</p>
               ) : (
                 (selectedProjectType === 'completed' ? completedProjects : ongoingProjects).map((p, i) => (
                   <div key={i} style={{ padding: '16px', borderRadius: '16px', backgroundColor: isDark ? '#0d0f1a' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.15)' : '#e2e8f0'}` }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 6px 0' }}>{p.title}</h4>
-                    <p style={{ fontSize: '12.5px', color: isDark ? '#94a3b8' : '#64748b', margin: 0, lineHeight: 1.5 }}>{p.desc || p.description || 'Project details.'}</p>
+                    <h4 style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 6px 0' }}>{p.title}</h4>
+                    <p style={{ fontSize: '12.5px', color: isDark ? '#CBDDE9' : '#415A77', margin: 0, lineHeight: 1.5 }}>{p.desc || p.description || 'Project details.'}</p>
                   </div>
                 ))
               )}
@@ -2628,10 +2628,10 @@ export default function Profile() {
       )}
       {isActivityModalOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', borderRadius: '24px', maxWidth: '540px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '80vh' }}>
+          <div style={{ backgroundColor: isDark ? '#0E2740' : '#FFFFFF', borderRadius: '24px', maxWidth: '540px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '80vh' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>⚡ Full Activity History</h3>
-              <button onClick={() => setIsActivityModalOpen(false)} style={{ border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}><X size={20} /></button>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>⚡ Full Activity History</h3>
+              <button onClick={() => setIsActivityModalOpen(false)} style={{ border: 'none', background: 'none', color: isDark ? '#CBDDE9' : '#415A77', cursor: 'pointer' }}><X size={20} /></button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', paddingRight: '4px' }}>
               {activityList.map((act) => {
@@ -2643,8 +2643,8 @@ export default function Profile() {
                         <IconComp size={18} />
                       </div>
                       <div>
-                        <h4 style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{act.title}</h4>
-                        <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>{act.desc}</p>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>{act.title}</h4>
+                        <p style={{ fontSize: '12px', color: isDark ? '#CBDDE9' : '#415A77', margin: '2px 0 0 0' }}>{act.desc}</p>
                       </div>
                     </div>
                     <span style={{ fontSize: '11px', fontWeight: 700, color: act.color, whiteSpace: 'nowrap' }}>{act.time}</span>
@@ -2659,10 +2659,10 @@ export default function Profile() {
       {/* Achievements Modal */}
       {isAchievementsModalOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', borderRadius: '24px', maxWidth: '540px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '80vh' }}>
+          <div style={{ backgroundColor: isDark ? '#0E2740' : '#FFFFFF', borderRadius: '24px', maxWidth: '540px', width: '100%', padding: '28px', border: `1px solid ${isDark ? 'rgba(148, 163, 184, 0.2)' : '#e2e8f0'}`, boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '80vh' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>🏆 Earned Achievements & Badges</h3>
-              <button onClick={() => setIsAchievementsModalOpen(false)} style={{ border: 'none', background: 'none', color: isDark ? '#94a3b8' : '#64748b', cursor: 'pointer' }}><X size={20} /></button>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>🏆 Earned Achievements & Badges</h3>
+              <button onClick={() => setIsAchievementsModalOpen(false)} style={{ border: 'none', background: 'none', color: isDark ? '#CBDDE9' : '#415A77', cursor: 'pointer' }}><X size={20} /></button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', paddingRight: '4px' }}>
               {achievementsList.map((ach) => {
@@ -2674,11 +2674,11 @@ export default function Profile() {
                         <IconComp size={20} fill="#ffffff" />
                       </div>
                       <div>
-                        <h4 style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>{ach.title}</h4>
-                        <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: '2px 0 0 0' }}>{ach.desc}</p>
+                        <h4 style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0 }}>{ach.title}</h4>
+                        <p style={{ fontSize: '12px', color: isDark ? '#CBDDE9' : '#415A77', margin: '2px 0 0 0' }}>{ach.desc}</p>
                       </div>
                     </div>
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#7b5cff', whiteSpace: 'nowrap' }}>{ach.date}</span>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#4A90C2' : '#2872A1', whiteSpace: 'nowrap' }}>{ach.date}</span>
                   </div>
                 );
               })}

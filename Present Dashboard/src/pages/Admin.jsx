@@ -33,6 +33,7 @@ import {
 import { UserPerformanceGraph, CollectivePerformanceGraph } from '../components/AnalyticsCharts';
 import { prepareUserChartData, prepareCollectiveChartData } from '../utils/analytics';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import UnderProgress from '../components/UnderProgress';
 
 const TABS = [
@@ -59,7 +60,7 @@ const ICON_MAP = {
 
 // ── Reusable card ─────────────────────────────────────────────────────────────
 const Card = ({ children, style = {} }) => (
-  <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '1.25rem', padding: '1.5rem', ...style }}>
+  <div style={{ background: 'var(--card-bg, #0E2740)', border: '1px solid var(--card-border, rgba(203, 221, 233, 0.15))', borderRadius: '20px', padding: '1.5rem', boxShadow: 'var(--card-shadow, 0 8px 24px rgba(0, 0, 0, 0.3))', ...style }}>
     {children}
   </div>
 );
@@ -67,13 +68,13 @@ const Card = ({ children, style = {} }) => (
 // ── Stat box ──────────────────────────────────────────────────────────────────
 const StatBox = ({ label, value, icon: Icon, color, bgTint, actionText, onClick, active }) => (
   <motion.div
-    whileHover={{ translateY: -3, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.06)' }}
+    whileHover={{ translateY: -3, boxShadow: `0 10px 25px -5px ${color}30` }}
     whileTap={{ scale: 0.98 }}
     onClick={onClick}
     style={{
-      backgroundColor: 'var(--bg-secondary, #f8fafc)',
-      border: active ? `2px solid ${color}` : '1px solid var(--border-subtle, #e2e8f0)',
-      borderRadius: '22px',
+      backgroundColor: 'var(--card-bg, #0E2740)',
+      border: active ? `2px solid ${color}` : '1px solid var(--card-border, rgba(203, 221, 233, 0.15))',
+      borderRadius: '20px',
       padding: '20px 22px',
       cursor: 'pointer',
       transition: 'all 0.2s ease',
@@ -81,14 +82,14 @@ const StatBox = ({ label, value, icon: Icon, color, bgTint, actionText, onClick,
       flexDirection: 'column',
       justifyContent: 'space-between',
       gap: '16px',
-      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.02)',
+      boxShadow: 'var(--card-shadow, 0 4px 14px rgba(0, 0, 0, 0.1))',
       boxSizing: 'border-box'
     }}
   >
     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
       <div style={{
-        width: '36px',
-        height: '36px',
+        width: '38px',
+        height: '38px',
         borderRadius: '12px',
         backgroundColor: bgTint || `${color}18`,
         color: color,
@@ -97,15 +98,15 @@ const StatBox = ({ label, value, icon: Icon, color, bgTint, actionText, onClick,
         justifyContent: 'center',
         flexShrink: 0
       }}>
-        <Icon size={18} />
+        <Icon size={19} />
       </div>
-      <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary, #0f172a)' }}>
+      <span style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary, #F3F7FB)' }}>
         {label}
       </span>
     </div>
 
     <div>
-      <p style={{ fontSize: '32px', fontWeight: 900, color: 'var(--text-primary, #0f172a)', margin: 0, lineHeight: 1, letterSpacing: '-0.02em' }}>
+      <p style={{ fontSize: '32px', fontWeight: 900, color: 'var(--text-primary, #F3F7FB)', margin: 0, lineHeight: 1, letterSpacing: '-0.02em' }}>
         {value}
       </p>
     </div>
@@ -157,8 +158,8 @@ const QuestionBuilder = ({ questions, setQuestions, attempted = false }) => {
                   placeholder={`Option ${String.fromCharCode(65 + oi)}`}
                   style={{
                     flex: 1,
-                    background: q.answer === oi ? 'rgba(99,102,241,0.1)' : 'var(--bg-secondary)',
-                    border: `1px solid ${attempted && !opt.trim() ? '#ef4444' : q.answer === oi ? 'rgba(99,102,241,0.4)' : attempted && opt.trim() ? '#22c55e' : 'var(--border-subtle)'}`,
+                    background: q.answer === oi ? 'rgba(40, 114, 161,0.1)' : 'var(--bg-secondary)',
+                    border: `1px solid ${attempted && !opt.trim() ? '#ef4444' : q.answer === oi ? 'rgba(40, 114, 161,0.4)' : attempted && opt.trim() ? '#22c55e' : 'var(--border-subtle)'}`,
                     borderRadius: '8px', padding: '8px 12px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', transition: 'border-color 0.2s'
                   }}
                 />
@@ -177,7 +178,7 @@ const QuestionBuilder = ({ questions, setQuestions, attempted = false }) => {
         </div>
       ))}
       <button onClick={add} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '12px', border: '1.5px dashed var(--border-strong)', background: 'transparent', color: 'var(--accent-primary)', fontWeight: 700, fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s' }}
-        onMouseEnter={e => e.currentTarget.style.background = 'rgba(99,102,241,0.06)'}
+        onMouseEnter={e => e.currentTarget.style.background = 'rgba(40, 114, 161,0.06)'}
         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
         <Plus size={16} /> Add Question
       </button>
@@ -187,7 +188,7 @@ const QuestionBuilder = ({ questions, setQuestions, attempted = false }) => {
 
 // ── Sub-domain builder ────────────────────────────────────────────────────────
 const SubDomainBuilder = ({ subs, setSubs, inputStyle }) => {
-  const add = () => setSubs(s => [...(s || []), { id: `sub-${Date.now()}`, title: '', icon: 'Code2', color: '#6366f1', desc: '', stats: '' }]);
+  const add = () => setSubs(s => [...(s || []), { id: `sub-${Date.now()}`, title: '', icon: 'Code2', color: '#2872A1', desc: '', stats: '' }]);
   const remove = (id) => setSubs(s => (s || []).filter(item => item.id !== id));
   const update = (id, field, val) => setSubs(s => (s || []).map(item => item.id === id ? { ...item, [field]: val } : item));
 
@@ -218,7 +219,7 @@ const SubDomainBuilder = ({ subs, setSubs, inputStyle }) => {
       ))}
       <button 
         onClick={add} 
-        style={{ background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', padding: '10px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, border: '1px dashed var(--accent-primary)', cursor: 'pointer', marginTop: '5px' }}
+        style={{ background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', padding: '10px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, border: '1px dashed var(--accent-primary)', cursor: 'pointer', marginTop: '5px' }}
       >
         + Add Specialization
       </button>
@@ -252,7 +253,7 @@ const DynamicCalendar = ({ assessments = [], results = [], setTab }) => {
           id: a.id, 
           label: `📘 ${a.topic || 'Assessment'} (Published)`, 
           time: new Date(a.createdAt || a.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          color: '#6366f1', 
+          color: '#2872A1', 
           type: 'assessment',
           raw: a 
         });
@@ -323,7 +324,7 @@ const DynamicCalendar = ({ assessments = [], results = [], setTab }) => {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(99,102,241,0.12)', color: '#6366f1' }}><Calendar size={18} /></div>
+          <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(40,114,161,0.15)', color: '#2872A1' }}><Calendar size={18} /></div>
           <div>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>Activity Calendar</h3>
             <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Live from platform data</p>
@@ -333,7 +334,7 @@ const DynamicCalendar = ({ assessments = [], results = [], setTab }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button 
             onClick={jumpToday}
-            style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '8px', padding: '5px 12px', cursor: 'pointer', color: 'var(--accent-primary)', fontWeight: 800, fontSize: '12px' }}
+            style={{ background: 'rgba(40, 114, 161,0.1)', border: '1px solid rgba(40, 114, 161,0.25)', borderRadius: '8px', padding: '5px 12px', cursor: 'pointer', color: 'var(--accent-primary)', fontWeight: 800, fontSize: '12px' }}
           >
             Today
           </button>
@@ -347,7 +348,7 @@ const DynamicCalendar = ({ assessments = [], results = [], setTab }) => {
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
         {[
           { id: 'ALL', color: 'var(--accent-primary)', label: 'All Events' },
-          { id: 'assessment', color: '#6366f1', label: 'Assessment Published' },
+          { id: 'assessment', color: '#2872A1', label: 'Assessment Published' },
           { id: 'unlock', color: '#06b6d4', label: 'Assessment Unlocks' },
           { id: 'submission', color: '#22c55e', label: 'Quiz Submissions' },
         ].map(l => {
@@ -396,15 +397,15 @@ const DynamicCalendar = ({ assessments = [], results = [], setTab }) => {
                 position: 'relative',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 padding: '6px 2px', borderRadius: '10px', border: 'none', cursor: 'pointer',
-                background: sel ? 'rgba(99,102,241,0.18)' : today_ ? 'rgba(99,102,241,0.08)' : 'transparent',
-                outline: sel ? '2px solid #6366f1' : today_ ? '2px solid rgba(99,102,241,0.4)' : hasEvents ? '1px dashed rgba(99,102,241,0.3)' : 'none',
+                background: sel ? 'rgba(40, 114, 161,0.18)' : today_ ? 'rgba(40, 114, 161,0.08)' : 'transparent',
+                outline: sel ? '2px solid #2872A1' : today_ ? '2px solid rgba(40,114,161,0.4)' : hasEvents ? '1px dashed rgba(40,114,161,0.3)' : 'none',
                 transition: 'all 0.15s',
                 minHeight: '44px',
               }}
               onMouseEnter={e => { if (!sel) e.currentTarget.style.background = 'var(--bg-tertiary)'; }}
-              onMouseLeave={e => { if (!sel) e.currentTarget.style.background = today_ ? 'rgba(99,102,241,0.08)' : 'transparent'; }}
+              onMouseLeave={e => { if (!sel) e.currentTarget.style.background = today_ ? 'rgba(40, 114, 161,0.08)' : 'transparent'; }}
             >
-              <span style={{ fontSize: '13px', fontWeight: today_ || sel || hasEvents ? 900 : 600, color: sel ? '#6366f1' : today_ ? 'var(--accent-primary)' : 'var(--text-primary)' }}>{d}</span>
+              <span style={{ fontSize: '13px', fontWeight: today_ || sel || hasEvents ? 900 : 600, color: sel ? '#2872A1' : today_ ? 'var(--accent-primary)' : 'var(--text-primary)' }}>{d}</span>
               {uniqueColors.length > 0 && (
                 <div style={{ display: 'flex', gap: '2px', marginTop: '3px' }}>
                   {uniqueColors.slice(0, 3).map((c, ci) => (
@@ -468,7 +469,7 @@ const DynamicCalendar = ({ assessments = [], results = [], setTab }) => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-subtle)', paddingTop: '12px', fontSize: '12px', color: 'var(--text-muted)', flexWrap: 'wrap', gap: '8px' }}>
         <span><strong>{monthEvents.length} Total Events</strong> in {MONTH_NAMES[month]}</span>
         <div style={{ display: 'flex', gap: '12px', fontSize: '11px', fontWeight: 700 }}>
-          <span style={{ color: '#6366f1' }}>{monthPublishedCount} Published</span>
+          <span style={{ color: '#2872A1' }}>{monthPublishedCount} Published</span>
           <span style={{ color: '#06b6d4' }}>{monthUnlocksCount} Unlocks</span>
           <span style={{ color: '#22c55e' }}>{monthSubmissionsCount} Submissions</span>
         </div>
@@ -480,6 +481,8 @@ const DynamicCalendar = ({ assessments = [], results = [], setTab }) => {
 // ── Main Admin Component ──────────────────────────────────────────────────────
 const Admin = () => {
   const { user } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [tab, setTab] = useState('overview');
 
   if (!user?.isAdmin) {
@@ -527,7 +530,7 @@ const Admin = () => {
   const [showDsaProblemForm, setShowDsaProblemForm] = useState(false);
   const [editingDsaTopicId, setEditingDsaTopicId] = useState(null);
   const [editingDsaProblemId, setEditingDsaProblemId] = useState(null);
-  const [dsaTopicForm, setDsaTopicForm] = useState({ name: '', color: '#7b5cff', icon: 'Layers' });
+  const [dsaTopicForm, setDsaTopicForm] = useState({ name: '', color: '#2872A1', icon: 'Layers' });
   const [dsaProblemForm, setDsaProblemForm] = useState({
     topicId: '', title: '', number: '', difficulty: 'Easy', tags: '',
     description: '', examples: '', constraints: '', hints: '',
@@ -665,10 +668,10 @@ const Admin = () => {
 
   // Domain & Project forms state
   const [showDomainForm, setShowDomainForm] = useState(false);
-  const [domForm, setDomForm] = useState({ title: '', icon: 'Code2', color: '#6366f1', desc: '', stats: '', trending: false, subDomains: [] });
+  const [domForm, setDomForm] = useState({ title: '', icon: 'Code2', color: '#2872A1', desc: '', stats: '', trending: false, subDomains: [] });
 
   const [showProjectForm, setShowProjectForm] = useState(false);
-  const [pForm, setPForm] = useState({ title: '', desc: '', status: 'completed', tech: '', github: '', live: '', color: '#6366f1', userId: '' });
+  const [pForm, setPForm] = useState({ title: '', desc: '', status: 'completed', tech: '', github: '', live: '', color: '#2872A1', userId: '' });
   const [pTeam, setPTeam] = useState([{ name: '', image: '' }]);
 
   // Discussion form
@@ -952,7 +955,7 @@ const Admin = () => {
         alert("Domain launched successfully!");
       }
       
-      setDomForm({ title: '', icon: 'Code2', color: '#6366f1', desc: '', stats: '', trending: false, subDomains: [] });
+      setDomForm({ title: '', icon: 'Code2', color: '#2872A1', desc: '', stats: '', trending: false, subDomains: [] });
       setEditingDomainId(null);
       setShowDomainForm(false);
       await refresh();
@@ -966,7 +969,7 @@ const Admin = () => {
       localStorage.setItem('nexus_domains', JSON.stringify([...local, newDom]));
       window.dispatchEvent(new Event('nexus-data-updated'));
 
-      setDomForm({ title: '', icon: 'Code2', color: '#6366f1', desc: '', stats: '', trending: false, subDomains: [] });
+      setDomForm({ title: '', icon: 'Code2', color: '#2872A1', desc: '', stats: '', trending: false, subDomains: [] });
       setEditingDomainId(null);
       setShowDomainForm(false);
       await refresh();
@@ -1053,11 +1056,11 @@ const Admin = () => {
     }
   };
 
-  const inputStyle = { width: '100%', background: 'var(--bg-tertiary)', border: '1px solid var(--border-strong)', borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', fontFamily: 'inherit' };
-  const labelStyle = { fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' };
+  const inputStyle = { width: '100%', background: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9'}`, borderRadius: '12px', padding: '10px 14px', color: isDark ? '#F3F7FB' : '#0D1B2A', fontSize: '14px', outline: 'none', fontFamily: 'inherit' };
+  const labelStyle = { fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: isDark ? '#4A90C2' : '#2872A1', display: 'block', marginBottom: '6px' };
 
   return (
-    <div className="flex flex-col gap-6 md:gap-8 animate-slide-up">
+    <div className="flex flex-col gap-6 md:gap-8 animate-slide-up" style={{ color: isDark ? '#F3F7FB' : '#0D1B2A' }}>
       {/* Hidden file input for bulk fetch */}
       <input 
         type="file" 
@@ -1066,50 +1069,110 @@ const Admin = () => {
         style={{ display: 'none' }} 
         accept=".pdf,.docx,.txt,.xlsx,.xls,.csv" 
       />
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <div style={{ padding: '12px', borderRadius: '14px', background: 'rgba(245,158,11,0.12)', color: '#f59e0b' }}>
-          <ShieldCheck size={28} />
-        </div>
-        <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>Admin Panel</h1>
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500 }}>Manage assessments, users, discussions & notifications</p>
+      
+      {/* Header Banner matching Nexus DSA Theme */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '18px',
+          padding: '24px 28px',
+          borderRadius: '24px',
+          backgroundColor: isDark ? '#0E2740' : '#FFFFFF',
+          border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9'}`,
+          boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.35)' : '0 4px 20px rgba(13, 27, 42, 0.04)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', zIndex: 2 }}>
+          <div
+            style={{
+              width: '52px',
+              height: '52px',
+              borderRadius: '14px',
+              background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 16px rgba(40, 114, 161, 0.35)',
+              flexShrink: 0
+            }}
+          >
+            <ShieldCheck size={28} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', padding: '3px 10px', borderRadius: '8px', backgroundColor: isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB', color: isDark ? '#4A90C2' : '#2872A1', border: `1px solid ${isDark ? 'rgba(74, 144, 194, 0.35)' : '#CBDDE9'}` }}>
+                Administration Center
+              </span>
+            </div>
+            <h1 style={{ fontSize: '24px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: 0, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+              Admin Panel
+            </h1>
+            <p style={{ fontSize: '13px', color: isDark ? '#CBDDE9' : '#64748B', margin: '4px 0 0 0', fontWeight: 500 }}>
+              Master control for assessments, DSA roadmap, users, project oversight, discussions & platform settings
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Tabs Header with Actions */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', flexWrap: 'wrap', gap: '1rem' }}>
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-          {TABS.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px', borderRadius: '10px 10px 0 0', fontWeight: 700, fontSize: '13px', cursor: 'pointer', border: 'none', transition: 'all 0.2s', background: tab === t.id ? 'var(--bg-secondary)' : 'transparent', color: tab === t.id ? 'var(--accent-primary)' : 'var(--text-muted)', borderBottom: tab === t.id ? '2px solid var(--accent-primary)' : '2px solid transparent' }}>
-              <t.icon size={15} /> {t.label}
-            </button>
-          ))}
+      {/* Tabs Header with Pill Design */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9'}`, paddingBottom: '10px', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          {TABS.map(t => {
+            const isActive = tab === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '9px 16px',
+                  borderRadius: '12px',
+                  fontWeight: 800,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  border: isActive ? 'none' : `1px solid ${isDark ? 'rgba(203,221,233,0.12)' : '#CBDDE9'}`,
+                  transition: 'all 0.2s',
+                  background: isActive
+                    ? 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)'
+                    : (isDark ? '#0E2740' : '#FFFFFF'),
+                  color: isActive ? '#FFFFFF' : (isDark ? '#CBDDE9' : '#415A77'),
+                  boxShadow: isActive ? '0 4px 14px rgba(40, 114, 161, 0.3)' : 'none'
+                }}
+              >
+                <t.icon size={15} /> {t.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Action Buttons (Top Right) */}
         {tab === 'assessments' && (
-          <div style={{ display: 'flex', gap: '10px', paddingBottom: '8px' }}>
+          <div style={{ display: 'flex', gap: '10px' }}>
             <button 
               onClick={() => pdfInputRef.current?.click()}
               disabled={isParsing}
               style={{ 
-                display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '10px', 
-                background: 'rgba(99,102,241,0.08)', color: 'var(--accent-primary)', border: '1.5px solid rgba(99,102,241,0.2)', 
-                fontWeight: 700, fontSize: '12px', cursor: 'pointer', opacity: isParsing ? 0.6 : 1, transition: 'all 0.2s' 
+                display: 'flex', alignItems: 'center', gap: '8px', padding: '9px 16px', borderRadius: '12px', 
+                background: isDark ? 'rgba(40, 114, 161, 0.2)' : '#EFF6FB', color: isDark ? '#4A90C2' : '#2872A1', border: `1px solid ${isDark ? 'rgba(74, 144, 194, 0.35)' : '#CBDDE9'}`, 
+                fontWeight: 800, fontSize: '12px', cursor: 'pointer', opacity: isParsing ? 0.6 : 1, transition: 'all 0.2s' 
               }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent-primary)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(99,102,241,0.2)'}
             >
               <FileText size={14} /> {isParsing ? 'Processing...' : 'Bulk Fetch'}
             </button>
             <button 
               onClick={() => { setShowAssessmentForm(v => !v); setAAttempted(false); }}
               style={{ 
-                display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 20px', borderRadius: '10px', 
-                background: 'var(--accent-gradient)', color: 'white', border: 'none', fontWeight: 800, fontSize: '12px', 
-                cursor: 'pointer', boxShadow: '0 4px 12px rgba(0, 242, 254, 0.2)' 
+                display: 'flex', alignItems: 'center', gap: '8px', padding: '9px 20px', borderRadius: '12px', 
+                background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', color: 'white', border: 'none', fontWeight: 900, fontSize: '12px', 
+                cursor: 'pointer', boxShadow: '0 4px 14px rgba(40, 114, 161, 0.35)' 
               }}
             >
               <Plus size={14} /> {showAssessmentForm ? 'Cancel' : 'New Assessment'}
@@ -1123,7 +1186,7 @@ const Admin = () => {
         <div className="flex flex-col gap-6">
           {/* Top 5 Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <StatBox label="Active Users" value={users.filter(u => u.status === 'active' || !u.status).length} icon={Users} color="#4f46e5" bgTint="#e0e7ff" actionText="View all users" active={overviewDetail==='users'} onClick={() => setOverviewDetail(v => v==='users' ? null : 'users')} />
+            <StatBox label="Active Users" value={users.filter(u => u.status === 'active' || !u.status).length} icon={Users} color="#2872A1" bgTint="#EFF6FB" actionText="View all users" active={overviewDetail==='users'} onClick={() => setOverviewDetail(v => v==='users' ? null : 'users')} />
             <StatBox label="Pending" value={users.filter(u => u.status === 'pending').length} icon={ShieldCheck} color="#d97706" bgTint="#fef3c7" actionText="View pending" active={overviewDetail==='pending'} onClick={() => setOverviewDetail(v => v==='pending' ? null : 'pending')} />
             <StatBox label="Assessments" value={assessments.length} icon={BrainCircuit} color="#0284c7" bgTint="#e0f2fe" actionText="View assessments" active={overviewDetail==='assessments'} onClick={() => setOverviewDetail(v => v==='assessments' ? null : 'assessments')} />
             <StatBox label="Submissions" value={results.length} icon={FileText} color="#16a34a" bgTint="#dcfce7" actionText="View submissions" active={overviewDetail==='submissions'} onClick={() => setOverviewDetail(v => v==='submissions' ? null : 'submissions')} />
@@ -1140,7 +1203,7 @@ const Admin = () => {
                 exit={{ opacity: 0, y: -20 }}
                 style={{ overflow: 'hidden' }}
               >
-                <Card style={{ display: 'flex', flexDirection: 'column', gap: '16px', border: '1px solid var(--accent-primary)', background: 'rgba(99,102,241,0.02)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}>
+                <Card style={{ display: 'flex', flexDirection: 'column', gap: '16px', border: '1px solid var(--accent-primary)', background: 'rgba(40, 114, 161,0.02)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--accent-primary)' }} />
@@ -1266,7 +1329,7 @@ const Admin = () => {
                                 <p style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>{d.title}</p>
                                 <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>By {d.author || 'User'} • Tag: {d.tag}</p>
                               </div>
-                              <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '6px', backgroundColor: 'rgba(168, 85, 247, 0.15)', color: '#a855f7' }}>{d.tag}</span>
+                              <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '6px', backgroundColor: 'rgba(74, 144, 194, 0.15)', color: '#4A90C2' }}>{d.tag}</span>
                             </div>
                           ))}
                           <button
@@ -1392,7 +1455,7 @@ const Admin = () => {
                 <MessageSquare size={16} />
                 <span>Send Notification</span>
               </button>
-              <button onClick={() => setTab('home_content')} style={{ padding: '14px 20px', borderRadius: '14px', border: 'none', backgroundColor: 'rgba(168, 85, 247, 0.08)', color: '#9333ea', fontSize: '13px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button onClick={() => setTab('home_content')} style={{ padding: '14px 20px', borderRadius: '14px', border: 'none', backgroundColor: 'rgba(74, 144, 194, 0.08)', color: '#9333ea', fontSize: '13px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Palette size={16} />
                 <span>System Settings</span>
               </button>
@@ -1404,7 +1467,7 @@ const Admin = () => {
       {/* HOME PAGE CONTENT CMS */}
       {tab === 'home_content' && (
         <div className="flex flex-col gap-6">
-          <Card style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.1), rgba(6,182,212,0.1))', border: '1px solid rgba(0, 242, 254, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', padding: '1.5rem' }}>
+          <Card style={{ background: 'linear-gradient(135deg, rgba(40, 114, 161,0.1), rgba(6,182,212,0.1))', border: '1px solid rgba(0, 242, 254, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', padding: '1.5rem' }}>
             <div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Palette className="text-cyan-400" /> Homepage CMS & Live Control Panel
@@ -1560,7 +1623,7 @@ const Admin = () => {
                   const newMember = { id: String(Date.now()), name: 'New Leader', role: 'Role / Title', image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80', linkedin: '#', twitter: '#', facebook: '#' };
                   setHomeContent({ ...homeContent, leadership: { ...homeContent.leadership, members: [...(homeContent.leadership?.members || []), newMember] } });
                 }}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 800, fontSize: '12px', cursor: 'pointer' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '10px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(40, 114, 161,0.2)', fontWeight: 800, fontSize: '12px', cursor: 'pointer' }}
               >
                 <Plus size={14} /> Add Leader
               </button>
@@ -1760,7 +1823,7 @@ const Admin = () => {
       {/* STAT CARDS CONTROL HUB */}
       {tab === 'stat_cards' && (
         <div className="flex flex-col gap-6">
-          <Card style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.12), rgba(6,182,212,0.12))', border: '1px solid rgba(0, 242, 254, 0.35)', padding: '1.5rem' }}>
+          <Card style={{ background: 'linear-gradient(135deg, rgba(40,114,161,0.15), rgba(6,182,212,0.12))', border: '1px solid rgba(0, 242, 254, 0.35)', padding: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
               <div>
                 <h3 style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1843,7 +1906,7 @@ const Admin = () => {
               .map(([key, card]) => (
                 <Card key={key} style={{ display: 'flex', flexDirection: 'column', gap: '14px', position: 'relative', border: '1px solid var(--border-subtle)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', padding: '3px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.12)', color: 'var(--accent-primary)' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', padding: '3px 8px', borderRadius: '6px', background: 'rgba(40,114,161,0.15)', color: 'var(--accent-primary)' }}>
                       {card.page || 'General'} • {card.category || 'Stat'}
                     </span>
                     <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{key}</span>
@@ -1913,7 +1976,7 @@ const Admin = () => {
         /* ── DSA filtered list ── */
         const STATUS_COLORS = {
           pending:  { bg: 'rgba(245,158,11,0.12)',  text: '#f59e0b',  border: 'rgba(245,158,11,0.3)'  },
-          reviewed: { bg: 'rgba(99,102,241,0.12)',  text: '#6366f1',  border: 'rgba(99,102,241,0.3)'  },
+          reviewed: { bg: 'rgba(40,114,161,0.15)',  text: '#2872A1',  border: 'rgba(40,114,161,0.3)'  },
           approved: { bg: 'rgba(34,197,94,0.12)',   text: '#22c55e',  border: 'rgba(34,197,94,0.3)'   },
           rejected: { bg: 'rgba(239,68,68,0.12)',   text: '#ef4444',  border: 'rgba(239,68,68,0.3)'   },
         };
@@ -1954,7 +2017,7 @@ const Admin = () => {
                 <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Review DSA solution uploads and Aptitude quiz results</p>
               </div>
               <button onClick={async () => { const sols = await getDSASolutions(); setDsaSolutions(sols); refresh(); }}
-                style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>
+                style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(40, 114, 161,0.2)', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>
                 ↻ Refresh
               </button>
             </div>
@@ -1974,7 +2037,7 @@ const Admin = () => {
                   }}>
                   {t.label}
                   <span style={{ fontSize: '11px', fontWeight: 900, padding: '2px 8px', borderRadius: '8px',
-                    background: subType === t.id ? 'rgba(99,102,241,0.15)' : 'var(--bg-tertiary)',
+                    background: subType === t.id ? 'rgba(40, 114, 161,0.15)' : 'var(--bg-tertiary)',
                     color: subType === t.id ? 'var(--accent-primary)' : 'var(--text-muted)' }}>
                     {t.count}
                   </span>
@@ -2013,7 +2076,7 @@ const Admin = () => {
                 {filteredDSA.length === 0 ? (
                   <Card>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '3rem', textAlign: 'center', gap: '12px' }}>
-                      <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <FileText size={28} />
                       </div>
                       <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>No DSA Submissions Yet</h4>
@@ -2100,7 +2163,7 @@ const Admin = () => {
                                 </div>
                               )}
                               {sol.adminNote && (
-                                <div style={{ padding: '12px 16px', borderRadius: '12px', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)' }}>
+                                <div style={{ padding: '12px 16px', borderRadius: '12px', background: 'rgba(40, 114, 161,0.06)', border: '1px solid rgba(40, 114, 161,0.2)' }}>
                                   <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 4px 0' }}>Admin Note</p>
                                   <p style={{ fontSize: '13px', color: 'var(--text-primary)', margin: 0 }}>{sol.adminNote}</p>
                                 </div>
@@ -2115,7 +2178,7 @@ const Admin = () => {
                                   <X size={14} /> Reject
                                 </button>
                                 <button onClick={async () => { await updateDSASolutionStatus(sol.id, 'reviewed'); getDSASolutions().then(sols => setDsaSolutions(sols)); }}
-                                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
+                                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(40, 114, 161,0.2)', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}>
                                   <Eye size={14} /> Mark Reviewed
                                 </button>
                                 <button onClick={async () => { if (confirm('Delete this submission permanently?')) { await deleteDSASolution(sol.id); getDSASolutions().then(sols => setDsaSolutions(sols)); setSelectedSubDetail(null); } }}
@@ -2139,10 +2202,10 @@ const Admin = () => {
                 {/* Stats Bar */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px' }}>
                   {[
-                    { label: 'Total Submissions', val: totalApt, color: '#6366f1', bg: 'rgba(99,102,241,0.12)', Icon: FileText },
+                    { label: 'Total Submissions', val: totalApt, color: '#2872A1', bg: 'rgba(40,114,161,0.15)', Icon: FileText },
                     { label: 'Passed (≥60%)',     val: passedApt, color: '#22c55e', bg: 'rgba(34,197,94,0.12)',  Icon: Check },
                     { label: 'Failed (<60%)',      val: failedApt, color: '#ef4444', bg: 'rgba(239,68,68,0.12)',  Icon: X },
-                    { label: 'Platform Avg',       val: `${avgApt}%`, color: '#a855f7', bg: 'rgba(168,85,247,0.12)', Icon: TrendingUp },
+                    { label: 'Platform Avg',       val: `${avgApt}%`, color: '#4A90C2', bg: 'rgba(74, 144, 194, 0.15)', Icon: TrendingUp },
                   ].map(({ label, val, color, bg, Icon }) => (
                     <Card key={label} style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -2188,7 +2251,7 @@ const Admin = () => {
                               <div style={{ display: 'flex', gap: '8px' }}>
                                 {r.answers && Object.keys(r.answers).length > 0 && (
                                   <button onClick={() => setSelectedSubDetail(r)}
-                                    style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(40, 114, 161,0.2)', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <Eye size={14} /> Inspect
                                   </button>
                                 )}
@@ -2200,12 +2263,12 @@ const Admin = () => {
                             </div>
                           </div>
                           {r.proctorVideo && (
-                            <div style={{ padding: '12px 14px', borderRadius: '14px', background: 'rgba(15,23,42,0.85)', border: '1px solid rgba(168,85,247,0.35)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <div style={{ padding: '12px 14px', borderRadius: '14px', background: 'rgba(15,23,42,0.85)', border: '1px solid rgba(74, 144, 194,0.35)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <span style={{ fontSize: '11px', fontWeight: 900, color: '#c084fc', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                   📹 Live Proctoring Session Recording (Video + Audio)
                                 </span>
-                                <a href={r.proctorVideo} download={`proctor_${(r.userName || 'user').replace(/[^a-zA-Z0-9]/g, '_')}_${(r.topic || 'exam').replace(/[^a-zA-Z0-9]/g, '_')}.${r.proctorVideo?.startsWith('data:video/mp4') ? 'mp4' : 'webm'}`} style={{ fontSize: '11px', fontWeight: 800, color: '#c084fc', textDecoration: 'none', background: 'rgba(168,85,247,0.2)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(168,85,247,0.4)' }}>
+                                <a href={r.proctorVideo} download={`proctor_${(r.userName || 'user').replace(/[^a-zA-Z0-9]/g, '_')}_${(r.topic || 'exam').replace(/[^a-zA-Z0-9]/g, '_')}.${r.proctorVideo?.startsWith('data:video/mp4') ? 'mp4' : 'webm'}`} style={{ fontSize: '11px', fontWeight: 800, color: '#c084fc', textDecoration: 'none', background: 'rgba(74, 144, 194,0.2)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(74, 144, 194,0.4)' }}>
                                   ⬇ Download
                                 </a>
                               </div>
@@ -2237,12 +2300,12 @@ const Admin = () => {
                       </div>
                       <div style={{ padding: '20px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                         {selectedSubDetail.proctorVideo ? (
-                          <div style={{ padding: '16px', borderRadius: '16px', background: 'rgba(15,23,42,0.9)', border: '1px solid rgba(168,85,247,0.4)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          <div style={{ padding: '16px', borderRadius: '16px', background: 'rgba(15,23,42,0.9)', border: '1px solid rgba(74, 144, 194,0.4)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                               <span style={{ fontSize: '12px', fontWeight: 900, color: '#c084fc', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                                 📹 Recorded Proctoring Video & Audio
                               </span>
-                              <a href={selectedSubDetail.proctorVideo} download={`proctor_${selectedSubDetail.userName || 'user'}_${selectedSubDetail.topic || 'exam'}.webm`} style={{ fontSize: '11px', fontWeight: 800, color: '#c084fc', textDecoration: 'none', background: 'rgba(168,85,247,0.2)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(168,85,247,0.4)' }}>
+                              <a href={selectedSubDetail.proctorVideo} download={`proctor_${selectedSubDetail.userName || 'user'}_${selectedSubDetail.topic || 'exam'}.webm`} style={{ fontSize: '11px', fontWeight: 800, color: '#c084fc', textDecoration: 'none', background: 'rgba(74, 144, 194,0.2)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(74, 144, 194,0.4)' }}>
                                 ⬇ Download Recording
                               </a>
                             </div>
@@ -2337,12 +2400,12 @@ const Admin = () => {
 
           {assessments.length === 0 && !showAssessmentForm && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', background: 'var(--bg-secondary)', borderRadius: '1.5rem', border: '1px dashed var(--border-strong)', textAlign: 'center' }}>
-              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
                 <BrainCircuit size={40} />
               </div>
               <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '8px' }}>No Assessments Found</h4>
               <p style={{ fontSize: '14px', color: 'var(--text-muted)', maxWidth: '400px', marginBottom: '1.5rem' }}>Get started by creating a new assessment or bulk fetching questions to populate your learning library.</p>
-              <button onClick={() => setShowAssessmentForm(true)} style={{ padding: '10px 24px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', fontWeight: 800, fontSize: '14px', border: 'none', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.2)' }}>
+              <button onClick={() => setShowAssessmentForm(true)} style={{ padding: '10px 24px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', fontWeight: 800, fontSize: '14px', border: 'none', cursor: 'pointer', boxShadow: '0 4px 12px rgba(40, 114, 161,0.2)' }}>
                 Create Assessment
               </button>
             </div>
@@ -2355,9 +2418,9 @@ const Admin = () => {
                   <p style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>{a.topic}</p>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                     {[a.category, a.week, `${a.questions?.length || 0} Qs`, `${a.timeLimit} min`].map((tag, i) => (
-                      <span key={i} style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)' }}>{tag}</span>
+                      <span key={i} style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)' }}>{tag}</span>
                     ))}
-                    <span style={{ fontSize: '10px', fontWeight: 900, padding: '2px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
+                    <span style={{ fontSize: '10px', fontWeight: 900, padding: '2px 8px', borderRadius: '6px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
                       Updated: {new Date(a.updated_at || a.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </span>
                     {a.unlockTime && (
@@ -2382,7 +2445,7 @@ const Admin = () => {
                     setShowAssessmentForm(true);
                     window.scrollTo({ top: 100, behavior: 'smooth' });
                   }}
-                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '10px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(40, 114, 161,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
                     <FileText size={14} /> Edit
                   </button>
                   <button onClick={() => handleDeleteAssessment(a.id)}
@@ -2405,7 +2468,7 @@ const Admin = () => {
               <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Define career paths and nested specializations</p>
             </div>
             <button 
-              onClick={() => { setShowDomainForm(!showDomainForm); setEditingDomainId(null); setDomForm({ title: '', icon: 'Code2', color: '#6366f1', desc: '', stats: '', trending: false, subDomains: [] }); }}
+              onClick={() => { setShowDomainForm(!showDomainForm); setEditingDomainId(null); setDomForm({ title: '', icon: 'Code2', color: '#2872A1', desc: '', stats: '', trending: false, subDomains: [] }); }}
               style={{ padding: '10px 20px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', fontWeight: 800, fontSize: '13px', cursor: 'pointer', border: 'none' }}
             >
               {showDomainForm ? 'Cancel' : 'New Domain'}
@@ -2432,7 +2495,7 @@ const Admin = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
                     <div>
                       <label style={labelStyle}>Color (Hex)</label>
-                      <input value={domForm.color} onChange={e => setDomForm({ ...domForm, color: e.target.value })} placeholder="#6366f1" style={inputStyle} />
+                      <input value={domForm.color} onChange={e => setDomForm({ ...domForm, color: e.target.value })} placeholder="#2872A1" style={inputStyle} />
                     </div>
                     <div>
                       <label style={labelStyle}>Stats Label</label>
@@ -2460,7 +2523,7 @@ const Admin = () => {
                   <SubDomainBuilder subs={domForm.subDomains} setSubs={(s) => setDomForm(f => ({ ...f, subDomains: typeof s === 'function' ? s(f.subDomains) : s }))} inputStyle={inputStyle} />
 
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
-                    <button onClick={handleAddDomain} style={{ padding: '12px 30px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', fontWeight: 800, fontSize: '14px', border: 'none', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.2)' }}>
+                    <button onClick={handleAddDomain} style={{ padding: '12px 30px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', fontWeight: 800, fontSize: '14px', border: 'none', cursor: 'pointer', boxShadow: '0 4px 12px rgba(40, 114, 161,0.2)' }}>
                       {editingDomainId ? 'Update' : 'Launch'} Domain
                     </button>
                   </div>
@@ -2493,7 +2556,7 @@ const Admin = () => {
                         setShowDomainForm(true);
                         window.scrollTo({ top: 100, behavior: 'smooth' });
                       }}
-                        style={{ padding: '8px 14px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                        style={{ padding: '8px 14px', borderRadius: '10px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(40, 114, 161,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
                         Edit
                       </button>
                       <button onClick={() => handleDeleteDomain(d.id)}
@@ -2525,7 +2588,7 @@ const Admin = () => {
           </div>
           {users.length === 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', background: 'var(--bg-secondary)', borderRadius: '1.5rem', border: '1px dashed var(--border-strong)', textAlign: 'center' }}>
-              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(168,85,247,0.1)', color: '#a855f7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(74, 144, 194, 0.15)', color: '#4A90C2', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
                 <Users size={40} />
               </div>
               <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '8px' }}>No Users Registered</h4>
@@ -2621,9 +2684,9 @@ const Admin = () => {
                         {/* Engagement Stats */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
                           {[
-                            { label: 'Total XP',     value: `${u.xp ?? 0} pts`,      color: '#a855f7', icon: Star },
+                            { label: 'Total XP',     value: `${u.xp ?? 0} pts`,      color: '#4A90C2', icon: Star },
                             { label: 'Current Streak', value: `${u.streak ?? 0} weeks`, color: '#f59e0b', icon: Zap },
-                            { label: 'Last Login',   value: u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Never', color: '#6366f1', icon: Calendar },
+                            { label: 'Last Login',   value: u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Never', color: '#2872A1', icon: Calendar },
                             { label: 'Avg Accuracy', value: userResults.length ? Math.round(userResults.reduce((a, r) => a + (r.percentage || 0), 0) / userResults.length) + '%' : 'N/A', color: '#22c55e', icon: TrendingUp },
                           ].map((stat, si) => (
                             <div key={si} style={{ padding: '12px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -2642,7 +2705,7 @@ const Admin = () => {
                           <UserPerformanceGraph 
                             data={prepareUserChartData(results.filter(r => r.userEmail === u.email))} 
                             height={150} 
-                            color="#a855f7"
+                            color="#4A90C2"
                           />
                         </div>
 
@@ -2664,7 +2727,7 @@ const Admin = () => {
                               const c = pct >= 80 ? '#22c55e' : pct >= 60 ? '#f59e0b' : '#ef4444';
                               return (
                                 <div key={ri} style={{ position: 'relative' }}>
-                                  <div style={{ position: 'absolute', left: '-22px', top: '4px', width: '10px', height: '10px', borderRadius: '50%', background: '#6366f1', border: '2px solid var(--bg-tertiary)' }} />
+                                  <div style={{ position: 'absolute', left: '-22px', top: '4px', width: '10px', height: '10px', borderRadius: '50%', background: '#2872A1', border: '2px solid var(--bg-tertiary)' }} />
                                   <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>Completed Assessment: {r.topic}</p>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '2px' }}>
                                     <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{new Date(r.submittedAt).toLocaleString()}</span>
@@ -2710,7 +2773,7 @@ const Admin = () => {
                           )}
                           <button 
                             onClick={(e) => { e.stopPropagation(); if(confirm(`Are you sure you want to ${u.status === 'banned' ? 'unban' : 'ban'} this user?`)) { updateUserStatus(u.id, u.status === 'banned' ? 'active' : 'banned'); refresh(); }}}
-                            style={{ padding: '8px 16px', borderRadius: '10px', background: u.status === 'banned' ? 'rgba(99,102,241,0.1)' : 'rgba(239,68,68,0.1)', color: u.status === 'banned' ? '#6366f1' : '#ef4444', border: `1px solid ${u.status === 'banned' ? 'rgba(99,102,241,0.2)' : 'rgba(239,68,68,0.2)'}`, fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}
+                            style={{ padding: '8px 16px', borderRadius: '10px', background: u.status === 'banned' ? 'rgba(40,114,161,0.15)' : 'rgba(239,68,68,0.1)', color: u.status === 'banned' ? '#2872A1' : '#ef4444', border: `1px solid ${u.status === 'banned' ? 'rgba(40,114,161,0.25)' : 'rgba(239,68,68,0.2)'}`, fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}
                           >
                             {u.status === 'banned' ? 'Unban User' : 'Ban User'}
                           </button>
@@ -2779,7 +2842,7 @@ const Admin = () => {
               <Card key={d.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', gap: '8px', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)' }}>{d.tag}</span>
+                    <span style={{ fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)' }}>{d.tag}</span>
                     <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{new Date(d.createdAt).toLocaleDateString()}</span>
                   </div>
                   <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)' }}>{d.title}</h4>
@@ -2787,7 +2850,7 @@ const Admin = () => {
                 </div>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button onClick={() => { setEditingDiscussionId(d.id); setDForm({ title: d.title, body: d.body, tag: d.tag }); setShowDForm(true); window.scrollTo({ top: 100, behavior: 'smooth' }); }}
-                    style={{ padding: '8px 14px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                    style={{ padding: '8px 14px', borderRadius: '10px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(40, 114, 161,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
                     Edit
                   </button>
                   <button onClick={() => { if(confirm('Delete thread?')) { deleteDiscussion(d.id); refresh(); } }}
@@ -2850,7 +2913,7 @@ const Admin = () => {
           ) : (
             notifications.map(n => {
               const colors = { info: '#06b6d4', success: '#22c55e', warning: '#f59e0b', alert: '#ef4444' };
-              const c = colors[n.type] || '#6366f1';
+              const c = colors[n.type] || '#2872A1';
               return (
                 <Card key={n.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', borderLeft: `4px solid ${c}` }}>
                   <div style={{ flex: 1 }}>
@@ -2863,7 +2926,7 @@ const Admin = () => {
                   </div>
                   <div style={{ display: 'flex', gap: '10px' }}>
                     <button onClick={() => { setEditingNotificationId(n.id); setNForm({ title: n.title, message: n.message, type: n.type }); setShowNForm(true); }}
-                      style={{ padding: '8px 14px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                      style={{ padding: '8px 14px', borderRadius: '10px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(40, 114, 161,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
                       Edit
                     </button>
                     <button onClick={() => { if(confirm('Revoke notification?')) { deleteNotification(n.id); refresh(); } }}
@@ -2909,7 +2972,7 @@ const Admin = () => {
               <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>Submissions Control Center</h3>
               <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Monitor, inspect, and manage student assessment results across the platform</p>
             </div>
-            <button onClick={refresh} style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+            <button onClick={refresh} style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(40, 114, 161,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
               Sync Submissions
             </button>
           </div>
@@ -2922,7 +2985,7 @@ const Admin = () => {
                   <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total Submissions</p>
                   <h4 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--text-primary)', margin: '4px 0 0 0' }}>{totalSubs}</h4>
                 </div>
-                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(99,102,241,0.12)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(40,114,161,0.15)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <FileText size={20} />
                 </div>
               </div>
@@ -2956,9 +3019,9 @@ const Admin = () => {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
                   <p style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Platform Avg Score</p>
-                  <h4 style={{ fontSize: '24px', fontWeight: 900, color: '#a855f7', margin: '4px 0 0 0' }}>{avgScore}%</h4>
+                  <h4 style={{ fontSize: '24px', fontWeight: 900, color: '#4A90C2', margin: '4px 0 0 0' }}>{avgScore}%</h4>
                 </div>
-                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(168,85,247,0.12)', color: '#a855f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(74, 144, 194, 0.15)', color: '#4A90C2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <TrendingUp size={20} />
                 </div>
               </div>
@@ -3028,7 +3091,7 @@ const Admin = () => {
                           {r.answers && Object.keys(r.answers).length > 0 && (
                             <button 
                               onClick={() => setSelectedSubDetail(r)}
-                              style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                              style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(40, 114, 161,0.2)', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
                             >
                               <Eye size={14} /> Inspect Answers
                             </button>
@@ -3149,7 +3212,7 @@ const Admin = () => {
                 </button>
               </div>
 
-              <button onClick={refresh} style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99,102,241,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+              <button onClick={refresh} style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(40, 114, 161,0.2)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
                 Sync Inquiries
               </button>
             </div>
@@ -3169,7 +3232,7 @@ const Admin = () => {
                         <p style={{ fontSize: '13px', color: 'var(--accent-primary)', fontWeight: 600 }}>{s.email}</p>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 800, padding: '4px 12px', borderRadius: '8px', background: 'rgba(99,102,241,0.1)', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 800, padding: '4px 12px', borderRadius: '8px', background: 'rgba(40, 114, 161,0.1)', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
                           {s.academicYear} | {s.branch}{s.division && s.division !== 'N/A' ? ` | Div ${s.division}` : ''}
                         </span>
                         <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Graduation: {s.graduationYear}</p>
@@ -3361,7 +3424,7 @@ const Admin = () => {
 
                             <div style={{ flex: 1 }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                                <h4 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary, #0f172a)', margin: 0, letterSpacing: '-0.01em' }}>
+                                <h4 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary, #F3F7FB)', margin: 0, letterSpacing: '-0.01em' }}>
                                   {req.projectTitle}
                                 </h4>
                                 <span style={{
@@ -3406,9 +3469,9 @@ const Admin = () => {
                                 textAlign: 'center'
                               }}
                             >
-                              <option value="pending" style={{ background: '#0f172a', color: '#f59e0b' }}>STATUS: PENDING</option>
-                              <option value="in_progress" style={{ background: '#0f172a', color: '#4A90C2' }}>STATUS: IN PROGRESS</option>
-                              <option value="completed" style={{ background: '#0f172a', color: '#22c55e' }}>STATUS: COMPLETED</option>
+                              <option value="pending" style={{ background: isDark ? '#0E2740' : '#FFFFFF', color: '#f59e0b' }}>STATUS: PENDING</option>
+                              <option value="in_progress" style={{ background: isDark ? '#0E2740' : '#FFFFFF', color: '#4A90C2' }}>STATUS: IN PROGRESS</option>
+                              <option value="completed" style={{ background: isDark ? '#0E2740' : '#FFFFFF', color: '#22c55e' }}>STATUS: COMPLETED</option>
                             </select>
 
                             <button
@@ -3647,9 +3710,9 @@ const Admin = () => {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
             <div>
               <h3 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <GraduationCap size={26} color="var(--accent-primary, #6366f1)" />
+                <GraduationCap size={26} color="var(--accent-primary, #2872A1)" />
                 Alumni Network & Directory
-                <span style={{ fontSize: '12px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--accent-primary)', padding: '3px 10px', borderRadius: '12px', fontWeight: 800 }}>
+                <span style={{ fontSize: '12px', background: 'rgba(40, 114, 161, 0.15)', color: 'var(--accent-primary)', padding: '3px 10px', borderRadius: '12px', fontWeight: 800 }}>
                   {alumniList.length} Total
                 </span>
               </h3>
@@ -3692,7 +3755,7 @@ const Admin = () => {
                 style={{
                   padding: '9px 18px',
                   borderRadius: '10px',
-                  background: 'var(--accent-gradient, linear-gradient(135deg, #6366f1, #4f46e5))',
+                  background: 'var(--accent-gradient, linear-gradient(135deg, #2872A1, #4A90C2))',
                   color: '#ffffff',
                   border: 'none',
                   fontWeight: 800,
@@ -3701,7 +3764,7 @@ const Admin = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  boxShadow: '0 4px 14px rgba(99, 102, 241, 0.3)'
+                  boxShadow: '0 4px 14px rgba(40, 114, 161, 0.3)'
                 }}
               >
                 <Plus size={16} /> Add Alumnus
@@ -3712,7 +3775,7 @@ const Admin = () => {
           {/* Quick Metrics */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             <Card style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1' }}>
+              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(40, 114, 161, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2872A1' }}>
                 <GraduationCap size={22} />
               </div>
               <div>
@@ -3833,7 +3896,7 @@ const Admin = () => {
                           height: '52px',
                           borderRadius: '50%',
                           overflow: 'hidden',
-                          background: 'rgba(99, 102, 241, 0.1)',
+                          background: 'rgba(40, 114, 161, 0.15)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -3864,7 +3927,7 @@ const Admin = () => {
                           <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {alumnus.name}
                           </h4>
-                          <span style={{ fontSize: '11px', fontWeight: 800, padding: '2px 8px', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--accent-primary)', flexShrink: 0 }}>
+                          <span style={{ fontSize: '11px', fontWeight: 800, padding: '2px 8px', borderRadius: '6px', background: 'rgba(40, 114, 161, 0.15)', color: 'var(--accent-primary)', flexShrink: 0 }}>
                             '{alumnus.batch}
                           </span>
                         </div>
@@ -3960,7 +4023,7 @@ const Admin = () => {
                         style={{
                           padding: '4px 10px',
                           borderRadius: '6px',
-                          background: 'rgba(99, 102, 241, 0.1)',
+                          background: 'rgba(40, 114, 161, 0.15)',
                           color: 'var(--accent-primary)',
                           border: 'none',
                           fontSize: '11px',

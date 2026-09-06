@@ -10,7 +10,7 @@ const MENTOR_DOMAINS = [
     id: 'web-dev', 
     title: 'Web Architecture', 
     icon: Code2, 
-    color: '#6366f1', 
+    color: '#2872A1', 
     desc: 'Master full-stack engineering with modern frameworks.',
     stats: '150+ Participated'
   },

@@ -60,7 +60,7 @@ const Navbar = ({ toggleSidebar, setActivePage, isDesktop }) => {
 
   const profileGroups = [
     { label: "Account", items: [
-      { label: "Profile",        desc: "Personal info & settings",  icon: User,        color: "#6366f1", page: "profile" },
+      { label: "Profile",        desc: "Personal info & settings",  icon: User,        color: "#2872A1", page: "profile" },
       // { label: "Pause Learning", desc: "Hold your course progress", icon: PauseCircle, color: "#f59e0b" },
     ]},
     // { label: "Learning Tools", items: [
@@ -70,7 +70,7 @@ const Navbar = ({ toggleSidebar, setActivePage, isDesktop }) => {
     // { label: "Support & Help", items: [
     //   { label: "Mentor Support", desc: "Chat with expert guides",       icon: LifeBuoy,    color: "#10b981" },
     //   // { label: "Council",        desc: "Sovereign community hub",       icon: MessageSquare, color: "#06b6d4", page: "council" },
-    //   { label: "Product Tour",   desc: "Explore new platform features", icon: Compass,     color: "#a855f7" },
+    //   { label: "Product Tour",   desc: "Explore new platform features", icon: Compass,     color: "#4A90C2" },
     // ]},
   ];
 

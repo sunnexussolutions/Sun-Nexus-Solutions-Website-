@@ -121,7 +121,7 @@ class ErrorBoundary extends React.Component {
                   padding: '1rem',
                   borderRadius: '14px',
                   border: '1px solid rgba(0, 242, 254, 0.4)',
-                  background: 'linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)',
+                  background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
                   color: '#ffffff',
                   fontWeight: 700,
                   fontSize: '1rem',

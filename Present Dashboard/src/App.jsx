@@ -86,7 +86,7 @@ function App() {
      * ─────────────────────────────────────────
      */
     <div
-      className="min-h-screen bg-slate-50 dark:bg-[#0d0f1a] text-slate-900 dark:text-slate-100"
+      className="min-h-screen bg-[#F3F7FB] dark:bg-[#0B1F33] text-[#0D1B2A] dark:text-[#F3F7FB]"
       style={{ position: 'relative', overflowX: 'hidden' }}
     >
       {/* ── SIDEBAR ─────────────────────────────────────────────────── */}
@@ -105,7 +105,7 @@ function App() {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            backgroundColor: 'rgba(11, 31, 51, 0.75)',
             backdropFilter: 'blur(4px)',
             zIndex: 40,
           }}
@@ -136,7 +136,7 @@ function App() {
 
         {/* ── PAGE CONTENT ─────────────────────────────────────────── */}
         <main
-          className={isDashboard ? '' : 'sidebar-theme-page'}
+          className="sidebar-theme-page"
           style={{
             flex: 1,
             display: 'flex',

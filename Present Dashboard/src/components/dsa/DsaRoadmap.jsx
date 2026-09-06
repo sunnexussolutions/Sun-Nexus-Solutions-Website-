@@ -19,7 +19,8 @@ export default function DsaRoadmap({
   onToggleRevision,
   onOpenNotes,
   onToggleStatus,
-  onSolve,
+  onOpenDetails,
+  onPractice,
   onResetFilters
 }) {
   // Apply multi-criteria filtering
@@ -33,7 +34,10 @@ export default function DsaRoadmap({
       const matchComp = Array.isArray(p.companies) && p.companies.some(c => c.toLowerCase().includes(query));
       const matchId = String(p.id || '').toLowerCase().includes(query);
       const matchNumber = String(p.number || '') === query;
-      if (!matchTitle && !matchTags && !matchComp && !matchId && !matchNumber) return false;
+      const matchPattern = (p.pattern || p.expectedConcepts || '').toLowerCase().includes(query);
+      const matchTopic = (p.topic || '').toLowerCase().includes(query);
+      const matchSubtopic = (p.subtopic || '').toLowerCase().includes(query);
+      if (!matchTitle && !matchTags && !matchComp && !matchId && !matchNumber && !matchPattern && !matchTopic && !matchSubtopic) return false;
     }
 
     // Difficulty filter
@@ -46,6 +50,8 @@ export default function DsaRoadmap({
     if (statusFilter !== 'ALL') {
       if (statusFilter === 'REVISION') {
         if (!revisions.includes(p.id) && !p.isRevision) return false;
+      } else if (statusFilter === 'BOOKMARKED') {
+        if (!bookmarks.includes(p.id)) return false;
       } else if (statusFilter === 'SOLVED' || statusFilter === 'COMPLETED') {
         if (status !== 'SOLVED' && status !== 'COMPLETED') return false;
       } else if (statusFilter === 'ATTEMPTED' || statusFilter === 'IN_PROGRESS') {
@@ -56,7 +62,7 @@ export default function DsaRoadmap({
     }
 
     // Topic selector
-    if (selectedTopicId !== 'ALL' && p.topicId !== selectedTopicId) {
+    if (selectedTopicId !== 'ALL' && p.topicId !== selectedTopicId && p.topic_id !== selectedTopicId) {
       return false;
     }
 
@@ -80,7 +86,7 @@ export default function DsaRoadmap({
     }
     const hasFilter = query || difficultyFilter !== 'ALL' || statusFilter !== 'ALL' || bookmarkOnly || revisionOnly;
     if (hasFilter) {
-      return filteredProblems.some(p => p.topicId === ch.id);
+      return filteredProblems.some(p => p.topicId === ch.id || p.topic_id === ch.id);
     }
     return true;
   });
@@ -111,7 +117,8 @@ export default function DsaRoadmap({
           onToggleRevision={onToggleRevision}
           onOpenNotes={onOpenNotes}
           onToggleStatus={onToggleStatus}
-          onSolve={onSolve}
+          onOpenDetails={onOpenDetails}
+          onPractice={onPractice}
           isInitiallyExpanded={idx === 0 || visibleChapters.length <= 2}
         />
       ))}

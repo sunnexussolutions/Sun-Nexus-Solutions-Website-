@@ -98,7 +98,7 @@ const PendingApproval = () => {
         <path d="M0,192L48,197.3C96,203,192,213,288,208C384,203,480,181,576,181.3C672,181,768,203,864,213.3C960,224,1056,224,1152,208C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" fill="url(#wg)" />
         <defs>
           <linearGradient id="wg" x1="0" y1="0" x2="1440" y2="320" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#635bff" stopOpacity="0.1" />
+            <stop stopColor="#2872A1" stopOpacity="0.1" />
             <stop offset="1" stopColor="#a78bfa" stopOpacity="0.04" />
           </linearGradient>
         </defs>
@@ -166,7 +166,7 @@ const PendingApproval = () => {
                 {/* Info rows */}
                 <div style={{ width: '100%', marginBottom: '1.5rem' }}>
                   <div style={infoRow}>
-                    <div style={iconCircle('#635bff', '#f0eeff')}>
+                    <div style={iconCircle('#2872A1', '#EFF6FB')}>
                       <Clock size={18} />
                     </div>
                     <div>
@@ -199,9 +199,9 @@ const PendingApproval = () => {
                       flex: 1,
                       padding: '13px',
                       borderRadius: '12px',
-                      background: '#f0eeff',
+                      background: '#EFF6FB',
                       border: '1.5px solid #c4b5fd',
-                      color: '#635bff',
+                      color: '#2872A1',
                       fontWeight: 700,
                       fontSize: '13.5px',
                       cursor: checking ? 'not-allowed' : 'pointer',
@@ -214,7 +214,7 @@ const PendingApproval = () => {
                       opacity: checking ? 0.7 : 1,
                     }}
                     onMouseEnter={e => { if (!checking) e.currentTarget.style.background = '#e0d9ff'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = '#f0eeff'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = '#EFF6FB'; }}
                   >
                     <RefreshCw size={15} style={{ animation: checking ? 'spin 1s linear infinite' : 'none' }} />
                     {checking ? 'Checking...' : 'Check Status'}

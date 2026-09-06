@@ -182,7 +182,7 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.85)', gap: '8px' }}>
                   <Camera size={26} color={camStatus === 'checking' ? '#f59e0b' : '#ef4444'} />
                   {camStatus === 'checking' && <span style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 700 }}>⏳ Requesting camera…</span>}
-                  {camStatus === 'denied'   && <button onClick={handleAllowCam} style={{ padding: '6px 14px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg,#a855f7,#6366f1)', color: '#fff', fontSize: '11px', fontWeight: 800, cursor: 'pointer' }}>Allow Camera</button>}
+                  {camStatus === 'denied'   && <button onClick={handleAllowCam} style={{ padding: '6px 14px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', color: '#fff', fontSize: '11px', fontWeight: 800, cursor: 'pointer' }}>Allow Camera</button>}
                   {camStatus === 'idle'     && <span style={{ fontSize: '11px', color: '#94a3b8' }}>Waiting…</span>}
                 </div>
               )}
@@ -227,13 +227,13 @@ export const ProctorPreCheckModal = ({ isOpen, onClose, onStartExam, topicTitle 
 
 
         <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', marginBottom: '22px', userSelect: 'none' }}>
-          <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} style={{ width: '18px', height: '18px', accentColor: '#a855f7', cursor: 'pointer' }} />
+          <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} style={{ width: '18px', height: '18px', accentColor: '#2872A1', cursor: 'pointer' }} />
           <span>I accept all security rules and authorize proctored monitoring</span>
         </label>
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <button onClick={onClose} style={{ flex: 1, padding: '12px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)', color: 'var(--text-primary)', fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
-          <button disabled={!canStart} onClick={handleStart} style={{ flex: 2, padding: '12px 20px', borderRadius: '14px', border: 'none', background: canStart ? 'linear-gradient(135deg,#a855f7,#6366f1)' : 'rgba(255,255,255,0.1)', color: canStart ? '#ffffff' : 'rgba(255,255,255,0.35)', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: canStart ? 'pointer' : 'not-allowed', transition: 'all 0.2s' }}>
+          <button disabled={!canStart} onClick={handleStart} style={{ flex: 2, padding: '12px 20px', borderRadius: '14px', border: 'none', background: canStart ? 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)' : 'rgba(255,255,255,0.1)', color: canStart ? '#ffffff' : 'rgba(255,255,255,0.35)', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: canStart ? 'pointer' : 'not-allowed', transition: 'all 0.2s' }}>
             <Play size={16} fill="currentColor" />
             <span>{!bothReady ? 'Cam & Mic Access Required' : !agreed ? 'Accept Rules to Begin' : 'Enter Proctored Exam'}</span>
           </button>

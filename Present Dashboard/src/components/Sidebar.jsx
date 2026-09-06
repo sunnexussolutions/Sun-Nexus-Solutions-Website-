@@ -162,19 +162,21 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                     fontSize: '14px',
                     fontWeight: isActive ? 600 : 500,
                     border: isActive
-                      ? (isDark ? '1px solid rgba(74, 144, 194, 0.4)' : '1px solid #CBDDE9')
+                      ? (isDark ? '1px solid rgba(74, 144, 194, 0.45)' : '1px solid rgba(40, 114, 161, 0.5)')
                       : '1px solid transparent',
                     cursor: 'pointer',
                     boxSizing: 'border-box',
                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     whiteSpace: 'nowrap',
                     background: isActive
-                      ? (isDark ? 'rgba(40, 114, 161, 0.25)' : '#F3F7FB')
+                      ? (isDark ? 'linear-gradient(135deg, rgba(40, 114, 161, 0.38) 0%, rgba(74, 144, 194, 0.22) 100%)' : 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)')
                       : 'transparent',
                     color: isActive
-                      ? (isDark ? '#CBDDE9' : '#2872A1')
+                      ? (isDark ? '#F3F7FB' : '#FFFFFF')
                       : (isDark ? '#8EA6BC' : '#0D1B2A'),
-                    boxShadow: isActive && !isDark ? '0 1px 3px rgba(13, 27, 42, 0.04)' : 'none',
+                    boxShadow: isActive
+                      ? (isDark ? '0 4px 14px rgba(40, 114, 161, 0.3)' : '0 4px 14px rgba(40, 114, 161, 0.35)')
+                      : 'none',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
@@ -184,7 +186,7 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                         strokeWidth={2}
                         style={{
                           color: isActive
-                            ? (isDark ? '#4A90C2' : '#2872A1')
+                            ? (isDark ? '#4A90C2' : '#FFFFFF')
                             : (isDark ? '#8EA6BC' : '#0D1B2A'),
                           flexShrink: 0,
                           transition: 'color 0.2s ease',
@@ -200,7 +202,7 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                     <ChevronDown
                       size={14}
                       style={{
-                        color: isActive ? (isDark ? '#CBDDE9' : '#2872A1') : (isDark ? '#8EA6BC' : '#64748B'),
+                        color: isActive ? (isDark ? '#4A90C2' : '#FFFFFF') : (isDark ? '#8EA6BC' : '#64748B'),
                         transform: isDsaExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
                         transition: 'transform 0.2s ease'
                       }}
@@ -212,9 +214,15 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                       style={{
                         padding: '2px 8px',
                         borderRadius: '6px',
-                        backgroundColor: isDark ? 'rgba(40, 114, 161, 0.25)' : '#FFFFFF',
-                        color: isDark ? '#CBDDE9' : '#2872A1',
-                        border: `1px solid ${isDark ? '#4A90C2' : '#CBDDE9'}`,
+                        backgroundColor: isActive
+                          ? (isDark ? 'rgba(74, 144, 194, 0.3)' : 'rgba(255, 255, 255, 0.25)')
+                          : (isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB'),
+                        color: isActive
+                          ? (isDark ? '#F3F7FB' : '#FFFFFF')
+                          : (isDark ? '#CBDDE9' : '#2872A1'),
+                        border: isActive
+                          ? (isDark ? '1px solid rgba(74, 144, 194, 0.5)' : '1px solid rgba(255, 255, 255, 0.4)')
+                          : `1px solid ${isDark ? '#4A90C2' : '#CBDDE9'}`,
                         fontSize: '11px',
                         fontWeight: 600,
                         flexShrink: 0,
@@ -248,12 +256,16 @@ const Sidebar = ({ isDesktop, mobileDrawerOpen, closeMobileDrawer, activePage, s
                             fontWeight: isSubActive ? 600 : 400,
                             border: 'none',
                             cursor: 'pointer',
-                            background: isSubActive ? (isDark ? 'rgba(40, 114, 161, 0.25)' : '#F3F7FB') : 'transparent',
-                            color: isSubActive ? (isDark ? '#CBDDE9' : '#2872A1') : (isDark ? '#8EA6BC' : '#64748B'),
+                            background: isSubActive
+                              ? (isDark ? 'rgba(40, 114, 161, 0.3)' : '#EFF6FB')
+                              : 'transparent',
+                            color: isSubActive
+                              ? (isDark ? '#F3F7FB' : '#2872A1')
+                              : (isDark ? '#8EA6BC' : '#64748B'),
                             textAlign: 'left'
                           }}
                         >
-                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: isSubActive ? '#2872A1' : (isDark ? '#8EA6BC' : '#CBDDE9') }} />
+                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: isSubActive ? (isDark ? '#4A90C2' : '#2872A1') : (isDark ? '#8EA6BC' : '#CBDDE9') }} />
                           <span>{sub.label}</span>
                         </button>
                       );

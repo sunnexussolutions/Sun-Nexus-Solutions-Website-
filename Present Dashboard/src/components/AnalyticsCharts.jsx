@@ -7,7 +7,7 @@ import {
 /**
  * A premium AreaChart for individual performance tracking.
  */
-export const UserPerformanceGraph = ({ data, height = 300, color = '#6366f1' }) => {
+export const UserPerformanceGraph = ({ data, height = 300, color = '#2872A1' }) => {
   if (!data || data.length === 0) {
     return (
       <div style={{ 
@@ -117,7 +117,7 @@ export const CollectivePerformanceGraph = ({ data, height = 350 }) => {
           />
           <Bar dataKey="avg" radius={[8, 8, 0, 0]} barSize={40} animationDuration={1500}>
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#6366f1' : '#a855f7'} />
+              <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#2872A1' : '#4A90C2'} />
             ))}
           </Bar>
         </BarChart>

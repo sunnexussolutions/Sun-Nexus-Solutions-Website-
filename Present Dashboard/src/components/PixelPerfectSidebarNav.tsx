@@ -12,7 +12,7 @@ import {
 export interface NavItem {
   id: string;
   label: string;
-  icon: React.ElementType;
+  icon: any;
   badge?: string;
 }
 
@@ -48,7 +48,7 @@ export const PixelPerfectSidebarNav: React.FC<PixelPerfectSidebarNavProps> = ({
 
   return (
     <div
-      className={`w-full max-w-[280px] bg-white dark:bg-[#0f111a] p-4 rounded-2xl font-sans select-none ${className}`}
+      className={`w-full max-w-[280px] bg-white dark:bg-[#0E2740] p-4 rounded-2xl font-sans select-none border border-[#CBDDE9] dark:border-[rgba(203,221,233,0.15)] ${className}`}
       style={{
         boxShadow: '0 4px 25px rgba(0, 0, 0, 0.03)',
       }}
@@ -67,8 +67,8 @@ export const PixelPerfectSidebarNav: React.FC<PixelPerfectSidebarNavProps> = ({
                 transition-all duration-200 ease-in-out cursor-pointer border-none outline-none
                 ${
                   isActive
-                    ? 'bg-[#f3e8ff] dark:bg-[#2b1845] text-[#6d28d9] dark:text-[#c4b5fd] font-bold shadow-sm'
-                    : 'bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 text-[#1e1b4b] dark:text-slate-200 font-semibold'
+                    ? 'bg-gradient-to-r from-[#2872A1] to-[#4A90C2] dark:from-[rgba(40,114,161,0.38)] dark:to-[rgba(74,144,194,0.22)] text-white dark:text-[#F3F7FB] font-bold shadow-md'
+                    : 'bg-transparent hover:bg-[#F3F7FB] dark:hover:bg-[rgba(40,114,161,0.15)] text-[#0D1B2A] dark:text-[#8EA6BC] font-semibold'
                 }
               `}
             >
@@ -81,8 +81,8 @@ export const PixelPerfectSidebarNav: React.FC<PixelPerfectSidebarNavProps> = ({
                     flex-shrink-0 transition-colors duration-200
                     ${
                       isActive
-                        ? 'text-[#6d28d9] dark:text-[#c4b5fd]'
-                        : 'text-[#1e1b4b] dark:text-slate-300 group-hover:text-[#6d28d9] dark:group-hover:text-[#c4b5fd]'
+                        ? 'text-white dark:text-[#4A90C2]'
+                        : 'text-[#0D1B2A] dark:text-[#8EA6BC] group-hover:text-[#2872A1] dark:group-hover:text-[#4A90C2]'
                     }
                   `}
                 />
@@ -99,8 +99,8 @@ export const PixelPerfectSidebarNav: React.FC<PixelPerfectSidebarNavProps> = ({
                     border transition-colors duration-200
                     ${
                       isActive
-                        ? 'bg-white dark:bg-[#1a0f2e] text-[#6d28d9] dark:text-[#c4b5fd] border-[#8b5cf6]'
-                        : 'bg-white dark:bg-[#1e1b4b] text-[#7c3aed] dark:text-[#a78bfa] border-[#a78bfa]'
+                        ? 'bg-white/25 dark:bg-[rgba(74,144,194,0.3)] text-white dark:text-[#F3F7FB] border-white/40 dark:border-[rgba(74,144,194,0.5)]'
+                        : 'bg-[#EFF6FB] dark:bg-[rgba(40,114,161,0.25)] text-[#2872A1] dark:text-[#CBDDE9] border-[#CBDDE9] dark:border-[#4A90C2]'
                     }
                   `}
                 >

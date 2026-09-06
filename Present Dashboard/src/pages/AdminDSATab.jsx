@@ -26,6 +26,7 @@ import {
 } from "../services/dsaService";
 import { useTheme } from "../contexts/ThemeContext";
 import AdminDsaProblemModal from "../components/dsa/AdminDsaProblemModal";
+import DsaImportModal from "../components/dsa/DsaImportModal";
 
 const DSA_DIFFICULTIES = ["Easy", "Medium", "Hard"];
 const DSA_ICONS = ["Layers", "Code", "Link", "Database", "Target", "RotateCcw", "FolderTree", "Network", "Cpu", "Brain", "Sparkles", "Zap"];
@@ -86,6 +87,7 @@ export default function AdminDSATab() {
   const [problemModalOpen, setProblemModalOpen] = useState(false);
   const [topicModalOpen, setTopicModalOpen] = useState(false);
   const [sectionModalOpen, setSectionModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [previewModalProblem, setPreviewModalProblem] = useState(null);
 
   const [problemForm, setProblemForm] = useState(EMPTY_PROBLEM);
@@ -512,27 +514,48 @@ export default function AdminDSATab() {
               </select>
             </div>
 
-            {/* Create Problem Button */}
-            <button
-              onClick={handleOpenNewProblem}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "9px 18px",
-                borderRadius: "10px",
-                backgroundColor: "#2872A1",
-                color: "#FFFFFF",
-                border: "none",
-                fontSize: "13px",
-                fontWeight: 700,
-                cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(40, 114, 161, 0.25)"
-              }}
-            >
-              <Plus size={16} />
-              <span>Create Problem</span>
-            </button>
+            {/* Actions: Bulk Import & Create Problem */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <button
+                onClick={() => setImportModalOpen(true)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "9px 16px",
+                  borderRadius: "10px",
+                  backgroundColor: isDark ? "#0B1F33" : "#EFF6FB",
+                  color: isDark ? "#CBDDE9" : "#2872A1",
+                  border: `1px solid ${isDark ? "rgba(203, 221, 233, 0.2)" : "#CBDDE9"}`,
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: "pointer"
+                }}
+              >
+                <span>Bulk Import</span>
+              </button>
+
+              <button
+                onClick={handleOpenNewProblem}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "9px 18px",
+                  borderRadius: "10px",
+                  backgroundColor: "#2872A1",
+                  color: "#FFFFFF",
+                  border: "none",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 8px rgba(40, 114, 161, 0.25)"
+                }}
+              >
+                <Plus size={16} />
+                <span>Create Problem</span>
+              </button>
+            </div>
           </div>
 
           {/* Problem Table */}
@@ -988,6 +1011,16 @@ export default function AdminDSATab() {
           </div>
         </div>
       )}
+
+      {/* Bulk Import Modal */}
+      <DsaImportModal
+        isOpen={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        onImportSuccess={() => {
+          showToast("Problems imported successfully!");
+          loadAdminData();
+        }}
+      />
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import React from 'react';
-import { Search, X, Filter, Bookmark, CheckCircle2, RotateCcw, Star } from 'lucide-react';
+import {
+  Search, X, Filter, Bookmark, Star, Dices, RotateCcw, ListFilter, CheckCircle2, CircleDot
+} from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 
 export default function DsaFilters({
@@ -16,7 +18,11 @@ export default function DsaFilters({
   setBookmarkOnly,
   revisionOnly = false,
   setRevisionOnly,
-  onResetFilters
+  onPickRandom,
+  onResetFilters,
+  totalMatching = 0,
+  revisionsCount = 0,
+  bookmarksCount = 0
 }) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -28,11 +34,12 @@ export default function DsaFilters({
     { id: 'Hard', label: 'Hard', color: '#EF4444' }
   ];
 
-  const STATUSES = [
-    { id: 'ALL', label: 'All Statuses' },
+  const STATUS_OPTIONS = [
+    { id: 'ALL', label: 'All Problems' },
     { id: 'SOLVED', label: 'Solved' },
-    { id: 'ATTEMPTED', label: 'Attempted' },
-    { id: 'UNSOLVED', label: 'Unsolved' }
+    { id: 'UNSOLVED', label: 'Unsolved' },
+    { id: 'REVISION', label: 'Revision' },
+    { id: 'BOOKMARKED', label: 'Bookmarked' }
   ];
 
   const hasActiveFilters =
@@ -49,21 +56,174 @@ export default function DsaFilters({
         display: 'flex',
         flexDirection: 'column',
         gap: '14px',
-        padding: '20px 24px',
+        padding: '18px 22px',
         borderRadius: '18px',
         backgroundColor: isDark ? '#0E2740' : '#FFFFFF',
         border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9'}`,
         boxShadow: isDark ? '0 4px 16px rgba(0,0,0,0.25)' : '0 2px 10px rgba(13, 27, 42, 0.03)',
-        marginBottom: '24px',
+        marginBottom: '20px',
         width: '100%',
         boxSizing: 'border-box'
       }}
     >
-      {/* Top Row: Search Input + Topic Selector + Bookmark Toggle */}
+      {/* ── Top Toolbar Row: All Problems | Revision | Bookmarked Pills + Random Problem ── */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px'
+        }}
+      >
+        {/* Filter Pills */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          {/* All Problems Pill */}
+          <button
+            onClick={() => {
+              setBookmarkOnly(false);
+              setRevisionOnly(false);
+              setStatusFilter('ALL');
+            }}
+            style={{
+              padding: '7px 16px',
+              borderRadius: '999px',
+              fontSize: '12.5px',
+              fontWeight: (!bookmarkOnly && !revisionOnly && statusFilter === 'ALL') ? 700 : 500,
+              backgroundColor: (!bookmarkOnly && !revisionOnly && statusFilter === 'ALL')
+                ? '#2872A1'
+                : (isDark ? '#0B1F33' : '#EFF6FB'),
+              color: (!bookmarkOnly && !revisionOnly && statusFilter === 'ALL')
+                ? '#FFFFFF'
+                : (isDark ? '#CBDDE9' : '#475569'),
+              border: `1px solid ${(!bookmarkOnly && !revisionOnly && statusFilter === 'ALL') ? '#2872A1' : (isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9')}`,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            All Problems
+          </button>
+
+          {/* Revision Pill */}
+          <button
+            onClick={() => {
+              setBookmarkOnly(false);
+              setRevisionOnly(!revisionOnly);
+              if (!revisionOnly) setStatusFilter('ALL');
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '7px 14px',
+              borderRadius: '999px',
+              fontSize: '12.5px',
+              fontWeight: (revisionOnly || statusFilter === 'REVISION') ? 700 : 500,
+              backgroundColor: (revisionOnly || statusFilter === 'REVISION')
+                ? (isDark ? 'rgba(245, 158, 11, 0.25)' : '#FEF3C7')
+                : (isDark ? '#0B1F33' : '#EFF6FB'),
+              color: (revisionOnly || statusFilter === 'REVISION')
+                ? '#D97706'
+                : (isDark ? '#CBDDE9' : '#475569'),
+              border: `1px solid ${(revisionOnly || statusFilter === 'REVISION') ? '#F59E0B' : (isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9')}`,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <Star size={13} fill={(revisionOnly || statusFilter === 'REVISION') ? 'currentColor' : 'none'} />
+            <span>Revision</span>
+            {revisionsCount > 0 && (
+              <span
+                style={{
+                  padding: '1px 6px',
+                  borderRadius: '999px',
+                  backgroundColor: '#F59E0B',
+                  color: '#FFFFFF',
+                  fontSize: '10px',
+                  fontWeight: 800
+                }}
+              >
+                {revisionsCount}
+              </span>
+            )}
+          </button>
+
+          {/* Bookmarked Pill */}
+          <button
+            onClick={() => {
+              setRevisionOnly(false);
+              setBookmarkOnly(!bookmarkOnly);
+              if (!bookmarkOnly) setStatusFilter('ALL');
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '7px 14px',
+              borderRadius: '999px',
+              fontSize: '12.5px',
+              fontWeight: (bookmarkOnly || statusFilter === 'BOOKMARKED') ? 700 : 500,
+              backgroundColor: (bookmarkOnly || statusFilter === 'BOOKMARKED')
+                ? (isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB')
+                : (isDark ? '#0B1F33' : '#EFF6FB'),
+              color: (bookmarkOnly || statusFilter === 'BOOKMARKED')
+                ? '#2872A1'
+                : (isDark ? '#CBDDE9' : '#475569'),
+              border: `1px solid ${(bookmarkOnly || statusFilter === 'BOOKMARKED') ? '#2872A1' : (isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9')}`,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <Bookmark size={13} fill={(bookmarkOnly || statusFilter === 'BOOKMARKED') ? 'currentColor' : 'none'} />
+            <span>Bookmarked</span>
+            {bookmarksCount > 0 && (
+              <span
+                style={{
+                  padding: '1px 6px',
+                  borderRadius: '999px',
+                  backgroundColor: '#2872A1',
+                  color: '#FFFFFF',
+                  fontSize: '10px',
+                  fontWeight: 800
+                }}
+              >
+                {bookmarksCount}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Random Problem Action Button */}
+        {onPickRandom && (
+          <button
+            onClick={onPickRandom}
+            title="Pick a random matching problem"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '7px 16px',
+              borderRadius: '10px',
+              backgroundColor: isDark ? 'rgba(40, 114, 161, 0.2)' : '#EFF6FB',
+              color: isDark ? '#4A90C2' : '#2872A1',
+              border: `1px solid ${isDark ? 'rgba(74, 144, 194, 0.3)' : '#CBDDE9'}`,
+              fontSize: '12.5px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <Dices size={15} />
+            <span>Random Problem</span>
+          </button>
+        )}
+      </div>
+
+      {/* ── Search & Filter Selectors Row ── */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: '12px',
           alignItems: 'center',
           width: '100%'
@@ -72,7 +232,7 @@ export default function DsaFilters({
         {/* Search Box */}
         <div style={{ position: 'relative', width: '100%' }}>
           <Search
-            size={16}
+            size={15}
             style={{
               position: 'absolute',
               left: '14px',
@@ -83,12 +243,12 @@ export default function DsaFilters({
           />
           <input
             type="text"
-            placeholder="Search problems, topics, tags, company..."
+            placeholder="Search problems, patterns, tags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
               width: '100%',
-              padding: '10px 36px 10px 38px',
+              padding: '9px 34px 9px 36px',
               borderRadius: '10px',
               border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'}`,
               backgroundColor: isDark ? '#0B1F33' : '#EFF6FB',
@@ -121,13 +281,26 @@ export default function DsaFilters({
           )}
         </div>
 
-        {/* Topic Selector */}
+        {/* Problem Status Filter Dropdown */}
         <select
-          value={selectedTopicId}
-          onChange={(e) => setSelectedTopicId(e.target.value)}
+          value={statusFilter}
+          onChange={(e) => {
+            const val = e.target.value;
+            setStatusFilter(val);
+            if (val === 'REVISION') {
+              setRevisionOnly(true);
+              setBookmarkOnly(false);
+            } else if (val === 'BOOKMARKED') {
+              setBookmarkOnly(true);
+              setRevisionOnly(false);
+            } else {
+              setBookmarkOnly(false);
+              setRevisionOnly(false);
+            }
+          }}
           style={{
             width: '100%',
-            padding: '10px 14px',
+            padding: '9px 12px',
             borderRadius: '10px',
             border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'}`,
             backgroundColor: isDark ? '#0B1F33' : '#EFF6FB',
@@ -139,80 +312,72 @@ export default function DsaFilters({
             boxSizing: 'border-box'
           }}
         >
-          <option value="ALL">All 18 Chapters</option>
-          {topics.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.chapterNumber ? `${String(t.chapterNumber).padStart(2, '0')} - ` : ''}
-              {t.title || t.name}
+          {STATUS_OPTIONS.map((st) => (
+            <option key={st.id} value={st.id}>
+              {st.label}
             </option>
           ))}
         </select>
 
-        {/* Bookmark & Revision Quick Filters */}
+        {/* Difficulty Filter Dropdown */}
+        <select
+          value={difficultyFilter}
+          onChange={(e) => setDifficultyFilter(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '9px 12px',
+            borderRadius: '10px',
+            border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'}`,
+            backgroundColor: isDark ? '#0B1F33' : '#EFF6FB',
+            color: isDark ? '#F3F7FB' : '#0D1B2A',
+            fontSize: '13px',
+            outline: 'none',
+            fontFamily: "'Poppins', sans-serif",
+            cursor: 'pointer',
+            boxSizing: 'border-box'
+          }}
+        >
+          {DIFFICULTIES.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.label}
+            </option>
+          ))}
+        </select>
+
+        {/* Topic Selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button
-            onClick={() => {
-              if (!bookmarkOnly && revisionOnly && setRevisionOnly) setRevisionOnly(false);
-              setBookmarkOnly(!bookmarkOnly);
-            }}
+          <select
+            value={selectedTopicId}
+            onChange={(e) => setSelectedTopicId(e.target.value)}
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              padding: '9px 14px',
+              width: '100%',
+              padding: '9px 12px',
               borderRadius: '10px',
-              backgroundColor: bookmarkOnly
-                ? (isDark ? 'rgba(245, 158, 11, 0.2)' : '#FFFBEB')
-                : (isDark ? '#0B1F33' : '#EFF6FB'),
-              border: `1px solid ${bookmarkOnly ? '#F59E0B' : (isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9')}`,
-              color: bookmarkOnly ? '#F59E0B' : (isDark ? '#8EA6BC' : '#475569'),
-              fontSize: '12.5px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
+              border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'}`,
+              backgroundColor: isDark ? '#0B1F33' : '#EFF6FB',
+              color: isDark ? '#F3F7FB' : '#0D1B2A',
+              fontSize: '13px',
+              outline: 'none',
               fontFamily: "'Poppins', sans-serif",
+              cursor: 'pointer',
+              boxSizing: 'border-box',
               flex: 1
             }}
           >
-            <Bookmark size={14} fill={bookmarkOnly ? 'currentColor' : 'none'} />
-            <span>Saved</span>
-          </button>
+            <option value="ALL">All 18 Topics</option>
+            {topics.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.chapterNumber ? `${String(t.chapterNumber).padStart(2, '0')} - ` : ''}
+                {t.title || t.name}
+              </option>
+            ))}
+          </select>
 
-          <button
-            onClick={() => {
-              if (!revisionOnly && bookmarkOnly) setBookmarkOnly(false);
-              if (setRevisionOnly) setRevisionOnly(!revisionOnly);
-            }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              padding: '9px 14px',
-              borderRadius: '10px',
-              backgroundColor: revisionOnly
-                ? (isDark ? 'rgba(245, 158, 11, 0.2)' : '#FFFBEB')
-                : (isDark ? '#0B1F33' : '#EFF6FB'),
-              border: `1px solid ${revisionOnly ? '#F59E0B' : (isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9')}`,
-              color: revisionOnly ? '#F59E0B' : (isDark ? '#8EA6BC' : '#475569'),
-              fontSize: '12.5px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              fontFamily: "'Poppins', sans-serif",
-              flex: 1
-            }}
-          >
-            <Star size={14} fill={revisionOnly ? 'currentColor' : 'none'} />
-            <span>Revision</span>
-          </button>
-
-          {/* Reset button if active */}
+          {/* Reset Filters Icon Button */}
           {hasActiveFilters && (
             <button
               onClick={onResetFilters}
-              title="Reset all filters"
+              title="Clear all filters"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -231,89 +396,6 @@ export default function DsaFilters({
               <RotateCcw size={14} />
             </button>
           )}
-        </div>
-      </div>
-
-      {/* Bottom Row: Difficulty & Status Quick Filter Pills */}
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '12px',
-          paddingTop: '8px',
-          borderTop: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.1)' : '#EFF6FB'}`
-        }}
-      >
-        {/* Difficulty Pills */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#8EA6BC' : '#64748B', marginRight: '4px' }}>
-            Difficulty:
-          </span>
-          {DIFFICULTIES.map((diff) => {
-            const isSelected = difficultyFilter === diff.id;
-            return (
-              <button
-                key={diff.id}
-                onClick={() => setDifficultyFilter(diff.id)}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: '999px',
-                  fontSize: '12px',
-                  fontWeight: isSelected ? 700 : 500,
-                  border: isSelected
-                    ? `1.5px solid ${diff.color || '#2872A1'}`
-                    : `1px solid ${isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9'}`,
-                  backgroundColor: isSelected
-                    ? (isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB')
-                    : 'transparent',
-                  color: isSelected
-                    ? (diff.color || '#2872A1')
-                    : (isDark ? '#8EA6BC' : '#475569'),
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                {diff.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Status Pills */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#8EA6BC' : '#64748B', marginRight: '4px' }}>
-            Status:
-          </span>
-          {STATUSES.map((st) => {
-            const isSelected = statusFilter === st.id;
-            return (
-              <button
-                key={st.id}
-                onClick={() => setStatusFilter(st.id)}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: '999px',
-                  fontSize: '12px',
-                  fontWeight: isSelected ? 700 : 500,
-                  border: isSelected
-                    ? '1.5px solid #2872A1'
-                    : `1px solid ${isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9'}`,
-                  backgroundColor: isSelected
-                    ? (isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB')
-                    : 'transparent',
-                  color: isSelected
-                    ? '#2872A1'
-                    : (isDark ? '#8EA6BC' : '#475569'),
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                {st.label}
-              </button>
-            );
-          })}
         </div>
       </div>
     </div>

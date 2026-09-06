@@ -37,7 +37,7 @@ const UnderProgress = ({ page = 'Coding', onReturn }) => {
         <div style={{
           width: '72px',
           height: '72px',
-          background: 'linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)',
+          background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
           borderRadius: '22px',
           display: 'flex',
           alignItems: 'center',
@@ -54,10 +54,10 @@ const UnderProgress = ({ page = 'Coding', onReturn }) => {
         {/* Text Area */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '540px' }}>
           <h2 style={{ fontSize: '34px', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.2 }}>
-            {page} <span style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Module</span> Offline
+            {page} <span style={{ background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Module</span> Offline
           </h2>
           <p style={{ fontSize: '16px', color: 'var(--text-secondary)', fontWeight: 500, lineHeight: 1.6, margin: 0 }}>
-            The requested {page.toLowerCase()} section for <span style={{ color: '#6366f1', fontWeight: 700 }}>Sun Nexus Solutions</span> is undergoing maintenance or optimization.
+            The requested {page.toLowerCase()} section for <span style={{ color: '#2872A1', fontWeight: 700 }}>Sun Nexus Solutions</span> is undergoing maintenance or optimization.
           </p>
         </div>
 
@@ -65,7 +65,7 @@ const UnderProgress = ({ page = 'Coding', onReturn }) => {
         <button
           onClick={handleReturn}
           style={{
-            background: 'linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)',
+            background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
             color: '#ffffff',
             border: 'none',
             borderRadius: '999px',

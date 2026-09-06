@@ -27,8 +27,8 @@ const StatCard = ({ icon: Icon, label, value, color, glowColor, delay, showDivid
       padding: '1.45rem 1.65rem',
       gap: '1.25rem',
       borderRadius: '20px',
-      background: 'var(--card-bg, #070a14)',
-      border: '1px solid var(--card-border, rgba(255, 255, 255, 0.08))',
+      background: 'var(--card-bg, #0E2740)',
+      border: '1px solid var(--card-border, rgba(203, 221, 233, 0.15))',
       boxShadow: 'var(--card-shadow, 0 10px 30px rgba(0, 0, 0, 0.4))'
     }}
   >
@@ -204,11 +204,11 @@ const Dashboard = () => {
       const statusColor =
         p.status === 'completed' ? '#22c55e' :
         p.status === 'planning'  ? '#f59e0b' :
-        '#6366f1';
+        '#2872A1';
       const statusBg =
         p.status === 'completed' ? 'rgba(34,197,94,0.12)' :
         p.status === 'planning'  ? 'rgba(245,158,11,0.12)' :
-        'rgba(99,102,241,0.12)';
+        'rgba(40,114,161,0.15)';
       const completion = Number(p.completion || p.completionPercentage) || 0;
       items.push({
         _type: 'project',
@@ -314,9 +314,9 @@ const Dashboard = () => {
           className="flex flex-col gap-2"
         >
           {/* Operator Status Pill Badge */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '999px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.12) 100%)', border: '1.5px solid rgba(168, 85, 247, 0.35)', width: 'fit-content', boxShadow: '0 4px 14px rgba(168, 85, 247, 0.12)' }}>
-            <Sparkles size={14} style={{ color: '#c084fc' }} />
-            <span style={{ fontSize: '11.5px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#c084fc' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '999px', background: 'linear-gradient(135deg, rgba(40, 114, 161, 0.22) 0%, rgba(74, 144, 194, 0.15) 100%)', border: '1.5px solid rgba(74, 144, 194, 0.35)', width: 'fit-content', boxShadow: '0 4px 14px rgba(40, 114, 161, 0.15)' }}>
+            <Sparkles size={14} style={{ color: '#4A90C2' }} />
+            <span style={{ fontSize: '11.5px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#4A90C2' }}>
               OPERATOR DASHBOARD HUB
             </span>
           </div>
@@ -356,12 +356,12 @@ const Dashboard = () => {
 
             return (
               <>
-                {/* SYSTEM TIME CARD (Purple Cyber Glass) */}
+                {/* SYSTEM TIME CARD (Solar Cyan / Imperial Blue Glass) */}
                 <motion.div
                   whileHover={{
                     y: -5,
-                    boxShadow: '0 18px 42px rgba(168, 85, 247, 0.38), 0 0 28px rgba(168, 85, 247, 0.28)',
-                    borderColor: 'rgba(168, 85, 247, 0.75)'
+                    boxShadow: '0 18px 42px rgba(74, 144, 194, 0.38), 0 0 28px rgba(74, 144, 194, 0.28)',
+                    borderColor: 'rgba(74, 144, 194, 0.75)'
                   }}
                   transition={{ duration: 0.25 }}
                   style={{
@@ -369,8 +369,8 @@ const Dashboard = () => {
                     background: 'var(--time-card-bg)',
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
-                    border: '1.5px solid var(--time-card-border, rgba(168, 85, 247, 0.45))',
-                    boxShadow: 'var(--time-card-shadow, 0 8px 32px rgba(168, 85, 247, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08))',
+                    border: '1.5px solid var(--time-card-border, rgba(74, 144, 194, 0.45))',
+                    boxShadow: 'var(--time-card-shadow, 0 8px 32px rgba(40, 114, 161, 0.15), inset 0 1px 0 rgba(203, 221, 233, 0.15))',
                     padding: '1.4rem 1.6rem',
                     minWidth: '240px',
                     display: 'flex',
@@ -385,14 +385,14 @@ const Dashboard = () => {
                         width: '40px', 
                         height: '40px', 
                         borderRadius: '13px', 
-                        backgroundColor: 'rgba(168, 85, 247, 0.12)', 
-                        border: '1px solid rgba(168, 85, 247, 0.28)', 
+                        backgroundColor: 'rgba(74, 144, 194, 0.12)', 
+                        border: '1px solid rgba(74, 144, 194, 0.28)', 
                         display: 'flex', 
                         alignItems: 'center', 
                         justifyContent: 'center' 
                       }}
                     >
-                      <Clock size={19} color="#a855f7" strokeWidth={2.5} />
+                      <Clock size={19} color="#4A90C2" strokeWidth={2.5} />
                     </div>
                     <span 
                       style={{ 
@@ -400,7 +400,7 @@ const Dashboard = () => {
                         fontWeight: 800, 
                         letterSpacing: '0.14em', 
                         textTransform: 'uppercase', 
-                        color: '#a855f7' 
+                        color: '#4A90C2' 
                       }}
                     >
                       SYSTEM TIME
@@ -419,7 +419,7 @@ const Dashboard = () => {
                     >
                       {timeDigits}
                     </span>
-                    <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#a855f7', lineHeight: 1 }}>
+                    <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#4A90C2', lineHeight: 1 }}>
                       {timePeriod}
                     </span>
                   </div>
@@ -430,13 +430,13 @@ const Dashboard = () => {
                       width: '85%', 
                       height: '3px', 
                       borderRadius: '99px', 
-                      backgroundColor: 'rgba(168, 85, 247, 0.18)', 
+                      backgroundColor: 'rgba(40, 114, 161, 0.2)', 
                       display: 'flex', 
                       alignItems: 'center' 
                     }}
                   >
-                    <div style={{ width: '30%', height: '100%', borderRadius: '99px', background: 'linear-gradient(90deg, #a855f7 0%, #c084fc 100%)' }} />
-                    <div style={{ width: '9px', height: '9px', borderRadius: '50%', backgroundColor: '#c084fc', boxShadow: '0 0 10px #c084fc', marginLeft: '-4px' }} />
+                    <div style={{ width: '30%', height: '100%', borderRadius: '99px', background: 'linear-gradient(90deg, #2872A1 0%, #4A90C2 100%)' }} />
+                    <div style={{ width: '9px', height: '9px', borderRadius: '50%', backgroundColor: '#4A90C2', boxShadow: '0 0 10px #4A90C2', marginLeft: '-4px' }} />
                   </div>
                 </motion.div>
 
@@ -454,7 +454,7 @@ const Dashboard = () => {
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
                     border: '1.5px solid var(--date-card-border, rgba(6, 182, 212, 0.45))',
-                    boxShadow: 'var(--date-card-shadow, 0 8px 32px rgba(6, 182, 212, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08))',
+                    boxShadow: 'var(--date-card-shadow, 0 8px 32px rgba(6, 182, 212, 0.15), inset 0 1px 0 rgba(203, 221, 233, 0.15))',
                     padding: '1.4rem 1.6rem',
                     minWidth: '240px',
                     display: 'flex',
@@ -520,7 +520,7 @@ const Dashboard = () => {
                   </div>
                 </motion.div>
 
-                {/* STREAK CARD (Orange/Amber Cyber Glass) placed directly after DATE CARD */}
+                {/* STREAK CARD (Orange/Amber Cyber Glass) */}
                 <motion.div
                   whileHover={{
                     y: -5,
@@ -534,7 +534,7 @@ const Dashboard = () => {
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
                     border: '1.5px solid var(--streak-card-border, rgba(249, 115, 22, 0.45))',
-                    boxShadow: 'var(--streak-card-shadow, 0 8px 32px rgba(249, 115, 22, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08))',
+                    boxShadow: 'var(--streak-card-shadow, 0 8px 32px rgba(249, 115, 22, 0.15), inset 0 1px 0 rgba(203, 221, 233, 0.15))',
                     padding: '1.4rem 1.6rem',
                     minWidth: '240px',
                     display: 'flex',
@@ -619,11 +619,11 @@ const Dashboard = () => {
       {/* Quick Stats Grid matching reference image */}
       <div className="flex flex-col gap-6">
         <div className="dashboard-stats-grid">
-          <StatCard icon={Star} label="Total XP" value={user?.xp || 0} color="#a855f7" glowColor="#a855f7" delay={0.1} />
+          <StatCard icon={Star} label="Total XP" value={user?.xp || 0} color="#4A90C2" glowColor="#4A90C2" delay={0.1} />
           <StatCard icon={TrendingUp} label="Avg Accuracy" value={`${stats.avg}%`} color="#10b981" glowColor="#10b981" delay={0.2} />
-          <StatCard icon={Target} label="Assessments" value={stats.count} color="#3b82f6" glowColor="#3b82f6" delay={0.3} />
+          <StatCard icon={Target} label="Assessments" value={stats.count} color="#2872A1" glowColor="#2872A1" delay={0.3} />
           <StatCard icon={Award} label="Best Score" value={`${stats.best}%`} color="#f97316" glowColor="#f97316" delay={0.4} />
-          <StatCard icon={Rocket} label="System Projects" value={projectStats.total} color="#6366f1" glowColor="#6366f1" delay={0.5} />
+          <StatCard icon={Rocket} label="System Projects" value={projectStats.total} color="#2872A1" glowColor="#2872A1" delay={0.5} />
           <StatCard icon={Layers} label="My Projects" value={myProjects.length} color="#06b6d4" glowColor="#06b6d4" delay={0.6} />
         </div>
       </div>
@@ -643,8 +643,8 @@ const Dashboard = () => {
           style={{
             padding: 'clamp(1.75rem, 2.5vw, 2.35rem)',
             borderRadius: '24px',
-            background: 'var(--card-bg, #070a14)',
-            border: '1px solid var(--card-border, rgba(255, 255, 255, 0.08))',
+            background: 'var(--card-bg, #0E2740)',
+            border: '1px solid var(--card-border, rgba(203, 221, 233, 0.15))',
             boxShadow: 'var(--card-shadow, 0 15px 35px rgba(0, 0, 0, 0.4))'
           }}
         >
@@ -656,26 +656,26 @@ const Dashboard = () => {
                     width: '44px',
                     height: '44px',
                     borderRadius: '14px',
-                    backgroundColor: 'rgba(168, 85, 247, 0.12)',
-                    border: '1.5px solid rgba(168, 85, 247, 0.32)',
-                    boxShadow: '0 0 16px rgba(168, 85, 247, 0.15)',
+                    backgroundColor: 'rgba(74, 144, 194, 0.12)',
+                    border: '1.5px solid rgba(74, 144, 194, 0.32)',
+                    boxShadow: '0 0 16px rgba(40, 114, 161, 0.15)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0
                   }}
                 >
-                  <Activity size={22} color="#a855f7" strokeWidth={2.5} />
+                  <Activity size={22} color="#4A90C2" strokeWidth={2.5} />
                 </div>
                 <div>
                   <h3
                     className="text-xl sm:text-2xl font-black tracking-tight"
                     style={{
                       margin: 0,
-                      background: 'linear-gradient(135deg, var(--text-primary) 0%, #c084fc 100%)',
+                      background: 'linear-gradient(135deg, var(--text-primary) 0%, #4A90C2 100%)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
-                      filter: 'drop-shadow(0 2px 8px rgba(168, 85, 247, 0.2))'
+                      filter: 'drop-shadow(0 2px 8px rgba(40, 114, 161, 0.2))'
                     }}
                   >
                     Performance Pulse
@@ -686,7 +686,7 @@ const Dashboard = () => {
                       fontWeight: 900,
                       textTransform: 'uppercase',
                       letterSpacing: '0.14em',
-                      color: '#a855f7',
+                      color: '#4A90C2',
                       display: 'block',
                       marginTop: '2px'
                     }}
@@ -705,15 +705,15 @@ const Dashboard = () => {
                     padding: '9px 18px',
                     borderRadius: '14px',
                     background: isTimeDropdownOpen
-                      ? 'linear-gradient(135deg, rgba(168, 85, 247, 0.22) 0%, rgba(99, 102, 241, 0.22) 100%)'
-                      : 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(99, 102, 241, 0.06) 100%)',
+                      ? 'linear-gradient(135deg, rgba(40, 114, 161, 0.25) 0%, rgba(74, 144, 194, 0.2) 100%)'
+                      : 'linear-gradient(135deg, rgba(40, 114, 161, 0.12) 0%, rgba(74, 144, 194, 0.08) 100%)',
                     border: isTimeDropdownOpen
-                      ? '1.5px solid rgba(168, 85, 247, 0.65)'
-                      : '1.5px solid rgba(168, 85, 247, 0.32)',
+                      ? '1.5px solid rgba(74, 144, 194, 0.65)'
+                      : '1.5px solid rgba(74, 144, 194, 0.32)',
                     boxShadow: isTimeDropdownOpen
-                      ? '0 6px 20px rgba(168, 85, 247, 0.25), 0 0 15px rgba(168, 85, 247, 0.15)'
-                      : '0 4px 14px rgba(168, 85, 247, 0.08)',
-                    color: '#a855f7',
+                      ? '0 6px 20px rgba(40, 114, 161, 0.25), 0 0 15px rgba(74, 144, 194, 0.15)'
+                      : '0 4px 14px rgba(40, 114, 161, 0.08)',
+                    color: '#4A90C2',
                     fontSize: '12.5px',
                     fontWeight: 800,
                     letterSpacing: '0.04em',
@@ -722,12 +722,12 @@ const Dashboard = () => {
                     transition: 'all 0.25s ease'
                   }}
                 >
-                  <Calendar size={14} style={{ color: '#a855f7' }} />
+                  <Calendar size={14} style={{ color: '#4A90C2' }} />
                   <span>{timeRange}</span>
                   <ChevronDown
                     size={14}
                     style={{
-                      color: '#a855f7',
+                      color: '#4A90C2',
                       transform: isTimeDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                       transition: 'transform 0.25s ease'
                     }}
@@ -744,9 +744,9 @@ const Dashboard = () => {
                       minWidth: '165px',
                       padding: '6px',
                       borderRadius: '18px',
-                      backgroundColor: 'var(--card-bg, #0b0f19)',
-                      border: '1.5px solid rgba(168, 85, 247, 0.35)',
-                      boxShadow: '0 16px 45px rgba(0, 0, 0, 0.45), 0 0 20px rgba(168, 85, 247, 0.15)',
+                      backgroundColor: 'var(--card-bg, #0E2740)',
+                      border: '1.5px solid rgba(74, 144, 194, 0.35)',
+                      boxShadow: '0 16px 45px rgba(0, 0, 0, 0.45), 0 0 20px rgba(40, 114, 161, 0.15)',
                       backdropFilter: 'blur(20px)',
                       display: 'flex',
                       flexDirection: 'column',
@@ -769,8 +769,8 @@ const Dashboard = () => {
                           padding: '10px 14px',
                           borderRadius: '12px',
                           border: 'none',
-                          backgroundColor: timeRange === opt.label ? 'rgba(168, 85, 247, 0.18)' : 'transparent',
-                          color: timeRange === opt.label ? '#a855f7' : 'var(--text-primary)',
+                          backgroundColor: timeRange === opt.label ? 'rgba(40, 114, 161, 0.22)' : 'transparent',
+                          color: timeRange === opt.label ? '#4A90C2' : 'var(--text-primary)',
                           fontSize: '12.5px',
                           fontWeight: 800,
                           display: 'flex',
@@ -864,7 +864,7 @@ const Dashboard = () => {
                   title="Click to refresh telemetry data"
                   className="flex items-center justify-center p-1.5 rounded-full hover:bg-white/10 active:scale-90 transition-all cursor-pointer ml-0.5"
                   style={{
-                    color: isSyncing ? '#a855f7' : 'var(--text-muted)',
+                    color: isSyncing ? '#4A90C2' : 'var(--text-muted)',
                     background: 'transparent',
                     border: 'none'
                   }}
@@ -898,7 +898,7 @@ const Dashboard = () => {
                   className="absolute bottom-0 left-0 right-0 pointer-events-none opacity-40"
                   style={{
                     height: '110px',
-                    background: 'radial-gradient(ellipse at 30% 120%, rgba(139, 92, 246, 0.35) 0%, transparent 70%), radial-gradient(ellipse at 80% 120%, rgba(59, 130, 246, 0.3) 0%, transparent 70%)'
+                    background: 'radial-gradient(ellipse at 30% 120%, rgba(40, 114, 161, 0.35) 0%, transparent 70%), radial-gradient(ellipse at 80% 120%, rgba(59, 130, 246, 0.3) 0%, transparent 70%)'
                   }}
                 />
 
@@ -909,11 +909,11 @@ const Dashboard = () => {
                       width: '56px',
                       height: '56px',
                       borderRadius: '16px',
-                      backgroundColor: 'rgba(168, 85, 247, 0.12)',
-                      border: '1px solid rgba(168, 85, 247, 0.28)'
+                      backgroundColor: 'rgba(74, 144, 194, 0.12)',
+                      border: '1px solid rgba(74, 144, 194, 0.28)'
                     }}
                   >
-                    <BarChart3 size={24} color="#a855f7" strokeWidth={2.2} />
+                    <BarChart3 size={24} color="#4A90C2" strokeWidth={2.2} />
                   </div>
                   <p className="text-sm font-semibold text-muted">
                     Insufficient assessment data.
@@ -929,16 +929,16 @@ const Dashboard = () => {
           <motion.div
             whileHover={{
               y: -5,
-              boxShadow: '0 24px 55px rgba(168, 85, 247, 0.35), 0 0 35px rgba(6, 182, 212, 0.25)',
-              borderColor: 'rgba(168, 85, 247, 0.65)'
+              boxShadow: '0 24px 55px rgba(6, 182, 212, 0.25), 0 0 35px rgba(40, 114, 161, 0.25)',
+              borderColor: 'rgba(6, 182, 212, 0.65)'
             }}
             transition={{ duration: 0.3 }}
             className="h-full flex flex-col justify-between"
             style={{
               padding: 'clamp(1.75rem, 2.5vw, 2.35rem)',
               borderRadius: '24px',
-              background: 'var(--card-bg, #070a14)',
-              border: '1px solid var(--card-border, rgba(255, 255, 255, 0.08))',
+              background: 'var(--card-bg, #0E2740)',
+              border: '1px solid var(--card-border, rgba(203, 221, 233, 0.15))',
               boxShadow: 'var(--card-shadow, 0 15px 35px rgba(0, 0, 0, 0.4))'
             }}
           >
@@ -1048,9 +1048,9 @@ const Dashboard = () => {
                   {recentActivity.map((res, i) => {
                     // Project-type row
                     if (res._type === 'project') {
-                      const scoreColor  = res.scoreColor  || '#6366f1';
-                      const scoreBg     = res.scoreBg     || 'rgba(99,102,241,0.12)';
-                      const scoreBorder = res.scoreBorder || 'rgba(99,102,241,0.35)';
+                      const scoreColor  = res.scoreColor  || '#2872A1';
+                      const scoreBg     = res.scoreBg     || 'rgba(40,114,161,0.15)';
+                      const scoreBorder = res.scoreBorder || 'rgba(74,144,194,0.35)';
                       const dateStr = res.submittedAt
                         ? new Date(res.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                         : '—';
@@ -1063,7 +1063,7 @@ const Dashboard = () => {
                             padding: '12px 16px',
                             borderRadius: '16px',
                             background: 'var(--item-row-bg, rgba(255,255,255,0.025))',
-                            border: '1px solid var(--card-border, rgba(255,255,255,0.07))',
+                            border: '1px solid var(--card-border, rgba(203, 221, 233, 0.12))',
                             transition: 'all 0.22s ease',
                             cursor: 'default',
                           }}
@@ -1074,7 +1074,7 @@ const Dashboard = () => {
                           }}
                           onMouseLeave={e => {
                             e.currentTarget.style.background = 'var(--item-row-bg, rgba(255,255,255,0.025))';
-                            e.currentTarget.style.borderColor = 'var(--card-border, rgba(255,255,255,0.07))';
+                            e.currentTarget.style.borderColor = 'var(--card-border, rgba(203, 221, 233, 0.12))';
                             e.currentTarget.style.boxShadow = 'none';
                           }}
                         >
@@ -1150,7 +1150,7 @@ const Dashboard = () => {
                           padding: '12px 16px',
                           borderRadius: '16px',
                           background: 'var(--item-row-bg, rgba(255,255,255,0.025))',
-                          border: '1px solid var(--card-border, rgba(255,255,255,0.07))',
+                          border: '1px solid var(--card-border, rgba(203, 221, 233, 0.12))',
                           transition: 'all 0.22s ease',
                           cursor: 'default',
                         }}
@@ -1161,7 +1161,7 @@ const Dashboard = () => {
                         }}
                         onMouseLeave={e => {
                           e.currentTarget.style.background = 'var(--item-row-bg, rgba(255,255,255,0.025))';
-                          e.currentTarget.style.borderColor = 'var(--card-border, rgba(255,255,255,0.07))';
+                          e.currentTarget.style.borderColor = 'var(--card-border, rgba(203, 221, 233, 0.12))';
                           e.currentTarget.style.boxShadow = 'none';
                         }}
                       >

@@ -12,9 +12,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 
 const CATEGORY_META = [
-  { title: 'Quantitative',      code: 'QA', icon: Target,        color: '#4f46e5' },
-  { title: 'Logical Reasoning', code: 'LR', icon: Brain,         color: '#06b6d4' },
-  { title: 'Verbal Ability',    code: 'VA', icon: MessageSquare, color: '#f59e0b' },
+  { title: 'Quantitative',      code: 'QA', icon: Target,        color: '#2872A1' },
+  { title: 'Logical Reasoning', code: 'LR', icon: Brain,         color: '#4A90C2' },
+  { title: 'Verbal Ability',    code: 'VA', icon: MessageSquare, color: '#10B981' },
 ];
 
 const YOUTUBE_LINKS = {
@@ -33,27 +33,27 @@ const YOUTUBE_LINKS = {
   'Cloze Test':                'https://www.youtube.com/results?search_query=cloze+test+verbal+ability',
 };
 
-/** Purple 3D Brain Illustration for Card 1 */
+/** Imperial Blue 3D Brain Illustration for Card 1 */
 const Purple3DBrainSvg = () => (
   <div style={{ width: '180px', height: '140px', margin: '12px auto', position: 'relative', display: 'flex', flexShrink: 0, alignItems: 'center', justifyContent: 'center' }}>
     <svg viewBox="0 0 200 160" style={{ width: '100%', height: '100%' }}>
       <defs>
         <linearGradient id="purpleBrainGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#c084fc" />
-          <stop offset="50%" stopColor="#9333ea" />
-          <stop offset="100%" stopColor="#6b21a8" />
+          <stop offset="0%" stopColor="#4A90C2" />
+          <stop offset="50%" stopColor="#2872A1" />
+          <stop offset="100%" stopColor="#143555" />
         </linearGradient>
         <linearGradient id="purpleBrainGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#e9d5ff" />
-          <stop offset="100%" stopColor="#a855f7" />
+          <stop offset="0%" stopColor="#CBDDE9" />
+          <stop offset="100%" stopColor="#4A90C2" />
         </linearGradient>
         <linearGradient id="puzzleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="100%" stopColor="#e9d5ff" />
+          <stop offset="100%" stopColor="#EFF6FB" />
         </linearGradient>
       </defs>
 
-      <ellipse cx="100" cy="142" rx="55" ry="10" fill="#6b21a8" opacity="0.15" />
+      <ellipse cx="100" cy="142" rx="55" ry="10" fill="#143555" opacity="0.15" />
 
       {/* Left Hemisphere */}
       <path
@@ -75,21 +75,21 @@ const Purple3DBrainSvg = () => (
       <path d="M 138 105 C 155 90, 140 70, 118 78 C 112 95, 125 115, 138 105 Z" fill="url(#purpleBrainGrad1)" />
       <path d="M 120 120 C 135 115, 130 95, 110 92 C 105 105, 110 125, 120 120 Z" fill="url(#purpleBrainGrad2)" />
 
-      <path d="M 98 42 C 96 70, 97 100, 99 125" stroke="#d8b4fe" strokeWidth="3" strokeLinecap="round" opacity="0.7" />
+      <path d="M 98 42 C 96 70, 97 100, 99 125" stroke="#CBDDE9" strokeWidth="3" strokeLinecap="round" opacity="0.7" />
 
       {/* Floating 3D Puzzle Piece */}
       <g transform="translate(86, 22) scale(0.9)">
         <path
           d="M 10 10 L 22 10 C 22 5, 27 5, 27 10 L 38 10 L 38 22 C 43 22, 43 27, 38 27 L 38 38 L 27 38 C 27 43, 22 43, 22 38 L 10 38 L 10 27 C 5 27, 5 22, 10 22 Z"
           fill="url(#puzzleGrad)"
-          stroke="#c084fc"
+          stroke="#4A90C2"
           strokeWidth="2"
         />
       </g>
 
-      <circle cx="35" cy="50" r="3" fill="#e9d5ff" opacity="0.8" />
-      <circle cx="165" cy="45" r="4" fill="#c084fc" opacity="0.7" />
-      <circle cx="160" cy="110" r="3.5" fill="#f3e8ff" opacity="0.9" />
+      <circle cx="35" cy="50" r="3" fill="#CBDDE9" opacity="0.8" />
+      <circle cx="165" cy="45" r="4" fill="#4A90C2" opacity="0.7" />
+      <circle cx="160" cy="110" r="3.5" fill="#EFF6FB" opacity="0.9" />
     </svg>
   </div>
 );
@@ -270,17 +270,17 @@ const Aptitude = () => {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <div style={{ padding: '6px', borderRadius: '8px', backgroundColor: isDark ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)', color: '#6366f1' }}>
+                <div style={{ padding: '6px', borderRadius: '8px', backgroundColor: isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB', color: isDark ? '#4A90C2' : '#2872A1' }}>
                   <TrendingUp size={18} />
                 </div>
-                <span style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: isDark ? '#94a3b8' : '#64748b' }}>
+                <span style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: isDark ? '#4A90C2' : '#2872A1' }}>
                   SKILL ASSESSMENT
                 </span>
               </div>
-              <h1 style={{ fontSize: '38px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
+              <h1 style={{ fontSize: '38px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
                 Aptitude & Logical Reasoning
               </h1>
-              <p style={{ fontSize: '15px', color: isDark ? '#94a3b8' : '#64748b', margin: 0, fontWeight: 500 }}>
+              <p style={{ fontSize: '15px', color: isDark ? '#CBDDE9' : '#415A77', margin: 0, fontWeight: 500 }}>
                 Select a category to explore topics and sharpen your skills.
               </p>
             </div>
@@ -297,9 +297,9 @@ const Aptitude = () => {
                   onClick={() => setSelectedCategory(cat.title)}
                   style={{
                     borderRadius: '24px',
-                    backgroundColor: isDark ? 'var(--bg-secondary, #1e293b)' : '#ffffff',
-                    border: isDark ? '1px solid var(--border-subtle, rgba(255,255,255,0.1))' : '1px solid #e2e8f0',
-                    boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.35)' : '0 4px 20px rgba(0,0,0,0.04)',
+                    backgroundColor: isDark ? '#0E2740' : '#ffffff',
+                    border: isDark ? '1px solid rgba(203, 221, 233, 0.15)' : '1px solid #CBDDE9',
+                    boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.35)' : '0 4px 20px rgba(13, 27, 42, 0.04)',
                     padding: '28px',
                     cursor: 'pointer',
                     display: 'flex',
@@ -314,16 +314,16 @@ const Aptitude = () => {
                     <div style={{ width: '48px', height: '48px', borderRadius: '16px', backgroundColor: isDark ? `${cat.color}25` : `${cat.color}15`, color: cat.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {React.createElement(cat.icon, { size: 24 })}
                     </div>
-                    <span style={{ padding: '4px 10px', borderRadius: '8px', backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#f1f5f9', color: isDark ? '#cbd5e1' : '#475569', fontSize: '11px', fontWeight: 800 }}>
+                    <span style={{ padding: '4px 10px', borderRadius: '8px', backgroundColor: isDark ? 'rgba(203,221,233,0.1)' : '#EFF6FB', color: isDark ? '#CBDDE9' : '#2872A1', fontSize: '11px', fontWeight: 800 }}>
                       {cat.code}
                     </span>
                   </div>
 
                   <div>
-                    <h3 style={{ fontSize: '22px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 6px 0' }}>
+                    <h3 style={{ fontSize: '22px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 6px 0' }}>
                       {cat.title}
                     </h3>
-                    <p style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#94a3b8' : '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
+                    <p style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#8EA6BC' : '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
                       {topicCount > 0 ? `${topicCount} Topics Available` : 'Modules Active'}
                     </p>
                   </div>
@@ -354,14 +354,14 @@ const Aptitude = () => {
         </div>
       )}
 
-      {/* Selected Category Topics View (With Pixel-Perfect UI Header + 3D Brain Cards) */}
+      {/* Selected Category Topics View */}
       {selectedCategory && (
         <>
           {/* Top Navigation Link */}
           <div style={{ marginBottom: '12px' }}>
             <button
               onClick={() => setSelectedCategory(null)}
-              style={{ background: 'none', border: 'none', color: isDark ? '#a78bfa' : '#7c3aed', fontWeight: 700, fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: isDark ? '#4A90C2' : '#2872A1', fontWeight: 700, fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
             >
               <ArrowLeft size={16} />
               <span>Back to Categories</span>
@@ -370,10 +370,10 @@ const Aptitude = () => {
 
           {/* Top Header Row */}
           <div style={{ marginBottom: '32px' }}>
-            <h1 style={{ fontSize: '36px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
+            <h1 style={{ fontSize: '36px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
               {selectedCategory} Topics
             </h1>
-            <p style={{ fontSize: '15px', color: isDark ? '#94a3b8' : '#64748b', margin: 0, fontWeight: 500 }}>
+            <p style={{ fontSize: '15px', color: isDark ? '#CBDDE9' : '#415A77', margin: 0, fontWeight: 500 }}>
               Select a module to explore your skills and unlock achievements.
             </p>
           </div>
@@ -383,8 +383,8 @@ const Aptitude = () => {
             <div style={{
               padding: '56px 32px',
               textAlign: 'center',
-              backgroundColor: isDark ? '#1e293b' : '#ffffff',
-              border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+              backgroundColor: isDark ? '#0E2740' : '#ffffff',
+              border: isDark ? '1px solid rgba(203, 221, 233, 0.15)' : '1px solid #CBDDE9',
               borderRadius: '28px',
               marginBottom: '36px',
               boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.2)' : '0 8px 30px rgba(0,0,0,0.03)',
@@ -397,19 +397,19 @@ const Aptitude = () => {
                 width: '64px',
                 height: '64px',
                 borderRadius: '20px',
-                backgroundColor: isDark ? '#334155' : '#f1f5f9',
+                backgroundColor: isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: '16px',
-                color: isDark ? '#94a3b8' : '#64748b'
+                color: isDark ? '#4A90C2' : '#2872A1'
               }}>
                 <HelpCircle size={32} />
               </div>
-              <h3 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
                 No Assessments Uploaded Yet
               </h3>
-              <p style={{ fontSize: '14px', fontWeight: 500, color: isDark ? '#94a3b8' : '#64748b', margin: 0, maxWidth: '420px', lineHeight: 1.6 }}>
+              <p style={{ fontSize: '14px', fontWeight: 500, color: isDark ? '#CBDDE9' : '#415A77', margin: 0, maxWidth: '420px', lineHeight: 1.6 }}>
                 There are currently no active assessment modules for <strong>{selectedCategory}</strong>. New tests uploaded from the Admin Panel will automatically appear here.
               </p>
             </div>
@@ -420,7 +420,6 @@ const Aptitude = () => {
                 const isCompleted = !!res;
                 const qCount = topicItem.questions ? topicItem.questions.length : 20;
                 const timeLimit = topicItem.timeLimit || 20;
-                const isPurple = idx % 2 === 0;
 
                 // Schedule Unlock Logic
                 const unlockDate = topicItem.unlockTime ? new Date(topicItem.unlockTime) : null;
@@ -435,13 +434,13 @@ const Aptitude = () => {
                     key={topicItem.id || idx}
                     style={{
                       borderRadius: '28px',
-                      backgroundColor: isDark ? '#1e293b' : (isPurple ? '#f0ebff' : '#e6f4f1'),
+                      backgroundColor: isDark ? '#0E2740' : '#FFFFFF',
                       border: isDark 
-                        ? (isPurple ? '1px solid rgba(124, 58, 237, 0.3)' : '1px solid rgba(16, 185, 129, 0.3)')
-                        : (isPurple ? '1px solid #d8cefe' : '1px solid #b2e5d9'),
+                        ? '1px solid rgba(203, 221, 233, 0.15)'
+                        : '1px solid #CBDDE9',
                       boxShadow: isDark 
-                        ? (isPurple ? '0 8px 30px rgba(124, 58, 237, 0.15)' : '0 8px 30px rgba(16, 185, 129, 0.15)')
-                        : (isPurple ? '0 8px 30px rgba(124, 58, 237, 0.05)' : '0 8px 30px rgba(16, 185, 129, 0.05)'),
+                        ? '0 8px 30px rgba(0,0,0,0.35)'
+                        : '0 6px 20px rgba(40, 114, 161, 0.08)',
                       padding: '32px',
                       display: 'flex',
                       flexDirection: 'column',
@@ -451,10 +450,10 @@ const Aptitude = () => {
                   >
                     {/* Header Badges */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                      <span style={{ padding: '6px 14px', borderRadius: '9999px', backgroundColor: isDark ? (isPurple ? 'rgba(124, 58, 237, 0.2)' : 'rgba(16, 185, 129, 0.2)') : (isPurple ? '#e4dcff' : '#d1f2e9'), color: isDark ? (isPurple ? '#c084fc' : '#34d399') : (isPurple ? '#6d28d9' : '#047857'), fontSize: '12px', fontWeight: 800, letterSpacing: '0.05em' }}>
+                      <span style={{ padding: '6px 14px', borderRadius: '9999px', backgroundColor: isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB', color: isDark ? '#4A90C2' : '#2872A1', fontSize: '12px', fontWeight: 800, letterSpacing: '0.05em' }}>
                         {topicItem.week || `WEEK ${Math.floor(idx / 2) + 1}`}
                       </span>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '9999px', backgroundColor: isScheduledLocked ? (isDark ? 'rgba(239, 68, 68, 0.2)' : '#fee2e2') : (isDark ? 'rgba(255,255,255,0.08)' : (isPurple ? '#ddd3fe' : '#c2eee1')), color: isScheduledLocked ? '#ef4444' : (isDark ? '#f8fafc' : (isPurple ? '#6d28d9' : '#047857')), fontSize: '12px', fontWeight: 800 }}>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '9999px', backgroundColor: isScheduledLocked ? (isDark ? 'rgba(239, 68, 68, 0.2)' : '#fee2e2') : (isDark ? 'rgba(203,221,233,0.1)' : '#EFF6FB'), color: isScheduledLocked ? '#ef4444' : (isDark ? '#CBDDE9' : '#2872A1'), fontSize: '12px', fontWeight: 800 }}>
                         {isScheduledLocked ? <Lock size={14} /> : (isCompleted ? <Award size={14} /> : <Zap size={14} />)}
                         <span>
                           {isScheduledLocked 
@@ -469,25 +468,25 @@ const Aptitude = () => {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', margin: '8px 0' }}>
                       <div style={{ flex: 1 }}>
                         {/* Stat Indicators */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', fontWeight: 800, color: isDark ? (isPurple ? '#c084fc' : '#34d399') : (isPurple ? '#6d28d9' : '#059669'), marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', fontWeight: 800, color: isDark ? '#4A90C2' : '#2872A1', marginBottom: '16px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isPurple ? '#6d28d9' : '#059669' }}>
+                            <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isDark ? '#4A90C2' : '#2872A1' }}>
                               <HelpCircle size={14} />
                             </div>
-                            <span style={{ color: isDark ? '#f8fafc' : '#0f172a' }}>{qCount} QNS</span>
+                            <span style={{ color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{qCount} QNS</span>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isPurple ? '#6d28d9' : '#059669' }}>
+                            <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isDark ? '#4A90C2' : '#2872A1' }}>
                               <Clock size={14} />
                             </div>
-                            <span style={{ color: isDark ? '#f8fafc' : '#0f172a' }}>{timeLimit} MIN</span>
+                            <span style={{ color: isDark ? '#F3F7FB' : '#0D1B2A' }}>{timeLimit} MIN</span>
                           </div>
                         </div>
 
-                        <h3 style={{ fontSize: '24px', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
+                        <h3 style={{ fontSize: '24px', fontWeight: 900, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
                           {topicItem.topic || topicItem.title}
                         </h3>
-                        <p style={{ fontSize: '13px', color: isDark ? '#94a3b8' : '#475569', lineHeight: 1.5, margin: '0 0 20px 0', maxWidth: '280px', fontWeight: 500 }}>
+                        <p style={{ fontSize: '13px', color: isDark ? '#CBDDE9' : '#415A77', lineHeight: 1.5, margin: '0 0 20px 0', maxWidth: '280px', fontWeight: 500 }}>
                           Focused practice module covering core concepts for {topicItem.topic || topicItem.title}.
                         </p>
 
@@ -499,9 +498,9 @@ const Aptitude = () => {
                             style={{
                               padding: '10px 18px',
                               borderRadius: '12px',
-                              border: isPurple ? (isDark ? '2px solid #a78bfa' : '2px solid #a78bfa') : (isDark ? '2px solid #34d399' : '2px solid #34d399'),
-                              backgroundColor: isDark ? (isPurple ? 'rgba(124, 58, 237, 0.25)' : 'rgba(16, 185, 129, 0.25)') : (isPurple ? '#e4dcff' : '#c2eee1'),
-                              color: isDark ? (isPurple ? '#c084fc' : '#34d399') : (isPurple ? '#6d28d9' : '#047857'),
+                              border: isDark ? '1.5px solid rgba(74, 144, 194, 0.45)' : '1.5px solid #2872A1',
+                              backgroundColor: isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB',
+                              color: isDark ? '#4A90C2' : '#2872A1',
                               fontSize: '12px',
                               fontWeight: 900,
                               cursor: 'pointer',
@@ -527,15 +526,18 @@ const Aptitude = () => {
                             style={{
                               padding: '10px 24px',
                               borderRadius: '12px',
-                              border: isScheduledLocked ? '2px solid #cbd5e1' : (isPurple ? '2px solid #a78bfa' : '2px solid #34d399'),
-                              backgroundColor: isScheduledLocked ? (isDark ? '#334155' : '#f1f5f9') : (isDark ? '#1e293b' : 'rgba(255,255,255,0.7)'),
-                              color: isScheduledLocked ? '#94a3b8' : (isDark ? (isPurple ? '#c084fc' : '#34d399') : (isPurple ? '#6d28d9' : '#059669')),
+                              border: isScheduledLocked ? '1px solid #CBDDE9' : 'none',
+                              background: isScheduledLocked 
+                                ? (isDark ? '#143555' : '#E2ECF4') 
+                                : 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
+                              color: '#FFFFFF',
                               fontSize: '12px',
                               fontWeight: 900,
                               cursor: isScheduledLocked ? 'not-allowed' : 'pointer',
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: '8px',
+                              boxShadow: isScheduledLocked ? 'none' : '0 4px 14px rgba(40, 114, 161, 0.35)',
                               transition: 'all 0.2s',
                               letterSpacing: '0.05em',
                               opacity: isScheduledLocked ? 0.8 : 1
@@ -556,8 +558,8 @@ const Aptitude = () => {
           {/* Bottom Feature Highlights Banner */}
           <div
             style={{
-              backgroundColor: isDark ? '#1e293b' : '#ffffff',
-              border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+              backgroundColor: isDark ? '#0E2740' : '#ffffff',
+              border: isDark ? '1px solid rgba(203, 221, 233, 0.15)' : '1px solid #CBDDE9',
               borderRadius: '20px',
               padding: '24px',
               display: 'grid',
@@ -567,48 +569,48 @@ const Aptitude = () => {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-              <div style={{ width: '40px', height: '40px', minWidth: '40px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(124, 58, 237, 0.2)' : '#f3e8ff', color: isDark ? '#c084fc' : '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '40px', height: '40px', minWidth: '40px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB', color: isDark ? '#4A90C2' : '#2872A1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Target size={20} />
               </div>
               <div>
-                <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 4px 0' }}>Sharpen Your Skills</h4>
-                <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: 0, lineHeight: 1.4 }}>
+                <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 4px 0' }}>Sharpen Your Skills</h4>
+                <p style={{ fontSize: '12px', color: isDark ? '#CBDDE9' : '#64748B', margin: 0, lineHeight: 1.4 }}>
                   Practice with curated topics and real-world questions.
                 </p>
               </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-              <div style={{ width: '40px', height: '40px', minWidth: '40px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(249, 115, 22, 0.2)' : '#ffedd5', color: isDark ? '#fb923c' : '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '40px', height: '40px', minWidth: '40px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(74, 144, 194, 0.2)' : '#EFF6FB', color: isDark ? '#4A90C2' : '#2872A1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Award size={20} />
               </div>
               <div>
-                <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 4px 0' }}>Track Progress</h4>
-                <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: 0, lineHeight: 1.4 }}>
+                <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 4px 0' }}>Track Progress</h4>
+                <p style={{ fontSize: '12px', color: isDark ? '#CBDDE9' : '#64748B', margin: 0, lineHeight: 1.4 }}>
                   Monitor your performance and stay consistent.
                 </p>
               </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-              <div style={{ width: '40px', height: '40px', minWidth: '40px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(59, 130, 246, 0.2)' : '#dbeafe', color: isDark ? '#60a5fa' : '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '40px', height: '40px', minWidth: '40px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(40, 114, 161, 0.25)' : '#EFF6FB', color: isDark ? '#4A90C2' : '#2872A1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <BarChart3 size={20} />
               </div>
               <div>
-                <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 4px 0' }}>Beat Your Best</h4>
-                <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: 0, lineHeight: 1.4 }}>
+                <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 4px 0' }}>Beat Your Best</h4>
+                <p style={{ fontSize: '12px', color: isDark ? '#CBDDE9' : '#64748B', margin: 0, lineHeight: 1.4 }}>
                   Improve accuracy and speed over time.
                 </p>
               </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-              <div style={{ width: '40px', height: '40px', minWidth: '40px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(236, 72, 153, 0.2)' : '#fce7f3', color: isDark ? '#f472b6' : '#ec4899', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '40px', height: '40px', minWidth: '40px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(74, 144, 194, 0.2)' : '#EFF6FB', color: isDark ? '#4A90C2' : '#2872A1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Trophy size={20} />
               </div>
               <div>
-                <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', margin: '0 0 4px 0' }}>Unlock Achievements</h4>
-                <p style={{ fontSize: '12px', color: isDark ? '#94a3b8' : '#64748b', margin: 0, lineHeight: 1.4 }}>
+                <h4 style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#F3F7FB' : '#0D1B2A', margin: '0 0 4px 0' }}>Unlock Achievements</h4>
+                <p style={{ fontSize: '12px', color: isDark ? '#CBDDE9' : '#64748B', margin: 0, lineHeight: 1.4 }}>
                   Complete modules and earn badges.
                 </p>
               </div>
@@ -629,7 +631,7 @@ const Aptitude = () => {
           width: '48px',
           height: '48px',
           borderRadius: '50%',
-          backgroundColor: '#6366f1',
+          backgroundColor: '#2872A1',
           color: '#ffffff',
           border: 'none',
           boxShadow: '0 4px 20px rgba(99, 102, 241, 0.45)',

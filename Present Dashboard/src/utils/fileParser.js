@@ -334,7 +334,7 @@ export const extractProjectsFromExcel = async (file) => {
         github: String(row[gitCol] || '#'),
         live: String(row[liveCol] || '#'),
         team,
-        color: '#6366f1'
+        color: '#2872A1'
       };
     });
   } catch (error) {

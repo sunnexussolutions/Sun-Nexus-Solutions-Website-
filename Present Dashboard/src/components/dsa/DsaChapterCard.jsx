@@ -23,7 +23,8 @@ export default function DsaChapterCard({
   onToggleRevision,
   onOpenNotes,
   onToggleStatus,
-  onSolve,
+  onOpenDetails,
+  onPractice,
   isInitiallyExpanded = false
 }) {
   const [isExpanded, setIsExpanded] = useState(isInitiallyExpanded);
@@ -221,7 +222,8 @@ export default function DsaChapterCard({
                 onToggleRevision={onToggleRevision}
                 onOpenNotes={onOpenNotes}
                 onToggleStatus={onToggleStatus}
-                onSolve={onSolve}
+                onOpenDetails={onOpenDetails}
+                onPractice={onPractice}
               />
             ))
           ) : (
@@ -239,7 +241,8 @@ export default function DsaChapterCard({
                   onToggleRevision={onToggleRevision}
                   onOpenNotes={onOpenNotes}
                   onToggleStatus={onToggleStatus}
-                  onSolve={onSolve}
+                  onOpenDetails={onOpenDetails}
+                  onPractice={onPractice}
                 />
               ))}
             </div>

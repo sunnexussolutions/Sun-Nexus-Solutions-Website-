@@ -14,7 +14,8 @@ export default function DsaSectionCard({
   onToggleRevision,
   onOpenNotes,
   onToggleStatus,
-  onSolve,
+  onOpenDetails,
+  onPractice,
   defaultExpanded = true
 }) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
@@ -131,7 +132,8 @@ export default function DsaSectionCard({
               onToggleRevision={onToggleRevision}
               onOpenNotes={onOpenNotes}
               onToggleStatus={onToggleStatus}
-              onSolve={onSolve}
+              onOpenDetails={onOpenDetails}
+              onPractice={onPractice}
             />
           ))}
         </div>

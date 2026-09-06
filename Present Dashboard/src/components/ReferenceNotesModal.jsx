@@ -205,7 +205,7 @@ const ReferenceNotesModal = ({ topicItem, onClose, onStartAssessment }) => {
           }}
         >
           {/* Header Bar matching Reference UI */}
-          <div style={{ padding: '22px 24px', background: 'linear-gradient(135deg, #6366f1 0%, #7c3aed 100%)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ padding: '22px 24px', background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ width: '42px', height: '42px', borderRadius: '14px', backgroundColor: 'rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <BookOpen size={22} style={{ color: '#ffffff' }} />
@@ -258,7 +258,7 @@ const ReferenceNotesModal = ({ topicItem, onClose, onStartAssessment }) => {
             {/* Cheatsheet Banner */}
             {refData.cheatsheet && (
               <div style={{ padding: '16px 18px', borderRadius: '18px', background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)', border: '1.5px solid #c7d2fe', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <Zap size={22} style={{ color: '#4f46e5', flexShrink: 0 }} />
+                <Zap size={22} style={{ color: '#2872A1', flexShrink: 0 }} />
                 <div>
                   <span style={{ fontSize: '10.5px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#4338ca' }}>QUICK FORMULA CHEATSHEET</span>
                   <p style={{ fontSize: '13.5px', fontWeight: 800, color: '#1e1b4b', margin: '3px 0 0 0' }}>

@@ -1194,3 +1194,15 @@ export const toggleAdminDsaProblemStatus = async (id, isVisible) => {
   });
   return res.json();
 };
+
+export const bulkImportDsa = async ({ items, rawJson, rawCsv }) => {
+  const res = await fetch(`${getBackendUrl()}/api/dsa/import`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-User-Id': getCurrentUserId()
+    },
+    body: JSON.stringify({ items, rawJson, rawCsv })
+  });
+  return res.json();
+};

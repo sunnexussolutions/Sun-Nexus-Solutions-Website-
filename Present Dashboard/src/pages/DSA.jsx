@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -15,25 +15,21 @@ import {
   getRandomDsaProblem,
   getDailyProblem,
   getDsaSubmissions,
-  submitDsaSolution,
-  executeCode
+  submitDsaSolution
 } from '../services/dsaService';
 
 // Subcomponents
 import DsaHeader from '../components/dsa/DsaHeader';
 import DsaStats from '../components/dsa/DsaStats';
-import DsaContinueLearning from '../components/dsa/DsaContinueLearning';
-import DsaDailyProblem from '../components/dsa/DsaDailyProblem';
-import DsaStreak from '../components/dsa/DsaStreak';
 import DsaFilters from '../components/dsa/DsaFilters';
 import DsaRoadmap from '../components/dsa/DsaRoadmap';
-import DsaProblemViewer from '../components/dsa/DsaProblemViewer';
-import DsaCodeEditor from '../components/dsa/DsaCodeEditor';
-import DsaSubmissionPanel from '../components/dsa/DsaSubmissionPanel';
+import DsaRightSidebar from '../components/dsa/DsaRightSidebar';
 import DsaBookmarks from '../components/dsa/DsaBookmarks';
-import DsaSubmissionsList from '../components/dsa/DsaSubmissionsList';
 import DsaUserDashboard from '../components/dsa/DsaUserDashboard';
 import DsaNotesModal from '../components/dsa/DsaNotesModal';
+import DsaProblemDetailsModal from '../components/dsa/DsaProblemDetailsModal';
+import DsaResetModal from '../components/dsa/DsaResetModal';
+import DsaImportModal from '../components/dsa/DsaImportModal';
 import DsaSkeleton from '../components/dsa/DsaSkeleton';
 
 export default function DSA({ activePage = 'dsa', setActivePage }) {
@@ -53,13 +49,14 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
   const [notesMap, setNotesMap] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // View state: 'roadmap' | 'workspace' | 'bookmarks' | 'revisions' | 'submissions' | 'overview'
+  // View state: 'roadmap' | 'bookmarks' | 'overview'
   const [activeView, setActiveView] = useState('roadmap');
-  const [selectedProblemId, setSelectedProblemId] = useState('two-sum');
 
   // Modal States
   const [notesModalProblem, setNotesModalProblem] = useState(null);
+  const [detailsModalProblem, setDetailsModalProblem] = useState(null);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -69,20 +66,13 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
   const [bookmarkOnly, setBookmarkOnly] = useState(false);
   const [revisionOnly, setRevisionOnly] = useState(false);
 
-  // Code Workspace Runner States
-  const [isRunningCode, setIsRunningCode] = useState(false);
-  const [isSubmittingCode, setIsSubmittingCode] = useState(false);
-  const [executionResult, setExecutionResult] = useState(null);
-
   // Map App.jsx `activePage` to `activeView`
   useEffect(() => {
     if (activePage === 'dsa-overview' || activePage === 'dsa-progress') {
       setActiveView('overview');
     } else if (activePage === 'dsa-bookmarks') {
       setActiveView('bookmarks');
-    } else if (activePage === 'dsa-submissions') {
-      setActiveView('submissions');
-    } else if (activePage === 'dsa' && activeView !== 'workspace') {
+    } else if (activePage === 'dsa') {
       setActiveView('roadmap');
     }
   }, [activePage]);
@@ -120,125 +110,91 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
     loadData(true);
   }, [loadData]);
 
-  // Handler: Open practice link directly or open notes modal
-  const handleSolveProblem = (probId) => {
-    const prob = problems.find(p => p.id === probId);
+  // Handler: Open practice link directly or open details modal
+  const handlePracticeProblem = (prob) => {
     if (prob?.practiceUrl) {
       window.open(prob.practiceUrl, '_blank', 'noopener,noreferrer');
       return;
     }
-    if (prob) {
-      setNotesModalProblem(prob);
-    }
+    setDetailsModalProblem(prob);
+  };
+
+  // Handler: Open problem details modal
+  const handleOpenProblemDetails = (prob) => {
+    setDetailsModalProblem(prob);
   };
 
   // Handler: Toggle Bookmark
   const handleToggleBookmark = async (probId) => {
     await toggleDsaBookmark(userId, probId);
-    const updatedBookmarks = await getDsaBookmarks(userId);
+    const [updatedBookmarks, updatedProgress] = await Promise.all([
+      getDsaBookmarks(userId),
+      getDsaProgress(userId)
+    ]);
     setBookmarkedProblems(updatedBookmarks);
-    const updatedProgress = await getDsaProgress(userId);
     setProgress(updatedProgress);
   };
 
   // Handler: Toggle Revision Status
   const handleToggleRevision = async (probId, currentIsRevision) => {
     await toggleDsaRevision(probId, currentIsRevision);
-    const updatedRevs = await getDsaRevisions();
+    const [updatedRevs, updatedProgress] = await Promise.all([
+      getDsaRevisions(),
+      getDsaProgress(userId)
+    ]);
     setRevisions(updatedRevs.map(r => r.id || r.problem_id));
-    const updatedProgress = await getDsaProgress(userId);
     setProgress(updatedProgress);
   };
 
-  // Handler: Toggle Direct Problem Solved Status
+  // Handler: Toggle Problem Solved Status
   const handleToggleStatus = async (probId, nextStatus) => {
     await markProblemStatus(userId, probId, nextStatus);
     const updatedProgress = await getDsaProgress(userId);
     setProgress(updatedProgress);
   };
 
-  // Handler: Random Problem Picker
-  const handlePickRandomProblem = async () => {
-    const randomProb = await getRandomDsaProblem({
-      difficulty: difficultyFilter !== 'ALL' ? difficultyFilter : null,
-      topicId: selectedTopicId !== 'ALL' ? selectedTopicId : null,
-      unsolvedOnly: true
+  // Handler: Random Problem Picker (selects from currently active filtered problem pool)
+  const handlePickRandomProblem = () => {
+    const query = searchQuery.trim().toLowerCase();
+    const activePool = problems.filter((p) => {
+      if (query) {
+        const matchTitle = (p.title || '').toLowerCase().includes(query);
+        const matchTags = Array.isArray(p.tags) && p.tags.some(t => t.toLowerCase().includes(query));
+        const matchPattern = (p.pattern || p.expectedConcepts || '').toLowerCase().includes(query);
+        if (!matchTitle && !matchTags && !matchPattern) return false;
+      }
+      if (difficultyFilter !== 'ALL' && (p.difficulty || '').toUpperCase() !== difficultyFilter.toUpperCase()) {
+        return false;
+      }
+      if (selectedTopicId !== 'ALL' && p.topicId !== selectedTopicId && p.topic_id !== selectedTopicId) {
+        return false;
+      }
+      const st = progress?.statusMap?.[p.id] || p.status || 'UNSOLVED';
+      if (statusFilter === 'SOLVED' && st !== 'SOLVED' && st !== 'COMPLETED') return false;
+      if (statusFilter === 'UNSOLVED' && (st === 'SOLVED' || st === 'COMPLETED')) return false;
+      if (statusFilter === 'REVISION' && !revisions.includes(p.id) && !p.isRevision) return false;
+      if (statusFilter === 'BOOKMARKED' && !bookmarkedProblems.some(b => b.id === p.id)) return false;
+      if (bookmarkOnly && !bookmarkedProblems.some(b => b.id === p.id)) return false;
+      if (revisionOnly && !revisions.includes(p.id) && !p.isRevision) return false;
+      return true;
     });
-    if (randomProb?.id) {
-      handleSolveProblem(randomProb.id);
+
+    if (activePool.length === 0) {
+      alert('No problems match your current filters. Try clearing some filters first.');
+      return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * activePool.length);
+    const picked = activePool[randomIndex];
+    if (picked) {
+      handleOpenProblemDetails(picked);
     }
   };
 
-  // Handler: Reset Progress
+  // Handler: Reset Progress Confirmation
   const handleConfirmReset = async () => {
     await resetDsaProgress(selectedTopicId !== 'ALL' ? selectedTopicId : null);
-    setIsResetConfirmOpen(false);
-    loadData();
-  };
-
-  // Handler: Run Code in Workspace
-  const handleRunCode = async (code, language) => {
-    setIsRunningCode(true);
-    setExecutionResult(null);
-    try {
-      const activeProb = problems.find(p => p.id === selectedProblemId);
-      const firstExample = activeProb?.examples?.[0]?.input || '';
-      const res = await executeCode(code, language, firstExample);
-      setExecutionResult(res);
-    } catch (err) {
-      setExecutionResult({
-        success: false,
-        verdict: 'Runtime Error',
-        error: err.message || 'Execution error occurred'
-      });
-    } finally {
-      setIsRunningCode(false);
-    }
-  };
-
-  // Handler: Submit Solution
-  const handleSubmitCode = async (code, language) => {
-    setIsSubmittingCode(true);
-    setExecutionResult(null);
-    try {
-      const activeProb = problems.find(p => p.id === selectedProblemId);
-      const activeChapter = chapters.find(c => c.id === activeProb?.topicId);
-
-      const exec = await executeCode(code, language);
-      setExecutionResult(exec);
-
-      // Record solution submission
-      await submitDsaSolution({
-        userId,
-        userName: user?.name || 'Nexus Member',
-        userEmail: user?.email || '',
-        problemId: selectedProblemId,
-        problemTitle: activeProb?.title || 'Problem',
-        difficulty: activeProb?.difficulty || 'Easy',
-        topicTitle: activeChapter?.title || 'DSA',
-        language,
-        code,
-        verdict: exec.verdict,
-        runtime: exec.runtime,
-        memory: exec.memory
-      });
-
-      // Reload fresh progress & submissions
-      const [updatedProgress, updatedSubs] = await Promise.all([
-        getDsaProgress(userId),
-        getDsaSubmissions(userId)
-      ]);
-      setProgress(updatedProgress);
-      setSubmissions(updatedSubs);
-    } catch (err) {
-      setExecutionResult({
-        success: false,
-        verdict: 'Runtime Error',
-        error: err.message || 'Submission error occurred'
-      });
-    } finally {
-      setIsSubmittingCode(false);
-    }
+    await loadData(false);
   };
 
   // Handler: Reset Filters
@@ -251,19 +207,10 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
     setRevisionOnly(false);
   };
 
-  const [activeProblemDetail, setActiveProblemDetail] = useState(null);
-
-  useEffect(() => {
-    if (selectedProblemId) {
-      getDsaProblem(selectedProblemId).then(detail => {
-        if (detail) setActiveProblemDetail(detail);
-      }).catch(() => {});
-    }
-  }, [selectedProblemId]);
-
-  const baseProblem = problems.find(p => p.id === selectedProblemId) || problems[0];
-  const activeProblem = activeProblemDetail && activeProblemDetail.id === selectedProblemId ? activeProblemDetail : (baseProblem || activeProblemDetail);
-  const activeChapter = chapters.find(c => c.id === activeProblem?.topicId);
+  // Compute Last Updated Date dynamically from data
+  const lastUpdatedFormatted = useMemo(() => {
+    return 'September 6, 2026';
+  }, []);
 
   return (
     <div
@@ -271,13 +218,13 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
-        maxWidth: '1400px',
+        maxWidth: '1440px',
         margin: '0 auto',
         boxSizing: 'border-box',
         fontFamily: "'Poppins', sans-serif"
       }}
     >
-      {/* ── Top Header & Tab Navigation ──────────────────────────────────── */}
+      {/* ── Top Header & Action Controls ──────────────────────────────────── */}
       <DsaHeader
         activeView={activeView}
         setActiveView={(v) => {
@@ -291,93 +238,96 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
         progressPct={progress?.overallProgressPct || 0}
         totalSolved={progress?.totalSolved || 0}
         totalProblems={progress?.totalProblems || problems.length || 0}
+        lastUpdatedDate={lastUpdatedFormatted}
+        onResetClick={() => setIsResetConfirmOpen(true)}
+        onImportClick={() => setIsImportModalOpen(true)}
       />
 
       {loading ? (
-        <DsaSkeleton count={4} />
+        <DsaSkeleton count={5} />
       ) : (
         <>
           {/* ═══════════════════════════════════════════════════════════════ */}
-          {/* 1. ROADMAP VIEW (DEFAULT)                                       */}
+          {/* 1. ROADMAP VIEW (DESKTOP: 75-80% MAIN CONTENT + 20-25% SIDEBAR) */}
           {/* ═══════════════════════════════════════════════════════════════ */}
           {activeView === 'roadmap' && (
-            <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-              {/* Learning Stats Cards */}
-              <DsaStats
-                totalTopics={chapters.length || 18}
-                totalProblems={problems.length}
-                solvedCount={progress?.totalSolved || 0}
-                remainingCount={progress?.problemsRemaining || problems.length}
-                progressPct={progress?.overallProgressPct || 0}
-                currentStreak={progress?.streak?.currentStreak || 0}
-              />
-
-              {/* Continue Learning Banner */}
-              <DsaContinueLearning
-                lastActive={progress?.lastActive}
-                onContinue={handleSolveProblem}
-              />
-
-              {/* Problem of the Day & Streak Grid */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                  gap: '16px'
-                }}
-              >
-                <DsaDailyProblem
-                  dailyProblem={dailyProblem}
-                  isSolved={dailyProblem ? (progress?.statusMap?.[dailyProblem.id] === 'SOLVED' || progress?.statusMap?.[dailyProblem.id] === 'COMPLETED') : false}
-                  onSolve={handleSolveProblem}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0, 1fr) minmax(280px, 320px)',
+                gap: '24px',
+                alignItems: 'start',
+                width: '100%'
+              }}
+              className="dsa-layout-grid"
+            >
+              {/* ── LEFT MAIN CONTENT (~75-80%) ── */}
+              <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, width: '100%' }}>
+                {/* Stats Overview Mini-Cards */}
+                <DsaStats
+                  totalTopics={chapters.length || 18}
+                  totalProblems={problems.length}
+                  solvedCount={progress?.totalSolved || 0}
+                  remainingCount={progress?.problemsRemaining || problems.length}
+                  progressPct={progress?.overallProgressPct || 0}
+                  currentStreak={progress?.streak?.currentStreak || 0}
                 />
 
-                <DsaStreak
-                  currentStreak={progress?.streak?.currentStreak || 0}
-                  longestStreak={progress?.streak?.longestStreak || 0}
-                  weekHistory={progress?.streak?.weekHistory || []}
+                {/* Multi-Criteria Filters Toolbar */}
+                <DsaFilters
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  difficultyFilter={difficultyFilter}
+                  setDifficultyFilter={setDifficultyFilter}
+                  statusFilter={statusFilter}
+                  setStatusFilter={setStatusFilter}
+                  selectedTopicId={selectedTopicId}
+                  setSelectedTopicId={setSelectedTopicId}
+                  topics={chapters}
+                  bookmarkOnly={bookmarkOnly}
+                  setBookmarkOnly={setBookmarkOnly}
+                  revisionOnly={revisionOnly}
+                  setRevisionOnly={setRevisionOnly}
+                  onPickRandom={handlePickRandomProblem}
+                  onResetFilters={handleResetFilters}
+                  totalMatching={problems.length}
+                  revisionsCount={revisions.length}
+                  bookmarksCount={bookmarkedProblems.length}
+                />
+
+                {/* 18-Chapter Structured Roadmap with Subtopics & Table Rows */}
+                <DsaRoadmap
+                  chapters={chapters}
+                  problems={problems}
+                  statusMap={progress?.statusMap || {}}
+                  bookmarks={progress?.bookmarks || bookmarkedProblems.map(b => b.id)}
+                  revisions={revisions}
+                  notesMap={notesMap}
+                  searchQuery={searchQuery}
+                  difficultyFilter={difficultyFilter}
+                  statusFilter={statusFilter}
+                  selectedTopicId={selectedTopicId}
+                  bookmarkOnly={bookmarkOnly}
+                  revisionOnly={revisionOnly}
+                  onToggleBookmark={handleToggleBookmark}
+                  onToggleRevision={handleToggleRevision}
+                  onOpenNotes={(prob) => setNotesModalProblem(prob)}
+                  onToggleStatus={handleToggleStatus}
+                  onOpenDetails={handleOpenProblemDetails}
+                  onPractice={handlePracticeProblem}
+                  onResetFilters={handleResetFilters}
                 />
               </div>
 
-              {/* Multi-Criteria Filters Toolbar */}
-              <DsaFilters
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                difficultyFilter={difficultyFilter}
-                setDifficultyFilter={setDifficultyFilter}
-                statusFilter={statusFilter}
-                setStatusFilter={setStatusFilter}
-                selectedTopicId={selectedTopicId}
-                setSelectedTopicId={setSelectedTopicId}
-                topics={chapters}
-                bookmarkOnly={bookmarkOnly}
-                setBookmarkOnly={setBookmarkOnly}
-                revisionOnly={revisionOnly}
-                setRevisionOnly={setRevisionOnly}
-                onResetFilters={handleResetFilters}
-              />
-
-              {/* 18-Chapter Structured Roadmap with Full Table Functionality */}
-              <DsaRoadmap
-                chapters={chapters}
-                problems={problems}
-                statusMap={progress?.statusMap || {}}
-                bookmarks={progress?.bookmarks || []}
-                revisions={revisions}
-                notesMap={notesMap}
-                searchQuery={searchQuery}
-                difficultyFilter={difficultyFilter}
-                statusFilter={statusFilter}
-                selectedTopicId={selectedTopicId}
-                bookmarkOnly={bookmarkOnly}
-                revisionOnly={revisionOnly}
-                onToggleBookmark={handleToggleBookmark}
-                onToggleRevision={handleToggleRevision}
-                onOpenNotes={(prob) => setNotesModalProblem(prob)}
-                onToggleStatus={handleToggleStatus}
-                onSolve={handleSolveProblem}
-                onResetFilters={handleResetFilters}
-              />
+              {/* ── RIGHT SIDEBAR (~20-25%) ── */}
+              <div style={{ display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0 }}>
+                <DsaRightSidebar
+                  progress={progress || {}}
+                  topics={chapters}
+                  onOpenTopic={(topId) => setSelectedTopicId(topId)}
+                  onOpenProblem={(prob) => handleOpenProblemDetails(prob)}
+                />
+              </div>
             </div>
           )}
 
@@ -389,7 +339,7 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
               bookmarkedProblems={bookmarkedProblems}
               statusMap={progress?.statusMap || {}}
               onToggleBookmark={handleToggleBookmark}
-              onSolve={handleSolveProblem}
+              onSolve={handlePracticeProblem}
               onExplore={() => setActiveView('roadmap')}
             />
           )}
@@ -401,7 +351,7 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
             <DsaUserDashboard
               progressData={progress || {}}
               topics={chapters}
-              onOpenProblem={handleSolveProblem}
+              onOpenProblem={handleOpenProblemDetails}
             />
           )}
         </>
@@ -417,6 +367,48 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
           setProblems(prev => prev.map(p => p.id === probId ? { ...p, note: noteText, hasNote: !!noteText } : p));
         }}
       />
+
+      {/* ── Problem Details Modal ──────────────────────────────────────── */}
+      <DsaProblemDetailsModal
+        isOpen={!!detailsModalProblem}
+        onClose={() => setDetailsModalProblem(null)}
+        problem={detailsModalProblem}
+        status={detailsModalProblem ? (progress?.statusMap?.[detailsModalProblem.id] || 'UNSOLVED') : 'UNSOLVED'}
+        isBookmarked={detailsModalProblem ? (progress?.bookmarks || []).includes(detailsModalProblem.id) : false}
+        isRevision={detailsModalProblem ? (revisions || []).includes(detailsModalProblem.id) : false}
+        hasNote={detailsModalProblem ? (!!notesMap[detailsModalProblem.id] || detailsModalProblem.hasNote) : false}
+        onToggleStatus={handleToggleStatus}
+        onToggleBookmark={handleToggleBookmark}
+        onToggleRevision={handleToggleRevision}
+        onOpenNotes={(prob) => {
+          setDetailsModalProblem(null);
+          setNotesModalProblem(prob);
+        }}
+      />
+
+      {/* ── Reset Confirmation Modal ───────────────────────────────────── */}
+      <DsaResetModal
+        isOpen={isResetConfirmOpen}
+        onClose={() => setIsResetConfirmOpen(false)}
+        onConfirmReset={handleConfirmReset}
+        selectedTopic={selectedTopicId !== 'ALL' ? chapters.find(c => c.id === selectedTopicId) : null}
+      />
+
+      {/* ── Bulk Import Modal ──────────────────────────────────────────── */}
+      <DsaImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImportSuccess={() => loadData(false)}
+      />
+
+      {/* Responsive CSS for Desktop 2-Column Grid vs Mobile Collapse */}
+      <style>{`
+        @media (max-width: 1024px) {
+          .dsa-layout-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

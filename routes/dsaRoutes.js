@@ -1518,3 +1518,156 @@ adminDsaRouter.patch('/problems/:id/status', requireAdmin, async (req, res) => {
     return res.status(500).json({ success: false, error: { code: 'SERVER_ERROR', message: err.message } });
   }
 });
+
+// ── BULK IMPORT ENDPOINT (ADMIN & STUDENT IMPORT) ───────────────────────────
+const handleBulkImport = async (req, res) => {
+  try {
+    const { items, rawJson, rawCsv } = req.body;
+    let importList = [];
+
+    if (Array.isArray(items)) {
+      importList = items;
+    } else if (rawJson) {
+      try {
+        const parsed = JSON.parse(rawJson);
+        importList = Array.isArray(parsed) ? parsed : [parsed];
+      } catch (e) {
+        return res.status(400).json({ success: false, error: 'Invalid JSON format in import payload.' });
+      }
+    } else if (rawCsv) {
+      // Simple CSV parser
+      const lines = rawCsv.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length > 1) {
+        const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim().replace(/^["']|["']$/g, ''));
+          const item = {};
+          headers.forEach((h, idx) => {
+            item[h] = values[idx] || '';
+          });
+          importList.push(item);
+        }
+      }
+    }
+
+    if (!Array.isArray(importList) || importList.length === 0) {
+      return res.status(400).json({ success: false, error: 'No valid problems found to import.' });
+    }
+
+    let importedCount = 0;
+    let failedCount = 0;
+    const validationErrors = [];
+
+    // Fetch existing topics and sections to map names if provided
+    const existingTopics = await sql`SELECT id, title, name, slug FROM dsa_topics`;
+    const existingSections = await sql`SELECT id, topic_id, title FROM dsa_sections`;
+
+    for (let i = 0; i < importList.length; i++) {
+      const item = importList[i];
+      const index = i + 1;
+
+      if (!item.title || !String(item.title).trim()) {
+        failedCount++;
+        validationErrors.push({ row: index, title: item.title || 'Untitled', error: 'Missing required problem title.' });
+        continue;
+      }
+
+      const cleanTitle = String(item.title).trim();
+      const problemId = item.id || `prob_${cleanTitle.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${Date.now().toString().slice(-4)}`;
+      const difficulty = ['Easy', 'Medium', 'Hard'].includes(item.difficulty) ? item.difficulty : 'Easy';
+
+      // Resolve topicId
+      let topicId = item.topicId || item.topic_id || '';
+      if (!topicId && item.topic) {
+        const matchedTopic = existingTopics.find(t => 
+          (t.title && t.title.toLowerCase() === item.topic.toLowerCase()) ||
+          (t.name && t.name.toLowerCase() === item.topic.toLowerCase()) ||
+          (t.slug && t.slug.toLowerCase() === item.topic.toLowerCase())
+        );
+        if (matchedTopic) {
+          topicId = matchedTopic.id;
+        } else {
+          // Default to first topic
+          topicId = existingTopics[0]?.id || '01-basics';
+        }
+      } else if (!topicId) {
+        topicId = existingTopics[0]?.id || '01-basics';
+      }
+
+      // Resolve sectionId
+      let sectionId = item.sectionId || item.section_id || null;
+      if (!sectionId && item.subtopic) {
+        const matchedSec = existingSections.find(s => s.topic_id === topicId && s.title && s.title.toLowerCase().includes(item.subtopic.toLowerCase()));
+        if (matchedSec) sectionId = matchedSec.id;
+      }
+
+      try {
+        const desc = item.description || `Solve the ${cleanTitle} problem efficiently using appropriate algorithmic techniques.`;
+        const practiceUrl = item.practiceUrl || item.practice_url || null;
+        const videoUrl = item.videoUrl || item.video_url || null;
+        const articleUrl = item.articleUrl || item.article_url || item.resource_url || null;
+        const expectedConcepts = item.pattern || item.expectedConcepts || item.expected_concepts || null;
+        const isVisible = item.published !== false && item.isVisible !== false;
+
+        await sql`
+          INSERT INTO dsa_problems (
+            id, topic_id, section_id, title, slug, number, description, difficulty,
+            practice_url, video_url, article_url, expected_concepts, is_visible, updated_at
+          ) VALUES (
+            ${problemId}, ${topicId}, ${sectionId}, ${cleanTitle}, ${problemId},
+            (SELECT COALESCE(MAX(number), 0) + 1 FROM dsa_problems),
+            ${desc}, ${difficulty}, ${practiceUrl}, ${videoUrl}, ${articleUrl},
+            ${expectedConcepts}, ${isVisible}, CURRENT_TIMESTAMP
+          )
+          ON CONFLICT (id) DO UPDATE SET
+            title = EXCLUDED.title,
+            topic_id = EXCLUDED.topic_id,
+            section_id = COALESCE(EXCLUDED.section_id, dsa_problems.section_id),
+            difficulty = EXCLUDED.difficulty,
+            description = EXCLUDED.description,
+            practice_url = COALESCE(EXCLUDED.practice_url, dsa_problems.practice_url),
+            video_url = COALESCE(EXCLUDED.video_url, dsa_problems.video_url),
+            article_url = COALESCE(EXCLUDED.article_url, dsa_problems.article_url),
+            expected_concepts = COALESCE(EXCLUDED.expected_concepts, dsa_problems.expected_concepts),
+            is_visible = EXCLUDED.is_visible,
+            updated_at = CURRENT_TIMESTAMP;
+        `;
+
+        // Handle tags
+        let tags = item.tags;
+        if (typeof tags === 'string') tags = tags.split(',').map(s => s.trim()).filter(Boolean);
+        if (Array.isArray(tags) && tags.length > 0) {
+          for (const tName of tags) {
+            const cleanT = tName.trim();
+            const tId = cleanT.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            await sql`INSERT INTO dsa_tags (id, name) VALUES (${tId}, ${cleanT}) ON CONFLICT (name) DO NOTHING;`;
+            const tRow = await sql`SELECT id FROM dsa_tags WHERE LOWER(name) = LOWER(${cleanT}) LIMIT 1`;
+            if (tRow && tRow.length > 0) {
+              await sql`INSERT INTO dsa_problem_tags (problem_id, tag_id) VALUES (${problemId}, ${tRow[0].id}) ON CONFLICT DO NOTHING;`;
+            }
+          }
+        }
+
+        importedCount++;
+      } catch (insertErr) {
+        failedCount++;
+        validationErrors.push({ row: index, title: cleanTitle, error: insertErr.message });
+      }
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        totalReceived: importList.length,
+        importedCount,
+        failedCount,
+        errors: validationErrors
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: { code: 'IMPORT_ERROR', message: err.message } });
+  }
+};
+
+adminDsaRouter.post('/import', requireAdmin, handleBulkImport);
+dsaRouter.post('/import', handleBulkImport);

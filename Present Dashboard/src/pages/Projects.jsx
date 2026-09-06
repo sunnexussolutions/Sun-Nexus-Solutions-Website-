@@ -70,9 +70,9 @@ const TechBadge = ({ name, isDark }) => {
       fontWeight: 700,
       padding: '3px 9px',
       borderRadius: '8px',
-      backgroundColor: isDark ? 'rgba(99, 102, 241, 0.15)' : '#eef2ff',
-      color: isDark ? '#a5b4fc' : '#4f46e5',
-      border: `1px solid ${isDark ? 'rgba(99, 102, 241, 0.3)' : '#c7d2fe'}`,
+      backgroundColor: isDark ? 'rgba(40, 114, 161, 0.2)' : '#EFF6FB',
+      color: isDark ? '#4A90C2' : '#2872A1',
+      border: `1px solid ${isDark ? 'rgba(74, 144, 194, 0.35)' : '#CBDDE9'}`,
       whiteSpace: 'nowrap'
     }}>
       {n}
@@ -82,7 +82,8 @@ const TechBadge = ({ name, isDark }) => {
 
 const Projects = () => {
   const { user } = useAuth();
-  const { isDark } = useTheme();
+  const { theme, isDark: contextIsDark } = useTheme();
+  const isDark = contextIsDark !== undefined ? contextIsDark : theme === 'dark';
   const {
     projects,
     allProjects,
@@ -306,10 +307,10 @@ const Projects = () => {
   });
 
   // Theme colors
-  const cardBg = isDark ? '#0f172a' : '#ffffff';
-  const cardBorder = isDark ? '#1e293b' : '#e2e8f0';
-  const textPrimary = isDark ? '#f8fafc' : '#0f172a';
-  const textSecondary = isDark ? '#94a3b8' : '#64748b';
+  const cardBg = isDark ? '#0E2740' : '#FFFFFF';
+  const cardBorder = isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9';
+  const textPrimary = isDark ? '#F3F7FB' : '#0D1B2A';
+  const textSecondary = isDark ? '#CBDDE9' : '#415A77';
 
   // Filter Categories & Lists
   const categories = ['ALL', 'Advanced', 'Beginner', 'Ongoing', 'Web', 'Mobile', 'AI/ML', 'Cloud'];
@@ -944,7 +945,7 @@ const Projects = () => {
       return { label: 'Completed', bg: 'rgba(34,197,94,0.15)', color: '#22c55e', border: 'rgba(34,197,94,0.3)' };
     }
     if (s === 'in_progress' || s === 'ongoing') {
-      return { label: 'In Progress', bg: 'rgba(99,102,241,0.15)', color: '#6366f1', border: 'rgba(99,102,241,0.3)' };
+      return { label: 'In Progress', bg: isDark ? 'rgba(40, 114, 161, 0.2)' : '#EFF6FB', color: isDark ? '#4A90C2' : '#2872A1', border: isDark ? 'rgba(74, 144, 194, 0.35)' : '#CBDDE9' };
     }
     if (s === 'planning') {
       return { label: 'Planning', bg: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: 'rgba(245,158,11,0.3)' };
@@ -966,10 +967,10 @@ const Projects = () => {
         padding: '32px 24px',
         borderRadius: '28px',
         background: isDark
-          ? 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)'
-          : 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)',
-        border: `1px solid ${isDark ? '#3730a3' : '#c7d2fe'}`,
-        boxShadow: isDark ? '0 12px 32px rgba(0,0,0,0.4)' : '0 6px 24px rgba(99,102,241,0.1)',
+          ? 'linear-gradient(135deg, #0E2740 0%, #0B1F33 100%)'
+          : 'linear-gradient(135deg, #EFF6FB 0%, #E2ECF4 100%)',
+        border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9'}`,
+        boxShadow: isDark ? '0 12px 32px rgba(0,0,0,0.4)' : '0 6px 24px rgba(40, 114, 161, 0.08)',
         marginBottom: '28px',
         display: 'flex',
         alignItems: 'center',
@@ -979,17 +980,17 @@ const Projects = () => {
       }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '4px 12px', borderRadius: '12px', backgroundColor: user?.isAdmin ? '#a855f7' : '#6366f1', color: '#ffffff' }}>
+            <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '4px 12px', borderRadius: '12px', backgroundColor: '#2872A1', color: '#ffffff' }}>
               {user?.isAdmin ? 'Admin Master Control' : 'Member Workspace'}
             </span>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#c7d2fe' : '#4338ca' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#CBDDE9' : '#2872A1' }}>
               {user?.isAdmin ? 'Full System Projects Access' : 'Scoped to My Projects & Team Attributions'} 🛡️
             </span>
           </div>
-          <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 8px 0', letterSpacing: '-0.02em', color: isDark ? '#ffffff' : '#1e1b4b' }}>
+          <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 8px 0', letterSpacing: '-0.02em', color: isDark ? '#F3F7FB' : '#0D1B2A' }}>
             {user?.isAdmin ? 'ALL PROJECTS MANAGEMENT' : 'MY PROJECTS HUB'}
           </h1>
-          <p style={{ fontSize: '14px', color: isDark ? '#cbd5e1' : '#4338ca', margin: 0, maxWidth: '640px', lineHeight: 1.5 }}>
+          <p style={{ fontSize: '14px', color: isDark ? '#CBDDE9' : '#415A77', margin: 0, maxWidth: '640px', lineHeight: 1.5 }}>
             {user?.isAdmin
               ? 'Admin control center for system-wide project oversight, ownership transfers, interactive team member editing, and multi-dimensional filter management.'
               : 'Personal project dashboard for tracking your owned projects, team assignments, progress, and screenshot uploads.'}
@@ -1002,7 +1003,7 @@ const Projects = () => {
             style={{
               padding: '14px 20px',
               borderRadius: '16px',
-              backgroundColor: isDark ? '#1e293b' : '#e2e8f0',
+              backgroundColor: isDark ? '#143555' : '#E2ECF4',
               color: textPrimary,
               border: `1px solid ${cardBorder}`,
               fontSize: '13.5px',
@@ -1022,7 +1023,7 @@ const Projects = () => {
             style={{
               padding: '14px 26px',
               borderRadius: '16px',
-              background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+              background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
               color: '#ffffff',
               border: 'none',
               fontSize: '14px',
@@ -1031,7 +1032,7 @@ const Projects = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              boxShadow: '0 8px 24px rgba(99, 102, 241, 0.4)',
+              boxShadow: '0 8px 24px rgba(40, 114, 161, 0.35)',
               transition: 'transform 0.2s'
             }}
           >
@@ -1044,11 +1045,11 @@ const Projects = () => {
       {/* ── REALTIME STATS COUNTERS BAR (ROLE SCOPED) ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '28px' }}>
         {[
-          { label: user?.isAdmin ? 'SYSTEM PROJECTS' : 'MY TOTAL PROJECTS', val: projectStats.total, color: '#6366f1', icon: Layers, sub: user?.isAdmin ? 'All system projects' : 'Owned & assigned' },
+          { label: user?.isAdmin ? 'SYSTEM PROJECTS' : 'MY TOTAL PROJECTS', val: projectStats.total, color: isDark ? '#4A90C2' : '#2872A1', icon: Layers, sub: user?.isAdmin ? 'All system projects' : 'Owned & assigned' },
           { label: 'COMPLETED', val: projectStats.completed, color: '#22c55e', icon: CheckCircle2, sub: 'Finished & deployed' },
           { label: 'IN PROGRESS', val: projectStats.inProgress, color: '#06b6d4', icon: Flame, sub: 'Active development' },
           { label: 'PLANNING', val: projectStats.planning, color: '#f59e0b', icon: Clock, sub: 'Architecture & scope' },
-          { label: 'ATTRIBUTED WORK', val: myProjects.length, color: '#a855f7', icon: User, sub: 'Directly assigned' },
+          { label: 'ATTRIBUTED WORK', val: myProjects.length, color: isDark ? '#4A90C2' : '#2872A1', icon: User, sub: 'Directly assigned' },
         ].map((st, idx) => {
           const IconComp = st.icon;
           return (
@@ -1118,8 +1119,8 @@ const Projects = () => {
                 width: '100%',
                 padding: '12px 40px 12px 46px',
                 borderRadius: '14px',
-                backgroundColor: isDark ? '#020617' : '#f8fafc',
-                border: `1px solid ${isDark ? '#334155' : '#cbd5e1'}`,
+                backgroundColor: isDark ? '#0B1F33' : '#EFF6FB',
+                border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'}`,
                 color: textPrimary,
                 fontSize: '14px',
                 outline: 'none',
@@ -1143,7 +1144,7 @@ const Projects = () => {
               style={{
                 padding: '10px 16px',
                 borderRadius: '12px',
-                backgroundColor: showAdvancedFilters ? '#6366f1' : (isDark ? '#020617' : '#f8fafc'),
+                backgroundColor: showAdvancedFilters ? '#2872A1' : (isDark ? '#0B1F33' : '#EFF6FB'),
                 color: showAdvancedFilters ? '#ffffff' : textPrimary,
                 border: `1px solid ${cardBorder}`,
                 fontSize: '13px',
@@ -1187,8 +1188,8 @@ const Projects = () => {
               style={{
                 padding: '10px 14px',
                 borderRadius: '12px',
-                backgroundColor: isDark ? '#020617' : '#f8fafc',
-                border: `1px solid ${isDark ? '#334155' : '#cbd5e1'}`,
+                backgroundColor: isDark ? '#0B1F33' : '#EFF6FB',
+                border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'}`,
                 color: textPrimary,
                 fontSize: '13px',
                 fontWeight: 700,
@@ -1204,7 +1205,7 @@ const Projects = () => {
           </div>
 
           {/* View Mode Toggle Buttons */}
-          <div style={{ display: 'flex', gap: '6px', padding: '4px', borderRadius: '14px', backgroundColor: isDark ? '#020617' : '#f1f5f9', border: `1px solid ${cardBorder}` }}>
+          <div style={{ display: 'flex', gap: '6px', padding: '4px', borderRadius: '14px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}` }}>
             <button
               onClick={() => setViewMode('all-grid')}
               style={{
@@ -1214,7 +1215,7 @@ const Projects = () => {
                 fontWeight: 800,
                 border: 'none',
                 cursor: 'pointer',
-                backgroundColor: viewMode === 'all-grid' ? '#6366f1' : 'transparent',
+                backgroundColor: viewMode === 'all-grid' ? '#2872A1' : 'transparent',
                 color: viewMode === 'all-grid' ? '#ffffff' : textSecondary,
                 display: 'flex',
                 alignItems: 'center',
@@ -1234,7 +1235,7 @@ const Projects = () => {
                 fontWeight: 800,
                 border: 'none',
                 cursor: 'pointer',
-                backgroundColor: viewMode === 'member-grouped' ? '#a855f7' : 'transparent',
+                backgroundColor: viewMode === 'member-grouped' ? '#2872A1' : 'transparent',
                 color: viewMode === 'member-grouped' ? '#ffffff' : textSecondary,
                 display: 'flex',
                 alignItems: 'center',
@@ -1264,8 +1265,8 @@ const Projects = () => {
                   fontWeight: 800,
                   whiteSpace: 'nowrap',
                   cursor: 'pointer',
-                  border: `1px solid ${selectedCategory === cat ? '#6366f1' : cardBorder}`,
-                  backgroundColor: selectedCategory === cat ? '#6366f1' : (isDark ? '#020617' : '#f8fafc'),
+                  border: `1px solid ${selectedCategory === cat ? '#2872A1' : cardBorder}`,
+                  backgroundColor: selectedCategory === cat ? '#2872A1' : (isDark ? '#0B1F33' : '#EFF6FB'),
                   color: selectedCategory === cat ? '#ffffff' : textPrimary
                 }}
               >
@@ -1288,8 +1289,8 @@ const Projects = () => {
                   fontWeight: 800,
                   cursor: 'pointer',
                   textTransform: 'capitalize',
-                  border: `1px solid ${selectedStatus === st ? '#a855f7' : cardBorder}`,
-                  backgroundColor: selectedStatus === st ? '#a855f7' : (isDark ? '#020617' : '#f8fafc'),
+                  border: `1px solid ${selectedStatus === st ? '#2872A1' : cardBorder}`,
+                  backgroundColor: selectedStatus === st ? '#2872A1' : (isDark ? '#0B1F33' : '#EFF6FB'),
                   color: selectedStatus === st ? '#ffffff' : textPrimary
                 }}
               >
@@ -1302,13 +1303,13 @@ const Projects = () => {
         {/* Row 3: Multi-Select Team Member Profile Chips Bar */}
         <div style={{ paddingTop: '12px', borderTop: `1px solid ${cardBorder}` }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', color: '#6366f1', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', color: isDark ? '#4A90C2' : '#2872A1', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Users size={14} /> Multi-Select Team Member Profiles (OR Condition):
             </span>
             {selectedMemberFilters.length > 0 && (
               <button
                 onClick={() => setSelectedMemberFilters([])}
-                style={{ fontSize: '12px', fontWeight: 700, color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer' }}
+                style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#4A90C2' : '#2872A1', background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 Clear Selected Members ({selectedMemberFilters.length})
               </button>
@@ -1329,8 +1330,8 @@ const Projects = () => {
                     fontWeight: 800,
                     whiteSpace: 'nowrap',
                     cursor: 'pointer',
-                    border: `1px solid ${isSelected ? '#6366f1' : cardBorder}`,
-                    backgroundColor: isSelected ? '#6366f1' : (isDark ? '#020617' : '#f8fafc'),
+                    border: `1px solid ${isSelected ? '#2872A1' : cardBorder}`,
+                    backgroundColor: isSelected ? '#2872A1' : (isDark ? '#0B1F33' : '#EFF6FB'),
                     color: isSelected ? '#ffffff' : textPrimary,
                     display: 'flex',
                     alignItems: 'center',
@@ -1341,12 +1342,12 @@ const Projects = () => {
                   {m.image ? (
                     <img src={m.image} alt="" aria-hidden="true" style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }} />
                   ) : (
-                    <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#6366f1', color: '#ffffff', fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#2872A1', color: '#ffffff', fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {m.name.charAt(0)}
                     </div>
                   )}
                   <span>{m.name}</span>
-                  <span style={{ padding: '1px 6px', borderRadius: '8px', backgroundColor: isSelected ? 'rgba(255,255,255,0.25)' : (isDark ? '#1e293b' : '#e2e8f0'), fontSize: '10px' }}>
+                  <span style={{ padding: '1px 6px', borderRadius: '8px', backgroundColor: isSelected ? 'rgba(255,255,255,0.25)' : (isDark ? '#143555' : '#E2ECF4'), fontSize: '10px' }}>
                     {m.count}
                   </span>
                 </button>
@@ -1365,7 +1366,7 @@ const Projects = () => {
               <select
                 value={selectedOwnerFilter}
                 onChange={e => setSelectedOwnerFilter(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
               >
                 <option value="ALL">All Owners</option>
                 {ownerOptionsList.map(o => (
@@ -1380,7 +1381,7 @@ const Projects = () => {
               <select
                 value={selectedDomain}
                 onChange={e => setSelectedDomain(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
               >
                 {domains.map(d => (
                   <option key={d} value={d}>{d}</option>
@@ -1394,7 +1395,7 @@ const Projects = () => {
               <select
                 value={selectedRole}
                 onChange={e => setSelectedRole(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
               >
                 {roles.map(r => (
                   <option key={r} value={r}>{r}</option>
@@ -1408,7 +1409,7 @@ const Projects = () => {
               <select
                 value={selectedPriority}
                 onChange={e => setSelectedPriority(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
               >
                 {priorities.map(p => (
                   <option key={p} value={p}>{p}</option>
@@ -1422,7 +1423,7 @@ const Projects = () => {
               <select
                 value={selectedCompletionRange}
                 onChange={e => setSelectedCompletionRange(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
               >
                 {completionRanges.map(cr => (
                   <option key={cr} value={cr}>{cr}</option>
@@ -1436,7 +1437,7 @@ const Projects = () => {
               <select
                 value={selectedYear}
                 onChange={e => setSelectedYear(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
               >
                 {academicYears.map(y => (
                   <option key={y} value={y}>{y}</option>
@@ -1450,7 +1451,7 @@ const Projects = () => {
               <select
                 value={selectedBranch}
                 onChange={e => setSelectedBranch(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none' }}
               >
                 {academicBranches.map(b => (
                   <option key={b} value={b}>{b}</option>
@@ -1480,13 +1481,13 @@ const Projects = () => {
                 style={{
                   padding: '12px 24px',
                   borderRadius: '14px',
-                  background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                  background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
                   color: '#ffffff',
                   border: 'none',
                   fontSize: '13.5px',
                   fontWeight: 900,
                   cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(99,102,241,0.3)',
+                  boxShadow: '0 6px 20px rgba(40, 114, 161, 0.3)',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px'
@@ -1520,14 +1521,14 @@ const Projects = () => {
                 >
                   <div>
                     {/* Project Card Header Image / Gradient Banner */}
-                    <div style={{ position: 'relative', height: '160px', backgroundColor: isDark ? '#1e1b4b' : '#e0e7ff', overflow: 'hidden' }}>
+                    <div style={{ position: 'relative', height: '160px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', overflow: 'hidden' }}>
                       {proj.thumbnail ? (
                         <img src={proj.thumbnail} alt={proj.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       ) : (
                         <div style={{
                           width: '100%',
                           height: '100%',
-                          background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                          background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -1579,7 +1580,7 @@ const Projects = () => {
                       </h3>
 
                       {/* Owner Attribution Line */}
-                      <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#6366f1', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <div style={{ fontSize: '11.5px', fontWeight: 700, color: isDark ? '#4A90C2' : '#2872A1', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <User size={13} />
                         <span>Owner: {proj.ownerName || 'Member'}</span>
                       </div>
@@ -1592,17 +1593,17 @@ const Projects = () => {
                       <div style={{ marginBottom: '16px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                           <span style={{ fontSize: '11px', fontWeight: 800, color: textSecondary }}>Completion Progress</span>
-                          <span style={{ fontSize: '12px', fontWeight: 900, color: proj.completion >= 100 ? '#22c55e' : '#6366f1' }}>
+                          <span style={{ fontSize: '12px', fontWeight: 900, color: proj.completion >= 100 ? '#22c55e' : '#2872A1' }}>
                             {proj.completion || 0}%
                           </span>
                         </div>
-                        <div style={{ width: '100%', height: '7px', borderRadius: '10px', backgroundColor: isDark ? '#1e293b' : '#e2e8f0', overflow: 'hidden' }}>
+                        <div style={{ width: '100%', height: '7px', borderRadius: '10px', backgroundColor: isDark ? '#143555' : '#E2ECF4', overflow: 'hidden' }}>
                           <div style={{
                             width: `${Math.min(100, Math.max(0, proj.completion || 0))}%`,
                             height: '100%',
                             background: proj.completion >= 100
                               ? 'linear-gradient(90deg, #22c55e 0%, #10b981 100%)'
-                              : 'linear-gradient(90deg, #6366f1 0%, #a855f7 100%)',
+                              : 'linear-gradient(90deg, #2872A1 0%, #4A90C2 100%)',
                             borderRadius: '10px',
                             transition: 'width 0.4s ease'
                           }} />
@@ -1632,7 +1633,7 @@ const Projects = () => {
                               const name = typeof m === 'string' ? m : m.name;
                               const img = typeof m === 'object' ? m.image : null;
                               return (
-                                <div key={idx} title={`${name} (${(typeof m === 'object' && m.role) || 'Contributor'})`} style={{ width: '24px', height: '24px', borderRadius: '50%', marginLeft: idx > 0 ? '-6px' : 0, border: `2px solid ${cardBg}`, overflow: 'hidden', backgroundColor: '#6366f1', color: '#fff', fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div key={idx} title={`${name} (${(typeof m === 'object' && m.role) || 'Contributor'})`} style={{ width: '24px', height: '24px', borderRadius: '50%', marginLeft: idx > 0 ? '-6px' : 0, border: `2px solid ${cardBg}`, overflow: 'hidden', backgroundColor: '#2872A1', color: '#fff', fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                   {img ? <img src={img} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : name?.charAt(0)}
                                 </div>
                               );
@@ -1647,7 +1648,7 @@ const Projects = () => {
                   </div>
 
                   {/* Card Actions Footer — 6 ACTION BUTTONS */}
-                  <div style={{ padding: '16px 20px', borderTop: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#020617' : '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+                  <div style={{ padding: '16px 20px', borderTop: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
                     
                     {/* Row of Action Buttons */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
@@ -1660,8 +1661,8 @@ const Projects = () => {
                         style={{
                           padding: '8px 10px',
                           borderRadius: '10px',
-                          backgroundColor: isDark ? '#1e293b' : '#e2e8f0',
-                          color: (proj.github || proj.liveDemo || proj.live) ? '#6366f1' : textSecondary,
+                          backgroundColor: isDark ? '#143555' : '#E2ECF4',
+                          color: (proj.github || proj.liveDemo || proj.live) ? '#2872A1' : textSecondary,
                           border: 'none',
                           cursor: 'pointer',
                           display: 'flex',
@@ -1680,8 +1681,8 @@ const Projects = () => {
                         style={{
                           padding: '8px 10px',
                           borderRadius: '10px',
-                          backgroundColor: 'rgba(168,85,247,0.15)',
-                          color: '#a855f7',
+                          backgroundColor: 'rgba(74, 144, 194, 0.15)',
+                          color: isDark ? '#4A90C2' : '#2872A1',
                           border: 'none',
                           cursor: 'pointer',
                           display: 'flex',
@@ -1721,8 +1722,8 @@ const Projects = () => {
                         style={{
                           padding: '8px 10px',
                           borderRadius: '10px',
-                          backgroundColor: 'rgba(99,102,241,0.15)',
-                          color: '#6366f1',
+                          backgroundColor: 'rgba(40, 114, 161, 0.15)',
+                          color: isDark ? '#4A90C2' : '#2872A1',
                           border: 'none',
                           cursor: 'pointer',
                           display: 'flex',
@@ -1763,7 +1764,7 @@ const Projects = () => {
                       style={{
                         padding: '8px 16px',
                         borderRadius: '12px',
-                        background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                        background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)',
                         color: '#ffffff',
                         border: 'none',
                         fontSize: '12px',
@@ -1798,9 +1799,9 @@ const Projects = () => {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '16px', borderBottom: `1px solid ${cardBorder}`, marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   {member.image ? (
-                    <img src={member.image} alt={member.name} style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #6366f1' }} />
+                    <img src={member.image} alt={member.name} style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #2872A1' }} />
                   ) : (
-                    <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#6366f1', color: '#fff', fontSize: '18px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#2872A1', color: '#fff', fontSize: '18px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {member.name.charAt(0)}
                     </div>
                   )}
@@ -1813,9 +1814,9 @@ const Projects = () => {
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '18px' }}>
                 {member.projects.map(proj => (
-                  <div key={proj.id || proj.title} style={{ padding: '18px', borderRadius: '18px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div key={proj.id || proj.title} style={{ padding: '18px', borderRadius: '18px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <div>
-                      <span style={{ fontSize: '10px', fontWeight: 900, color: '#6366f1', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                      <span style={{ fontSize: '10px', fontWeight: 900, color: isDark ? '#4A90C2' : '#2872A1', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
                         {proj.category || 'Advanced'} Project
                       </span>
                       <h4 style={{ fontSize: '15px', fontWeight: 800, color: textPrimary, margin: '0 0 6px 0' }}>{proj.title}</h4>
@@ -1824,7 +1825,7 @@ const Projects = () => {
 
                     <button
                       onClick={() => setActiveProjectModal(proj)}
-                      style={{ width: '100%', padding: '8px', borderRadius: '10px', border: '1px solid #6366f1', backgroundColor: 'transparent', color: '#6366f1', fontSize: '12px', fontWeight: 800, cursor: 'pointer' }}
+                      style={{ width: '100%', padding: '8px', borderRadius: '10px', border: '1px solid #2872A1', backgroundColor: 'transparent', color: isDark ? '#4A90C2' : '#2872A1', fontSize: '12px', fontWeight: 800, cursor: 'pointer' }}
                     >
                       View Details →
                     </button>
@@ -1852,11 +1853,11 @@ const Projects = () => {
                 value={newOwnerInput}
                 onChange={e => setNewOwnerInput(e.target.value)}
                 placeholder="e.g. Bhargava, Rahul, Sai..."
-                style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '14px', outline: 'none', marginBottom: '20px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '14px', outline: 'none', marginBottom: '20px', boxSizing: 'border-box' }}
               />
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                 <button type="button" onClick={() => setTransferModalProject(null)} style={{ padding: '10px 18px', borderRadius: '12px', border: `1px solid ${cardBorder}`, background: 'none', color: textSecondary, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" style={{ padding: '10px 22px', borderRadius: '12px', background: 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)', color: '#fff', border: 'none', fontWeight: 900, cursor: 'pointer' }}>Transfer</button>
+                <button type="submit" style={{ padding: '10px 22px', borderRadius: '12px', background: 'linear-gradient(135deg, #2872A1 0%, #205E86 100%)', color: '#fff', border: 'none', fontWeight: 900, cursor: 'pointer' }}>Transfer</button>
               </div>
             </form>
           </div>
@@ -1876,7 +1877,7 @@ const Projects = () => {
               
               {/* Dynamic Interactive Team Member List */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 800, color: '#6366f1', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 800, color: isDark ? '#4A90C2' : '#2872A1', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Users size={15} /> Assigned Team Members ({assignTeamList.length})
                 </label>
 
@@ -1887,7 +1888,7 @@ const Projects = () => {
                   const isStandardRole = STANDARD_PROJECT_ROLES.includes(currentRole);
 
                   return (
-                    <div key={idx} style={{ padding: '12px 14px', borderRadius: '14px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div key={idx} style={{ padding: '12px 14px', borderRadius: '14px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '10px', alignItems: 'center' }}>
                         
                         {/* Member Name Dropdown */}
@@ -2017,8 +2018,8 @@ const Projects = () => {
                     padding: '10px',
                     borderRadius: '12px',
                     backgroundColor: 'transparent',
-                    border: '1px dashed #6366f1',
-                    color: '#6366f1',
+                    border: '1px dashed #2872A1',
+                    color: isDark ? '#4A90C2' : '#2872A1',
                     fontSize: '12.5px',
                     fontWeight: 800,
                     cursor: 'pointer',
@@ -2085,7 +2086,7 @@ const Projects = () => {
                     value={formData.title}
                     onChange={e => setFormData({ ...formData, title: e.target.value })}
                     placeholder="e.g. Weather AI Forecast Hub"
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
@@ -2093,7 +2094,7 @@ const Projects = () => {
                   <select
                     value={formData.category}
                     onChange={e => setFormData({ ...formData, category: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
                   >
                     <option value="Advanced">Advanced</option>
                     <option value="Beginner">Beginner</option>
@@ -2105,14 +2106,14 @@ const Projects = () => {
                   </select>
                 </div>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#6366f1', display: 'block', marginBottom: '6px' }}>Display Order #</label>
+                  <label style={{ fontSize: '12px', fontWeight: 800, color: isDark ? '#4A90C2' : '#2872A1', display: 'block', marginBottom: '6px' }}>Display Order #</label>
                   <input
                     type="number"
                     min="1"
                     value={formData.displayOrder}
                     onChange={e => setFormData({ ...formData, displayOrder: e.target.value })}
                     placeholder="e.g. 1"
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid rgba(99,102,241,0.4)`, color: textPrimary, fontSize: '14px', fontWeight: 700, outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid rgba(99,102,241,0.4)`, color: textPrimary, fontSize: '14px', fontWeight: 700, outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
@@ -2120,7 +2121,7 @@ const Projects = () => {
                   <select
                     value={formData.icon || 'monitor'}
                     onChange={e => setFormData({ ...formData, icon: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid rgba(6,182,212,0.4)`, color: textPrimary, fontSize: '13.5px', fontWeight: 700, outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid rgba(6,182,212,0.4)`, color: textPrimary, fontSize: '13.5px', fontWeight: 700, outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
                   >
                     <option value="monitor">🖥️ Monitor (Cyan)</option>
                     <option value="database">🗄️ Database (Green)</option>
@@ -2143,7 +2144,7 @@ const Projects = () => {
                   <select
                     value={formData.status}
                     onChange={e => setFormData({ ...formData, status: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
                   >
                     <option value="in_progress">In Progress</option>
                     <option value="completed">Completed</option>
@@ -2175,25 +2176,25 @@ const Projects = () => {
                     value={formData.summary}
                     onChange={e => setFormData({ ...formData, summary: e.target.value })}
                     placeholder="Brief 1-2 sentence overview displayed on the project card face..."
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid rgba(6,182,212,0.4)`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid rgba(6,182,212,0.4)`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#6366f1', display: 'block', marginBottom: '6px' }}>Modal Detailed Description (Appears in Detail Modal) *</label>
+                  <label style={{ fontSize: '12px', fontWeight: 800, color: isDark ? '#4A90C2' : '#2872A1', display: 'block', marginBottom: '6px' }}>Modal Detailed Description (Appears in Detail Modal) *</label>
                   <textarea
                     required
                     rows="3"
                     value={formData.description}
                     onChange={e => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Comprehensive detailed description displayed inside the project detail modal..."
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid rgba(99,102,241,0.4)`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid rgba(99,102,241,0.4)`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
                   />
                 </div>
               </div>
 
               {/* Row 4: Interactive Team Members & Roles Dropdown Editor */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px', borderRadius: '16px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}` }}>
-                <label style={{ fontSize: '12px', fontWeight: 800, color: '#6366f1', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px', borderRadius: '16px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}` }}>
+                <label style={{ fontSize: '12px', fontWeight: 800, color: isDark ? '#4A90C2' : '#2872A1', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Users size={15} /> Team Members & Roles ({formData.teamMembersList.length})
                 </label>
 
@@ -2338,7 +2339,7 @@ const Projects = () => {
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, teamMembersList: [...formData.teamMembersList, { name: '', image: '', role: 'Contributor' }] })}
-                  style={{ padding: '9px 16px', borderRadius: '12px', backgroundColor: 'transparent', border: '1px dashed #6366f1', color: '#6366f1', fontSize: '12.5px', fontWeight: 800, cursor: 'pointer', marginTop: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                  style={{ padding: '9px 16px', borderRadius: '12px', backgroundColor: 'transparent', border: '1px dashed #2872A1', color: isDark ? '#4A90C2' : '#2872A1', fontSize: '12.5px', fontWeight: 800, cursor: 'pointer', marginTop: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
                   <Plus size={15} />
                   <span>+ Add Team Member</span>
@@ -2354,7 +2355,7 @@ const Projects = () => {
                     value={formData.github}
                     onChange={e => setFormData({ ...formData, github: e.target.value })}
                     placeholder="https://github.com/..."
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
@@ -2364,7 +2365,7 @@ const Projects = () => {
                     value={formData.liveDemo}
                     onChange={e => setFormData({ ...formData, liveDemo: e.target.value })}
                     placeholder="https://..."
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
@@ -2374,7 +2375,7 @@ const Projects = () => {
                     value={formData.apkUrl}
                     onChange={e => setFormData({ ...formData, apkUrl: e.target.value })}
                     placeholder="https://.../app-release.apk"
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid rgba(16,185,129,0.4)`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid rgba(16,185,129,0.4)`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
@@ -2388,7 +2389,7 @@ const Projects = () => {
                     value={formData.thumbnail}
                     onChange={e => setFormData({ ...formData, thumbnail: e.target.value })}
                     placeholder="https://res.cloudinary.com/..."
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
@@ -2398,7 +2399,7 @@ const Projects = () => {
                     value={formData.techStackText}
                     onChange={e => setFormData({ ...formData, techStackText: e.target.value })}
                     placeholder="React, Node.js, PostgreSQL"
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
@@ -2411,7 +2412,7 @@ const Projects = () => {
                   value={formData.screenshotsText}
                   onChange={e => setFormData({ ...formData, screenshotsText: e.target.value })}
                   placeholder="https://image1.jpg&#10;https://image2.jpg"
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
                 />
               </div>
 
@@ -2423,7 +2424,7 @@ const Projects = () => {
                   value={formData.documentsText}
                   onChange={e => setFormData({ ...formData, documentsText: e.target.value })}
                   placeholder="Architecture Spec | https://docs.google.com/spec&#10;User Guide | https://pdf.org/guide.pdf"
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
                 />
               </div>
 
@@ -2438,7 +2439,7 @@ const Projects = () => {
                 </button>
                 <button
                   type="submit"
-                  style={{ padding: '12px 28px', borderRadius: '12px', background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', color: '#ffffff', border: 'none', fontWeight: 900, fontSize: '13.5px', cursor: 'pointer', boxShadow: '0 6px 20px rgba(99,102,241,0.3)' }}
+                  style={{ padding: '12px 28px', borderRadius: '12px', background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', color: '#ffffff', border: 'none', fontWeight: 900, fontSize: '13.5px', cursor: 'pointer', boxShadow: '0 6px 20px rgba(40, 114, 161, 0.3)' }}
                 >
                   {editingProjectData ? 'Save Changes' : 'Publish Project'}
                 </button>
@@ -2489,7 +2490,7 @@ const Projects = () => {
                 {p.thumbnail ? (
                   <img src={p.thumbnail} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
-                  <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #4f46e5 0%, #7e22ce 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff' }}>
+                  <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff' }}>
                     <Rocket size={72} style={{ opacity: 0.7 }} />
                   </div>
                 )}
@@ -2551,8 +2552,8 @@ const Projects = () => {
                       border: 'none',
                       cursor: 'pointer',
                       background: 'none',
-                      borderBottom: activeTabDetail === tab.id ? '3px solid #6366f1' : '3px solid transparent',
-                      color: activeTabDetail === tab.id ? '#6366f1' : textSecondary
+                      borderBottom: activeTabDetail === tab.id ? '3px solid #2872A1' : '3px solid transparent',
+                      color: activeTabDetail === tab.id ? '#2872A1' : textSecondary
                     }}
                   >
                     {tab.label}
@@ -2585,16 +2586,16 @@ const Projects = () => {
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                         <span style={{ fontSize: '12px', fontWeight: 800, color: textSecondary }}>Project Completion Rate</span>
-                        <span style={{ fontSize: '13px', fontWeight: 900, color: '#6366f1' }}>{p.completion || 0}%</span>
+                        <span style={{ fontSize: '13px', fontWeight: 900, color: isDark ? '#4A90C2' : '#2872A1' }}>{p.completion || 0}%</span>
                       </div>
-                      <div style={{ width: '100%', height: '10px', borderRadius: '10px', backgroundColor: isDark ? '#1e293b' : '#e2e8f0', overflow: 'hidden' }}>
-                        <div style={{ width: `${p.completion || 0}%`, height: '100%', background: 'linear-gradient(90deg, #6366f1 0%, #a855f7 100%)', borderRadius: '10px' }} />
+                      <div style={{ width: '100%', height: '10px', borderRadius: '10px', backgroundColor: isDark ? '#143555' : '#E2ECF4', overflow: 'hidden' }}>
+                        <div style={{ width: `${p.completion || 0}%`, height: '100%', background: 'linear-gradient(90deg, #2872A1 0%, #4A90C2 100%)', borderRadius: '10px' }} />
                       </div>
                     </div>
 
                     {/* Detailed Description */}
                     <div>
-                      <h4 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6366f1', margin: '0 0 8px 0' }}>
+                      <h4 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', color: isDark ? '#4A90C2' : '#2872A1', margin: '0 0 8px 0' }}>
                         Description
                       </h4>
                       <p style={{ fontSize: '14px', color: textPrimary, lineHeight: 1.7, margin: 0 }}>
@@ -2605,7 +2606,7 @@ const Projects = () => {
                     {/* Tech Stack Pills */}
                     {techList.length > 0 && (
                       <div>
-                        <h4 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6366f1', margin: '0 0 10px 0' }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', color: isDark ? '#4A90C2' : '#2872A1', margin: '0 0 10px 0' }}>
                           Technology Stack
                         </h4>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -2619,7 +2620,7 @@ const Projects = () => {
                     {/* Team Members List */}
                     {teamList.length > 0 && (
                       <div>
-                        <h4 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6366f1', margin: '0 0 12px 0' }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', color: isDark ? '#4A90C2' : '#2872A1', margin: '0 0 12px 0' }}>
                           Team Members & Roles ({teamList.length})
                         </h4>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
@@ -2628,11 +2629,11 @@ const Projects = () => {
                             const img = typeof m === 'object' ? m.image : null;
                             const memberRole = (typeof m === 'object' && m.role) || p.role || 'Contributor';
                             return (
-                              <div key={idx} style={{ padding: '10px 14px', borderRadius: '14px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <div key={idx} style={{ padding: '10px 14px', borderRadius: '14px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 {img ? (
                                   <img src={img} alt={name} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
                                 ) : (
-                                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#6366f1', color: '#ffffff', fontSize: '12px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#2872A1', color: '#ffffff', fontSize: '12px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {name?.charAt(0)}
                                   </div>
                                 )}
@@ -2654,7 +2655,7 @@ const Projects = () => {
                           href={p.github.startsWith('http') ? p.github : `https://${p.github}`}
                           target="_blank"
                           rel="noreferrer"
-                          style={{ padding: '12px 22px', borderRadius: '14px', backgroundColor: isDark ? '#1e293b' : '#e2e8f0', color: textPrimary, border: 'none', fontWeight: 800, fontSize: '13px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}
+                          style={{ padding: '12px 22px', borderRadius: '14px', backgroundColor: isDark ? '#143555' : '#E2ECF4', color: textPrimary, border: 'none', fontWeight: 800, fontSize: '13px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}
                         >
                           <Github size={16} />
                           <span>View GitHub Code</span>
@@ -2666,7 +2667,7 @@ const Projects = () => {
                           href={(p.liveDemo || p.live).startsWith('http') ? (p.liveDemo || p.live) : `https://${p.liveDemo || p.live}`}
                           target="_blank"
                           rel="noreferrer"
-                          style={{ padding: '12px 24px', borderRadius: '14px', background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 6px 18px rgba(99,102,241,0.3)' }}
+                          style={{ padding: '12px 24px', borderRadius: '14px', background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 6px 18px rgba(99,102,241,0.3)' }}
                         >
                           <ExternalLink size={16} />
                           <span>Open Live Demo</span>
@@ -2683,7 +2684,7 @@ const Projects = () => {
                     <h4 style={{ fontSize: '15px', fontWeight: 900, margin: '0 0 12px 0' }}>Key System Features</h4>
                     {featureList.length > 0 ? (
                       featureList.map((ft, idx) => (
-                        <div key={idx} style={{ padding: '14px 18px', borderRadius: '14px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div key={idx} style={{ padding: '14px 18px', borderRadius: '14px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <CheckCircle2 size={18} style={{ color: '#22c55e', flexShrink: 0 }} />
                           <span style={{ fontSize: '13.5px', fontWeight: 700, color: textPrimary }}>{ft}</span>
                         </div>
@@ -2711,7 +2712,7 @@ const Projects = () => {
                         ))}
                       </div>
                     ) : (
-                      <div style={{ padding: '40px', textAlign: 'center', color: textSecondary, backgroundColor: isDark ? '#020617' : '#f8fafc', borderRadius: '16px', border: `1px solid ${cardBorder}` }}>
+                      <div style={{ padding: '40px', textAlign: 'center', color: textSecondary, backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', borderRadius: '16px', border: `1px solid ${cardBorder}` }}>
                         <ImageIcon size={36} style={{ margin: '0 auto 8px auto', opacity: 0.5 }} />
                         <p style={{ margin: 0, fontSize: '13px' }}>No screenshot gallery uploaded yet for this project.</p>
                       </div>
@@ -2728,12 +2729,12 @@ const Projects = () => {
                         const name = typeof doc === 'string' ? `Document ${idx+1}` : doc.name;
                         const url = typeof doc === 'string' ? doc : doc.url;
                         return (
-                          <div key={idx} style={{ padding: '14px 18px', borderRadius: '14px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div key={idx} style={{ padding: '14px 18px', borderRadius: '14px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              <FileText size={20} style={{ color: '#6366f1' }} />
+                              <FileText size={20} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
                               <span style={{ fontSize: '13.5px', fontWeight: 800, color: textPrimary }}>{name}</span>
                             </div>
-                            <a href={url.startsWith('http') ? url : `https://${url}`} target="_blank" rel="noreferrer" style={{ padding: '6px 14px', borderRadius: '10px', backgroundColor: '#6366f1', color: '#fff', fontSize: '12px', fontWeight: 800, textDecoration: 'none' }}>
+                            <a href={url.startsWith('http') ? url : `https://${url}`} target="_blank" rel="noreferrer" style={{ padding: '6px 14px', borderRadius: '10px', backgroundColor: '#2872A1', color: '#fff', fontSize: '12px', fontWeight: 800, textDecoration: 'none' }}>
                               Open Document
                             </a>
                           </div>
@@ -2749,7 +2750,7 @@ const Projects = () => {
                 {activeTabDetail === 'architecture' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <div>
-                      <h4 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', color: '#6366f1', margin: '0 0 8px 0' }}>System Architecture</h4>
+                      <h4 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', color: isDark ? '#4A90C2' : '#2872A1', margin: '0 0 8px 0' }}>System Architecture</h4>
                       <p style={{ fontSize: '13.5px', color: textPrimary, lineHeight: 1.6 }}>{p.architecture || 'Modular full-stack application built using React, Vite, Express REST API, and Neon Cloud Serverless PostgreSQL.'}</p>
                     </div>
 
@@ -2780,14 +2781,14 @@ const Projects = () => {
                         value={newCommentInput}
                         onChange={e => setNewCommentInput(e.target.value)}
                         placeholder="Leave feedback or comment..."
-                        style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none' }}
+                        style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}`, color: textPrimary, fontSize: '13.5px', outline: 'none' }}
                       />
                       <button
                         onClick={() => {
                           addCommentToProject(p.id, newCommentInput);
                           setNewCommentInput('');
                         }}
-                        style={{ padding: '12px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}
+                        style={{ padding: '12px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}
                       >
                         Post
                       </button>
@@ -2797,9 +2798,9 @@ const Projects = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {(p.comments || []).length > 0 ? (
                         p.comments.map(cmt => (
-                          <div key={cmt.id} style={{ padding: '14px 16px', borderRadius: '14px', backgroundColor: isDark ? '#020617' : '#f8fafc', border: `1px solid ${cardBorder}` }}>
+                          <div key={cmt.id} style={{ padding: '14px 16px', borderRadius: '14px', backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', border: `1px solid ${cardBorder}` }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                              <span style={{ fontSize: '13px', fontWeight: 800, color: '#6366f1' }}>{cmt.author}</span>
+                              <span style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#4A90C2' : '#2872A1' }}>{cmt.author}</span>
                               <span style={{ fontSize: '11px', color: textSecondary }}>{new Date(cmt.createdAt).toLocaleDateString()}</span>
                             </div>
                             <p style={{ fontSize: '13px', color: textPrimary, margin: 0, lineHeight: 1.5 }}>{cmt.text}</p>
@@ -2816,13 +2817,13 @@ const Projects = () => {
               </div>
 
               {/* View Details Drawer Bottom Action Bar */}
-              <div style={{ padding: '18px 28px', borderTop: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#020617' : '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+              <div style={{ padding: '18px 28px', borderTop: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {(user?.isAdmin || p.ownerId === (user?.id || user?.email) || p.ownerName === user?.name) && (
                     <>
                       <button
                         onClick={(e) => handleOpenEditProject(p, e)}
-                        style={{ padding: '8px 14px', borderRadius: '10px', backgroundColor: 'rgba(99,102,241,0.15)', color: '#6366f1', border: 'none', fontWeight: 800, fontSize: '12.5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                        style={{ padding: '8px 14px', borderRadius: '10px', backgroundColor: 'rgba(40, 114, 161, 0.15)', color: isDark ? '#4A90C2' : '#2872A1', border: 'none', fontWeight: 800, fontSize: '12.5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
                       >
                         <Edit3 size={14} /> Edit
                       </button>
@@ -2853,7 +2854,7 @@ const Projects = () => {
                   )}
                   <button
                     onClick={(e) => handleOpenShareModal(p, e)}
-                    style={{ padding: '8px 14px', borderRadius: '10px', backgroundColor: 'rgba(168,85,247,0.15)', color: '#a855f7', border: 'none', fontWeight: 800, fontSize: '12.5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    style={{ padding: '8px 14px', borderRadius: '10px', backgroundColor: 'rgba(74, 144, 194, 0.15)', color: isDark ? '#4A90C2' : '#2872A1', border: 'none', fontWeight: 800, fontSize: '12.5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
                   >
                     <Share2 size={14} /> Share
                   </button>
@@ -2885,7 +2886,7 @@ const Projects = () => {
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
-              <div style={{ padding: '10px', borderRadius: '14px', backgroundColor: 'rgba(168,85,247,0.15)', color: '#a855f7' }}>
+              <div style={{ padding: '10px', borderRadius: '14px', backgroundColor: 'rgba(74, 144, 194, 0.15)', color: isDark ? '#4A90C2' : '#2872A1' }}>
                 <Share2 size={22} />
               </div>
               <div>
@@ -2902,10 +2903,10 @@ const Projects = () => {
                   showToast('Project link copied to clipboard!');
                   logProjectAction('SHARE_COPY_LINK', shareModalProject.id);
                 }}
-                style={{ padding: '12px 16px', borderRadius: '14px', border: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#020617' : '#f8fafc', color: textPrimary, fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                style={{ padding: '12px 16px', borderRadius: '14px', border: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', color: textPrimary, fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <Link size={16} style={{ color: '#6366f1' }} />
+                  <Link size={16} style={{ color: isDark ? '#4A90C2' : '#2872A1' }} />
                   <span>Copy Internal Link</span>
                 </div>
                 <Copy size={15} style={{ color: textSecondary }} />
@@ -2917,7 +2918,7 @@ const Projects = () => {
                   showToast(`Project ID (${shareModalProject.id}) copied!`);
                   logProjectAction('SHARE_COPY_ID', shareModalProject.id);
                 }}
-                style={{ padding: '12px 16px', borderRadius: '14px', border: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#020617' : '#f8fafc', color: textPrimary, fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                style={{ padding: '12px 16px', borderRadius: '14px', border: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', color: textPrimary, fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <Code2 size={16} style={{ color: '#06b6d4' }} />
@@ -2934,7 +2935,7 @@ const Projects = () => {
                     showToast('GitHub URL copied to clipboard!');
                     logProjectAction('SHARE_COPY_GITHUB', shareModalProject.id);
                   }}
-                  style={{ padding: '12px 16px', borderRadius: '14px', border: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#020617' : '#f8fafc', color: textPrimary, fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                  style={{ padding: '12px 16px', borderRadius: '14px', border: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', color: textPrimary, fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Github size={16} />
@@ -2952,7 +2953,7 @@ const Projects = () => {
                     showToast('Live Demo link copied to clipboard!');
                     logProjectAction('SHARE_COPY_DEMO', shareModalProject.id);
                   }}
-                  style={{ padding: '12px 16px', borderRadius: '14px', border: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#020617' : '#f8fafc', color: textPrimary, fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                  style={{ padding: '12px 16px', borderRadius: '14px', border: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', color: textPrimary, fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <ExternalLink size={16} style={{ color: '#22c55e' }} />
@@ -2964,7 +2965,7 @@ const Projects = () => {
 
               <a
                 href={`mailto:?subject=${encodeURIComponent(`Project: ${shareModalProject.title}`)}&body=${encodeURIComponent(`Check out ${shareModalProject.title}:\n\n${shareModalProject.description || ''}`)}`}
-                style={{ padding: '12px 16px', borderRadius: '14px', border: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#020617' : '#f8fafc', color: textPrimary, fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', textDecoration: 'none' }}
+                style={{ padding: '12px 16px', borderRadius: '14px', border: `1px solid ${cardBorder}`, backgroundColor: isDark ? '#0B1F33' : '#EFF6FB', color: textPrimary, fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', textDecoration: 'none' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <Mail size={16} style={{ color: '#eab308' }} />
@@ -2981,7 +2982,7 @@ const Projects = () => {
                     showToast('Public Project Link generated & copied!');
                     logProjectAction('SHARE_PUBLIC_LINK', shareModalProject.id);
                   }}
-                  style={{ padding: '12px 16px', borderRadius: '14px', border: `1px solid rgba(168,85,247,0.3)`, backgroundColor: 'rgba(168,85,247,0.1)', color: '#a855f7', fontWeight: 800, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                  style={{ padding: '12px 16px', borderRadius: '14px', border: `1px solid rgba(168,85,247,0.3)`, backgroundColor: 'rgba(168,85,247,0.1)', color: isDark ? '#4A90C2' : '#2872A1', fontWeight: 800, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Sparkles size={16} />
@@ -3068,7 +3069,7 @@ const Projects = () => {
           zIndex: 9999,
           padding: '14px 22px',
           borderRadius: '16px',
-          backgroundColor: toast.type === 'error' ? '#ef4444' : (toast.type === 'info' ? '#6366f1' : '#10b981'),
+          backgroundColor: toast.type === 'error' ? '#ef4444' : (toast.type === 'info' ? '#2872A1' : '#10b981'),
           color: '#ffffff',
           fontWeight: 800,
           fontSize: '13.5px',

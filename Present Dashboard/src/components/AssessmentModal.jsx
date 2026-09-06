@@ -30,9 +30,9 @@ const TrophyGraphic = () => (
       {/* Floating Particles around Trophy */}
       <circle cx="25" cy="40" r="2.5" fill="#38bdf8" />
       <rect x="50" y="20" width="4" height="4" rx="1" fill="#f59e0b" transform="rotate(25 50 20)" />
-      <circle cx="55" cy="55" r="3" fill="#a855f7" />
+      <circle cx="55" cy="55" r="3" fill="#4A90C2" />
       <circle cx="100" cy="22" r="3" fill="#fb923c" />
-      <circle cx="140" cy="40" r="2.5" fill="#a855f7" />
+      <circle cx="140" cy="40" r="2.5" fill="#4A90C2" />
       <rect x="135" y="70" width="4" height="4" rx="1" fill="#818cf8" transform="rotate(45 135 70)" />
       <circle cx="125" cy="90" r="2" fill="#38bdf8" opacity="0.8" />
       <circle cx="35" cy="85" r="3" fill="#c084fc" opacity="0.8" />
@@ -303,7 +303,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
-  const timerColor = timeLeft < 60 ? '#ef4444' : timeLeft < 300 ? '#f59e0b' : '#6366f1';
+  const timerColor = timeLeft < 60 ? '#ef4444' : timeLeft < 300 ? '#f59e0b' : '#2872A1';
 
   const handleSelect = (optIdx) => {
     if (submitted) return;
@@ -722,7 +722,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
 
               {/* Progress Bar */}
               <div style={{ height: '5px', background: '#f1f5f9', borderRadius: '999px', overflow: 'hidden' }}>
-                <motion.div animate={{ width: `${((current + 1) / total) * 100}%` }} style={{ height: '100%', background: '#6366f1', borderRadius: '999px' }} />
+                <motion.div animate={{ width: `${((current + 1) / total) * 100}%` }} style={{ height: '100%', background: '#2872A1', borderRadius: '999px' }} />
               </div>
 
               {/* Question Statement Container */}
@@ -1256,7 +1256,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                 }}
               >
                 {/* Header */}
-                <div style={{ padding: '18px 22px', background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ padding: '18px 22px', background: 'linear-gradient(135deg, #2872A1 0%, #4A90C2 100%)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <BookOpen size={20} style={{ color: '#ffffff' }} />
@@ -1309,7 +1309,7 @@ const AssessmentModal = ({ assessment, onClose, previousResult = null }) => {
                   {/* Cheatsheet Banner */}
                   {refData.cheatsheet && (
                     <div style={{ padding: '14px 16px', borderRadius: '14px', background: 'linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%)', border: '1px solid #c7d2fe', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <Zap size={20} style={{ color: '#4f46e5', flexShrink: 0 }} />
+                      <Zap size={20} style={{ color: '#2872A1', flexShrink: 0 }} />
                       <div>
                         <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#4338ca' }}>Quick Formula Cheatsheet</span>
                         <p style={{ fontSize: '13px', fontWeight: 800, color: '#1e1b4b', margin: '2px 0 0 0' }}>

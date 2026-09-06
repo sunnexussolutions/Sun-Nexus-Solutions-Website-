@@ -405,7 +405,7 @@ export default function Auth() {
           <path d="M0,192L48,197.3C96,203,192,213,288,208C384,203,480,181,576,181.3C672,181,768,203,864,213.3C960,224,1056,224,1152,208C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" fill="url(#waveGradient)"></path>
           <defs>
             <linearGradient id="waveGradient" x1="0" y1="0" x2="1440" y2="320" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#635bff" stopOpacity="0.12"/>
+              <stop stopColor="#2872A1" stopOpacity="0.12"/>
               <stop offset="1" stopColor="#a78bfa" stopOpacity="0.05"/>
             </linearGradient>
           </defs>
@@ -488,7 +488,7 @@ export default function Auth() {
         {/* RIGHT PANEL — Card */}
         <div className="login-card">
           <div className="card-icon-wrap">
-            <Lock size={24} color="#635bff" />
+            <Lock size={24} color="#2872A1" />
           </div>
           <div className="card-title">Executive Portal</div>
           <div className="card-sub">Authorize your session to continue.</div>
@@ -735,7 +735,7 @@ export default function Auth() {
                   <div style={{ textAlign: 'center', marginTop: '16px' }}>
                     <span 
                       onClick={() => { setMode('login'); setForgotError(''); }} 
-                      style={{ fontSize: '0.85rem', fontWeight: 700, color: '#635bff', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                      style={{ fontSize: '0.85rem', fontWeight: 700, color: '#2872A1', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                     >
                       ← Back to Login
                     </span>
@@ -811,7 +811,7 @@ export default function Auth() {
                       style={{ 
                         background: 'none', 
                         border: 'none', 
-                        color: resendCooldown > 0 ? '#94a3b8' : '#635bff', 
+                        color: resendCooldown > 0 ? '#94a3b8' : '#2872A1', 
                         fontWeight: 700, 
                         cursor: resendCooldown > 0 ? 'not-allowed' : 'pointer' 
                       }}

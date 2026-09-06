@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Brain, Map, Code2, Bookmark, FileText, BarChart3, Sparkles
+  Brain, RotateCcw, Upload, Calendar, Clock, Map, Bookmark, BarChart3, Sparkles
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -9,15 +9,18 @@ export default function DsaHeader({
   setActiveView,
   progressPct = 0,
   totalSolved = 0,
-  totalProblems = 0
+  totalProblems = 0,
+  lastUpdatedDate = 'September 6, 2026',
+  onResetClick,
+  onImportClick
 }) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
   const NAV_TABS = [
-    { id: 'roadmap', label: 'Roadmap', icon: Map },
-    { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
-    { id: 'overview', label: 'Overview & Stats', icon: BarChart3 }
+    { id: 'roadmap', label: 'DSA A2Z Sheet', icon: Map },
+    { id: 'bookmarks', label: 'Saved Bookmarks', icon: Bookmark },
+    { id: 'overview', label: 'Progress & Analytics', icon: BarChart3 }
   ];
 
   return (
@@ -25,12 +28,13 @@ export default function DsaHeader({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '18px',
-        marginBottom: '24px',
+        gap: '16px',
+        marginBottom: '20px',
         width: '100%',
         boxSizing: 'border-box'
       }}
     >
+      {/* ── Main Banner Card ──────────────────────────────────────────────── */}
       <div
         style={{
           display: 'flex',
@@ -47,7 +51,7 @@ export default function DsaHeader({
           overflow: 'hidden'
         }}
       >
-        {/* Left: Branding & Title */}
+        {/* Left: Branding & Title & Subtitle */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', zIndex: 2 }}>
           <div
             style={{
@@ -78,7 +82,7 @@ export default function DsaHeader({
                   fontFamily: "'Poppins', sans-serif"
                 }}
               >
-                Nexus DSA
+                DSA A2Z Sheet
               </h1>
               <span
                 style={{
@@ -93,7 +97,7 @@ export default function DsaHeader({
                   textTransform: 'uppercase'
                 }}
               >
-                Structured Sheet
+                Nexus Hub
               </span>
             </div>
             <p
@@ -105,69 +109,93 @@ export default function DsaHeader({
                 fontWeight: 400
               }}
             >
-              Master Data Structures & Algorithms step by step.
+              Learn Data Structures and Algorithms from A to Z in a structured manner.
             </p>
           </div>
         </div>
 
-        {/* Right: Overall Progress Bar Widget */}
+        {/* Right: Last Updated + Reset + Import Buttons */}
         <div
           style={{
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            minWidth: '220px',
+            alignItems: 'center',
+            gap: '12px',
+            flexWrap: 'wrap',
             zIndex: 2
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-            <span
-              style={{
-                fontSize: '12px',
-                fontWeight: 600,
-                color: isDark ? '#8EA6BC' : '#475569',
-                fontFamily: "'Poppins', sans-serif"
-              }}
-            >
-              Solved {totalSolved} of {totalProblems}
-            </span>
-            <span
-              style={{
-                fontSize: '15px',
-                fontWeight: 800,
-                color: '#2872A1',
-                fontFamily: "'Poppins', sans-serif"
-              }}
-            >
-              {progressPct}%
-            </span>
-          </div>
-
+          {/* Last Updated Badge */}
           <div
             style={{
-              width: '100%',
-              maxWidth: '260px',
-              height: '8px',
-              borderRadius: '999px',
-              backgroundColor: isDark ? 'rgba(203, 221, 233, 0.1)' : '#EFF6FB',
-              border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.15)' : '#CBDDE9'}`,
-              overflow: 'hidden'
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              backgroundColor: isDark ? 'rgba(203, 221, 233, 0.06)' : '#EFF6FB',
+              border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.12)' : '#CBDDE9'}`,
+              color: isDark ? '#8EA6BC' : '#64748B',
+              fontSize: '12px',
+              fontWeight: 500
             }}
           >
-            <div
-              style={{
-                width: `${Math.min(100, Math.max(0, progressPct))}%`,
-                height: '100%',
-                borderRadius: '999px',
-                background: 'linear-gradient(90deg, #2872A1, #4A90C2)',
-                transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-              }}
-            />
+            <Clock size={13} />
+            <span>Last updated: {lastUpdatedDate}</span>
           </div>
+
+          {/* Import Button */}
+          {onImportClick && (
+            <button
+              onClick={onImportClick}
+              title="Import DSA Sheet"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 14px',
+                borderRadius: '10px',
+                backgroundColor: isDark ? '#0B1F33' : '#EFF6FB',
+                color: isDark ? '#CBDDE9' : '#2872A1',
+                border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'}`,
+                fontSize: '12.5px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Upload size={14} />
+              <span>Import</span>
+            </button>
+          )}
+
+          {/* Reset Button */}
+          {onResetClick && (
+            <button
+              onClick={onResetClick}
+              title="Reset progress"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 14px',
+                borderRadius: '10px',
+                backgroundColor: isDark ? 'rgba(239, 68, 68, 0.12)' : '#FEF2F2',
+                color: '#EF4444',
+                border: '1px solid rgba(239, 68, 68, 0.25)',
+                fontSize: '12.5px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <RotateCcw size={14} />
+              <span>Reset</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Navigation Pills Bar */}
+      {/* Navigation View Switcher Tabs */}
       <div
         style={{
           display: 'flex',
@@ -200,7 +228,7 @@ export default function DsaHeader({
                 border: 'none',
                 cursor: 'pointer',
                 backgroundColor: isActive
-                  ? (isDark ? '#2872A1' : '#2872A1')
+                  ? '#2872A1'
                   : 'transparent',
                 color: isActive
                   ? '#FFFFFF'

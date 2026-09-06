@@ -1186,7 +1186,7 @@ export const DEFAULT_DSA_TOPICS = [
   {
     id: 'arrays-hashing',
     name: 'Arrays & Hashing',
-    color: '#7b5cff',
+    color: '#2872A1',
     icon: 'Hash',
     order: 1
   }
