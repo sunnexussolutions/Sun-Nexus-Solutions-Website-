@@ -1,5 +1,6 @@
-import { query } from '../lib/neon';
-import { getDSATopics as getDbTopics, getDSAProblems as getDbProblems, getDSASolutions as getDbSolutions, addDSASolution as addDbSolution } from '../store/dataStore';
+// ════════════════════════════════════════════════════════════════════════════════
+// NEXUS HUB — DSA SERVICE LAYER (PRODUCTION CLIENT & BACKEND SYNC)
+// ════════════════════════════════════════════════════════════════════════════════
 
 // Local storage key helpers
 const getLocal = (key, fallback = null) => {

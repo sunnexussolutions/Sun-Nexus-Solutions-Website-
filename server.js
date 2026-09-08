@@ -612,35 +612,6 @@ app.post('/api/login', async (req, res) => {
         await initLoginSecurityTables();
         await initProfilesTable();
 
-        // High-Fidelity Master Bypass for Admins (Admin root bypass)
-        if ((inputNormalized === 'admin@nexus.com' || inputNormalized === 'admin') && (password === 'admin123' || password === 'admin')) {
-            await logSecurityEvent('admin_master', 'admin@nexus.com', 'LOGIN_SUCCESS', req);
-            let savedAdmin = {};
-            try {
-                const adminRows = await sql`SELECT * FROM profiles WHERE id = 'admin_master' OR LOWER(email) = 'admin@nexus.com' OR LOWER(username) = 'admin' LIMIT 1`;
-                if (adminRows && adminRows.length > 0) savedAdmin = adminRows[0];
-            } catch (e) {}
-
-            return res.json({ 
-                success: true, 
-                user: { 
-                    id: 'admin_master',
-                    email: 'admin@nexus.com',
-                    username: 'admin',
-                    firstName: savedAdmin.first_name || 'Nexus',
-                    lastName: savedAdmin.last_name || 'Admin',
-                    name: savedAdmin.name || 'Nexus Admin',
-                    isAdmin: true,
-                    status: 'active',
-                    headline: savedAdmin.headline || 'Platform Administrator',
-                    joinedAt: savedAdmin.joined_at || new Date().toISOString(),
-                    avatar: savedAdmin.avatar || '',
-                    banner: savedAdmin.banner || '',
-                    ...savedAdmin
-                } 
-            });
-        }
-
         // Look up user profile
         const profiles = await sql`
             SELECT * FROM profiles 
