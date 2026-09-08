@@ -38,29 +38,40 @@ function initNexusNavigation() {
         });
     }
 
-    // ── 2. Dropdown Hover & Touch Protocol with Graceful Delay ───────────────
+    // ── 2. Dropdown Hover & Mobile Accordion Protocol ───────────────────────
     const dropdowns = document.querySelectorAll('.nav-dropdown');
     dropdowns.forEach(dropdown => {
         const toggle = dropdown.querySelector('.dropdown-toggle');
         let closeTimer = null;
 
+        // Desktop hover protocol (active only above 1024px)
         dropdown.addEventListener('mouseenter', () => {
-            if (closeTimer) clearTimeout(closeTimer);
-            dropdown.classList.add('open');
+            if (window.innerWidth > 1024) {
+                if (closeTimer) clearTimeout(closeTimer);
+                dropdown.classList.add('open');
+            }
         });
 
         dropdown.addEventListener('mouseleave', () => {
-            if (closeTimer) clearTimeout(closeTimer);
-            closeTimer = setTimeout(() => {
-                dropdown.classList.remove('open');
-            }, 150); // 220ms smooth & responsive delay time before closing dropdown
+            if (window.innerWidth > 1024) {
+                if (closeTimer) clearTimeout(closeTimer);
+                closeTimer = setTimeout(() => {
+                    dropdown.classList.remove('open');
+                }, 150);
+            }
         });
 
         if (toggle) {
             toggle.addEventListener('click', (e) => {
-                if (window.innerWidth <= 992) {
-                    // On mobile, click toggles sub-menu
-                    dropdown.classList.toggle('open');
+                if (window.innerWidth <= 1024) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const isAlreadyOpen = dropdown.classList.contains('open');
+                    // Accordion behavior: close other open dropdowns for a clean viewport
+                    dropdowns.forEach(d => {
+                        if (d !== dropdown) d.classList.remove('open');
+                    });
+                    dropdown.classList.toggle('open', !isAlreadyOpen);
                 }
             });
         }
@@ -80,14 +91,16 @@ function initNexusNavigation() {
             
             if (isOpening) {
                 navLinks.classList.add('active');
+                document.body.classList.add('nexus-menu-open');
                 menuToggle.textContent = '✕';
-                menuToggle.style.transform = 'rotate(90deg)';
                 menuToggle.setAttribute('aria-expanded', 'true');
             } else {
                 navLinks.classList.remove('active');
+                document.body.classList.remove('nexus-menu-open');
                 menuToggle.textContent = '☰';
-                menuToggle.style.transform = 'rotate(0deg)';
                 menuToggle.setAttribute('aria-expanded', 'false');
+                // Reset open dropdowns on close
+                dropdowns.forEach(d => d.classList.remove('open'));
             }
         }
 
@@ -120,9 +133,10 @@ function initNexusNavigation() {
             }
         });
 
-        // Close menu automatically if window resized above mobile breakpoint (992px)
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 992 && navLinks.classList.contains('active')) {
+        // Close menu automatically if window resized above mobile breakpoint (1024px)
+        const mediaQuery = window.matchMedia('(min-width: 1025px)');
+        mediaQuery.addEventListener('change', (e) => {
+            if (e.matches && navLinks.classList.contains('active')) {
                 toggleMenu(true);
             }
         });

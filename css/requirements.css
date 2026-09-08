@@ -611,7 +611,7 @@ body.light-mode .req-select {
 /* Checkbox & Radio Grids */
 .req-checkbox-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr));
   gap: 10px;
   margin-top: 10px;
 }
@@ -1200,15 +1200,67 @@ body.light-mode .trust-dot {
 }
 
 @media (max-width: 768px) {
+  .hero-float-badge {
+    display: none !important;
+  }
+  .req-hero {
+    padding: 100px 16px 30px;
+  }
+  .req-steps-bar {
+    padding: 12px 14px;
+    gap: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .req-step {
+    padding: 6px 8px;
+    font-size: 1.2rem;
+  }
   .req-form-sheet {
     padding: 20px 16px;
   }
   .req-actions-bar {
     flex-direction: column-reverse;
     width: 100%;
+    gap: 12px;
   }
   .req-submit-btn, .req-reset-btn {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .req-hero {
+    padding: 85px 12px 24px;
+  }
+  .req-hero h1 {
+    font-size: clamp(2.4rem, 7vw, 3.2rem);
+  }
+  .req-form-sheet {
+    padding: 16px 12px;
+    border-radius: 12px;
+  }
+  .req-checkbox-label,
+  .req-radio-label {
+    padding: 8px 10px;
+    font-size: 1.2rem;
+  }
+  .req-terms-checkbox-label {
+    gap: 10px;
+  }
+  .req-terms-text {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 374px) {
+  .req-hero {
+    padding: 75px 8px 20px;
+  }
+  .req-form-sheet {
+    padding: 14px 10px;
+  }
+  .req-checkbox-grid {
+    grid-template-columns: 1fr;
   }
 }

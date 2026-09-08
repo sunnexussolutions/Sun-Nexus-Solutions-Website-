@@ -1261,57 +1261,61 @@ body.light-mode .leader-socials a:hover {
    5. RESPONSIVE BREAKPOINTS (ALL SCREENS)
    ════════════════════════════════════════════════════ */
 @media (max-width: 1200px) {
-  .hero-title { font-size: 5.2rem; }
+  .hero-title { font-size: 4.8rem; }
   .hero-container { gap: 30px; }
-  .logbook-featured-card { padding: 44px 36px; gap: 30px; }
+  .logbook-featured-card { padding: 40px 32px; gap: 30px; }
 }
 
 @media (max-width: 1024px) {
+  .hero-section {
+    padding: 110px 20px 50px;
+  }
   .hero-container {
-    flex-direction: column;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
     text-align: center;
-    gap: 45px;
+    gap: 40px;
   }
   .hero-left {
+    align-items: center;
     text-align: center;
-    flex: 1 1 auto;
     width: 100%;
   }
   .hero-desc {
-    margin: 0 auto 36px;
+    margin: 0 auto 30px;
   }
   .hero-btn-group {
     justify-content: center;
   }
   .hero-right {
-    flex: 1 1 auto;
-    max-width: 600px;
+    max-width: 540px;
+    margin: 0 auto;
+    width: 100%;
     order: -1;
-    display: flex;
-    flex-direction: column;
   }
   .hero-image-card {
-    order: -1;
     width: 100%;
   }
   .hero-stats-row,
   .values-grid,
   .leadership-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px;
   }
   .why-icons-row {
     grid-template-columns: 1fr;
     max-width: 550px;
+    margin: 0 auto;
   }
   .logbook-featured-card {
     flex-direction: column;
     text-align: center;
     padding: 30px 20px;
-    gap: 10px;
+    gap: 16px;
   }
   .logbook-text-area {
     text-align: center;
-    flex: 1 1 auto;
+    width: 100%;
   }
   .logbook-description {
     margin: 0 auto 20px;
@@ -1324,31 +1328,103 @@ body.light-mode .leader-socials a:hover {
 }
 
 @media (max-width: 768px) {
+  .hero-section {
+    padding: 95px 16px 40px;
+  }
   .hero-badges-row {
     display: none !important;
   }
-}
-
-@media (max-width: 640px) {
-  .hero-section { padding: 100px 20px 40px; }
-  .hero-title { font-size: 4.0rem; }
-  .hero-subtitle { font-size: 1.8rem; }
-  .hero-desc { font-size: 1.5rem; }
-  .hero-badges-row { display: none !important; }
   .hero-stats-row,
   .values-grid,
-  .leadership-grid,
-  .why-icons-row {
-    grid-template-columns: 1fr;
+  .leadership-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .hero-btn-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+  .btn-explore,
+  .btn-join {
+    width: 100%;
+    justify-content: center;
   }
   .section-title,
   .logbook-heading,
-  .why-heading { font-size: 3.0rem; }
+  .why-heading {
+    font-size: 3.0rem;
+  }
   .section-subtitle,
-  .why-subtext { font-size: 1.55rem; margin-bottom: 36px; }
-  .notebook-3d { width: 100%; max-width: 300px; height: 200px; padding: 24px; }
-  .ring-1 { width: 260px; height: 70px; margin-top: 70px; }
-  .ring-2 { width: 300px; height: 90px; margin-top: 65px; }
+  .why-subtext {
+    font-size: 1.45rem;
+    margin-bottom: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    padding: 85px 12px 30px;
+  }
+  .hero-title {
+    font-size: clamp(2.6rem, 7.5vw, 3.4rem);
+  }
+  .hero-subtitle {
+    font-size: 1.55rem;
+  }
+  .hero-desc {
+    font-size: 1.35rem;
+  }
+  .stat-grid-card,
+  .val-card,
+  .leader-card,
+  .why-card {
+    padding: 20px 16px !important;
+    border-radius: 14px !important;
+  }
+  .notebook-3d {
+    width: 100%;
+    max-width: 260px;
+    height: 180px;
+    padding: 20px 16px;
+  }
+  .ring-1 {
+    width: 220px;
+    height: 60px;
+    margin-top: 55px;
+  }
+  .ring-2 {
+    width: 250px;
+    height: 75px;
+    margin-top: 50px;
+  }
+}
+
+@media (max-width: 374px) {
+  .hero-section {
+    padding: 75px 8px 24px;
+  }
+  .hero-title {
+    font-size: 2.3rem;
+  }
+  .hero-subtitle {
+    font-size: 1.4rem;
+  }
+  .hero-desc {
+    font-size: 1.25rem;
+  }
+  .notebook-3d {
+    max-width: 210px;
+    height: 150px;
+    padding: 12px;
+  }
+  .ring-1 {
+    width: 180px;
+    height: 50px;
+  }
+  .ring-2 {
+    width: 200px;
+    height: 60px;
+  }
 }
 
 /* ════════════════════════════════════════════════════

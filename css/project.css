@@ -606,7 +606,7 @@ body.light-mode .project-category-accordion.open .category-accordion-content {
    ══════════════════════════════════════════════════════════════ */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 24px;
 }
 
@@ -938,7 +938,7 @@ body.light-mode .team-label {
    ══════════════════════════════════════════════════════════════ */
 .skeleton-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 24px;
   margin-bottom: 32px;
 }
@@ -1738,5 +1738,17 @@ body.light-mode .member-role-dot {
   }
   .project-category-accordion.open .category-accordion-content {
     padding: 16px;
+  }
+}
+
+@media (max-width: 374px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .projects-hero {
+    padding: 24px 10px 16px;
+  }
+  .stat-card {
+    padding: 10px;
   }
 }

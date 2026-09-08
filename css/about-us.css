@@ -757,6 +757,10 @@ body.light-mode .team-card h5 {
   .about-main-container {
     padding-top: 100px;
   }
+  .about-content-wrapper,
+  .nexus-cta-section {
+    padding: 0 14px;
+  }
   .about-badge {
     font-size: 1rem;
     padding: 4px 12px;
@@ -771,5 +775,21 @@ body.light-mode .team-card h5 {
   }
   .nexus-cta-card {
     padding: 28px 16px;
+  }
+}
+
+@media (max-width: 374px) {
+  .about-main-container {
+    padding-top: 85px;
+  }
+  .about-content-wrapper,
+  .nexus-cta-section {
+    padding: 0 10px;
+  }
+  .about-hero-title {
+    font-size: 2.4rem;
+  }
+  .card.domain-card {
+    padding: 18px 12px;
   }
 }
