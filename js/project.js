@@ -1340,8 +1340,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Project Description
     detailsHtml += `
-      <div class="modal-description-box" style="margin-bottom: 24px;">
-        <p style="font-size: 14.5px; line-height: 1.7; color: var(--text-secondary); margin: 0; font-weight: 400;">
+      <div class="modal-description-box">
+        <p>
           ${data.details || data.description || data.summary || ''}
         </p>
       </div>
@@ -1350,12 +1350,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Key Challenges & Technical Solutions
     if (data.challenges) {
       detailsHtml += `
-        <div class="modal-challenges-box" style="margin-bottom: 24px; padding: 18px 22px; border-radius: 14px; border: 1px solid rgba(74, 144, 194, 0.25); background: rgba(40, 114, 161, 0.05);">
+        <div class="modal-challenges-box">
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
             <span style="font-size: 16px;">⚡</span>
             <strong style="color: var(--nexus-secondary, #4A90C2); font-size: 13px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;">Key Challenges & Solutions</strong>
           </div>
-          <p style="margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--text-secondary);">${data.challenges}</p>
+          <p>${data.challenges}</p>
         </div>
       `;
     }
@@ -1363,10 +1363,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Tech Stack
     if (Array.isArray(data.techStack) && data.techStack.length > 0) {
       detailsHtml += `
-        <div class="modal-tech-section" style="margin-bottom: 26px;">
+        <div class="modal-tech-section">
           <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
             <span style="font-size: 14px;">🛠️</span>
-            <strong style="color: var(--text-primary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">TECHNOLOGY STACK</strong>
+            <strong class="modal-tech-title">TECHNOLOGY STACK</strong>
           </div>
           <div class="modal-tech-pills" style="display: flex; flex-wrap: wrap; gap: 8px;">
             ${data.techStack.map(t => {
@@ -1381,7 +1381,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Action Buttons
     const apkLink = data.apk || data.apk_url || data.apkUrl || '';
     if (data.visit || data.github || apkLink) {
-      detailsHtml += `<div class="modal-action-buttons" style="margin-top: 24px; margin-bottom: 28px; display: flex; gap: 14px; flex-wrap: wrap;">`;
+      detailsHtml += `<div class="modal-action-buttons">`;
       if (data.visit) {
         detailsHtml += `<a href="${data.visit}" target="_blank" class="modal-btn-live">🌐 Live Demo ↗</a>`;
       }

@@ -177,14 +177,26 @@ body.light-mode .event-card:hover {
 }
 
 .event-icon {
-  font-size: 3.6rem;
+  font-size: 5.8rem;
+  line-height: 1;
   text-align: center;
-  margin: 8px 0 16px;
-  transition: transform 0.3s ease;
+  margin: 12px auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.event-icon img,
+.event-icon svg {
+  width: 62px;
+  height: 62px;
+  object-fit: contain;
+  display: block;
 }
 
 .event-card:hover .event-icon {
-  transform: scale(1.08);
+  transform: scale(1.14);
 }
 
 .event-card h2 {
@@ -361,28 +373,33 @@ body.light-mode .modal-content.pixel-modal {
 }
 
 .brain-badge-glow {
-  width: 60px;
-  height: 60px;
-  border-radius: 12px;
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  overflow: hidden;
   border: 1px solid rgba(203, 221, 233, 0.2);
   background: rgba(14, 39, 64, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
 [data-theme="light"] .brain-badge-glow {
   background: #FFFFFF;
   border-color: #CBDDE9;
-  box-shadow: 0 2px 8px rgba(13, 27, 42, 0.08);
+  box-shadow: 0 4px 14px rgba(13, 27, 42, 0.08);
 }
 
 .brain-badge-glow .modal-logo {
-  width: 40px;
-  height: 40px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  transform: scale(2.0);
+  transform-origin: center;
+  display: block;
 }
 
 /* Top Section Grid */

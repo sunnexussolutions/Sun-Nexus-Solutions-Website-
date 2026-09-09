@@ -1670,9 +1670,12 @@ body.light-mode .footer-col-title {
   /* Modal Tweaks */
   .modal-content {
     width: 95% !important;
-    margin: 10px auto !important;
-    padding: 24px 15px !important;
-    max-height: 90vh !important;
+    margin: 16px auto !important;
+    padding: 24px 16px !important;
+    max-height: calc(100dvh - 32px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    box-sizing: border-box !important;
   }
   
   .modal-content h2 {

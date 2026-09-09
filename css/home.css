@@ -82,13 +82,67 @@
 }
 
 .hero-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
   font-size: clamp(3.2rem, 4.8vw, 5.2rem);
   font-weight: 800;
-  line-height: 1.12;
+  line-height: 1.15;
   letter-spacing: -0.025em;
   margin-bottom: 18px;
   font-family: 'Poppins', sans-serif;
   word-wrap: break-word;
+}
+
+.hero-title-logo-wrap {
+  width: clamp(48px, 4.8vw, 58px);
+  height: clamp(48px, 4.8vw, 58px);
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(14, 39, 64, 0.75);
+  border: 1.5px solid rgba(203, 221, 233, 0.22);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-title-logo-wrap:hover {
+  border-color: var(--nexus-secondary, #4A90C2);
+  box-shadow: 0 6px 22px rgba(74, 144, 194, 0.35);
+  transform: translateY(-2px) scale(1.04);
+}
+
+.hero-title-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(2.0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+.hero-title-logo-wrap:hover .hero-title-logo {
+  transform: scale(2.12);
+}
+
+[data-theme="light"] .hero-title-logo-wrap,
+body.light-mode .hero-title-logo-wrap {
+  background: #FFFFFF !important;
+  border: 1px solid #CBDDE9 !important;
+  box-shadow: 0 4px 14px rgba(13, 27, 42, 0.08) !important;
+}
+
+[data-theme="light"] .hero-title-logo-wrap:hover,
+body.light-mode .hero-title-logo-wrap:hover {
+  border-color: var(--color-primary, #2872A1) !important;
+  box-shadow: 0 6px 20px rgba(40, 114, 161, 0.2) !important;
 }
 
 .title-main {
@@ -854,36 +908,58 @@ body.light-mode .hero-subtitle {
   transform: none;
 }
 
+.logbook-logo-wrap,
 .logbook-logo-circle {
   width: 84px;
   height: 84px;
-  border-radius: 50%;
+  border-radius: 16px;
   overflow: hidden;
   padding: 0;
-  background: rgba(15, 23, 42, 0.5);
-  border: 2px solid rgba(0, 242, 254, 0.8);
-  box-shadow: 0 0 25px rgba(0, 242, 254, 0.6);
+  background: rgba(14, 39, 64, 0.75);
+  border: 1.5px solid rgba(203, 221, 233, 0.22);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 16px;
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+.logbook-featured-card:hover .logbook-logo-wrap,
 .logbook-featured-card:hover .logbook-logo-circle {
-  box-shadow: 0 0 35px rgba(0, 242, 254, 0.9);
-  border-color: #00f2fe;
+  border-color: var(--nexus-secondary, #4A90C2);
+  box-shadow: 0 6px 24px rgba(74, 144, 194, 0.35);
+  transform: translateY(-2px);
 }
 .logbook-inner-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transform: scale(1.9);
+  transform: scale(2.0);
   transform-origin: center;
   transition: transform 0.3s ease;
   display: block;
 }
 .logbook-featured-card:hover .logbook-inner-img {
-  transform: scale(2.0);
+  transform: scale(2.12);
+}
+
+[data-theme="light"] .logbook-logo-wrap,
+[data-theme="light"] .logbook-logo-circle,
+body.light-mode .logbook-logo-wrap,
+body.light-mode .logbook-logo-circle {
+  background: #FFFFFF !important;
+  border: 1px solid #CBDDE9 !important;
+  box-shadow: 0 4px 16px rgba(13, 27, 42, 0.08) !important;
+}
+
+[data-theme="light"] .logbook-featured-card:hover .logbook-logo-wrap,
+[data-theme="light"] .logbook-featured-card:hover .logbook-logo-circle,
+body.light-mode .logbook-featured-card:hover .logbook-logo-wrap,
+body.light-mode .logbook-featured-card:hover .logbook-logo-circle {
+  border-color: var(--color-primary, #2872A1) !important;
+  box-shadow: 0 6px 20px rgba(40, 114, 161, 0.2) !important;
 }
 
 .neon-ring {
@@ -1367,6 +1443,12 @@ body.light-mode .leader-socials a:hover {
   }
   .hero-title {
     font-size: clamp(2.6rem, 7.5vw, 3.4rem);
+    gap: 10px;
+  }
+  .hero-title-logo-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
   }
   .hero-subtitle {
     font-size: 1.55rem;
@@ -1405,6 +1487,12 @@ body.light-mode .leader-socials a:hover {
   }
   .hero-title {
     font-size: 2.3rem;
+    gap: 8px;
+  }
+  .hero-title-logo-wrap {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
   }
   .hero-subtitle {
     font-size: 1.4rem;
