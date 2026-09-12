@@ -1,6 +1,6 @@
 async function testCors() {
   const neonUrl = 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/sql';
-  const dbUrl = 'postgresql://neondb_owner:REDACTED_SECRET@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+  const dbUrl = 'process.env.DATABASE_URL';
 
   // Test OPTIONS preflight
   const optRes = await fetch(neonUrl, {

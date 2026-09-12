@@ -31,6 +31,7 @@ import DsaProblemDetailsModal from '../components/dsa/DsaProblemDetailsModal';
 import DsaResetModal from '../components/dsa/DsaResetModal';
 import DsaImportModal from '../components/dsa/DsaImportModal';
 import DsaSkeleton from '../components/dsa/DsaSkeleton';
+import '../components/dsa/dsaResponsive.css';
 
 export default function DSA({ activePage = 'dsa', setActivePage }) {
   const { theme } = useTheme();
@@ -214,6 +215,7 @@ export default function DSA({ activePage = 'dsa', setActivePage }) {
 
   return (
     <div
+      className="dsa-page-root"
       style={{
         display: 'flex',
         flexDirection: 'column',

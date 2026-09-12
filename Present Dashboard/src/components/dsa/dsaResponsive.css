@@ -1,0 +1,439 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DSA SHEET RESPONSIVE MOBILE & SMALL SCREEN STYLES
+   Tailored specifically for mobile viewports (<= 768px and <= 480px)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. DSA Page Container ────────────────────────────────────────────────── */
+.dsa-page-root {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+}
+
+@media (max-width: 640px) {
+  .dsa-page-root {
+    padding: 0 2px;
+  }
+}
+
+/* ── 2. Top Banner Header ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .dsa-header-card {
+    padding: 16px !important;
+    gap: 14px !important;
+    border-radius: 16px !important;
+  }
+  .dsa-header-title {
+    font-size: 18px !important;
+  }
+  .dsa-header-subtitle {
+    font-size: 12px !important;
+  }
+  .dsa-header-actions {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+  }
+  .dsa-header-btn {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .dsa-header-card {
+    padding: 12px 14px !important;
+    gap: 10px !important;
+  }
+  .dsa-header-icon-box {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+  }
+  .dsa-header-icon-box svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+  .dsa-header-actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .dsa-header-updated-badge {
+    padding: 5px 8px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* ── 3. Navigation View Switcher Tabs ──────────────────────────────────────── */
+.dsa-nav-tabs-container {
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.dsa-nav-tabs-container::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .dsa-nav-tabs-container {
+    padding: 4px !important;
+    gap: 4px !important;
+    border-radius: 12px !important;
+  }
+  .dsa-nav-tab-btn {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    gap: 6px !important;
+  }
+  .dsa-nav-tab-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+/* ── 4. Stats Cards Grid ──────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .dsa-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+  .dsa-stat-card {
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+    gap: 8px !important;
+  }
+  .dsa-stat-label {
+    font-size: 11px !important;
+  }
+  .dsa-stat-value {
+    font-size: 17px !important;
+  }
+  .dsa-stat-icon-box {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 9px !important;
+  }
+  .dsa-stat-icon-box svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .dsa-stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+}
+
+/* ── 5. Multi-Criteria Filters Toolbar ────────────────────────────────────── */
+@media (max-width: 768px) {
+  .dsa-filters-card {
+    padding: 12px 14px !important;
+    gap: 10px !important;
+    border-radius: 14px !important;
+    margin-bottom: 16px !important;
+  }
+  .dsa-filters-pill-btn {
+    padding: 6px 12px !important;
+    font-size: 11.5px !important;
+  }
+  .dsa-random-prob-btn {
+    padding: 6px 12px !important;
+    font-size: 11.5px !important;
+  }
+  .dsa-filters-dropdowns-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .dsa-filters-search-col {
+    grid-column: 1 / -1 !important;
+  }
+  .dsa-filters-topic-col {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .dsa-filters-top-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  .dsa-filters-pills-group {
+    display: flex !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    padding-bottom: 2px !important;
+    width: 100% !important;
+  }
+  .dsa-filters-pills-group::-webkit-scrollbar {
+    display: none;
+  }
+  .dsa-random-prob-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* ── 6. Chapter Cards & Headers ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .dsa-chapter-card {
+    border-radius: 14px !important;
+  }
+  .dsa-chapter-header-btn {
+    padding: 12px 14px !important;
+    gap: 10px !important;
+  }
+  .dsa-chapter-left {
+    gap: 10px !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+  .dsa-chapter-num-box {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 13px !important;
+    border-radius: 9px !important;
+  }
+  .dsa-chapter-title {
+    font-size: 14px !important;
+  }
+  .dsa-chapter-subtitle {
+    font-size: 11px !important;
+  }
+  .dsa-chapter-right {
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+  }
+  .dsa-chapter-progress-box {
+    min-width: 76px !important;
+  }
+  .dsa-chapter-progress-text {
+    font-size: 11px !important;
+  }
+  .dsa-chapter-chevron-box {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+  }
+  .dsa-chapter-body {
+    padding: 6px 8px 14px 8px !important;
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 440px) {
+  .dsa-chapter-header-btn {
+    padding: 10px 10px !important;
+  }
+  .dsa-chapter-left {
+    min-width: 100% !important;
+    margin-bottom: 2px !important;
+  }
+  .dsa-chapter-right {
+    width: 100% !important;
+    justify-content: space-between !important;
+    padding-left: 46px !important;
+  }
+  .dsa-chapter-progress-box {
+    flex: 1 !important;
+    max-width: 180px !important;
+  }
+}
+
+/* ── 7. Section Cards (Subtopics) ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .dsa-section-btn {
+    padding: 10px 12px !important;
+    gap: 6px !important;
+  }
+  .dsa-section-title {
+    font-size: 13px !important;
+  }
+  .dsa-section-meta {
+    font-size: 11px !important;
+  }
+  .dsa-section-body {
+    padding: 6px 6px !important;
+    gap: 6px !important;
+  }
+}
+
+/* ── 8. Problem Rows (CRITICAL FOR SMALL SCREENS) ─────────────────────────── */
+.dsa-problem-row {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.dsa-problem-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.dsa-problem-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 680px) {
+  .dsa-problem-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
+  }
+
+  .dsa-problem-left {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .dsa-problem-check-btn {
+    margin-top: 1px !important;
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 7px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .dsa-problem-title-box {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .dsa-problem-title {
+    font-size: 13.5px !important;
+    line-height: 1.35 !important;
+    word-break: break-word !important;
+  }
+
+  .dsa-problem-tags-row {
+    margin-top: 3px !important;
+    gap: 4px !important;
+  }
+
+  .dsa-problem-right {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    padding-top: 8px !important;
+    border-top: 1px dashed rgba(203, 221, 233, 0.16) !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .dsa-problem-icons-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .dsa-problem-actions-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-left: auto !important;
+  }
+
+  .dsa-problem-practice-btn {
+    padding: 5px 10px !important;
+    font-size: 11px !important;
+    border-radius: 7px !important;
+  }
+
+  .dsa-problem-diff-badge {
+    padding: 2px 7px !important;
+    font-size: 10.5px !important;
+    min-width: 44px !important;
+  }
+}
+
+/* ── 9. Problem Details Modal ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .dsa-modal-backdrop {
+    padding: 8px !important;
+  }
+  .dsa-modal-dialog {
+    max-height: 96vh !important;
+    border-radius: 16px !important;
+  }
+  .dsa-modal-header {
+    padding: 12px 14px !important;
+    gap: 10px !important;
+  }
+  .dsa-modal-title {
+    font-size: 15px !important;
+    white-space: normal !important;
+    line-height: 1.3 !important;
+  }
+  .dsa-modal-tabs-bar {
+    padding: 6px 10px !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .dsa-modal-tabs-bar::-webkit-scrollbar {
+    display: none;
+  }
+  .dsa-modal-tab-btn {
+    padding: 5px 10px !important;
+    font-size: 11.5px !important;
+    white-space: nowrap !important;
+  }
+  .dsa-modal-body {
+    padding: 14px !important;
+  }
+  .dsa-modal-footer {
+    padding: 10px 14px !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .dsa-modal-footer-btn {
+    padding: 7px 12px !important;
+    font-size: 12px !important;
+    flex: 1 1 auto !important;
+    justify-content: center !important;
+  }
+}
+
+/* ── 10. Bookmarks View ──────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .dsa-bookmarks-header {
+    padding: 12px 14px !important;
+    gap: 10px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .dsa-bookmarks-search-box {
+    width: 100% !important;
+  }
+}
+
+/* ── 11. User Dashboard / Progress View ──────────────────────────────────── */
+@media (max-width: 640px) {
+  .dsa-user-dash-diff-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+}

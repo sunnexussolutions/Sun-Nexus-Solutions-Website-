@@ -4,8 +4,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const dbUrl = process.env.VITE_NEON_URL || process.env.DATABASE_URL || 'postgresql://neondb_owner:REDACTED_SECRET@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
-const sql = neon(dbUrl);
+const dbUrl = process.env.DATABASE_URL || process.env.VITE_NEON_URL;
+if (!dbUrl) {
+    console.error('⚠️ WARNING: DATABASE_URL / VITE_NEON_URL environment variable is not defined.');
+}
+const sql = neon(dbUrl || '');
 
 export const dsaRouter = express.Router();
 export const adminDsaRouter = express.Router();

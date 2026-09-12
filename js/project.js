@@ -734,31 +734,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return String(t).toLowerCase().replace(/[^a-z0-9]/g, '').trim();
   };
 
-  // ── Fetch Projects from Central Database API ──
-  // ── Neon DB Direct Endpoint Config (Production Vercel Fallback) ──
-  const NEON_DB_URL = 'postgresql://neondb_owner:REDACTED_SECRET@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
-  const NEON_SQL_ENDPOINT = 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/sql';
-
-  const fetchProjectsDirectFromNeon = async () => {
-    try {
-      const res = await fetch(NEON_SQL_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Neon-Connection-String': NEON_DB_URL
-        },
-        body: JSON.stringify({
-          query: 'SELECT * FROM projects WHERE deleted_at IS NULL ORDER BY display_order ASC, created_at DESC'
-        })
-      });
-      if (!res.ok) throw new Error(`Neon HTTP error: ${res.status}`);
-      const data = await res.json();
-      return Array.isArray(data.rows) ? data.rows : [];
-    } catch (e) {
-      console.warn("Direct Neon DB fetch fallback notice:", e.message);
-      return null;
-    }
-  };
+  // ── Central Project Data Pipeline ──
 
   // ── Deleted Project Set (resolved once, reused everywhere) ──
   const deletedSet = (() => {
@@ -889,18 +865,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (emptyState) emptyState.style.display = "none";
     }
 
-    // ── STEP 1: Try live Neon DB direct HTTP endpoint (works on Vercel & localhost) ──
-    try {
-      const directNeonRows = await fetchProjectsDirectFromNeon();
-      if (processRawProjects(directNeonRows)) return;
-    } catch (e) {
-      console.warn('Neon direct fetch failed:', e.message);
-    }
-
-    // ── STEP 2: Try local backend API (only useful when server.js on port 3000 is running) ──
+    // ── Fetch Fresh Projects from Backend API (/api/projects/public) ──
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 1500);
+      const timeout = setTimeout(() => controller.abort(), 3000);
       const response = await fetch(`${getApiBaseUrl()}/api/projects/public?_t=${Date.now()}`, {
         signal: controller.signal,
         cache: 'no-store',
@@ -914,7 +882,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (processRawProjects(apiProjects)) return;
       }
     } catch (e) {
-      // Timed out or connection refused — silently skip
+      // Offline / server downtime — preserve existing rendered data
     }
 
     // ── STEP 3: If allProjects still empty after all attempts, show error ──

@@ -5,16 +5,15 @@ import { neon } from '@neondatabase/serverless';
  * We are wrapping the query in a high-visibility logger to catch 
  * hidden browser security blocks.
  */
-const DEFAULT_NEON_URL = 'postgresql://neondb_owner:REDACTED_SECRET@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
-const neonUrl = import.meta.env.VITE_NEON_URL || DEFAULT_NEON_URL;
+const neonUrl = import.meta.env.VITE_NEON_URL || '';
 
-if (!neonUrl) {
-  console.error("CRITICAL_ERROR: VITE_NEON_URL is missing.");
-}
-
-const sql = neon(neonUrl);
+const sql = neonUrl ? neon(neonUrl) : null;
 
 export const query = async (queryString, params = []) => {
+  if (!sql) {
+    console.warn("VITE_NEON_URL not provided, skipping direct cloud DB call.");
+    return [];
+  }
   console.log("📡 CALLING_CLOUD_DATABASE...", { query: queryString.substring(0, 50) + "..." });
   
   try {

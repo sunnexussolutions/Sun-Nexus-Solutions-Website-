@@ -52,6 +52,7 @@ export default function DsaFilters({
 
   return (
     <div
+      className="dsa-filters-card"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -68,6 +69,7 @@ export default function DsaFilters({
     >
       {/* ── Top Toolbar Row: All Problems | Revision | Bookmarked Pills + Random Problem ── */}
       <div
+        className="dsa-filters-top-row"
         style={{
           display: 'flex',
           flexWrap: 'wrap',
@@ -77,7 +79,7 @@ export default function DsaFilters({
         }}
       >
         {/* Filter Pills */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+        <div className="dsa-filters-pills-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           {/* All Problems Pill */}
           <button
             onClick={() => {
@@ -85,6 +87,7 @@ export default function DsaFilters({
               setRevisionOnly(false);
               setStatusFilter('ALL');
             }}
+            className="dsa-filters-pill-btn"
             style={{
               padding: '7px 16px',
               borderRadius: '999px',
@@ -111,6 +114,7 @@ export default function DsaFilters({
               setRevisionOnly(!revisionOnly);
               if (!revisionOnly) setStatusFilter('ALL');
             }}
+            className="dsa-filters-pill-btn"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -155,6 +159,7 @@ export default function DsaFilters({
               setBookmarkOnly(!bookmarkOnly);
               if (!bookmarkOnly) setStatusFilter('ALL');
             }}
+            className="dsa-filters-pill-btn"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -197,6 +202,7 @@ export default function DsaFilters({
         {onPickRandom && (
           <button
             onClick={onPickRandom}
+            className="dsa-random-prob-btn"
             title="Pick a random matching problem"
             style={{
               display: 'inline-flex',
@@ -221,6 +227,7 @@ export default function DsaFilters({
 
       {/* ── Search & Filter Selectors Row ── */}
       <div
+        className="dsa-filters-dropdowns-grid"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -230,7 +237,7 @@ export default function DsaFilters({
         }}
       >
         {/* Search Box */}
-        <div style={{ position: 'relative', width: '100%' }}>
+        <div className="dsa-filters-search-col" style={{ position: 'relative', width: '100%' }}>
           <Search
             size={15}
             style={{
@@ -282,70 +289,74 @@ export default function DsaFilters({
         </div>
 
         {/* Problem Status Filter Dropdown */}
-        <select
-          value={statusFilter}
-          onChange={(e) => {
-            const val = e.target.value;
-            setStatusFilter(val);
-            if (val === 'REVISION') {
-              setRevisionOnly(true);
-              setBookmarkOnly(false);
-            } else if (val === 'BOOKMARKED') {
-              setBookmarkOnly(true);
-              setRevisionOnly(false);
-            } else {
-              setBookmarkOnly(false);
-              setRevisionOnly(false);
-            }
-          }}
-          style={{
-            width: '100%',
-            padding: '9px 12px',
-            borderRadius: '10px',
-            border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'}`,
-            backgroundColor: isDark ? '#0B1F33' : '#EFF6FB',
-            color: isDark ? '#F3F7FB' : '#0D1B2A',
-            fontSize: '13px',
-            outline: 'none',
-            fontFamily: "'Poppins', sans-serif",
-            cursor: 'pointer',
-            boxSizing: 'border-box'
-          }}
-        >
-          {STATUS_OPTIONS.map((st) => (
-            <option key={st.id} value={st.id}>
-              {st.label}
-            </option>
-          ))}
-        </select>
+        <div className="dsa-filters-status-col" style={{ width: '100%' }}>
+          <select
+            value={statusFilter}
+            onChange={(e) => {
+              const val = e.target.value;
+              setStatusFilter(val);
+              if (val === 'REVISION') {
+                setRevisionOnly(true);
+                setBookmarkOnly(false);
+              } else if (val === 'BOOKMARKED') {
+                setBookmarkOnly(true);
+                setRevisionOnly(false);
+              } else {
+                setBookmarkOnly(false);
+                setRevisionOnly(false);
+              }
+            }}
+            style={{
+              width: '100%',
+              padding: '9px 12px',
+              borderRadius: '10px',
+              border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'}`,
+              backgroundColor: isDark ? '#0B1F33' : '#EFF6FB',
+              color: isDark ? '#F3F7FB' : '#0D1B2A',
+              fontSize: '13px',
+              outline: 'none',
+              fontFamily: "'Poppins', sans-serif",
+              cursor: 'pointer',
+              boxSizing: 'border-box'
+            }}
+          >
+            {STATUS_OPTIONS.map((st) => (
+              <option key={st.id} value={st.id}>
+                {st.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* Difficulty Filter Dropdown */}
-        <select
-          value={difficultyFilter}
-          onChange={(e) => setDifficultyFilter(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '9px 12px',
-            borderRadius: '10px',
-            border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'}`,
-            backgroundColor: isDark ? '#0B1F33' : '#EFF6FB',
-            color: isDark ? '#F3F7FB' : '#0D1B2A',
-            fontSize: '13px',
-            outline: 'none',
-            fontFamily: "'Poppins', sans-serif",
-            cursor: 'pointer',
-            boxSizing: 'border-box'
-          }}
-        >
-          {DIFFICULTIES.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.label}
-            </option>
-          ))}
-        </select>
+        <div className="dsa-filters-diff-col" style={{ width: '100%' }}>
+          <select
+            value={difficultyFilter}
+            onChange={(e) => setDifficultyFilter(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '9px 12px',
+              borderRadius: '10px',
+              border: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.2)' : '#CBDDE9'}`,
+              backgroundColor: isDark ? '#0B1F33' : '#EFF6FB',
+              color: isDark ? '#F3F7FB' : '#0D1B2A',
+              fontSize: '13px',
+              outline: 'none',
+              fontFamily: "'Poppins', sans-serif",
+              cursor: 'pointer',
+              boxSizing: 'border-box'
+            }}
+          >
+            {DIFFICULTIES.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* Topic Selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="dsa-filters-topic-col" style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
           <select
             value={selectedTopicId}
             onChange={(e) => setSelectedTopicId(e.target.value)}

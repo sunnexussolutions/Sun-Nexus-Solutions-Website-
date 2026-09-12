@@ -51,6 +51,7 @@ export default function DsaUserDashboard({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
       {/* 3 Difficulty Progress Breakdown Cards */}
       <div
+        className="dsa-user-dash-diff-grid"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',

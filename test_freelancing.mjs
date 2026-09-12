@@ -1,7 +1,14 @@
 
 
-const dbUrl = 'postgresql://neondb_owner:REDACTED_SECRET@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
-const neonUrl = 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/sql';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const dbUrl = process.env.DATABASE_URL || process.env.VITE_NEON_URL;
+if (!dbUrl) {
+  console.error('DATABASE_URL or VITE_NEON_URL is not set in .env');
+  process.exit(1);
+}
+const neonUrl = process.env.NEON_SQL_ENDPOINT || 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/sql';
 
 async function testDirectInsert() {
   console.log("🔍 Testing Direct Neon HTTPS SQL insert...");

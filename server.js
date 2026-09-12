@@ -10,8 +10,11 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-const dbUrl = process.env.VITE_NEON_URL || process.env.DATABASE_URL || 'postgresql://neondb_owner:REDACTED_SECRET@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
-const sql = neon(dbUrl);
+const dbUrl = process.env.DATABASE_URL || process.env.VITE_NEON_URL;
+if (!dbUrl) {
+    console.error('⚠️ WARNING: DATABASE_URL / VITE_NEON_URL environment variable is not defined.');
+}
+const sql = neon(dbUrl || '');
 
 import { dsaRouter, adminDsaRouter } from './routes/dsaRoutes.js';
 
@@ -2706,16 +2709,16 @@ app.get('/api/alumni', async (req, res) => {
         // Calculate dynamic summary stats across all active alumni
         const allActive = await sql`SELECT batch, company, country FROM alumni WHERE is_active = true`;
         const uniqueBatches = new Set(allActive.map(a => a.batch)).size;
-        const uniqueCompanies = new Set(allActive.map(a => a.company.trim().toLowerCase())).size;
-        const uniqueCountries = new Set(allActive.map(a => (a.country || 'India').trim().toLowerCase())).size;
+        const uniqueCompanies = new Set(allActive.map(a => (a.company || '').trim().toLowerCase()).filter(Boolean)).size;
+        const uniqueCountries = new Set(allActive.map(a => (a.country || 'India').trim().toLowerCase()).filter(Boolean)).size;
         const totalAlumni = allActive.length;
 
-        // Custom stats multipliers for grand showcase (15+ batches, 850+ alumni, 250+ companies, 12+ countries)
+        // Dynamic stats calculated from real database records
         const stats = {
-            totalBatches: Math.max(uniqueBatches, 15),
-            totalAlumni: Math.max(totalAlumni, 850),
-            totalCompanies: Math.max(uniqueCompanies, 250),
-            totalCountries: Math.max(uniqueCountries, 12),
+            totalBatches: uniqueBatches,
+            totalAlumni: totalAlumni,
+            totalCompanies: uniqueCompanies,
+            totalCountries: uniqueCountries,
             exactBatchCount: uniqueBatches,
             exactAlumniCount: totalAlumni,
             exactCompanyCount: uniqueCompanies,

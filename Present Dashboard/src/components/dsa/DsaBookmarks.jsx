@@ -41,6 +41,7 @@ export default function DsaBookmarks({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', width: '100%' }}>
       {/* Header Bar */}
       <div
+        className="dsa-bookmarks-header"
         style={{
           display: 'flex',
           flexWrap: 'wrap',
@@ -69,7 +70,7 @@ export default function DsaBookmarks({
         </div>
 
         {/* Search inside bookmarks */}
-        <div style={{ position: 'relative', width: '260px' }}>
+        <div className="dsa-bookmarks-search-box" style={{ position: 'relative', width: '260px' }}>
           <Search
             size={15}
             style={{

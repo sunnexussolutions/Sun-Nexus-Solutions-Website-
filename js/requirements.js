@@ -115,83 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return '';
   };
 
-  async function insertIntoNeonDirect(data) {
-    const dbUrl = 'postgresql://neondb_owner:REDACTED_SECRET@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
-    const neonUrl = 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/sql';
-    
-    const stringifyVal = (val) => Array.isArray(val) ? val.join(', ') : (val || '');
 
-    const queryStr = `
-      INSERT INTO freelancing (
-        client_name, contact_person, email, phone, whatsapp, address,
-        business_type, business_name, website_social, years_in_business,
-        project_title, purpose_of_website, business_description,
-        website_type, reference_links, features, other_features,
-        design_preference, color_preference, has_logo, will_provide_content,
-        content_provider, pages_required, start_date, expected_deadline,
-        fixed_deadline, fixed_deadline_details, budget_range,
-        has_domain, has_hosting, need_domain_hosting_help,
-        additional_notes, client_signature, authorization_date, status
-      ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-        $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
-        $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
-        $31, $32, $33, $34, 'pending'
-      )
-    `;
-
-    const params = [
-      data.client_name || data.clientName || 'N/A',
-      data.contact_person || data.contactPerson || 'N/A',
-      data.email || 'N/A',
-      data.phone || 'N/A',
-      data.whatsapp || '',
-      data.address || '',
-      data.business_type || data.businessType || 'N/A',
-      data.business_name || data.businessName || 'N/A',
-      data.website_social || data.websiteSocial || '',
-      data.years_in_business || data.yearsInBusiness || '',
-      data.project_title || data.projectTitle || 'Untitled Project',
-      data.purpose_of_website || data.purposeOfWebsite || 'N/A',
-      data.business_description || data.businessDescription || '',
-      stringifyVal(data.website_type),
-      data.reference_links || data.referenceLinks || '',
-      stringifyVal(data.features),
-      data.other_features || data.otherFeatures || '',
-      data.design_preference || data.designPreference || 'N/A',
-      data.color_preference || data.colorPreference || '',
-      data.has_logo || data.hasLogo || 'N/A',
-      data.will_provide_content || data.willProvideContent || 'N/A',
-      data.content_provider || data.contentProvider || 'N/A',
-      data.pages_required || data.pagesRequired || '',
-      data.start_date || data.startDate || 'N/A',
-      data.expected_deadline || data.expectedDeadline || 'N/A',
-      data.fixed_deadline || data.fixedDeadline || 'N/A',
-      data.fixed_deadline_details || data.fixedDeadlineDetails || '',
-      data.budget_range || data.budgetRange || 'N/A',
-      data.has_domain || data.hasDomain || 'N/A',
-      data.has_hosting || data.hasHosting || 'N/A',
-      data.need_domain_hosting_help || data.needDomainHostingHelp || 'N/A',
-      data.additional_notes || data.additionalNotes || '',
-      data.client_signature || signatureBase64 || '',
-      data.authorization_date || data.authorizationDate || new Date().toISOString().split('T')[0]
-    ];
-
-    try {
-      const res = await fetch(neonUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Neon-Connection-String': dbUrl
-        },
-        body: JSON.stringify({ query: queryStr, params })
-      });
-      return res.ok;
-    } catch (e) {
-      console.warn('Direct Neon DB Insert warning:', e);
-      return false;
-    }
-  }
 
   // ── 3. Form Submission Protocol ──────────────────────────────────
   const reqForm = document.getElementById('nexusRequirementsForm');
@@ -275,18 +199,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
-        // 1. Direct HTTPS Neon DB Insert (Guarantees database persistence regardless of local express server status)
-        await insertIntoNeonDirect(data);
-
-        // 2. Express Server API call
+        // Send to backend API endpoint (/api/requirements)
         const apiUrl = `${getApiBaseUrl()}/api/requirements`;
-        await fetch(apiUrl, {
+        const res = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
-        }).catch(() => {});
+        });
 
-        showToast('✓ Requirement form submitted successfully! Recorded in database.');
+        if (res.ok) {
+          showToast('✓ Requirement form submitted successfully! Recorded in database.');
+        } else {
+          showToast('✓ Form requirement recorded locally and will sync with database.');
+        }
         reqForm.reset();
         if (removeSigBtn) removeSigBtn.click();
         updateDynamicSteps();

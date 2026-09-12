@@ -11,7 +11,10 @@ export default async function handler(req, res) {
     return;
   }
 
-  const dbUrl = process.env.DATABASE_URL || process.env.VITE_NEON_URL || 'postgresql://neondb_owner:REDACTED_SECRET@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+  const dbUrl = process.env.DATABASE_URL || process.env.VITE_NEON_URL;
+  if (!dbUrl) {
+    return res.status(500).json({ success: false, message: 'Database connection string not configured' });
+  }
   const sql = neon(dbUrl);
 
   try {

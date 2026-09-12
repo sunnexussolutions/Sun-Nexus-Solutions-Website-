@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-const NEON_DB_URL = 'postgresql://neondb_owner:REDACTED_SECRET@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+const NEON_DB_URL = 'process.env.DATABASE_URL';
 const NEON_SQL_ENDPOINT = 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/sql';
 
 // Helper: Safe JSON Array Parser

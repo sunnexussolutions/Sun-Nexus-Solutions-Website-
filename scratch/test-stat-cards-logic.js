@@ -1,5 +1,5 @@
 async function testStatCardsLogic() {
-  const dbUrl = 'postgresql://neondb_owner:REDACTED_SECRET@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+  const dbUrl = 'process.env.DATABASE_URL';
   const neonUrl = 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/sql';
   try {
     const res = await fetch(neonUrl, {

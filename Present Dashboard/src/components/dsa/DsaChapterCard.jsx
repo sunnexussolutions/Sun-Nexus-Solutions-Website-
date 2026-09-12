@@ -44,6 +44,7 @@ export default function DsaChapterCard({
 
   return (
     <div
+      className="dsa-chapter-card"
       style={{
         borderRadius: '18px',
         backgroundColor: isDark ? '#0E2740' : '#FFFFFF',
@@ -62,6 +63,7 @@ export default function DsaChapterCard({
       {/* Chapter Card Header / Accordion Button */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
+        className="dsa-chapter-header-btn"
         style={{
           width: '100%',
           padding: '20px 24px',
@@ -78,9 +80,10 @@ export default function DsaChapterCard({
         }}
       >
         {/* Left: Index + Icon + Title + Description */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, minWidth: '240px' }}>
+        <div className="dsa-chapter-left" style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, minWidth: '240px' }}>
           {/* Chapter Index Pill */}
           <div
+            className="dsa-chapter-num-box"
             style={{
               width: '44px',
               height: '44px',
@@ -104,6 +107,7 @@ export default function DsaChapterCard({
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <IconComp size={17} style={{ color: chapterColor }} />
               <h3
+                className="dsa-chapter-title"
                 style={{
                   fontSize: '16.5px',
                   fontWeight: 700,
@@ -117,6 +121,7 @@ export default function DsaChapterCard({
             </div>
             {chapter.subtitle && (
               <p
+                className="dsa-chapter-subtitle"
                 style={{
                   fontSize: '12.5px',
                   color: isDark ? '#8EA6BC' : '#64748B',
@@ -131,10 +136,11 @@ export default function DsaChapterCard({
         </div>
 
         {/* Right: Progress Pill & Chevron */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: '130px' }}>
+        <div className="dsa-chapter-right" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
+          <div className="dsa-chapter-progress-box" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: '130px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
               <span
+                className="dsa-chapter-progress-text"
                 style={{
                   fontSize: '12px',
                   fontWeight: 600,
@@ -179,6 +185,7 @@ export default function DsaChapterCard({
           </div>
 
           <div
+            className="dsa-chapter-chevron-box"
             style={{
               width: '32px',
               height: '32px',
@@ -199,6 +206,7 @@ export default function DsaChapterCard({
       {/* Expanded Sections & Problem Rows Container */}
       {isExpanded && (
         <div
+          className="dsa-chapter-body"
           style={{
             padding: '8px 24px 20px 24px',
             display: 'flex',

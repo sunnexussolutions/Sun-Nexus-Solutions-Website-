@@ -36,6 +36,7 @@ export default function DsaHeader({
     >
       {/* ── Main Banner Card ──────────────────────────────────────────────── */}
       <div
+        className="dsa-header-card"
         style={{
           display: 'flex',
           flexWrap: 'wrap',
@@ -52,8 +53,9 @@ export default function DsaHeader({
         }}
       >
         {/* Left: Branding & Title & Subtitle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', zIndex: 2 }}>
+        <div className="dsa-header-branding" style={{ display: 'flex', alignItems: 'center', gap: '16px', zIndex: 2 }}>
           <div
+            className="dsa-header-icon-box"
             style={{
               width: '52px',
               height: '52px',
@@ -73,6 +75,7 @@ export default function DsaHeader({
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h1
+                className="dsa-header-title"
                 style={{
                   fontSize: '22px',
                   fontWeight: 800,
@@ -101,6 +104,7 @@ export default function DsaHeader({
               </span>
             </div>
             <p
+              className="dsa-header-subtitle"
               style={{
                 fontSize: '13.5px',
                 color: isDark ? '#8EA6BC' : '#475569',
@@ -116,6 +120,7 @@ export default function DsaHeader({
 
         {/* Right: Last Updated + Reset + Import Buttons */}
         <div
+          className="dsa-header-actions"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -126,6 +131,7 @@ export default function DsaHeader({
         >
           {/* Last Updated Badge */}
           <div
+            className="dsa-header-updated-badge"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -147,6 +153,7 @@ export default function DsaHeader({
           {onImportClick && (
             <button
               onClick={onImportClick}
+              className="dsa-header-btn"
               title="Import DSA Sheet"
               style={{
                 display: 'inline-flex',
@@ -172,6 +179,7 @@ export default function DsaHeader({
           {onResetClick && (
             <button
               onClick={onResetClick}
+              className="dsa-header-btn"
               title="Reset progress"
               style={{
                 display: 'inline-flex',
@@ -197,6 +205,7 @@ export default function DsaHeader({
 
       {/* Navigation View Switcher Tabs */}
       <div
+        className="dsa-nav-tabs-container"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -217,6 +226,7 @@ export default function DsaHeader({
             <button
               key={tab.id}
               onClick={() => setActiveView(tab.id)}
+              className="dsa-nav-tab-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',

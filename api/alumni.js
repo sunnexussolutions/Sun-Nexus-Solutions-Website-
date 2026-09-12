@@ -13,7 +13,10 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const dbUrl = process.env.DATABASE_URL || process.env.VITE_NEON_URL || 'postgresql://neondb_owner:REDACTED_SECRET@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+  const dbUrl = process.env.DATABASE_URL || process.env.VITE_NEON_URL;
+  if (!dbUrl) {
+    return res.status(500).json({ success: false, message: 'Database connection string not configured' });
+  }
   const sql = neon(dbUrl);
 
   try {
@@ -48,15 +51,15 @@ export default async function handler(req, res) {
 
       const allActive = await sql`SELECT batch, company, country FROM alumni WHERE is_active = true`;
       const uniqueBatches = new Set(allActive.map(a => a.batch)).size;
-      const uniqueCompanies = new Set(allActive.map(a => String(a.company || '').trim().toLowerCase())).size;
-      const uniqueCountries = new Set(allActive.map(a => (a.country || 'India').trim().toLowerCase())).size;
+      const uniqueCompanies = new Set(allActive.map(a => String(a.company || '').trim().toLowerCase()).filter(Boolean)).size;
+      const uniqueCountries = new Set(allActive.map(a => (a.country || 'India').trim().toLowerCase()).filter(Boolean)).size;
       const totalAlumni = allActive.length;
 
       const stats = {
-        totalBatches: Math.max(uniqueBatches, 15),
-        totalAlumni: Math.max(totalAlumni, 850),
-        totalCompanies: Math.max(uniqueCompanies, 250),
-        totalCountries: Math.max(uniqueCountries, 12),
+        totalBatches: uniqueBatches,
+        totalAlumni: totalAlumni,
+        totalCompanies: uniqueCompanies,
+        totalCountries: uniqueCountries,
         exactBatchCount: uniqueBatches,
         exactAlumniCount: totalAlumni,
         exactCompanyCount: uniqueCompanies,

@@ -77,6 +77,7 @@ export default function DsaProblemDetailsModal({
 
   return (
     <div
+      className="dsa-modal-backdrop"
       style={{
         position: 'fixed',
         inset: 0,
@@ -93,6 +94,7 @@ export default function DsaProblemDetailsModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="dsa-modal-dialog"
         style={{
           width: '100%',
           maxWidth: '820px',
@@ -110,6 +112,7 @@ export default function DsaProblemDetailsModal({
       >
         {/* Modal Header */}
         <div
+          className="dsa-modal-header"
           style={{
             padding: '20px 24px',
             borderBottom: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.12)' : '#EFF6FB'}`,
@@ -145,14 +148,14 @@ export default function DsaProblemDetailsModal({
             <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <h3
+                  className="dsa-modal-title"
                   style={{
                     margin: 0,
                     fontSize: '18px',
                     fontWeight: 800,
                     color: isDark ? '#F3F7FB' : '#0D1B2A',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
+                    wordBreak: 'break-word',
+                    lineHeight: 1.3
                   }}
                 >
                   {problem.number ? `${problem.number}. ` : ''}{problem.title}
@@ -259,6 +262,7 @@ export default function DsaProblemDetailsModal({
 
         {/* Sub-tabs Bar */}
         <div
+          className="dsa-modal-tabs-bar"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -270,6 +274,7 @@ export default function DsaProblemDetailsModal({
         >
           <button
             onClick={() => setActiveTab('problem')}
+            className="dsa-modal-tab-btn"
             style={{
               padding: '6px 14px',
               borderRadius: '8px',
@@ -288,6 +293,7 @@ export default function DsaProblemDetailsModal({
           {normalizedHints.length > 0 && (
             <button
               onClick={() => setActiveTab('hints')}
+              className="dsa-modal-tab-btn"
               style={{
                 padding: '6px 14px',
                 borderRadius: '8px',
@@ -307,6 +313,7 @@ export default function DsaProblemDetailsModal({
           {(problem.videoUrl || problem.articleUrl || problem.editorialUrl) && (
             <button
               onClick={() => setActiveTab('solution')}
+              className="dsa-modal-tab-btn"
               style={{
                 padding: '6px 14px',
                 borderRadius: '8px',
@@ -563,6 +570,7 @@ export default function DsaProblemDetailsModal({
 
         {/* Modal Footer */}
         <div
+          className="dsa-modal-footer"
           style={{
             padding: '16px 24px',
             borderTop: `1px solid ${isDark ? 'rgba(203, 221, 233, 0.12)' : '#EFF6FB'}`,
@@ -573,9 +581,10 @@ export default function DsaProblemDetailsModal({
             gap: '12px'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 auto' }}>
             <button
               onClick={() => onToggleStatus && onToggleStatus(problem.id, isSolved ? 'UNSOLVED' : 'SOLVED')}
+              className="dsa-modal-footer-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -595,12 +604,13 @@ export default function DsaProblemDetailsModal({
             </button>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: '1 1 auto' }}>
             {problem.practiceUrl ? (
               <a
                 href={problem.practiceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="dsa-modal-footer-btn"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',

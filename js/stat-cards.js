@@ -32,7 +32,13 @@
     // Dashboard Page
     'dash_active_members': { value: '100+', label: 'Active Members', page: 'Dashboard' },
     'dash_projects_done': { value: '50+', label: 'Projects Done', page: 'Dashboard' },
-    'dash_tech_domains': { value: '10+', label: 'Tech Domains', page: 'Dashboard' }
+    'dash_tech_domains': { value: '10+', label: 'Tech Domains', page: 'Dashboard' },
+
+    // Alumni Page
+    'alumni_batches': { value: '7+', label: 'Batches', page: 'Alumni' },
+    'alumni_count': { value: '25+', label: 'Alumni', page: 'Alumni' },
+    'alumni_companies': { value: '24+', label: 'Companies', page: 'Alumni' },
+    'alumni_countries': { value: '5+', label: 'Countries', page: 'Alumni' }
   };
 
   const getApiUrl = () => {
@@ -109,45 +115,8 @@
     });
   }
 
-  async function fetchFromNeonDirect() {
-    const dbUrl = 'postgresql://neondb_owner:REDACTED_SECRET@ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
-    const neonUrl = 'https://ep-autumn-grass-aokbs98e-pooler.c-2.ap-southeast-1.aws.neon.tech/sql';
-    try {
-      const res = await fetch(neonUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Neon-Connection-String': dbUrl
-        },
-        body: JSON.stringify({
-          query: 'SELECT card_key, page, category, label, value, subtext, icon, order_index FROM site_stat_cards ORDER BY order_index ASC'
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data && Array.isArray(data.rows) && data.rows.length > 0) {
-          const cardsMap = {};
-          data.rows.forEach(r => {
-            cardsMap[r.card_key] = {
-              card_key: r.card_key,
-              page: r.page,
-              category: r.category,
-              label: r.label,
-              value: r.value,
-              subtext: r.subtext || '',
-              icon: r.icon || '',
-              order_index: r.order_index || 0
-            };
-          });
-          return cardsMap;
-        }
-      }
-    } catch (e) {}
-    return null;
-  }
-
   async function loadStatCards() {
-    // 1. Fetch fresh live values directly from API server or Neon HTTPS DB
+    // 1. Fetch fresh live values directly from backend API endpoint (/api/stat-cards)
     try {
       const res = await fetch(getApiUrl());
       if (res.ok) {
@@ -160,15 +129,7 @@
       }
     } catch (err) {}
 
-    // 2. Direct Neon Cloud DB fetch over HTTPS if local server is offline
-    const cloudCards = await fetchFromNeonDirect();
-    if (cloudCards && Object.keys(cloudCards).length > 0) {
-      localStorage.setItem('nexus_stat_cards', JSON.stringify(cloudCards));
-      applyStatCards(cloudCards);
-      return;
-    }
-
-    // 3. Render local storage cache if network is unavailable
+    // 2. Render local storage cache or defaults if network/server is unavailable
     applyStatCards(getCombinedCards());
   }
 

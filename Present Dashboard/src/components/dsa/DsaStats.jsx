@@ -74,6 +74,7 @@ export default function DsaStats({
 
   return (
     <div
+      className="dsa-stats-grid"
       style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
@@ -88,6 +89,7 @@ export default function DsaStats({
         return (
           <div
             key={st.id}
+            className="dsa-stat-card"
             style={{
               padding: '18px 20px',
               borderRadius: '16px',
@@ -112,6 +114,7 @@ export default function DsaStats({
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <span
+                className="dsa-stat-label"
                 style={{
                   fontSize: '12px',
                   fontWeight: 600,
@@ -122,6 +125,7 @@ export default function DsaStats({
                 {st.label}
               </span>
               <span
+                className="dsa-stat-value"
                 style={{
                   fontSize: '20px',
                   fontWeight: 800,
@@ -135,6 +139,7 @@ export default function DsaStats({
             </div>
 
             <div
+              className="dsa-stat-icon-box"
               style={{
                 width: '42px',
                 height: '42px',

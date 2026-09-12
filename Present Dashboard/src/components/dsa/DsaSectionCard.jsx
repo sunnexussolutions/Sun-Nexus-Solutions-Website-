@@ -45,6 +45,7 @@ export default function DsaSectionCard({
       {/* Section Header Accordion Trigger */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
+        className="dsa-section-btn"
         style={{
           width: '100%',
           padding: '12px 18px',
@@ -66,6 +67,7 @@ export default function DsaSectionCard({
           )}
 
           <span
+            className="dsa-section-title"
             style={{
               fontSize: '14px',
               fontWeight: 700,
@@ -79,6 +81,7 @@ export default function DsaSectionCard({
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span
+            className="dsa-section-meta"
             style={{
               fontSize: '12px',
               fontWeight: 600,
@@ -112,6 +115,7 @@ export default function DsaSectionCard({
       {/* Expanded Problem Rows List */}
       {isExpanded && (
         <div
+          className="dsa-section-body"
           style={{
             padding: '12px 14px',
             display: 'flex',
