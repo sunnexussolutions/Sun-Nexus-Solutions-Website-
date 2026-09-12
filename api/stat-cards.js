@@ -38,7 +38,8 @@ export default async function handler(req, res) {
     return;
   }
 
-  const dbUrl = process.env.DATABASE_URL || process.env.VITE_NEON_URL;
+  let dbUrl = process.env.DATABASE_URL || process.env.VITE_NEON_URL || '';
+  dbUrl = dbUrl.trim().replace(/^['"]|['"]$/g, '');
   if (!dbUrl) {
     return res.status(500).json({ success: false, message: 'Database connection string not configured' });
   }
@@ -108,6 +109,16 @@ export default async function handler(req, res) {
     res.status(405).json({ error: 'Method Not Allowed' });
   } catch (error) {
     console.error('Vercel API stat-cards error:', error);
-    res.status(200).json({ success: true, cards: DEFAULT_STAT_CARDS, note: error.message });
+    const masked = dbUrl ? dbUrl.replace(/:([^:@]+)@/, (_, p) => ':' + p.slice(0, 3) + '***' + p.slice(-2) + '@') : 'none';
+    res.status(200).json({
+      success: true,
+      cards: DEFAULT_STAT_CARDS,
+      note: error.message,
+      debug: {
+        hasDbUrl: Boolean(process.env.DATABASE_URL),
+        hasViteUrl: Boolean(process.env.VITE_NEON_URL),
+        preview: masked
+      }
+    });
   }
 }
